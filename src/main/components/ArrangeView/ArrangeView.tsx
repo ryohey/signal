@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import Color from "color"
-import { clamp } from "lodash"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useEffect, useRef } from "react"
 import {
@@ -18,9 +17,9 @@ import {
   selectTrack,
 } from "../../actions"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
+import { handleWheel } from "../../helpers/handleWheel"
 import { getClientPos } from "../../helpers/mouseEvent"
 import { observeDrag } from "../../helpers/observeDrag"
-import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useStores } from "../../hooks/useStores"
 import { useTheme } from "../../hooks/useTheme"
@@ -274,27 +273,28 @@ export const ArrangeView: FC = observer(() => {
 
   const onWheel = useCallback(
     (e: React.WheelEvent) => {
-      if (e.shiftKey && (e.altKey || e.ctrlKey)) {
-        // vertical zoom
-        let scaleYDelta = isTouchPadEvent(e.nativeEvent)
-          ? 0.02 * e.deltaY
-          : 0.01 * e.deltaX
-        scaleYDelta = clamp(scaleYDelta, -0.15, 0.15) // prevent acceleration to zoom too fast
-        arrangeViewStore.setScaleY(arrangeViewStore.scaleY * (1 + scaleYDelta))
-      } else if (e.altKey || e.ctrlKey) {
-        // horizontal zoom
-        const scaleFactor = isTouchPadEvent(e.nativeEvent) ? 0.01 : -0.01
-        const scaleXDelta = clamp(e.deltaY * scaleFactor, -0.15, 0.15) // prevent acceleration to zoom too fast
-        arrangeViewStore.scaleAroundPointX(scaleXDelta, e.nativeEvent.offsetX)
-      } else {
-        const scaleFactor = isTouchPadEvent(e.nativeEvent)
-          ? 1
-          : 20 * transform.pixelsPerKey * WHEEL_SCROLL_RATE
-        const deltaY = e.deltaY * scaleFactor
-        arrangeViewStore.scrollBy(-e.deltaX, -deltaY)
+      const action = handleWheel(
+        e,
+        transform.pixelsPerKey * WHEEL_SCROLL_RATE * 20
+      )
+      switch (action.type) {
+        case "scaleX":
+          arrangeViewStore.scaleAroundPointX(
+            action.delta,
+            e.nativeEvent.offsetX
+          )
+          break
+        case "scaleY":
+          arrangeViewStore.setScaleY(
+            arrangeViewStore.scaleY * (1 + action.delta)
+          )
+          break
+        case "scroll":
+          arrangeViewStore.scrollBy(action.x, action.y)
+          break
       }
     },
-    [arrangeViewStore, scrollBy]
+    [arrangeViewStore, transform, scrollBy]
   )
 
   const openTrack = (trackId: number) => {

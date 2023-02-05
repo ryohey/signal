@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { clamp } from "lodash"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
-import { isTouchPadEvent } from "../../helpers/touchpad"
+import { handleWheel } from "../../helpers/handleWheel"
 import { useStores } from "../../hooks/useStores"
 import ControlPane from "../ControlPane/ControlPane"
 import {
@@ -78,25 +77,17 @@ const PianoRollWrapper: FC = observer(() => {
 
   const onWheel = useCallback(
     (e: React.WheelEvent) => {
-      if (e.shiftKey && (e.altKey || e.ctrlKey)) {
-        // vertical zoom
-        let scaleYDelta = isTouchPadEvent(e.nativeEvent)
-          ? 0.02 * e.deltaY
-          : 0.01 * e.deltaX
-        scaleYDelta = clamp(scaleYDelta, -0.15, 0.15) // prevent acceleration to zoom too fast
-        s.scaleAroundPointY(scaleYDelta, e.nativeEvent.offsetY)
-      } else if (e.altKey || e.ctrlKey) {
-        // horizontal zoom
-        const scaleFactor = isTouchPadEvent(e.nativeEvent) ? 0.01 : -0.01
-        const scaleXDelta = clamp(e.deltaY * scaleFactor, -0.15, 0.15) // prevent acceleration to zoom too fast
-        s.scaleAroundPointX(scaleXDelta, e.nativeEvent.offsetX)
-      } else {
-        // scrolling
-        const scaleFactor = isTouchPadEvent(e.nativeEvent)
-          ? 1
-          : transform.pixelsPerKey * WHEEL_SCROLL_RATE
-        const deltaY = e.deltaY * scaleFactor
-        s.scrollBy(-e.deltaX, -deltaY)
+      const action = handleWheel(e, transform.pixelsPerKey * WHEEL_SCROLL_RATE)
+      switch (action.type) {
+        case "scaleX":
+          s.scaleAroundPointX(action.delta, e.nativeEvent.offsetX)
+          break
+        case "scaleY":
+          s.scaleAroundPointY(action.delta, e.nativeEvent.offsetY)
+          break
+        case "scroll":
+          s.scrollBy(action.x, action.y)
+          break
       }
     },
     [s, transform]
