@@ -95,6 +95,7 @@ export default class PianoRollStore {
       scrollLeft: computed,
       scrollTop: computed,
       transform: computed,
+      playheadInScrollZone: computed,
       windowedEvents: computed,
       allNotes: computed,
       notes: computed,
@@ -121,14 +122,9 @@ export default class PianoRollStore {
   setUpAutorun() {
     autorun(() => {
       const { isPlaying, position } = this.rootStore.player
-      const { autoScroll, scrollLeftTicks, transform, canvasWidth } = this
-
-      // keep scroll position to cursor
-      if (autoScroll && isPlaying) {
-        const screenX = transform.getX(position - scrollLeftTicks)
-        if (screenX > canvasWidth * 0.7 || screenX < 0) {
-          this.scrollLeftTicks = position
-        }
+      const { autoScroll, playheadInScrollZone } = this
+      if (autoScroll && isPlaying && playheadInScrollZone) {
+        this.scrollLeftTicks = position
       }
     })
 
@@ -178,6 +174,9 @@ export default class PianoRollStore {
     const maxX = contentWidth - canvasWidth
     const scrollLeft = clamp(x, 0, maxX)
     this.scrollLeftTicks = this.transform.getTicks(scrollLeft)
+    if (this.playheadInScrollZone) {
+      this.autoScroll = false
+    }
   }
 
   setScrollTopInPixels(y: number) {
@@ -242,6 +241,19 @@ export default class PianoRollStore {
       Layout.pixelsPerTick * this.scaleX,
       Layout.keyHeight * this.scaleY,
       127,
+    )
+  }
+
+  get playheadPosition(): number {
+    const position = this.rootStore.player.position
+    return this.transform.getX(position - this.scrollLeftTicks)
+  }
+
+  // Returns true if the user needs to scroll to comfortably view the playhead.
+  get playheadInScrollZone(): boolean {
+    return (
+      this.playheadPosition < 0 ||
+      this.playheadPosition > this.canvasWidth * 0.7
     )
   }
 

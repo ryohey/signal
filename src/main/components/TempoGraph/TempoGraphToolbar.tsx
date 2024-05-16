@@ -5,8 +5,8 @@ import { Localized } from "../../../components/Localized"
 import { useStores } from "../../hooks/useStores"
 import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
-import { Toolbar } from "../Toolbar/Toolbar"
 import { ToolSelector } from "../Toolbar/ToolSelector"
+import { Toolbar } from "../Toolbar/Toolbar"
 
 const Title = styled.span`
   font-weight: bold;

@@ -57,6 +57,7 @@ export default class ArrangeViewStore {
       scrollLeft: computed,
       transform: computed,
       trackTransform: computed,
+      playheadInScrollZone: computed,
       notes: computed,
       cursorX: computed,
       trackHeight: computed,
@@ -69,17 +70,13 @@ export default class ArrangeViewStore {
     })
   }
 
-  // keep scroll position to cursor
   setUpAutorun() {
+    // keep scroll position to cursor
     autorun(() => {
       const { isPlaying, position } = this.rootStore.player
-      const { scrollLeft, transform, canvasWidth } = this
-      if (this.autoScroll && isPlaying) {
-        const x = transform.getX(position)
-        const screenX = x - scrollLeft
-        if (screenX > canvasWidth * 0.7 || screenX < 0) {
-          this.scrollLeftTicks = position
-        }
+      const { autoScroll, playheadInScrollZone } = this
+      if (autoScroll && isPlaying && playheadInScrollZone) {
+        this.scrollLeftTicks = position
       }
     })
   }
@@ -105,6 +102,9 @@ export default class ArrangeViewStore {
     const maxOffset = Math.max(0, contentWidth - canvasWidth)
     const scrollLeft = Math.floor(Math.min(maxOffset, Math.max(0, x)))
     this.scrollLeftTicks = this.transform.getTicks(scrollLeft)
+    if (this.playheadInScrollZone) {
+      this.autoScroll = false
+    }
   }
 
   setScrollTop(value: number) {
@@ -168,6 +168,19 @@ export default class ArrangeViewStore {
     return (
       Math.ceil(transform.pixelsPerKey * transform.numberOfKeys) +
       bottomBorderWidth
+    )
+  }
+
+  get playheadPosition(): number {
+    const position = this.rootStore.player.position
+    return this.transform.getX(position - this.scrollLeftTicks)
+  }
+
+  // Returns true if the user needs to scroll to comfortably view the playhead.
+  get playheadInScrollZone(): boolean {
+    return (
+      this.playheadPosition < 0 ||
+      this.playheadPosition > this.canvasWidth * 0.7
     )
   }
 

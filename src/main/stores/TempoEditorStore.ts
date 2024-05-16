@@ -51,19 +51,27 @@ export default class TempoEditorStore {
   }
 
   setUpAutorun() {
+    // keep scroll position to cursor
     autorun(() => {
       const { isPlaying, position } = this.rootStore.player
-      const { autoScroll, scrollLeft, transform, canvasWidth } = this
+      const { autoScroll, transform, curPlayheadScreenOffset } = this
 
-      // keep scroll position to cursor
-      if (autoScroll && isPlaying) {
-        const x = transform.getX(position)
-        const screenX = x - scrollLeft
-        if (screenX > canvasWidth * 0.7 || screenX < 0) {
-          this.scrollLeft = x
-        }
+      if (
+        isPlaying &&
+        autoScroll &&
+        this.playheadInScrollZone(curPlayheadScreenOffset)
+      ) {
+        this.scrollLeft = transform.getX(position)
       }
     })
+  }
+
+  setScrollLeft(x: number) {
+    const nextPlayheadPos = this.playheadScreenOffset(x)
+    if (this.playheadInScrollZone(nextPlayheadPos)) {
+      this.autoScroll = false
+    }
+    this.scrollLeft = x
   }
 
   get transform() {
@@ -73,6 +81,23 @@ export default class TempoEditorStore {
 
   get cursorX(): number {
     return this.transform.getX(this.rootStore.player.position)
+  }
+
+  // Position of the playhead relative to the current screen.
+  get curPlayheadScreenOffset(): number {
+    return this.playheadScreenOffset(this.scrollLeft)
+  }
+
+  // Position of the playhead relative to a screen. `scrollLeft` is the position
+  // in the song where the screen starts.
+  playheadScreenOffset(scrollLeft: number): number {
+    const position = this.rootStore.player.position
+    return this.transform.getX(position) - scrollLeft
+  }
+
+  // Returns true if the user needs to scroll to comfortably view the playhead.
+  playheadInScrollZone(playheadPos: number): boolean {
+    return playheadPos < 0 || playheadPos > this.canvasWidth * 0.7
   }
 
   get items() {
