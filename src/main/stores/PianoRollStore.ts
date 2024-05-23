@@ -95,7 +95,7 @@ export default class PianoRollStore {
       scrollLeft: computed,
       scrollTop: computed,
       transform: computed,
-      playheadInScrollZone: computed,
+      curPlayheadScreenOffset: computed,
       windowedEvents: computed,
       allNotes: computed,
       notes: computed,
@@ -120,10 +120,15 @@ export default class PianoRollStore {
   }
 
   setUpAutorun() {
+    // keep scroll position to cursor
     autorun(() => {
       const { isPlaying, position } = this.rootStore.player
-      const { autoScroll, playheadInScrollZone } = this
-      if (autoScroll && isPlaying && playheadInScrollZone) {
+      const { autoScroll } = this
+      if (
+        autoScroll &&
+        isPlaying &&
+        this.playheadInScrollZone(this.curPlayheadScreenOffset)
+      ) {
         this.scrollLeftTicks = position
       }
     })
@@ -173,10 +178,13 @@ export default class PianoRollStore {
     const { canvasWidth, contentWidth } = this
     const maxX = contentWidth - canvasWidth
     const scrollLeft = clamp(x, 0, maxX)
-    this.scrollLeftTicks = this.transform.getTicks(scrollLeft)
-    if (this.playheadInScrollZone) {
+    const scrollLeftTicks = this.transform.getTicks(scrollLeft)
+    const playheadPos = this.playheadScreenOffset(scrollLeftTicks)
+
+    if (this.playheadInScrollZone(playheadPos)) {
       this.autoScroll = false
     }
+    this.scrollLeftTicks = scrollLeftTicks
   }
 
   setScrollTopInPixels(y: number) {
@@ -244,17 +252,21 @@ export default class PianoRollStore {
     )
   }
 
-  get playheadPosition(): number {
+  // Position of the playhead relative to the current screen.
+  get curPlayheadScreenOffset(): number {
+    return this.playheadScreenOffset(this.scrollLeftTicks)
+  }
+
+  // Position of the playhead relative to a screen. `scrollLeftTicks` is the
+  // position in the song where the screen starts.
+  playheadScreenOffset(scrollLeftTicks: number): number {
     const position = this.rootStore.player.position
-    return this.transform.getX(position - this.scrollLeftTicks)
+    return this.transform.getX(position - scrollLeftTicks)
   }
 
   // Returns true if the user needs to scroll to comfortably view the playhead.
-  get playheadInScrollZone(): boolean {
-    return (
-      this.playheadPosition < 0 ||
-      this.playheadPosition > this.canvasWidth * 0.7
-    )
+  playheadInScrollZone(playheadOffset: number): boolean {
+    return playheadOffset < 0 || playheadOffset > this.canvasWidth * 0.7
   }
 
   get windowedEvents(): TrackEvent[] {

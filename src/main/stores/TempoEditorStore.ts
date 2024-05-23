@@ -44,6 +44,7 @@ export default class TempoEditorStore {
       transform: computed,
       items: computed,
       cursorX: computed,
+      curPlayheadScreenOffset: computed,
       contentWidth: computed,
       controlPoints: computed,
       selectionRect: computed,
@@ -96,8 +97,8 @@ export default class TempoEditorStore {
   }
 
   // Returns true if the user needs to scroll to comfortably view the playhead.
-  playheadInScrollZone(playheadPos: number): boolean {
-    return playheadPos < 0 || playheadPos > this.canvasWidth * 0.7
+  playheadInScrollZone(playheadOffset: number): boolean {
+    return playheadOffset < 0 || playheadOffset > this.canvasWidth * 0.7
   }
 
   get items() {
