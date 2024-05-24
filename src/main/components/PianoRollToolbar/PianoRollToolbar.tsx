@@ -33,10 +33,9 @@ export const PianoRollToolbar: FC = observer(() => {
     selectedTrackId,
   } = pianoRollStore
 
-  const onClickAutoScroll = useCallback(
-    () => (pianoRollStore.autoScroll = !pianoRollStore.autoScroll),
-    [pianoRollStore],
-  )
+  const onClickAutoScroll = useCallback(() => {
+    pianoRollStore.autoScroll = !pianoRollStore.autoScroll
+  }, [pianoRollStore])
 
   const onSelectQuantize = useCallback(
     (denominator: number) => {

@@ -5,8 +5,8 @@ import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout } from "../../Constants"
 import { useStores } from "../../hooks/useStores"
 import { useTheme } from "../../hooks/useTheme"
-import { BAR_WIDTH, HorizontalScrollBar } from "../inputs/ScrollBar"
 import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
+import { BAR_WIDTH, HorizontalScrollBar } from "../inputs/ScrollBar"
 import { TempoGraphAxis } from "./TempoGraphAxis"
 import { TempoGraphCanvas } from "./TempoGraphCanvas/TempoGraphCanvas"
 
@@ -26,10 +26,6 @@ export const TempoGraph: FC = observer(() => {
   const ref = useRef(null)
   const size = useComponentSize(ref)
 
-  const setScrollLeft = useCallback(
-    (x: number) => (tempoEditorStore.scrollLeft = x),
-    [],
-  )
   const theme = useTheme()
 
   const scrollLeft = Math.floor(_scrollLeft)
@@ -73,7 +69,10 @@ export const TempoGraph: FC = observer(() => {
       <HorizontalScrollBar
         scrollOffset={scrollLeft}
         contentLength={contentWidth}
-        onScroll={setScrollLeft}
+        onScroll={useCallback(
+          (v: any) => tempoEditorStore.setScrollLeft(v),
+          [tempoEditorStore],
+        )}
       />
     </Wrapper>
   )
