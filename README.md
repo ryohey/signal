@@ -52,6 +52,18 @@ By setting these constraints, signal aims to offer a streamlined and distraction
    ```
 2. The application should now be running on [http://localhost:3000](http://localhost:3000).
 
+### Running via Docker
+> [!NOTE] 
+> with docker, `npm install` and `npm run build` will not be necessary, and you will only need to install **docker**, then **clone the repository**, then run the command specified below.
+
+1. to run via docker, run:
+   ```sh
+   docker compose up
+   # or 
+   docker compose up -d
+   ```
+2. The application should now be accessible on [http://localhost:3000](http://localhost:3000).
+
 ## Contribution
 
 As the creator of signal, I, @ryohey, welcome any form of contribution to this music sequencer application. Your support, whether it's through code improvements, bug fixes, or feedback, is invaluable in enhancing and evolving signal.
