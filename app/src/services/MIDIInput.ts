@@ -22,7 +22,7 @@ export class MIDIInput {
     this.devices.push(device)
   }
 
-  onMidiMessage = (e: WebMidi.MIDIMessageEvent) => {
+  private onMidiMessage = (e: WebMidi.MIDIMessageEvent) => {
     this.onMessage?.(e)
   }
 }
@@ -42,7 +42,7 @@ export const previewMidiInput =
       return
     }
 
-    // TODO: seems like if sending to a channel which is not mapped to a Track, it defaults to playing the default piano. This should not happen.
+    // TODO: seems like if sending to a channel which is not mapped to a Track, it defaults to playing the default piano (or Drums on CH 10). This should not happen.
     player.sendEvent(event)
 
     // optional, only showing notes in piano roll if its the same channel as selected track
