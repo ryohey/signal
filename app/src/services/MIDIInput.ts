@@ -42,6 +42,7 @@ export const previewMidiInput =
       return
     }
 
+    // TODO: seems like if sending to a channel which is not mapped to a Track, it defaults to playing the default piano. This should not happen.
     player.sendEvent(event)
 
     // optional, only showing notes in piano roll if its the same channel as selected track
