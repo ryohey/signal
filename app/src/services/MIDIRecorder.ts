@@ -53,12 +53,12 @@ export class MIDIRecorder {
     })
   }
 
-  onMessage(e: WebMidi.MIDIMessageEvent) {
+  onMessage(dataRaw: Uint8Array) {
     if (!this.isRecording) {
       return
     }
 
-    const stream = new Stream(e.data)
+    const stream = new Stream(dataRaw)
     const message = deserializeSingleEvent(stream)
     if (message.type !== "channel") {
       return

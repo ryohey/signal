@@ -3,7 +3,7 @@ import RootStore from "../stores/RootStore"
 
 export class MIDIInput {
   private devices: WebMidi.MIDIInput[] = []
-  onMessage: ((e: WebMidi.MIDIMessageEvent) => void) | undefined
+  onMessage: ((data: Uint8Array) => void) | undefined
 
   removeAllDevices = () => {
     this.devices.forEach(this.removeDevice)
@@ -23,19 +23,19 @@ export class MIDIInput {
   }
 
   private onMidiMessage = (e: WebMidi.MIDIMessageEvent) => {
-    this.onMessage?.(e)
+    this.onMessage?.(e.data)
   }
 }
 
 export const previewMidiInput =
-  (rootStore: RootStore) => (e: WebMidi.MIDIMessageEvent) => {
+  (rootStore: RootStore) => (dataRaw: Uint8Array) => {
     const {
       pianoRollStore,
       pianoRollStore: { selectedTrack },
       player,
     } = rootStore
 
-    const stream = new Stream(e.data)
+    const stream = new Stream(dataRaw)
     const event = deserializeSingleEvent(stream)
 
     if (event.type !== "channel") {
