@@ -34,13 +34,6 @@ export const previewMidiInput =
       pianoRollStore: { selectedTrack },
       player,
     } = rootStore
-    if (selectedTrack === undefined) {
-      return
-    }
-    const { channel } = selectedTrack
-    if (channel === undefined) {
-      return
-    }
 
     const stream = new Stream(e.data)
     const event = deserializeSingleEvent(stream)
@@ -49,10 +42,10 @@ export const previewMidiInput =
       return
     }
 
-    // modify channel to the selected track channel
-    event.channel = channel
-
     player.sendEvent(event)
+
+    // optional, only showing notes in piano roll if its the same channel as selected track
+    if (event.channel !== selectedTrack?.channel) return;
 
     if (event.subtype === "noteOn") {
       pianoRollStore.previewingNoteNumbers.add(event.noteNumber)
