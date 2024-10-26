@@ -21,8 +21,6 @@ enum SignalEventType {
 }
 
 export type SignalEvent<T extends string> = {
-  id: number
-  tick: number
   type: "channel"
   subtype: "signal"
   signalEventType: T
@@ -38,14 +36,12 @@ export const isSignalEvent = (
 
 export const isSignalTrackColorEvent = (
   e: TrackEvent,
-): e is SignalTrackColorEvent =>
+): e is TrackEventOf<SignalTrackColorEvent> =>
   isSignalEvent(e) && e.signalEventType === "trackColor"
 
-export const mapToSignalEvent = <
-  T extends Pick<SequencerSpecificEvent, "data">,
->(
-  e: T,
-): AnySignalEvent | T => {
+export const mapToSignalEvent = (
+  e: TrackEventOf<SequencerSpecificEvent>,
+): TrackEventOf<AnySignalEvent> | TrackEventOf<SequencerSpecificEvent> => {
   if (e.data.length <= 5 || !isEqual(e.data.slice(0, 4), signalEventPrefix)) {
     return e
   }
@@ -58,6 +54,7 @@ export const mapToSignalEvent = <
       }
       return {
         ...e,
+        type: "channel",
         subtype: "signal",
         signalEventType: "trackColor",
         alpha: e.data[5],
@@ -71,7 +68,7 @@ export const mapToSignalEvent = <
 }
 
 export const mapFromSignalEvent = (
-  e: AnySignalEvent,
+  e: TrackEventOf<AnySignalEvent>,
 ): TrackEventOf<SequencerSpecificEvent> => {
   switch (e.signalEventType) {
     case "trackColor":

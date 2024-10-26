@@ -8,13 +8,7 @@ import {
   TimeSignatureEvent,
   TrackNameEvent,
 } from "midifile-ts"
-import {
-  AnyEventFeature,
-  FeatureOf,
-  NoteEvent,
-  TrackEvent,
-  TrackEventOf,
-} from "./TrackEvent"
+import { NoteEvent, TrackEvent, TrackEventOf } from "./TrackEvent"
 
 export const isNoteEvent = (e: TrackEvent): e is NoteEvent =>
   "subtype" in e && e.subtype === "note"
@@ -64,7 +58,7 @@ export const isPanEvent = isControllerEventWithType(10)
 export const isModulationEvent = isControllerEventWithType(1)
 export const isExpressionEvent = isControllerEventWithType(0x0b)
 
-export const isSequencerSpecificEvent = <T extends AnyEventFeature>(
-  e: T,
-): e is FeatureOf<SequencerSpecificEvent> & T =>
+export const isSequencerSpecificEvent = (
+  e: TrackEvent,
+): e is TrackEventOf<SequencerSpecificEvent> =>
   "subtype" in e && e.subtype === "sequencerSpecific"
