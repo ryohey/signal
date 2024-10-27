@@ -1,6 +1,5 @@
 import { isEqual } from "lodash"
 import { SequencerSpecificEvent } from "midifile-ts"
-import { DistributiveOmit } from "../types"
 import { TrackColor } from "./TrackColor"
 import { TrackEvent, TrackEventOf } from "./TrackEvent"
 
@@ -20,7 +19,7 @@ enum SignalEventType {
   trackColor = 1,
 }
 
-export type SignalEvent<T extends string> = {
+type SignalEvent<T extends string> = {
   type: "channel"
   subtype: "signal"
   signalEventType: T
@@ -30,14 +29,84 @@ export type SignalTrackColorEvent = SignalEvent<"trackColor"> & TrackColor
 
 export type AnySignalEvent = SignalTrackColorEvent
 
-export const isSignalEvent = (
-  e: DistributiveOmit<TrackEvent, "tick" | "id">,
-): e is AnySignalEvent => "subtype" in e && e.subtype === "signal"
+// extract the value type of SignalEvent
+type SignalEventValueOf<T extends AnySignalEvent> = Omit<
+  T,
+  "type" | "subtype" | "signalEventType"
+>
 
-export const isSignalTrackColorEvent = (
+export const isSignalEvent = (
   e: TrackEvent,
-): e is TrackEventOf<SignalTrackColorEvent> =>
-  isSignalEvent(e) && e.signalEventType === "trackColor"
+): e is TrackEventOf<AnySignalEvent> => "subtype" in e && e.subtype === "signal"
+
+const identifySignalEvent =
+  <T extends AnySignalEvent>(signalEventType: T["signalEventType"]) =>
+  (e: TrackEvent): e is TrackEventOf<T> =>
+    isSignalEvent(e) && e.signalEventType === signalEventType
+
+export const isSignalTrackColorEvent = identifySignalEvent("trackColor")
+
+const signalEventToSequencerSpecificEvent =
+  <T extends AnySignalEvent>(toData: (e: TrackEventOf<T>) => number[]) =>
+  (e: TrackEventOf<T>): TrackEventOf<SequencerSpecificEvent> => {
+    return {
+      id: e.id,
+      tick: e.tick,
+      type: "meta",
+      subtype: "sequencerSpecific",
+      data: [
+        ...signalEventPrefix,
+        SignalEventType[e.signalEventType],
+        ...toData(e),
+      ],
+    }
+  }
+
+const sequencerSpecificEventToSignalEvent =
+  <T extends AnySignalEvent>(
+    size: number,
+    fromData: (data: number[]) => SignalEventValueOf<T>,
+  ) =>
+  (e: TrackEventOf<SequencerSpecificEvent>): TrackEventOf<T> | undefined => {
+    if (e.data.length - 5 !== size) {
+      return undefined
+    }
+    const signalEvent = {
+      type: "channel",
+      subtype: "signal",
+      signalEventType: SignalEventType[e.data[4]] as T["signalEventType"],
+      ...fromData(e.data.slice(5)),
+    } as T
+    return {
+      ...signalEvent,
+      id: e.id,
+      tick: e.tick,
+    } as unknown as TrackEventOf<T>
+  }
+
+const createConverter = <T extends AnySignalEvent>(
+  dataSize: number,
+  fromData: (data: number[]) => SignalEventValueOf<T>,
+  toData: (e: TrackEventOf<T>) => number[],
+) => ({
+  fromSequencerSpecificEvent: sequencerSpecificEventToSignalEvent<T>(
+    dataSize,
+    fromData,
+  ),
+  toSequencerSpecificEvent: signalEventToSequencerSpecificEvent<T>(toData),
+})
+
+// 'S' 'i' 'g' 'n' 0x01 A B G R
+const signalTrackColorConverter = createConverter(
+  4,
+  (data) => ({
+    alpha: data[0],
+    blue: data[1],
+    green: data[2],
+    red: data[3],
+  }),
+  (e) => [e.alpha, e.blue, e.green, e.red],
+)
 
 export const mapToSignalEvent = (
   e: TrackEventOf<SequencerSpecificEvent>,
@@ -48,20 +117,7 @@ export const mapToSignalEvent = (
 
   switch (e.data[4]) {
     case SignalEventType.trackColor:
-      // 'S' 'i' 'g' 'n' 0x01 A B G R
-      if (e.data.length !== 9) {
-        return e
-      }
-      return {
-        ...e,
-        type: "channel",
-        subtype: "signal",
-        signalEventType: "trackColor",
-        alpha: e.data[5],
-        blue: e.data[6],
-        green: e.data[7],
-        red: e.data[8],
-      }
+      return signalTrackColorConverter.fromSequencerSpecificEvent(e) ?? e
     default:
       return e
   }
@@ -72,20 +128,6 @@ export const mapFromSignalEvent = (
 ): TrackEventOf<SequencerSpecificEvent> => {
   switch (e.signalEventType) {
     case "trackColor":
-      // 'S' 'i' 'g' 'n' 0x01 A B G R
-      return {
-        id: e.id,
-        tick: e.tick,
-        type: "meta",
-        subtype: "sequencerSpecific",
-        data: [
-          ...signalEventPrefix,
-          SignalEventType.trackColor,
-          e.alpha,
-          e.blue,
-          e.green,
-          e.red,
-        ],
-      }
+      return signalTrackColorConverter.toSequencerSpecificEvent(e)
   }
 }
