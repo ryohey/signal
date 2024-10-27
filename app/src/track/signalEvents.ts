@@ -17,38 +17,40 @@ const signalEventPrefix = "Sign".split("").map((c) => c.charCodeAt(0))
 enum SignalEventType {
   preserved = 0,
   trackColor = 1,
+  inputChannel = 2,
 }
 
-type SignalEvent<T extends string> = {
+type SignalEvent<T extends string> = TrackEventOf<{
   type: "channel"
   subtype: "signal"
   signalEventType: T
-}
+}>
 
 export type SignalTrackColorEvent = SignalEvent<"trackColor"> & TrackColor
 
-export type AnySignalEvent = SignalTrackColorEvent
+export type SignalInputChannelEvent = SignalEvent<"inputChannel"> & {
+  value: number
+}
+
+export type AnySignalEvent = SignalTrackColorEvent | SignalInputChannelEvent
 
 // extract the value type of SignalEvent
 type SignalEventValueOf<T extends AnySignalEvent> = Omit<
   T,
-  "type" | "subtype" | "signalEventType"
+  "id" | "tick" | "type" | "subtype" | "signalEventType"
 >
 
-export const isSignalEvent = (
-  e: TrackEvent,
-): e is TrackEventOf<AnySignalEvent> => "subtype" in e && e.subtype === "signal"
+export const isSignalEvent = (e: TrackEvent): e is AnySignalEvent =>
+  "subtype" in e && e.subtype === "signal"
 
 const identifySignalEvent =
   <T extends AnySignalEvent>(signalEventType: T["signalEventType"]) =>
-  (e: TrackEvent): e is TrackEventOf<T> =>
+  (e: TrackEvent): e is T =>
     isSignalEvent(e) && e.signalEventType === signalEventType
 
-export const isSignalTrackColorEvent = identifySignalEvent("trackColor")
-
 const signalEventToSequencerSpecificEvent =
-  <T extends AnySignalEvent>(toData: (e: TrackEventOf<T>) => number[]) =>
-  (e: TrackEventOf<T>): TrackEventOf<SequencerSpecificEvent> => {
+  <T extends AnySignalEvent>(toData: (e: T) => number[]) =>
+  (e: T): TrackEventOf<SequencerSpecificEvent> => {
     return {
       id: e.id,
       tick: e.tick,
@@ -67,27 +69,24 @@ const sequencerSpecificEventToSignalEvent =
     size: number,
     fromData: (data: number[]) => SignalEventValueOf<T>,
   ) =>
-  (e: TrackEventOf<SequencerSpecificEvent>): TrackEventOf<T> | undefined => {
+  (e: TrackEventOf<SequencerSpecificEvent>): T | undefined => {
     if (e.data.length - 5 !== size) {
       return undefined
     }
-    const signalEvent = {
+    return {
       type: "channel",
       subtype: "signal",
       signalEventType: SignalEventType[e.data[4]] as T["signalEventType"],
-      ...fromData(e.data.slice(5)),
-    } as T
-    return {
-      ...signalEvent,
       id: e.id,
       tick: e.tick,
-    } as unknown as TrackEventOf<T>
+      ...fromData(e.data.slice(5)),
+    } as T
   }
 
 const createConverter = <T extends AnySignalEvent>(
   dataSize: number,
   fromData: (data: number[]) => SignalEventValueOf<T>,
-  toData: (e: TrackEventOf<T>) => number[],
+  toData: (e: T) => number[],
 ) => ({
   fromSequencerSpecificEvent: sequencerSpecificEventToSignalEvent<T>(
     dataSize,
@@ -96,8 +95,10 @@ const createConverter = <T extends AnySignalEvent>(
   toSequencerSpecificEvent: signalEventToSequencerSpecificEvent<T>(toData),
 })
 
+// MARK: - Converters
+
 // 'S' 'i' 'g' 'n' 0x01 A B G R
-const signalTrackColorConverter = createConverter(
+const trackColorEventConverter = createConverter<SignalTrackColorEvent>(
   4,
   (data) => ({
     alpha: data[0],
@@ -108,26 +109,45 @@ const signalTrackColorConverter = createConverter(
   (e) => [e.alpha, e.blue, e.green, e.red],
 )
 
+export const isSignalTrackColorEvent =
+  identifySignalEvent<SignalTrackColorEvent>("trackColor")
+
+// 'S' 'i' 'g' 'n' 0x02 <Value>
+const inputChannelEventConverter = createConverter<SignalInputChannelEvent>(
+  1,
+  (data) => ({ value: data[0] }),
+  (e) => [e.value],
+)
+
+export const isSignalInputChannelEvent =
+  identifySignalEvent<SignalInputChannelEvent>("inputChannel")
+
+// MARK: - Mapping
+
 export const mapToSignalEvent = (
   e: TrackEventOf<SequencerSpecificEvent>,
-): TrackEventOf<AnySignalEvent> | TrackEventOf<SequencerSpecificEvent> => {
+): AnySignalEvent | TrackEventOf<SequencerSpecificEvent> => {
   if (e.data.length <= 5 || !isEqual(e.data.slice(0, 4), signalEventPrefix)) {
     return e
   }
 
   switch (e.data[4]) {
     case SignalEventType.trackColor:
-      return signalTrackColorConverter.fromSequencerSpecificEvent(e) ?? e
+      return trackColorEventConverter.fromSequencerSpecificEvent(e) ?? e
+    case SignalEventType.inputChannel:
+      return inputChannelEventConverter.fromSequencerSpecificEvent(e) ?? e
     default:
       return e
   }
 }
 
 export const mapFromSignalEvent = (
-  e: TrackEventOf<AnySignalEvent>,
+  e: AnySignalEvent,
 ): TrackEventOf<SequencerSpecificEvent> => {
   switch (e.signalEventType) {
     case "trackColor":
-      return signalTrackColorConverter.toSequencerSpecificEvent(e)
+      return trackColorEventConverter.toSequencerSpecificEvent(e)
+    case "inputChannel":
+      return inputChannelEventConverter.toSequencerSpecificEvent(e)
   }
 }

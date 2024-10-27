@@ -255,7 +255,7 @@ export default class Track {
     return maxTick
   }
 
-  get color(): TrackEventOf<SignalTrackColorEvent> | undefined {
+  get color(): SignalTrackColorEvent | undefined {
     return this.events.filter(isSignalTrackColorEvent)[0]
   }
 
@@ -269,9 +269,9 @@ export default class Track {
     }
     const e = this.color
     if (e !== undefined) {
-      this.updateEvent<TrackEventOf<SignalTrackColorEvent>>(e.id, color)
+      this.updateEvent<SignalTrackColorEvent>(e.id, color)
     } else {
-      this.addEvent<TrackEventOf<SignalTrackColorEvent>>({
+      this.addEvent<SignalTrackColorEvent>({
         tick: 0,
         type: "channel",
         subtype: "signal",
