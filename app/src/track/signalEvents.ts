@@ -48,6 +48,21 @@ const identifySignalEvent =
   (e: TrackEvent): e is T =>
     isSignalEvent(e) && e.signalEventType === signalEventType
 
+export const createSignalEvent = <T extends AnySignalEvent>(
+  id: number,
+  tick: number,
+  signalEventType: T["signalEventType"],
+  data: SignalEventValueOf<T>,
+): T =>
+  ({
+    ...data,
+    id,
+    tick,
+    type: "channel",
+    subtype: "signal",
+    signalEventType,
+  }) as T
+
 const signalEventToSequencerSpecificEvent =
   <T extends AnySignalEvent>(toData: (e: T) => number[]) =>
   (e: T): TrackEventOf<SequencerSpecificEvent> => {
@@ -73,21 +88,23 @@ const sequencerSpecificEventToSignalEvent =
     if (e.data.length - 5 !== size) {
       return undefined
     }
-    return {
-      type: "channel",
-      subtype: "signal",
-      signalEventType: SignalEventType[e.data[4]] as T["signalEventType"],
-      id: e.id,
-      tick: e.tick,
-      ...fromData(e.data.slice(5)),
-    } as T
+    return createSignalEvent(
+      e.id,
+      e.tick,
+      SignalEventType[e.data[4]] as T["signalEventType"],
+      fromData(e.data.slice(5)),
+    )
   }
 
 const createConverter = <T extends AnySignalEvent>(
+  signalEventType: T["signalEventType"],
   dataSize: number,
   fromData: (data: number[]) => SignalEventValueOf<T>,
   toData: (e: T) => number[],
 ) => ({
+  create: (id: number, tick: number, data: SignalEventValueOf<T>) =>
+    createSignalEvent(id, tick, signalEventType, data),
+  identify: identifySignalEvent<T>(signalEventType),
   fromSequencerSpecificEvent: sequencerSpecificEventToSignalEvent<T>(
     dataSize,
     fromData,
@@ -99,6 +116,7 @@ const createConverter = <T extends AnySignalEvent>(
 
 // 'S' 'i' 'g' 'n' 0x01 A B G R
 const trackColorEventConverter = createConverter<SignalTrackColorEvent>(
+  "trackColor",
   4,
   (data) => ({
     alpha: data[0],
@@ -109,18 +127,19 @@ const trackColorEventConverter = createConverter<SignalTrackColorEvent>(
   (e) => [e.alpha, e.blue, e.green, e.red],
 )
 
-export const isSignalTrackColorEvent =
-  identifySignalEvent<SignalTrackColorEvent>("trackColor")
+export const isSignalTrackColorEvent = trackColorEventConverter.identify
+export const createSignalTrackColorEvent = trackColorEventConverter.create
 
 // 'S' 'i' 'g' 'n' 0x02 <Value>
 const inputChannelEventConverter = createConverter<SignalInputChannelEvent>(
+  "inputChannel",
   1,
   (data) => ({ value: data[0] }),
   (e) => [e.value],
 )
 
-export const isSignalInputChannelEvent =
-  identifySignalEvent<SignalInputChannelEvent>("inputChannel")
+export const isSignalInputChannelEvent = inputChannelEventConverter.identify
+export const createSignalInputChannelEvent = inputChannelEventConverter.create
 
 // MARK: - Mapping
 
