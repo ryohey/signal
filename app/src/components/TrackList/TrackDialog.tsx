@@ -47,15 +47,18 @@ const ChannelSelect: FC<{
 }
 
 const MIDIInputSelect: FC<{
-  channel: number | undefined
-  onChange: (channel: number) => void
+  channel: number | null
+  onChange: (channel: number | null) => void
 }> = ({ channel, onChange }) => {
   return (
     <Select
-      value={channel}
-      onChange={(e) => onChange(parseInt(e.target.value as string))}
+      value={channel ?? -1}
+      onChange={(e) => {
+        const value = parseInt(e.target.value as string)
+        onChange(value === -1 ? null : value)
+      }}
     >
-      <option key={-1} value={undefined}>
+      <option key={-1} value={-1}>
         <Localized name="midi-input-all" />
       </option>
       {range(0, 16).map((v) => (
@@ -70,16 +73,22 @@ const MIDIInputSelect: FC<{
 export const TrackDialog: FC<TrackDialogProps> = ({ track, open, onClose }) => {
   const [name, setName] = useState(track.name)
   const [channel, setChannel] = useState(track.channel)
-  const [midiInputChannel, setMIDIInputChannel] = useState(0)
+  const [midiInputChannel, setMIDIInputChannel] = useState(
+    track.inputChannel?.value ?? null,
+  )
 
   useEffect(() => {
-    setName(track.name)
-    setChannel(track.channel)
-  }, [track])
+    if (open) {
+      setName(track.name)
+      setChannel(track.channel)
+      setMIDIInputChannel(track.inputChannel?.value ?? null)
+    }
+  }, [open])
 
   const onClickOK = () => {
     track.channel = channel
     track.setName(name ?? "")
+    track.setInputChannel(midiInputChannel)
     onClose()
   }
 

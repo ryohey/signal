@@ -12,7 +12,7 @@ import { pushHistory } from "../actions/history"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
-import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
+import { MIDIInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
 import Song, { emptySong } from "../song"
 import { UNASSIGNED_TRACK_ID } from "../track"
@@ -101,10 +101,7 @@ export default class RootStore {
     this.controlStore = new ControlStore(this.pianoRollStore)
     this.soundFontStore = new SoundFontStore(this.synth)
 
-    const preview = previewMidiInput(this)
-
     this.midiInput.onMidiMessage = (e) => {
-      preview(e)
       this.midiRecorder.onMessage(e)
     }
 

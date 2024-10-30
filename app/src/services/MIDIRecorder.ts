@@ -29,7 +29,7 @@ export class MIDIRecorder {
         return
       }
 
-      const tick = change.object.get()
+      const tick = Math.floor(change.object.get())
 
       Object.entries(this.recordedNotes).forEach(([trackId, notes]) => {
         const track = rootStore.song.getTrack(parseInt(trackId) as TrackId)
@@ -60,9 +60,7 @@ export class MIDIRecorder {
   }
 
   onMessage(e: WebMidi.MIDIMessageEvent) {
-    if (!this.isRecording) {
-      return
-    }
+    const { pianoRollStore, player } = this.rootStore
 
     const stream = new Stream(e.data)
     const message = deserializeSingleEvent(stream)
@@ -74,11 +72,34 @@ export class MIDIRecorder {
     // route to tracks by input channel
     const tracks = this.rootStore.song.tracks.filter(
       (t) =>
-        t.inputChannel === undefined ||
-        t.inputChannel.value === message.channel,
+        !t.isConductorTrack &&
+        (t.inputChannel === undefined ||
+          t.inputChannel.value === message.channel),
     )
 
-    const tick = this.player.position
+    // sound preview
+    // route to each track
+    tracks.forEach((track) => {
+      if (track.channel === undefined) {
+        return
+      }
+      const event = { ...message, channel: track.channel }
+      player.sendEvent(event)
+
+      if (track.id === pianoRollStore.selectedTrackId) {
+        if (event.subtype === "noteOn") {
+          pianoRollStore.previewingNoteNumbers.add(event.noteNumber)
+        } else if (event.subtype === "noteOff") {
+          pianoRollStore.previewingNoteNumbers.delete(event.noteNumber)
+        }
+      }
+    })
+
+    if (!this.isRecording) {
+      return
+    }
+
+    const tick = Math.floor(player.position)
 
     switch (message.subtype) {
       case "noteOn": {
