@@ -94,6 +94,7 @@ export const selectTrack =
   ({ pianoRollStore }: RootStore) =>
   (trackId: TrackId) => {
     pianoRollStore.selectedTrackId = trackId
+    pianoRollStore.previewingNoteNumbers.clear()
   }
 
 export const insertTrack =
