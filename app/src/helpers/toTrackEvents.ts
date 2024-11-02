@@ -4,12 +4,15 @@ import {
   DeltaTimeProvider,
   isSequencerSpecificEvent,
   TickProvider,
+  TrackEvent,
 } from "../track"
 import { mapToSignalEvent } from "../track/signalEvents"
 import { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 
-export function addTick<T extends DeltaTimeProvider>(events: T[]) {
+export function addTick<T extends DeltaTimeProvider>(
+  events: T[],
+): (DistributiveOmit<T, "deltaTime"> & TickProvider)[] {
   let tick = 0
   return events.map((e) => {
     const { deltaTime, ...rest } = e
@@ -29,28 +32,28 @@ export const removeUnnecessaryProps = <T>(e: T): T => {
 export const isSupportedEvent = (e: AnyEventFeature): boolean =>
   !(e.type === "meta" && e.subtype === "endOfTrack")
 
-const toSignalEvent = <
-  T extends DistributiveOmit<AnyEvent, "deltaTime"> & TickProvider,
->(
-  e: T,
-) => {
+const toSignalEvent = (e: TrackEvent): TrackEvent => {
   if (isSequencerSpecificEvent(e)) {
     return mapToSignalEvent(e)
   }
   return e
 }
 
-export function toTrackEvents(events: AnyEvent[]) {
-  return assembleNotes(
-    addTick(events.filter(isSupportedEvent)).map(toSignalEvent),
-  ).map(removeUnnecessaryProps)
+export function toTrackEvents(events: AnyEvent[]): TrackEvent[] {
+  const tickedEvents: (DistributiveOmit<AnyEvent, "deltaTime"> &
+    TickProvider)[] = addTick(events.filter(isSupportedEvent))
+  const trackEvents = assembleNotes(tickedEvents).map(
+    removeUnnecessaryProps,
+  ) as unknown as TrackEvent[]
+  return trackEvents.map(toSignalEvent)
 }
 
 // toTrackEvents without addTick
 export function tickedEventsToTrackEvents(
   events: (DistributiveOmit<AnyEvent, "deltaTime"> & TickProvider)[],
-) {
-  return assembleNotes(events.filter(isSupportedEvent).map(toSignalEvent)).map(
+): TrackEvent[] {
+  const trackEvents = assembleNotes(events.filter(isSupportedEvent)).map(
     removeUnnecessaryProps,
-  )
+  ) as unknown as TrackEvent[]
+  return trackEvents.map(toSignalEvent)
 }
