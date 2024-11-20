@@ -11,7 +11,7 @@
   "dependencies": {
     "@tonejs/midi": "^2.0.28",
     "axios": "^1.6.2",
-    "firebase-admin": "^11.11.1",
+    "firebase-admin": "^12.1.1",
     "firebase-functions": "^4.5.0",
     "googleapis": "^129.0.0"
   },
