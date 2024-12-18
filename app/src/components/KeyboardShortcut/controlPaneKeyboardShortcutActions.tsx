@@ -4,27 +4,32 @@ import {
   duplicateControlSelection,
   resetControlSelection,
 } from "../../actions/control"
-import RootStore from "../../stores/RootStore"
-import { Action } from "./KeyboardShortcut"
+import { useStores } from "../../hooks/useStores"
 
-export const controlPaneKeyboardShortcutActions = (
-  rootStore: RootStore,
-): Action[] => [
-  { code: "Escape", run: () => resetControlSelection(rootStore)() },
-  { code: "Backspace", run: () => deleteControlSelection(rootStore)() },
-  { code: "Delete", run: () => deleteControlSelection(rootStore)() },
-  { code: "KeyC", metaKey: true, run: () => copyControlSelection(rootStore)() },
-  {
-    code: "KeyX",
-    metaKey: true,
-    run: () => {
-      copyControlSelection(rootStore)()
-      deleteControlSelection(rootStore)()
+export const useControlPaneKeyboardShortcutActions = () => {
+  const rootStore = useStores()
+
+  return () => [
+    { code: "Escape", run: () => resetControlSelection(rootStore)() },
+    { code: "Backspace", run: () => deleteControlSelection(rootStore)() },
+    { code: "Delete", run: () => deleteControlSelection(rootStore)() },
+    {
+      code: "KeyC",
+      metaKey: true,
+      run: () => copyControlSelection(rootStore)(),
     },
-  },
-  {
-    code: "KeyD",
-    metaKey: true,
-    run: () => duplicateControlSelection(rootStore)(),
-  },
-]
+    {
+      code: "KeyX",
+      metaKey: true,
+      run: () => {
+        copyControlSelection(rootStore)()
+        deleteControlSelection(rootStore)()
+      },
+    },
+    {
+      code: "KeyD",
+      metaKey: true,
+      run: () => duplicateControlSelection(rootStore)(),
+    },
+  ]
+}

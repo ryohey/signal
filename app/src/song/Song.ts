@@ -2,9 +2,10 @@ import { PlayerEvent } from "@signal-app/player"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
 import { Measure } from "../entities/measure/Measure"
-import { isNotUndefined } from "../helpers/array"
+import { NoteNumber } from "../entities/unit/NoteNumber"
+import { isNotNull, isNotUndefined } from "../helpers/array"
 import { collectAllEvents } from "../player/collectAllEvents"
-import Track, { isTimeSignatureEvent, TrackId } from "../track"
+import Track, { isNoteEvent, isTimeSignatureEvent, TrackId } from "../track"
 
 const END_MARGIN = 480 * 30
 const DEFAULT_TIME_BASE = 480
@@ -106,6 +107,36 @@ export default class Song {
 
   get allEvents(): PlayerEvent[] {
     return collectAllEvents(this.tracks)
+  }
+
+  transposeNotes(
+    deltaPitch: number,
+    selectedEventIds: {
+      [key: number]: number[] // trackIndex: eventId
+    },
+  ) {
+    for (const trackIndexStr in selectedEventIds) {
+      const trackIndex = parseInt(trackIndexStr)
+      const eventIds = selectedEventIds[trackIndex]
+      const track = this.tracks[trackIndex]
+      if (track === undefined) {
+        continue
+      }
+      track.updateEvents(
+        eventIds
+          .map((id) => {
+            const n = track.getEventById(id)
+            if (n == undefined || !isNoteEvent(n)) {
+              return null
+            }
+            return {
+              id,
+              noteNumber: NoteNumber.clamp(n.noteNumber + deltaPitch),
+            }
+          })
+          .filter(isNotNull),
+      )
+    }
   }
 }
 

@@ -7,8 +7,8 @@ import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
 import {
   setTrackInstrument as setTrackInstrumentAction,
-  startNote,
-  stopNote,
+  useStartNote,
+  useStopNote,
 } from "../../actions"
 import { isNotUndefined } from "../../helpers/array"
 import { useStores } from "../../hooks/useStores"
@@ -168,6 +168,9 @@ const InstrumentBrowserWrapper: FC = observer(() => {
     song,
   } = rootStore
 
+  const startNote = useStartNote()
+  const stopNote = useStopNote()
+
   const [stopNoteTimeout, setStopNoteTimeout] = useState<NodeJS.Timeout | null>(
     null,
   )
@@ -202,19 +205,19 @@ const InstrumentBrowserWrapper: FC = observer(() => {
       // if note is already playing, stop it immediately and cancel the timeout
       if (stopNoteTimeout !== null) {
         clearTimeout(stopNoteTimeout)
-        stopNote(rootStore)({
+        stopNote({
           noteNumber,
           channel,
         })
       }
 
-      startNote(rootStore)({
+      startNote({
         noteNumber,
         velocity: 100,
         channel,
       })
       const timeout = setTimeout(() => {
-        stopNote(rootStore)({
+        stopNote({
           noteNumber,
           channel,
         })

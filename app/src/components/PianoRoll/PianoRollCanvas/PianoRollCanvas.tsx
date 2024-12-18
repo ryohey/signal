@@ -1,21 +1,14 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { observer } from "mobx-react-lite"
-import {
-  FC,
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import { FC, MouseEventHandler, useCallback, useEffect, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useStores } from "../../../hooks/useStores"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
-import NoteMouseHandler from "../MouseHandler/NoteMouseHandler"
+import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
 import { PianoRollStageProps } from "../PianoRollStage"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
@@ -38,7 +31,7 @@ export const PianoRollCanvas: FC<PianoRollStageProps> = observer(
       },
     } = rootStore
 
-    const [mouseHandler] = useState(new NoteMouseHandler(rootStore))
+    const mouseHandler = useNoteMouseGesture()
 
     const { onContextMenu, menuProps } = useContextMenu()
 

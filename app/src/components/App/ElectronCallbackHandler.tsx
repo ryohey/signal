@@ -6,7 +6,7 @@ import {
   signInWithCredential,
 } from "firebase/auth"
 import { observer } from "mobx-react-lite"
-import { FC, useEffect } from "react"
+import { FC, useEffect, useState } from "react"
 import { ElectronAPI } from "../../../../electron/src/ElectronAPI"
 import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 import { auth } from "../.././firebase/firebase"
@@ -14,9 +14,9 @@ import { setSong } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
 import { redo, undo } from "../../actions/history"
 import {
-  copySelectionGlobal,
-  cutSelectionGlobal,
-  pasteSelectionGlobal,
+  useCopySelectionGlobal,
+  useCutSelectionGlobal,
+  usePasteSelectionGlobal,
 } from "../../actions/hotkey"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useSongFile } from "../../hooks/useSongFile"
@@ -36,6 +36,10 @@ export const ElectronCallbackHandler: FC = observer(() => {
   const localSongFile = useSongFile()
   const cloudSongFile = useCloudFile()
   const toast = useToast()
+  const cutSelectionGlobal = useCutSelectionGlobal()
+  const copySelectionGlobal = useCopySelectionGlobal()
+  const pasteSelectionGlobal = usePasteSelectionGlobal()
+  const [isInitialized, setIsInitialized] = useState(false)
 
   const saveFileAs = async () => {
     const { song } = rootStore
@@ -155,13 +159,13 @@ export const ElectronCallbackHandler: FC = observer(() => {
         redo(rootStore)()
       }),
       window.electronAPI.onCut(() => {
-        cutSelectionGlobal(rootStore)()
+        cutSelectionGlobal()
       }),
       window.electronAPI.onCopy(() => {
-        copySelectionGlobal(rootStore)()
+        copySelectionGlobal()
       }),
       window.electronAPI.onPaste(() => {
-        pasteSelectionGlobal(rootStore)()
+        pasteSelectionGlobal()
       }),
       window.electronAPI.onOpenSetting(() => {
         rootStore.rootViewStore.openSettingDialog = true
@@ -180,11 +184,19 @@ export const ElectronCallbackHandler: FC = observer(() => {
         },
       ),
     ]
-    window.electronAPI.ready()
+    if (!isInitialized) {
+      setIsInitialized(true)
+      window.electronAPI.ready()
+    }
     return () => {
       unsubscribes.forEach((unsubscribe) => unsubscribe())
     }
-  }, [])
+  }, [
+    isInitialized,
+    cutSelectionGlobal,
+    copySelectionGlobal,
+    pasteSelectionGlobal,
+  ])
 
   return <></>
 })

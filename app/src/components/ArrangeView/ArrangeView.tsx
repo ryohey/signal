@@ -8,7 +8,6 @@ import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import {
   arrangeEndSelection,
   arrangeResizeSelection,
-  arrangeStartSelection,
   selectTrack,
 } from "../../actions"
 import { Point } from "../../entities/geometry/Point"
@@ -194,7 +193,7 @@ export const ArrangeView: FC = observer(() => {
           tick: trackTransform.getTick(startPosPx.x),
           trackIndex: 0,
         }
-        arrangeStartSelection(rootStore)()
+        arrangeViewStore.resetSelection()
 
         observeDrag({
           onMouseMove: (e) => {

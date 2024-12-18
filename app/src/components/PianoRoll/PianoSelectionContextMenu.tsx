@@ -1,11 +1,11 @@
-import React, { FC, useCallback } from "react"
+import React, { FC } from "react"
 import {
-  copySelection,
-  deleteSelection,
-  duplicateSelection,
-  pasteSelection,
-  quantizeSelectedNotes,
-  transposeSelection,
+  useCopySelection,
+  useDeleteSelection,
+  useDuplicateSelection,
+  usePasteSelection,
+  useQuantizeSelectedNotes,
+  useTransposeSelection,
 } from "../../actions"
 import { useStores } from "../../hooks/useStores"
 import { envString } from "../../localize/envString"
@@ -20,60 +20,66 @@ import { MenuDivider, MenuItem } from "../ui/Menu"
 export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
   (props) => {
     const { handleClose } = props
-    const rootStore = useStores()
-    const { pianoRollStore } = rootStore
+    const { pianoRollStore } = useStores()
     const isNoteSelected = pianoRollStore.selectedNoteIds.length > 0
 
-    const onClickCut = useCallback(() => {
-      copySelection(rootStore)()
-      deleteSelection(rootStore)()
-      handleClose()
-    }, [])
+    const copySelection = useCopySelection()
+    const deleteSelection = useDeleteSelection()
+    const pasteSelection = usePasteSelection()
+    const duplicateSelection = useDuplicateSelection()
+    const quantizeSelectedNotes = useQuantizeSelectedNotes()
+    const transposeSelection = useTransposeSelection()
 
-    const onClickCopy = useCallback(() => {
-      copySelection(rootStore)()
+    const onClickCut = () => {
+      copySelection()
+      deleteSelection()
       handleClose()
-    }, [])
+    }
 
-    const onClickPaste = useCallback(() => {
-      pasteSelection(rootStore)()
+    const onClickCopy = () => {
+      copySelection()
       handleClose()
-    }, [])
+    }
 
-    const onClickDuplicate = useCallback(() => {
-      duplicateSelection(rootStore)()
+    const onClickPaste = () => {
+      pasteSelection()
       handleClose()
-    }, [])
+    }
 
-    const onClickDelete = useCallback(() => {
-      deleteSelection(rootStore)()
+    const onClickDuplicate = () => {
+      duplicateSelection()
       handleClose()
-    }, [])
+    }
 
-    const onClickOctaveUp = useCallback(() => {
-      transposeSelection(rootStore)(12)
+    const onClickDelete = () => {
+      deleteSelection()
       handleClose()
-    }, [])
+    }
 
-    const onClickOctaveDown = useCallback(() => {
-      transposeSelection(rootStore)(-12)
+    const onClickOctaveUp = () => {
+      transposeSelection(12)
       handleClose()
-    }, [])
+    }
 
-    const onClickQuantize = useCallback(() => {
-      quantizeSelectedNotes(rootStore)()
+    const onClickOctaveDown = () => {
+      transposeSelection(-12)
       handleClose()
-    }, [])
+    }
 
-    const onClickTranspose = useCallback(() => {
+    const onClickQuantize = () => {
+      quantizeSelectedNotes()
+      handleClose()
+    }
+
+    const onClickTranspose = () => {
       pianoRollStore.openTransposeDialog = true
       handleClose()
-    }, [])
+    }
 
-    const onClickVelocity = useCallback(() => {
+    const onClickVelocity = () => {
       pianoRollStore.openVelocityDialog = true
       handleClose()
-    }, [])
+    }
 
     return (
       <ContextMenu {...props}>

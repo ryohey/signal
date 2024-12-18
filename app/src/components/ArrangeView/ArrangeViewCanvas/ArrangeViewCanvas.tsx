@@ -6,7 +6,6 @@ import {
   arrangeEndSelection,
   arrangeMoveSelection,
   arrangeResizeSelection,
-  arrangeStartSelection,
 } from "../../../actions"
 import { pushHistory } from "../../../actions/history"
 import { Point } from "../../../entities/geometry/Point"
@@ -96,7 +95,7 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = observer(
           })
         } else {
           const startPos = trackTransform.getArrangePoint(startPosPx)
-          arrangeStartSelection(rootStore)()
+          arrangeViewStore.resetSelection()
 
           if (!player.isPlaying) {
             player.position = arrangeViewStore.quantizer.round(startPos.tick)

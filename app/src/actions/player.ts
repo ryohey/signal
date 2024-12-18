@@ -1,4 +1,5 @@
 import { Measure } from "../entities/measure/Measure"
+import { useStores } from "../hooks/useStores"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 import RootStore from "../stores/RootStore"
 
@@ -132,9 +133,9 @@ export const toggleEnableLoop =
     player.loop = { ...player.loop, enabled: !player.loop.enabled }
   }
 
-export const startNote =
-  ({ player, synthGroup }: Pick<RootStore, "player" | "synthGroup">) =>
-  (
+export const useStartNote = () => {
+  const { player, synthGroup } = useStores()
+  return (
     {
       channel,
       noteNumber,
@@ -152,10 +153,11 @@ export const startNote =
       delayTime,
     )
   }
+}
 
-export const stopNote =
-  ({ player }: Pick<RootStore, "player">) =>
-  (
+export const useStopNote = () => {
+  const { player } = useStores()
+  return (
     {
       channel,
       noteNumber,
@@ -167,3 +169,4 @@ export const stopNote =
   ) => {
     player.sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
   }
+}

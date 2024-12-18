@@ -1,9 +1,7 @@
-import { NoteNumber } from "../entities/unit/NoteNumber"
-import { isNotNull } from "../helpers/array"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
 import RootStore from "../stores/RootStore"
-import { emptyTrack, isNoteEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
+import { emptyTrack, TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { songFromFile } from "./file"
 
 const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
@@ -115,36 +113,4 @@ export const duplicateTrack =
     newTrack.channel = undefined
     pushHistory()
     song.insertTrack(newTrack, trackIndex + 1)
-  }
-
-export const transposeNotes =
-  ({ song }: RootStore) =>
-  (
-    deltaPitch: number,
-    selectedEventIds: {
-      [key: number]: number[] // trackIndex: eventId
-    },
-  ) => {
-    for (const trackIndexStr in selectedEventIds) {
-      const trackIndex = parseInt(trackIndexStr)
-      const eventIds = selectedEventIds[trackIndex]
-      const track = song.tracks[trackIndex]
-      if (track === undefined) {
-        continue
-      }
-      track.updateEvents(
-        eventIds
-          .map((id) => {
-            const n = track.getEventById(id)
-            if (n == undefined || !isNoteEvent(n)) {
-              return null
-            }
-            return {
-              id,
-              noteNumber: NoteNumber.clamp(n.noteNumber + deltaPitch),
-            }
-          })
-          .filter(isNotNull),
-      )
-    }
   }

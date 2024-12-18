@@ -4,7 +4,6 @@ import {
   arrangeDeleteSelection,
   arrangeDuplicateSelection,
   arrangePasteSelection,
-  arrangeResetSelection,
 } from "../../actions"
 import { useStores } from "../../hooks/useStores"
 import { KeyboardShortcut } from "./KeyboardShortcut"
@@ -18,7 +17,7 @@ export const ArrangeViewKeyboardShortcut: FC = () => {
   return (
     <KeyboardShortcut
       actions={[
-        { code: "Escape", run: () => arrangeResetSelection(rootStore)() },
+        { code: "Escape", run: () => arrangeViewStore.resetSelection() },
         { code: "Delete", run: () => arrangeDeleteSelection(rootStore)() },
         { code: "Backspace", run: () => arrangeDeleteSelection(rootStore)() },
         {
