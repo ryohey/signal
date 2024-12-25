@@ -186,7 +186,9 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
     router.pushTrack()
     selectTrack(rootStore)(track.id)
   }, [track.id])
-  const onClickChannel = useCallback(() => {
+
+  const onClickChannel: MouseEventHandler = useCallback((e) => {
+    e.stopPropagation()
     setDialogOpened(true)
   }, [])
 
@@ -246,7 +248,7 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
               <Layers />
             </ControlButton>
             {channel !== undefined && (
-              <ChannelName onClick={onClickChannel}>
+              <ChannelName onMouseDown={onClickChannel}>
                 CH {channel + 1}
               </ChannelName>
             )}

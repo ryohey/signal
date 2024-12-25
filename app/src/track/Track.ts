@@ -29,7 +29,14 @@ import {
   getVolume,
   isTickBefore,
 } from "./selector"
-import { isSignalTrackColorEvent, SignalTrackColorEvent } from "./signalEvents"
+import {
+  createSignalInputChannelEvent,
+  createSignalTrackColorEvent,
+  isSignalInputChannelEvent,
+  isSignalTrackColorEvent,
+  SignalInputChannelEvent,
+  SignalTrackColorEvent,
+} from "./signalEvents"
 import { TrackColor } from "./TrackColor"
 import { TrackEvent, TrackEventOf } from "./TrackEvent"
 import { validateMidiEvent } from "./validate"
@@ -271,13 +278,27 @@ export default class Track {
     if (e !== undefined) {
       this.updateEvent<SignalTrackColorEvent>(e.id, color)
     } else {
-      this.addEvent<TrackEventOf<SignalTrackColorEvent>>({
-        tick: 0,
-        type: "channel",
-        subtype: "signal",
-        signalEventType: "trackColor",
-        ...color,
-      })
+      this.addEvent(createSignalTrackColorEvent(0, 0, color))
+    }
+  }
+
+  get inputChannel(): SignalInputChannelEvent | undefined {
+    return this.events.filter(isSignalInputChannelEvent)[0]
+  }
+
+  setInputChannel(value: number | null) {
+    if (value === null) {
+      const e = this.inputChannel
+      if (e !== undefined) {
+        this.removeEvent(e.id)
+      }
+      return
+    }
+    const e = this.inputChannel
+    if (e !== undefined) {
+      this.updateEvent<SignalInputChannelEvent>(e.id, { value })
+    } else {
+      this.addEvent(createSignalInputChannelEvent(0, 0, { value }))
     }
   }
 
