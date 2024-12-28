@@ -103,9 +103,9 @@ export default class RootStore {
 
     const preview = previewMidiInput(this)
 
-    this.midiInput.onMidiMessage = (e) => {
-      preview(e)
-      this.midiRecorder.onMessage(e)
+    this.midiInput.onMessage = (dataRaw) => {
+      preview(dataRaw)
+      this.midiRecorder.onMessage(dataRaw)
     }
 
     this.pianoRollStore.setUpAutorun()
