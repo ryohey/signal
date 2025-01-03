@@ -50,6 +50,7 @@
     "dialog-hooks": "*",
     "firebase": "^10.12.1",
     "gl-matrix": "^3.4.3",
+    "lamejs": "^1.2.1",
     "lodash": "^4.17.21",
     "mdi-react": "^9.4.0",
     "midifile-ts": "1.5.1",

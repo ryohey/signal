@@ -42,5 +42,8 @@
     "app",
     "packages/*"
   ],
-  "packageManager": "npm@10.9.0"
+  "packageManager": "npm@10.9.0",
+  "dependencies": {
+    "@breezystack/lamejs": "^1.2.7"
+  }
 }
