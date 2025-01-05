@@ -1,0 +1,55 @@
+from midiutil import MIDIFile
+
+# Create a MIDI file object with one track
+midi = MIDIFile(1)
+track = 0
+time = 0  # Start at the beginning
+midi.addTempo(track, time, 70)  # Set the tempo to 70 BPM
+
+# Define the melody for the intro, verse, refrain, and outro in C major
+# Format: (note, duration), where note is MIDI number and duration is in beats
+
+# Intro melody (C, G, Am, F progression)
+intro = [
+    (60, 1), (67, 1), (72, 1), (69, 1),  # C chord arpeggio
+    (67, 1), (64, 1), (69, 1), (72, 1),  # G chord arpeggio
+    (69, 1), (72, 1), (76, 1), (74, 1),  # Am chord arpeggio
+    (65, 1), (69, 1), (72, 1), (69, 1),  # F chord arpeggio
+]
+
+# Verse melody (C, G, Am, F progression, similar to intro)
+verse = intro
+
+# Refrain melody (F, G, C, Am progression)
+refrain = [
+    (65, 1), (69, 1), (72, 1), (67, 1),  # F chord arpeggio
+    (67, 1), (71, 1), (74, 1), (71, 1),  # G chord arpeggio
+    (60, 1), (64, 1), (67, 1), (64, 1),  # C chord arpeggio
+    (69, 1), (72, 1), (76, 1), (74, 1),  # Am chord arpeggio
+]
+
+# Outro melody (C, G, Am, F progression, similar to intro)
+outro = intro
+
+# Function to add a melody to the MIDI file
+def add_melody(midi, track, channel, melody, start_time):
+    time = start_time
+    for note, duration in melody:
+        midi.addNote(track, channel, note, time, duration, 100)
+        time += duration
+
+# Add melodies to the MIDI file
+add_melody(midi, track, 0, intro, time)
+time += len(intro)
+add_melody(midi, track, 0, verse, time)
+time += len(verse)
+add_melody(midi, track, 0, refrain, time)
+time += len(refrain)
+add_melody(midi, track, 0, outro, time)
+
+# Save the MIDI file
+output_path = "Worte_Melodie.mid"
+with open(output_path, "wb") as output_file:
+    midi.writeFile(output_file)
+
+print(f"MIDI file saved as {output_path}")
