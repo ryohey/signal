@@ -42,7 +42,7 @@ export function getEventController<T extends TrackEvent>(
             value: {
               type: "number",
               value: e.velocity.toFixed(0),
-              update: intConverter(0, 127, (velocity) => ({ velocity })),
+              update: intConverter(1, 127, (velocity) => ({ velocity })),
             },
             gate: {
               type: "number",

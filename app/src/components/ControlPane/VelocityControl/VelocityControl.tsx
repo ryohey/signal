@@ -20,7 +20,7 @@ const PianoVelocityControl: FC<PianoVelocityControlProps> = observer(
   ({ width, height }: PianoVelocityControlProps) => {
     return (
       <Parent>
-        <GraphAxis values={[0, 32, 64, 96, 128]} onClick={() => {}} />
+        <GraphAxis values={[1, 32, 64, 96, 127]} onClick={() => {}} />
         <VelocityControlCanvas width={width} height={height} />
       </Parent>
     )
