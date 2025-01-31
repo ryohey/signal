@@ -85,9 +85,8 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> =
 
         const calcValue = (e: MouseEvent) => {
           const offsetY = e.clientY - startY
-          return Math.max(
-            1,
-            Math.round(Math.max(0, Math.min(1, 1 - offsetY / height)) * 127),
+          return Math.round(
+            Math.max(0, Math.min(1, 1 - offsetY / height)) * 127,
           )
         }
 

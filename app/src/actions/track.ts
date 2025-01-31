@@ -367,7 +367,7 @@ export const batchUpdateNotesVelocity = (
       id: note.id,
       velocity: clamp(
         Math.floor(applyOperation(operation, note.velocity)),
-        1,
+        0,
         127,
       ),
     })),
