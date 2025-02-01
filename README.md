@@ -4,6 +4,8 @@
 
 signal is a user-friendly music sequencer application developed using web technology, designed for seamless, cross-platform use.
 
+You can launch signal by visiting [https://signal.vercel.app](https://signal.vercel.app).
+
 ## Goals
 
 - **Cross-Platform Compatibility:** Ensure accessibility across various devices and operating systems.
