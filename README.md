@@ -2,9 +2,11 @@
 
 ![Node.js CI](https://github.com/ryohey/signal/workflows/Node.js%20CI/badge.svg) [![Join the chat at https://discord.gg/XQxzNdDJse](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XQxzNdDJse)
 
-signal is a user-friendly music sequencer application developed using web technology, designed for seamless, cross-platform use.
+[signal](https://signal.vercel.app) is a user-friendly music sequencer application developed using web technology, designed for seamless, cross-platform use.
 
-You can launch signal by visiting [https://signal.vercel.app](https://signal.vercel.app)
+## Launch
+
+https://signal.vercel.app/edit
 
 ## Goals
 
