@@ -72,7 +72,7 @@ By setting these constraints, signal aims to offer a streamlined and distraction
 
 ## Contribution
 
-As the creator of signal, I, @ryohey, welcome any form of contribution to this music sequencer application. Your support, whether it's through code improvements, bug fixes, or feedback, is invaluable in enhancing and evolving signal.
+As the creator of signal, I, [@ryohey](https://github.com/ryohey), welcome any form of contribution to this music sequencer application. Your support, whether it's through code improvements, bug fixes, or feedback, is invaluable in enhancing and evolving signal.
 
 ### Reporting Bugs
 
