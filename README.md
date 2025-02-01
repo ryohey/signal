@@ -2,7 +2,9 @@
 
 ![Node.js CI](https://github.com/ryohey/signal/workflows/Node.js%20CI/badge.svg) [![Join the chat at https://discord.gg/XQxzNdDJse](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XQxzNdDJse)
 
-signal is a user-friendly music sequencer application developed using web technology, designed for seamless, cross-platform use.
+signal is a user-friendly music sequencer application developed using web technologies, designed for seamless, cross-platform use.
+
+<img width="1024" alt="image" src="https://github.com/user-attachments/assets/0c64ff3d-b095-4359-ab77-9355e04a8bee" />
 
 ## Goals
 
