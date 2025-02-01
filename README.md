@@ -4,6 +4,8 @@
 
 [signal](https://signal.vercel.app) is a user-friendly music sequencer application developed using web technologies, designed for seamless, cross-platform use, released under the MIT license.
 
+<img width="1024" alt="image" src="https://github.com/user-attachments/assets/0c64ff3d-b095-4359-ab77-9355e04a8bee" />
+
 ## Launch
 
 https://signal.vercel.app/edit
