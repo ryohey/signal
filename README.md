@@ -1,6 +1,7 @@
 ![logo-github](https://github.com/ryohey/signal/assets/5355966/46834ee4-30d8-4b66-a47c-6e081cc2c09f)
 
-![Node.js CI](https://github.com/ryohey/signal/workflows/Node.js%20CI/badge.svg) [![Join the chat at https://discord.gg/XQxzNdDJse](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XQxzNdDJse)
+![Node.js CI](https://github.com/ryohey/signal/workflows/Node.js%20CI/badge.svg)
+[![Join the chat at https://discord.gg/XQxzNdDJse](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FXQxzNdDJse%3Fwith_counts%3Dtrue&query=%24.approximate_presence_count&suffix=%20online&style=flat&logo=discord&logoColor=white&label=discord&labelColor=%235865F2&color=%23424549)](https://discord.gg/XQxzNdDJse)
 
 [signal](https://signal.vercel.app) is a user-friendly music sequencer application developed using web technologies, designed for seamless, cross-platform use, released under the MIT license.
 
