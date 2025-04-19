@@ -3,7 +3,7 @@ import { vec4 } from "gl-matrix"
 import { FC } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { DrumNoteShader } from "./shaders/DrumNoteShader"
-import { INoteData, NoteBuffer } from "./shaders/NoteShader"
+import { INoteData } from "./shaders/NoteShader"
 
 export interface NoteCirclesProps {
   rects: (Rect & INoteData)[]
@@ -26,8 +26,7 @@ export const NoteCircles: FC<NoteCirclesProps> = ({
 
   return (
     <GLNode
-      createShader={DrumNoteShader}
-      createBuffer={(gl) => new NoteBuffer(gl)}
+      shader={DrumNoteShader}
       uniforms={{
         projectionMatrix,
         strokeColor,

@@ -120,4 +120,5 @@ export const HorizontalGridShader = (gl: WebGL2RenderingContext) =>
       },
       height: uniformFloat(),
     },
+    (vertexArray) => new HorizontalGridBuffer(vertexArray),
   )

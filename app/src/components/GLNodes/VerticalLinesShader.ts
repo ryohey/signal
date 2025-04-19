@@ -8,7 +8,7 @@ import {
   VertexArray,
 } from "@ryohey/webgl-react"
 
-export class VerticalLinesBuffer
+class VerticalLinesBuffer
   implements InstancedBuffer<number[], "position" | "x">
 {
   private _instanceCount: number = 0
@@ -69,4 +69,5 @@ export const VerticalLinesShader = (gl: WebGL2RenderingContext) =>
       height: uniformFloat(),
       lineWidth: uniformFloat(),
     },
+    (gl) => new VerticalLinesBuffer(gl),
   )

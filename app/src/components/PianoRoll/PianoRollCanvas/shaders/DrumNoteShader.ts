@@ -1,4 +1,5 @@
 import { Shader, uniformMat4, uniformVec4 } from "@ryohey/webgl-react"
+import { NoteBuffer } from "./NoteShader"
 
 export const DrumNoteShader = (gl: WebGL2RenderingContext) =>
   new Shader(
@@ -66,4 +67,5 @@ export const DrumNoteShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
+    (vertexArray) => new NoteBuffer(vertexArray),
   )

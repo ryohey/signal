@@ -23,8 +23,7 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
 
   return (
     <GLNode
-      createShader={VelocityShader}
-      createBuffer={(vertexArray) => new VelocityBuffer(vertexArray)}
+      shader={VelocityShader}
       uniforms={{
         projectionMatrix,
         strokeColor,
