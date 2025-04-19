@@ -1,6 +1,7 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
 import { partition } from "lodash"
+import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
 import { BeatWithX } from "../../entities/beat/BeatWithX"
 import { colorToVec4 } from "../../gl/color"
@@ -18,7 +19,7 @@ export const Beats = (props: BeatsProps) => {
   return <GLFallback component={_Beats} fallback={LegacyBeats} {...props} />
 }
 
-const _Beats: FC<BeatsProps> = ({ height, beats, zIndex }) => {
+const _Beats: FC<BeatsProps> = observer(({ height, beats, zIndex }) => {
   const theme = useTheme()
 
   const [highlightedBeats, nonHighlightedBeats] = partition(
@@ -56,4 +57,4 @@ const _Beats: FC<BeatsProps> = ({ height, beats, zIndex }) => {
       />
     </>
   )
-}
+})
