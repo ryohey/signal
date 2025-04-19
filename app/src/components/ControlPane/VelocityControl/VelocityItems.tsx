@@ -1,25 +1,41 @@
+import { useTheme } from "@emotion/react"
 import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
-import { vec4 } from "gl-matrix"
-import { FC } from "react"
+import Color from "color"
+import { observer } from "mobx-react-lite"
+import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
-import { IVelocityData, VelocityBuffer, VelocityShader } from "./VelocityShader"
+import { colorToVec4, enhanceContrast } from "../../../gl/color"
+import { GLFallback } from "../../GLNodes/GLFallback"
+import { LegacyVelocityItems } from "../../GLNodes/legacy/LegacyVelocityItems"
+import { IVelocityData, VelocityShader } from "./VelocityShader"
 
 export interface VelocityItemsProps {
   rects: (Rect & IVelocityData)[]
-  strokeColor: vec4
-  activeColor: vec4
-  selectedColor: vec4
   zIndex?: number
 }
 
-export const VelocityItems: FC<VelocityItemsProps> = ({
-  rects,
-  strokeColor,
-  activeColor,
-  selectedColor,
-  zIndex,
-}) => {
+export const VelocityItems: FC<VelocityItemsProps> = (props) => {
+  return (
+    <GLFallback
+      component={_VelocityItems}
+      fallback={LegacyVelocityItems}
+      {...props}
+    />
+  )
+}
+
+const _VelocityItems: FC<VelocityItemsProps> = observer(({ rects, zIndex }) => {
   const projectionMatrix = useProjectionMatrix()
+  const theme = useTheme()
+  const baseColor = Color(theme.themeColor)
+  const strokeColor = colorToVec4(
+    enhanceContrast(baseColor, theme.isLightContent, 0.3),
+  )
+  const activeColor = useMemo(() => colorToVec4(baseColor), [theme])
+  const selectedColor = useMemo(
+    () => colorToVec4(baseColor.lighten(0.7)),
+    [theme],
+  )
 
   return (
     <GLNode
@@ -34,4 +50,4 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
       zIndex={zIndex}
     />
   )
-}
+})

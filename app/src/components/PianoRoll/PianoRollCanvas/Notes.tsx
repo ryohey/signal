@@ -5,10 +5,20 @@ import { FC } from "react"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
 import { useStores } from "../../../hooks/useStores"
 import { trackColorToCSSColor } from "../../../track/TrackColor"
+import { GLFallback } from "../../GLNodes/GLFallback"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
+import { LegacyNotes } from "./lagacy/LegacyNotes"
 
-export const Notes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
+export interface NotesProps {
+  zIndex: number
+}
+
+export const Notes: FC<NotesProps> = (props) => {
+  return <GLFallback component={_Notes} fallback={LegacyNotes} {...props} />
+}
+
+const _Notes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
   const {
     pianoRollStore: { notes, selectedTrack },
   } = useStores()

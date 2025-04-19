@@ -1,6 +1,5 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useMemo } from "react"
 import {
@@ -9,7 +8,6 @@ import {
 } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
-import { colorToVec4, enhanceContrast } from "../../../gl/color"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { observeDrag, observeDrag2 } from "../../../helpers/observeDrag"
 import { useStores } from "../../../hooks/useStores"
@@ -139,16 +137,6 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> =
       [scrollLeft],
     )
 
-    const baseColor = Color(theme.themeColor)
-    const strokeColor = colorToVec4(
-      enhanceContrast(baseColor, theme.isLightContent, 0.3),
-    )
-    const activeColor = useMemo(() => colorToVec4(baseColor), [theme])
-    const selectedColor = useMemo(
-      () => colorToVec4(baseColor.lighten(0.7)),
-      [theme],
-    )
-
     return (
       <GLCanvas
         width={width}
@@ -159,13 +147,7 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> =
         onMouseDown={onMouseDown}
       >
         <Transform matrix={scrollXMatrix}>
-          <VelocityItems
-            rects={items}
-            strokeColor={strokeColor}
-            activeColor={activeColor}
-            selectedColor={selectedColor}
-            zIndex={1}
-          />
+          <VelocityItems rects={items} zIndex={1} />
           <Beats height={height} beats={beats} zIndex={2} />
           <Cursor x={cursorX} height={height} zIndex={4} />
         </Transform>
