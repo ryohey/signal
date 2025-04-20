@@ -118,11 +118,6 @@ export default class ArrangeViewStore {
     this.setScrollTop(this.scrollTop)
   }
 
-  resetSelection() {
-    this.selection = null
-    this.selectedEventIds = {}
-  }
-
   get contentWidth(): number {
     return this.tickScrollStore.contentWidth
   }

@@ -15,6 +15,9 @@ export function useArrangeView() {
   const canvasHeight = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.canvasHeight,
   )
+  const cursorX = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.cursorX,
+  )
   const scaleX = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleX)
   const scaleY = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleY)
   const trackHeight = useMobxStore(
@@ -26,6 +29,7 @@ export function useArrangeView() {
   const contentHeight = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.contentHeight,
   )
+  const notes = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
   const transform = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.transform,
   )
@@ -44,12 +48,27 @@ export function useArrangeView() {
   const selection = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.selection,
   )
+  const selectionRect = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.selectionRect,
+  )
   const selectedEventIds = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.selectedEventIds,
   )
   const tracks = useMobxStore(({ song }) => song.tracks)
+  const quantize = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.quantize,
+  )
   const quantizer = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.quantizer,
+  )
+  const trackTransform = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.trackTransform,
+  )
+  const openTransposeDialog = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.openTransposeDialog,
+  )
+  const openVelocityDialog = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.openVelocityDialog,
   )
 
   return {
@@ -57,20 +76,27 @@ export function useArrangeView() {
     autoScroll,
     canvasWidth,
     canvasHeight,
+    cursorX,
+    notes,
     scaleX,
     scaleY,
     trackHeight,
     contentWidth,
     contentHeight,
     transform,
+    trackTransform,
     scrollLeft,
     scrollTop,
     selectedTrackIndex,
     selectedTrackId,
     selection,
+    selectionRect,
     selectedEventIds,
     rulerStore: arrangeViewStore.rulerStore,
+    quantize,
     quantizer,
+    openTransposeDialog,
+    openVelocityDialog,
     setCanvasWidth: useCallback((width: number) => {
       arrangeViewStore.canvasWidth = width
     }, []),
@@ -109,6 +135,19 @@ export function useArrangeView() {
     ),
     setAutoScroll: useCallback((value: boolean) => {
       arrangeViewStore.autoScroll = value
+    }, []),
+    setQuantize: useCallback((value: number) => {
+      arrangeViewStore.quantize = value
+    }, []),
+    resetSelection: useCallback(() => {
+      arrangeViewStore.selection = null
+      arrangeViewStore.selectedEventIds = {}
+    }, []),
+    setOpenTransposeDialog: useCallback((value: boolean) => {
+      arrangeViewStore.openTransposeDialog = value
+    }, []),
+    setOpenVelocityDialog: useCallback((value: boolean) => {
+      arrangeViewStore.openVelocityDialog = value
     }, []),
   }
 }

@@ -53,7 +53,7 @@ export const useArrangeMoveSelection = () => {
   return (point: ArrangePoint) => {
     const {
       song: { tracks },
-      arrangeViewStore: { selection },
+      arrangeViewStore: { selection }, // read selection from store to use latest value
     } = rootStore
 
     if (selection === null) {
@@ -85,7 +85,7 @@ export const useArrangeMoveSelectionBy = () => {
   return (delta: ArrangePoint) => {
     const {
       song: { tracks },
-      arrangeViewStore: { selection, selectedEventIds },
+      arrangeViewStore: { selection, selectedEventIds }, // read selection from store to use latest value
     } = rootStore
 
     if (selection === null) {

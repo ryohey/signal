@@ -1,3 +1,4 @@
+import { useArrangeView } from "../hooks/useArrangeView"
 import { useStores } from "../hooks/useStores"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
@@ -14,14 +15,13 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
+  const { songStore, trackMute, pianoRollStore, player, historyStore } =
+    useStores()
+
   const {
-    songStore,
-    trackMute,
-    pianoRollStore,
-    player,
-    historyStore,
-    arrangeViewStore,
-  } = useStores()
+    setSelection: setArrangeSelection,
+    setSelectedEventIds: setArrangeSelectedEventIds,
+  } = useArrangeView()
 
   return (newSong: Song) => {
     songStore.song = newSong
@@ -35,8 +35,8 @@ export const useSetSong = () => {
     pianoRollStore.selectedTrackId =
       newSong.tracks.find((t) => !t.isConductorTrack)?.id ?? UNASSIGNED_TRACK_ID
 
-    arrangeViewStore.selection = null
-    arrangeViewStore.selectedEventIds = []
+    setArrangeSelection(null)
+    setArrangeSelectedEventIds({})
 
     historyStore.clear()
 
@@ -79,7 +79,12 @@ export const useAddTrack = () => {
 }
 
 export const useRemoveTrack = () => {
-  const { song, pianoRollStore, arrangeViewStore, pushHistory } = useStores()
+  const { song, pianoRollStore, pushHistory } = useStores()
+  const {
+    selectedTrackIndex: arrangeSelectedTrackIndex,
+    setSelectedTrackIndex: setArrangeSelectedTrackIndex,
+  } = useArrangeView()
+
   return (trackId: TrackId) => {
     if (song.tracks.filter((t) => !t.isConductorTrack).length <= 1) {
       // conductor track を除き、最後のトラックの場合
@@ -90,15 +95,13 @@ export const useRemoveTrack = () => {
     }
     pushHistory()
     const pianoRollSelectedTrackIndex = pianoRollStore.selectedTrackIndex
-    const arrangeViewSelectedTrackIndex = arrangeViewStore.selectedTrackIndex
     song.removeTrack(trackId)
     pianoRollStore.selectedTrackIndex = Math.min(
       pianoRollSelectedTrackIndex,
       song.tracks.length - 1,
     )
-    arrangeViewStore.selectedTrackIndex = Math.min(
-      arrangeViewSelectedTrackIndex,
-      song.tracks.length - 1,
+    setArrangeSelectedTrackIndex(
+      Math.min(arrangeSelectedTrackIndex, song.tracks.length - 1),
     )
   }
 }

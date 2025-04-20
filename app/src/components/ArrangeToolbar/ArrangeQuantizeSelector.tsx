@@ -1,23 +1,16 @@
-import { observer } from "mobx-react-lite"
-import { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { FC } from "react"
+import { useArrangeView } from "../../hooks/useArrangeView"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
 
-export const ArrangeQuantizeSelector: FC = observer(() => {
-  const { arrangeViewStore } = useStores()
-  const { quantize } = arrangeViewStore
-
-  const onSelectQuantize = useCallback(
-    (denominator: number) => (arrangeViewStore.quantize = denominator),
-    [arrangeViewStore],
-  )
+export const ArrangeQuantizeSelector: FC = () => {
+  const { quantize, setQuantize } = useArrangeView()
 
   return (
     <QuantizeSelector
       value={quantize}
       enabled={true}
-      onSelect={onSelectQuantize}
+      onSelect={setQuantize}
       onClickSwitch={() => {}}
     />
   )
-})
+}

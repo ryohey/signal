@@ -8,14 +8,11 @@ import { ArrangePoint } from "../../entities/transform/ArrangePoint"
 import { MouseGesture } from "../../gesture/MouseGesture"
 import { getClientPos } from "../../helpers/mouseEvent"
 import { observeDrag } from "../../helpers/observeDrag"
-import { useStores } from "../../hooks/useStores"
+import { useArrangeView } from "../../hooks/useArrangeView"
 
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const {
-    arrangeViewStore,
-    song: { tracks },
-  } = useStores()
-
+  const { tracks, scrollLeft, scrollTop, trackTransform, resetSelection } =
+    useArrangeView()
   const arrangeResizeSelection = useArrangeResizeSelection()
   const arrangeEndSelection = useArrangeEndSelection()
 
@@ -24,8 +21,6 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
       if (e.button !== 0 || e.ctrlKey || e.altKey) {
         return
       }
-
-      const { scrollLeft, scrollTop, trackTransform } = arrangeViewStore
 
       const startPosPx: Point = {
         x: e.nativeEvent.offsetX + scrollLeft,
@@ -37,7 +32,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
         tick: trackTransform.getTick(startPosPx.x),
         trackIndex: 0,
       }
-      arrangeViewStore.resetSelection()
+      resetSelection()
 
       observeDrag({
         onMouseMove: (e) => {
@@ -54,7 +49,15 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
         },
       })
     },
-    [arrangeViewStore, arrangeResizeSelection, arrangeEndSelection, tracks],
+    [
+      scrollLeft,
+      scrollTop,
+      trackTransform,
+      arrangeResizeSelection,
+      arrangeEndSelection,
+      tracks,
+      resetSelection,
+    ],
   )
 
   return {

@@ -7,7 +7,7 @@ import {
   useArrangePasteSelection,
   useArrangeTransposeSelection,
 } from "../../actions"
-import { useStores } from "../../hooks/useStores"
+import { useArrangeView } from "../../hooks/useArrangeView"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -19,7 +19,8 @@ import { MenuDivider, MenuItem } from "../ui/Menu"
 
 export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
   const { handleClose } = props
-  const { arrangeViewStore } = useStores()
+  const { selectedEventIds, setOpenVelocityDialog, setOpenTransposeDialog } =
+    useArrangeView()
 
   const arrangeCopySelection = useArrangeCopySelection()
   const arrangeDeleteSelection = useArrangeDeleteSelection()
@@ -27,14 +28,14 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
   const arrangeDuplicateSelection = useArrangeDuplicateSelection()
   const arrangeTransposeSelection = useArrangeTransposeSelection()
 
-  const isNoteSelected = Object.values(arrangeViewStore.selectedEventIds).some(
+  const isNoteSelected = Object.values(selectedEventIds).some(
     (e) => e.length > 0,
   )
 
   const onClickVelocity = useCallback(() => {
-    arrangeViewStore.openVelocityDialog = true
+    setOpenVelocityDialog(true)
     handleClose()
-  }, [arrangeViewStore])
+  }, [handleClose, setOpenVelocityDialog])
 
   return (
     <ContextMenu {...props}>
@@ -77,7 +78,7 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
           handleClose()
           arrangeDuplicateSelection()
         }}
-        disabled={arrangeViewStore.selection === null}
+        disabled={!isNoteSelected}
       >
         <Localized name="duplicate" />
         <HotKey>{envString.cmdOrCtrl}+D</HotKey>
@@ -118,7 +119,7 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
         onClick={(e) => {
           e.stopPropagation()
           handleClose()
-          arrangeViewStore.openTransposeDialog = true
+          setOpenTransposeDialog(true)
         }}
         disabled={!isNoteSelected}
       >
