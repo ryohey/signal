@@ -3,20 +3,23 @@ import { useCallback, useSyncExternalStore } from "react"
 import RootStore from "../stores/RootStore"
 import { useStores } from "./useStores"
 
-type Selector<T> = (store: RootStore) => T
+type Selector<T> = () => T
 
 export function useMobxSelector<T>(selector: Selector<T>): T {
-  const rootStore = useStores()
-  const getter = useCallback(() => selector(rootStore), [rootStore])
-
   return useSyncExternalStore(
     useCallback(
       (onStoreChange) =>
-        reaction(getter, onStoreChange, {
+        reaction(selector, onStoreChange, {
           fireImmediately: true,
         }),
-      [getter],
+      [selector],
     ),
-    getter,
+    selector,
   )
+}
+
+export function useMobxStore<T>(selector: (rootStore: RootStore) => T): T {
+  const rootStore = useStores()
+  const getter = useCallback(() => selector(rootStore), [rootStore])
+  return useMobxSelector(getter)
 }
