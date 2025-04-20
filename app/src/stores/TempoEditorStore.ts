@@ -12,7 +12,7 @@ import { TickScrollStore } from "./TickScrollStore"
 
 export default class TempoEditorStore {
   readonly rulerStore: RulerStore
-  private readonly tickScrollStore: TickScrollStore
+  readonly tickScrollStore: TickScrollStore
 
   scrollLeftTicks: number = 0
   scaleX: number = 1
@@ -43,8 +43,6 @@ export default class TempoEditorStore {
       scrollLeft: computed,
       transform: computed,
       items: computed,
-      cursorX: computed,
-      contentWidth: computed,
       controlPoints: computed,
       quantizer: computed,
     })
@@ -52,10 +50,6 @@ export default class TempoEditorStore {
 
   setUpAutorun() {
     this.tickScrollStore.setUpAutoScroll()
-  }
-
-  setScrollLeftInPixels(x: number) {
-    this.tickScrollStore.setScrollLeftInPixels(x)
   }
 
   get scrollLeft(): number {
@@ -67,18 +61,10 @@ export default class TempoEditorStore {
     return new TempoCoordTransform(pixelsPerTick, this.canvasHeight)
   }
 
-  get cursorX(): number {
-    return this.transform.getX(this.rootStore.player.position)
-  }
-
   get items() {
     const { transform, canvasWidth, scrollLeft } = this
     const events = this.rootStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
-  }
-
-  get contentWidth() {
-    return this.tickScrollStore.contentWidth
   }
 
   get quantizer(): Quantizer {

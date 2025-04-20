@@ -8,8 +8,11 @@ import { useStores } from "./useStores"
 
 export function useTempoEditor() {
   const { tempoEditorStore } = useStores()
-  const { rulerStore } = tempoEditorStore
+  const { rulerStore, tickScrollStore } = tempoEditorStore
 
+  const autoScroll = useMobxStore(
+    ({ tempoEditorStore }) => tempoEditorStore.autoScroll,
+  )
   const selection = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.selection,
   )
@@ -32,13 +35,17 @@ export function useTempoEditor() {
   const mouseMode = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.mouseMode,
   )
+  const isQuantizeEnabled = useMobxStore(
+    ({ tempoEditorStore }) => tempoEditorStore.isQuantizeEnabled,
+  )
+  const quantize = useMobxStore(
+    ({ tempoEditorStore }) => tempoEditorStore.quantize,
+  )
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
-  const cursorX = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.cursorX,
-  )
   const contentWidth = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.contentWidth,
+    ({ tempoEditorStore: { tickScrollStore } }) => tickScrollStore.contentWidth,
   )
+  const playerPosition = useMobxStore(({ player }) => player.position)
 
   const selectionRect = useMemo(
     () =>
@@ -53,7 +60,13 @@ export function useTempoEditor() {
     [controlPoints],
   )
 
+  const cursorX = useMemo(
+    () => transform.getX(playerPosition),
+    [transform, playerPosition],
+  )
+
   return {
+    autoScroll,
     selectionRect,
     controlPoints,
     hitTest,
@@ -61,6 +74,8 @@ export function useTempoEditor() {
     transform,
     scrollLeft,
     quantizer,
+    isQuantizeEnabled,
+    quantize,
     selectedEventIds,
     mouseMode,
     beats,
@@ -74,7 +89,7 @@ export function useTempoEditor() {
       tempoEditorStore.selectedEventIds = ids
     }, []),
     setScrollLeftInPixels: useCallback((scrollLeft: number) => {
-      tempoEditorStore.setScrollLeftInPixels(scrollLeft)
+      tickScrollStore.setScrollLeftInPixels(scrollLeft)
     }, []),
     setAutoScroll: useCallback((autoScroll: boolean) => {
       tempoEditorStore.autoScroll = autoScroll
@@ -87,6 +102,12 @@ export function useTempoEditor() {
     }, []),
     setCanvasHeight: useCallback((height: number) => {
       tempoEditorStore.canvasHeight = height
+    }, []),
+    setQuantize: useCallback((quantize: number) => {
+      tempoEditorStore.quantize = quantize
+    }, []),
+    setQuantizeEnabled: useCallback((isEnabled: boolean) => {
+      tempoEditorStore.isQuantizeEnabled = isEnabled
     }, []),
   }
 }
