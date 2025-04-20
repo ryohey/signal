@@ -1,13 +1,15 @@
 import { useTheme } from "@emotion/react"
 import { LoopSetting } from "@signal-app/player"
 import { isEqual } from "lodash"
+import { TimeSignatureEvent } from "midifile-ts"
 import React, { FC, useCallback, useState } from "react"
 import { Layout } from "../../Constants"
 import { TickTransform } from "../../entities/transform/TickTransform"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { RulerBeat, RulerTimeSignature, useRuler } from "../../hooks/useRuler"
-import { RulerStore, TimeSignature } from "../../stores/RulerStore"
+import { RulerStore } from "../../stores/RulerStore"
 import { Theme } from "../../theme/Theme"
+import { TrackEventOf } from "../../track"
 import DrawCanvas from "../DrawCanvas"
 import { RulerContextMenu } from "./RulerContextMenu"
 import { TimeSignatureDialog } from "./TimeSignatureDialog"
@@ -163,7 +165,6 @@ const PianoRuler: FC<PianoRulerProps> = ({
     beats,
     loop,
     timeSignatures,
-    quantizer,
     timeSignatureHitTest,
     setLoopBegin,
     setLoopEnd,
@@ -171,10 +172,12 @@ const PianoRuler: FC<PianoRulerProps> = ({
     selectTimeSignature,
     clearSelectedTimeSignature,
     updateTimeSignature,
+    getQuantizedTick,
+    getTick,
   } = useRuler(rulerStore)
 
   const onClickTimeSignature = (
-    timeSignature: TimeSignature,
+    timeSignature: TrackEventOf<TimeSignatureEvent>,
     e: React.MouseEvent,
   ) => {
     if (e.detail == 2) {
@@ -182,7 +185,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
     } else {
       selectTimeSignature(timeSignature.id)
       if (e.button === 2) {
-        setRightClickTick(rulerStore.getQuantizedTick(e.nativeEvent.offsetX))
+        setRightClickTick(getQuantizedTick(e.nativeEvent.offsetX))
         onContextMenu(e)
       }
     }
@@ -190,8 +193,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
 
   const onClickRuler: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
     (e) => {
-      const tick = rulerStore.getTick(e.nativeEvent.offsetX)
-      const quantizedTick = quantizer.round(tick)
+      const quantizedTick = getQuantizedTick(e.nativeEvent.offsetX)
       if (e.nativeEvent.ctrlKey) {
         setLoopBegin(quantizedTick)
       } else if (e.nativeEvent.altKey) {
@@ -200,12 +202,12 @@ const PianoRuler: FC<PianoRulerProps> = ({
         seek(quantizedTick)
       }
     },
-    [quantizer, setLoopBegin, setLoopEnd, seek],
+    [getQuantizedTick, setLoopBegin, setLoopEnd, seek],
   )
 
   const onMouseDown: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
     (e) => {
-      const tick = rulerStore.getTick(e.nativeEvent.offsetX)
+      const tick = getTick(e.nativeEvent.offsetX)
       const timeSignature = timeSignatureHitTest(tick)
 
       if (timeSignature !== undefined) {
@@ -213,7 +215,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
         onClickRuler(e)
       } else {
         if (e.button == 2) {
-          setRightClickTick(rulerStore.getQuantizedTick(e.nativeEvent.offsetX))
+          setRightClickTick(getQuantizedTick(e.nativeEvent.offsetX))
           onContextMenu(e)
         } else {
           clearSelectedTimeSignature()
@@ -224,7 +226,8 @@ const PianoRuler: FC<PianoRulerProps> = ({
       _onMouseDown?.(e)
     },
     [
-      quantizer,
+      getTick,
+      getQuantizedTick,
       scrollLeft,
       transform,
       timeSignatures,

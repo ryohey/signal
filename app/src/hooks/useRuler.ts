@@ -1,6 +1,8 @@
 import { findLast } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useUpdateTimeSignature } from "../actions"
+import { Range } from "../entities/geometry/Range"
+import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
@@ -24,25 +26,26 @@ export function useRuler(rulerStore: RulerStore) {
   const updateTimeSignature = useUpdateTimeSignature()
 
   const transform = useMobxSelector(
-    useCallback(() => rulerStore.parent.transform, [rulerStore]),
+    () => rulerStore.parent.transform,
+    [rulerStore],
   )
-  const timeSignatures = useMobxSelector(
-    useCallback(() => rulerStore.timeSignatures, [rulerStore]),
-  )
-  const beats = useMobxSelector(
-    useCallback(() => rulerStore.beats, [rulerStore]),
-  )
+  const timeSignatures = useMobxStore(({ song }) => song.timeSignatures)
+  const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
   const quantizer = useMobxSelector(
-    useCallback(() => rulerStore.quantizer, [rulerStore]),
+    () => rulerStore.parent.quantizer,
+    [rulerStore],
   )
   const canvasWidth = useMobxSelector(
-    useCallback(() => rulerStore.parent.canvasWidth, [rulerStore]),
+    () => rulerStore.parent.canvasWidth,
+    [rulerStore],
   )
   const scrollLeft = useMobxSelector(
-    useCallback(() => rulerStore.parent.scrollLeft, [rulerStore]),
+    () => rulerStore.parent.scrollLeft,
+    [rulerStore],
   )
   const selectedTimeSignatureEventIds = useMobxSelector(
-    useCallback(() => rulerStore.selectedTimeSignatureEventIds, [rulerStore]),
+    () => rulerStore.selectedTimeSignatureEventIds,
+    [rulerStore],
   )
   const loop = useMobxStore(({ player }) => player.loop)
 
@@ -63,8 +66,8 @@ export function useRuler(rulerStore: RulerStore) {
     // 密過ぎる時は省略する
     const shouldOmit = beats.length > 1 && beats[1].x - beats[0].x <= 5
 
-    for (let i = 0; i < rulerStore.beats.length; i++) {
-      const beat = rulerStore.beats[i]
+    for (let i = 0; i < beats.length; i++) {
+      const beat = beats[i]
       const x = transform.getX(beat.tick)
       if (beat.beat === 0 || !shouldOmit) {
         result.push({
@@ -80,18 +83,43 @@ export function useRuler(rulerStore: RulerStore) {
       }
     }
     return result
-  }, [rulerStore.beats, transform])
+  }, [beats, transform])
 
   const rulerTimeSignatures = useMemo(() => {
-    return timeSignatures.map((e) => {
-      const x = transform.getX(e.tick)
-      return {
-        x,
-        label: `${e.numerator}/${e.denominator}`,
-        isSelected: selectedTimeSignatureEventIds.includes(e.id),
-      }
-    })
-  }, [timeSignatures, transform, selectedTimeSignatureEventIds])
+    return timeSignatures
+      .filter(
+        isEventInRange(
+          Range.fromLength(
+            transform.getTick(scrollLeft),
+            transform.getTick(canvasWidth),
+          ),
+        ),
+      )
+      .map((e) => {
+        const x = transform.getX(e.tick)
+        return {
+          x,
+          label: `${e.numerator}/${e.denominator}`,
+          isSelected: selectedTimeSignatureEventIds.includes(e.id),
+        }
+      })
+  }, [
+    scrollLeft,
+    canvasWidth,
+    transform,
+    selectedTimeSignatureEventIds,
+    timeSignatures,
+  ])
+
+  const getTick = useCallback(
+    (offsetX: number) => transform.getTick(offsetX + scrollLeft),
+    [transform, scrollLeft],
+  )
+
+  const getQuantizedTick = useCallback(
+    (offsetX: number) => quantizer.round(getTick(offsetX)),
+    [quantizer, getTick],
+  )
 
   return {
     canvasWidth,
@@ -99,7 +127,6 @@ export function useRuler(rulerStore: RulerStore) {
     beats: rulerBeats,
     loop,
     timeSignatures: rulerTimeSignatures,
-    quantizer,
     transform,
     timeSignatureHitTest,
     setLoopBegin: (tick: number) => player.setLoopBegin(tick),
@@ -118,5 +145,7 @@ export function useRuler(rulerStore: RulerStore) {
         updateTimeSignature(id, numerator, denominator)
       })
     },
+    getTick,
+    getQuantizedTick,
   }
 }

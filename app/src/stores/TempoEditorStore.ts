@@ -48,6 +48,7 @@ export default class TempoEditorStore {
       contentWidth: computed,
       controlPoints: computed,
       selectionRect: computed,
+      quantizer: computed,
     })
   }
 

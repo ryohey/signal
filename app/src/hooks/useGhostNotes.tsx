@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import { Range } from "../entities/geometry/Range"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import { isNoteEvent, TrackId } from "../track"
@@ -15,9 +15,7 @@ export function useGhostNotes(trackId: TrackId) {
     ({ pianoRollStore }) => pianoRollStore.canvasWidth,
   )
   const track = useMobxStore(({ song }) => song.getTrack(trackId))
-  const events = useMobxSelector(
-    useCallback(() => track?.events ?? [], [track]),
-  )
+  const events = useMobxSelector(() => track?.events ?? [], [track])
 
   const windowedEvents = useMemo(
     () =>
