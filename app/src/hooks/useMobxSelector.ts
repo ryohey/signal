@@ -12,7 +12,7 @@ export function useMobxSelector<T>(selector: Selector<T>, deps: any[]): T {
         reaction(selector, onStoreChange, {
           fireImmediately: true,
         }),
-      [deps],
+      deps,
     ),
     selector,
   )
@@ -20,6 +20,5 @@ export function useMobxSelector<T>(selector: Selector<T>, deps: any[]): T {
 
 export function useMobxStore<T>(selector: (rootStore: RootStore) => T): T {
   const rootStore = useStores()
-  const getter = useCallback(() => selector(rootStore), [rootStore])
-  return useMobxSelector(getter, [getter])
+  return useMobxSelector(() => selector(rootStore), [rootStore])
 }

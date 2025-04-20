@@ -24,25 +24,14 @@ export interface RulerTimeSignature {
 export function useRuler(rulerStore: RulerStore) {
   const { player } = useStores()
   const updateTimeSignature = useUpdateTimeSignature()
+  const { parent } = rulerStore
 
-  const transform = useMobxSelector(
-    () => rulerStore.parent.transform,
-    [rulerStore],
-  )
+  const transform = useMobxSelector(() => parent.transform, [parent])
   const timeSignatures = useMobxStore(({ song }) => song.timeSignatures)
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
-  const quantizer = useMobxSelector(
-    () => rulerStore.parent.quantizer,
-    [rulerStore],
-  )
-  const canvasWidth = useMobxSelector(
-    () => rulerStore.parent.canvasWidth,
-    [rulerStore],
-  )
-  const scrollLeft = useMobxSelector(
-    () => rulerStore.parent.scrollLeft,
-    [rulerStore],
-  )
+  const quantizer = useMobxSelector(() => parent.quantizer, [parent])
+  const canvasWidth = useMobxSelector(() => parent.canvasWidth, [parent])
+  const scrollLeft = useMobxSelector(() => parent.scrollLeft, [parent])
   const selectedTimeSignatureEventIds = useMobxSelector(
     () => rulerStore.selectedTimeSignatureEventIds,
     [rulerStore],

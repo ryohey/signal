@@ -2,7 +2,6 @@ import { computed, makeObservable, observable } from "mobx"
 import { Layout } from "../Constants"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { Point } from "../entities/geometry/Point"
-import { Rect } from "../entities/geometry/Rect"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import Quantizer from "../quantizer"
@@ -47,7 +46,6 @@ export default class TempoEditorStore {
       cursorX: computed,
       contentWidth: computed,
       controlPoints: computed,
-      selectionRect: computed,
       quantizer: computed,
     })
   }
@@ -95,17 +93,6 @@ export default class TempoEditorStore {
       ...pointToCircleRect(p.bounds, circleRadius),
       id: p.id,
     }))
-  }
-
-  get selectionRect() {
-    const { selection, transform } = this
-    return selection != null
-      ? TempoSelection.getBounds(selection, transform)
-      : null
-  }
-
-  hitTest(point: Point): number | undefined {
-    return this.controlPoints.find((r) => Rect.containsPoint(r, point))?.id
   }
 }
 

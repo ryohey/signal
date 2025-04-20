@@ -1,6 +1,5 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../../hooks/useStores"
+import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { LineGraphItems } from "../../ControlPane/LineGraph/LineGraphItems"
 
 export interface TempoItemsProps {
@@ -8,10 +7,9 @@ export interface TempoItemsProps {
   zIndex: number
 }
 
-export const TempoItems: FC<TempoItemsProps> = observer(({ width, zIndex }) => {
-  const {
-    tempoEditorStore: { items, selectedEventIds, controlPoints, scrollLeft },
-  } = useStores()
+export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
+  const { items, selectedEventIds, controlPoints, scrollLeft } =
+    useTempoEditor()
 
   return (
     <LineGraphItems
@@ -24,4 +22,4 @@ export const TempoItems: FC<TempoItemsProps> = observer(({ width, zIndex }) => {
       zIndex={zIndex}
     />
   )
-})
+}

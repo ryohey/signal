@@ -1,18 +1,8 @@
-import { observer } from "mobx-react-lite"
-import { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { FC } from "react"
+import { useTempoEditor } from "../../hooks/useTempoEditor"
 import { ToolSelector } from "../Toolbar/ToolSelector"
 
-export const TempoGraphToolSelector: FC = observer(() => {
-  const { tempoEditorStore } = useStores()
-  const { mouseMode } = tempoEditorStore
-  return (
-    <ToolSelector
-      mouseMode={mouseMode}
-      onSelect={useCallback(
-        (mouseMode: any) => (tempoEditorStore.mouseMode = mouseMode),
-        [],
-      )}
-    />
-  )
-})
+export const TempoGraphToolSelector: FC = () => {
+  const { mouseMode, setMouseMode } = useTempoEditor()
+  return <ToolSelector mouseMode={mouseMode} onSelect={setMouseMode} />
+}

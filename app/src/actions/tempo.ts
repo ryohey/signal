@@ -5,18 +5,16 @@ import {
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useStores } from "../hooks/useStores"
+import { useTempoEditor } from "../hooks/useTempoEditor"
 import clipboard from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
-  const {
-    song: { conductorTrack },
-    tempoEditorStore,
-    tempoEditorStore: { selectedEventIds },
-    pushHistory,
-  } = useStores()
+  const { song, pushHistory } = useStores()
+  const { selectedEventIds, setSelection } = useTempoEditor()
 
   return () => {
+    const { conductorTrack } = song
     if (conductorTrack === undefined || selectedEventIds.length === 0) {
       return
     }
@@ -26,26 +24,25 @@ export const useDeleteTempoSelection = () => {
     // 選択範囲と選択されたノートを削除
     // Remove selected notes and selected notes
     conductorTrack.removeEvents(selectedEventIds)
-    tempoEditorStore.selection = null
+    setSelection(null)
   }
 }
 
 export const useResetTempoSelection = () => {
-  const { tempoEditorStore } = useStores()
+  const { setSelection, setSelectedEventIds } = useTempoEditor()
 
   return () => {
-    tempoEditorStore.selection = null
-    tempoEditorStore.selectedEventIds = []
+    setSelection(null)
+    setSelectedEventIds([])
   }
 }
 
 export const useCopyTempoSelection = () => {
-  const {
-    song: { conductorTrack },
-    tempoEditorStore: { selectedEventIds },
-  } = useStores()
+  const { song } = useStores()
+  const { selectedEventIds } = useTempoEditor()
 
   return () => {
+    const { conductorTrack } = song
     if (conductorTrack === undefined || selectedEventIds.length === 0) {
       return
     }
@@ -111,14 +108,11 @@ export const usePasteTempoSelection = () => {
 }
 
 export const useDuplicateTempoSelection = () => {
-  const {
-    song: { conductorTrack },
-    tempoEditorStore,
-    tempoEditorStore: { selectedEventIds },
-    pushHistory,
-  } = useStores()
+  const { song, pushHistory } = useStores()
+  const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
 
   return () => {
+    const { conductorTrack } = song
     if (conductorTrack === undefined || selectedEventIds.length === 0) {
       return
     }
@@ -144,6 +138,6 @@ export const useDuplicateTempoSelection = () => {
     )
 
     // select the created events
-    tempoEditorStore.selectedEventIds = addedEvents.map((e) => e.id)
+    setSelectedEventIds(addedEvents.map((e) => e.id))
   }
 }
