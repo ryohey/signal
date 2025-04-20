@@ -1,4 +1,5 @@
 import { useCallback } from "react"
+import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
@@ -40,10 +41,16 @@ export function useArrangeView() {
   const selectedTrackId = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.selectedTrackId,
   )
+  const selection = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.selection,
+  )
   const selectedEventIds = useMobxStore(
     ({ arrangeViewStore }) => arrangeViewStore.selectedEventIds,
   )
   const tracks = useMobxStore(({ song }) => song.tracks)
+  const quantizer = useMobxStore(
+    ({ arrangeViewStore }) => arrangeViewStore.quantizer,
+  )
 
   return {
     tracks,
@@ -60,8 +67,10 @@ export function useArrangeView() {
     scrollTop,
     selectedTrackIndex,
     selectedTrackId,
+    selection,
     selectedEventIds,
     rulerStore: arrangeViewStore.rulerStore,
+    quantizer,
     setCanvasWidth: useCallback((width: number) => {
       arrangeViewStore.canvasWidth = width
     }, []),
@@ -88,6 +97,9 @@ export function useArrangeView() {
     }, []),
     setSelectedTrackIndex: useCallback((index: number) => {
       arrangeViewStore.selectedTrackIndex = index
+    }, []),
+    setSelection: useCallback((selection: ArrangeSelection | null) => {
+      arrangeViewStore.selection = selection
     }, []),
     setSelectedEventIds: useCallback(
       (ids: { [trackIndex: number]: number[] } = {}) => {
