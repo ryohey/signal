@@ -1,4 +1,5 @@
 import { useTheme } from "@emotion/react"
+import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
@@ -6,7 +7,6 @@ import { Layout } from "../../../Constants"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../gl/color"
 import { useStores } from "../../../hooks/useStores"
-import { GLFallback } from "../../GLNodes/GLFallback"
 import { HorizontalGrid } from "./HorizontalGrid"
 import { LegacyLines } from "./lagacy/LegacyLines"
 

@@ -2,7 +2,6 @@ import { useTheme } from "@emotion/react"
 import { IRect, Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { BeatWithX } from "../../../entities/beat/BeatWithX"
 import { colorToVec4 } from "../../../gl/color"
@@ -11,7 +10,7 @@ export const LegacyBeats: FC<{
   height: number
   beats: BeatWithX[]
   zIndex: number
-}> = observer(({ height, beats, zIndex }) => {
+}> = ({ height, beats, zIndex }) => {
   const theme = useTheme()
 
   const vline = (x: number): IRect => ({
@@ -42,4 +41,4 @@ export const LegacyBeats: FC<{
       />
     </>
   )
-})
+}

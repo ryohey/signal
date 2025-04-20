@@ -1,11 +1,10 @@
 import { useTheme } from "@emotion/react"
-import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
+import { GLFallback, GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
 import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
-import { GLFallback } from "../../GLNodes/GLFallback"
 import { LegacyVelocityItems } from "../../GLNodes/legacy/LegacyVelocityItems"
 import { IVelocityData, VelocityShader } from "./VelocityShader"
 
