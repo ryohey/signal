@@ -10,11 +10,11 @@
     "baseUrl": "./src",
     "sourceMap": true,
     "target": "esnext",
-    "module": "esnext",
+    "module": "es2015",
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "lib": ["es2019", "dom"],
@@ -28,5 +28,5 @@
       "@types/react": ["../node_modules/@types/react"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*"]
 }

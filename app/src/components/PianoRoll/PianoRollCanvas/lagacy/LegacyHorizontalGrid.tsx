@@ -1,23 +1,23 @@
 import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
 import { vec4 } from "gl-matrix"
 import { FC } from "react"
-import { Rect } from "../../../entities/geometry/Rect"
-import { HorizontalGridShader } from "./shaders/HorizontalGridShader"
+import { Rect } from "../../../../entities/geometry/Rect"
+import { HorizontalGridShader } from "./HorizontalGridShader"
 
-export interface HorizontalGridProps {
+export interface LegacyHorizontalGridProps {
   rect: Rect
   color: vec4
   highlightedColor: vec4
-  laneColors: Float32Array // 12 colors x 4 rgba
+  blackLaneColor: vec4
   height: number
   zIndex?: number
 }
 
-export const HorizontalGrid: FC<HorizontalGridProps> = ({
+export const LegacyHorizontalGrid: FC<LegacyHorizontalGridProps> = ({
   rect,
   color,
   highlightedColor,
-  laneColors,
+  blackLaneColor,
   height,
   zIndex,
 }) => {
@@ -25,12 +25,13 @@ export const HorizontalGrid: FC<HorizontalGridProps> = ({
 
   return (
     <GLNode
-      shader={HorizontalGridShader}
+      shader={null as any}
+      shaderFallback={HorizontalGridShader}
       uniforms={{
         projectionMatrix,
         color,
         highlightedColor,
-        laneColors,
+        blackLaneColor,
         height,
       }}
       buffer={rect}

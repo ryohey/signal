@@ -1,4 +1,5 @@
 import { useTheme } from "@emotion/react"
+import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
@@ -7,8 +8,17 @@ import { useStores } from "../../../hooks/useStores"
 import { trackColorToCSSColor } from "../../../track/TrackColor"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
+import { LegacyNotes } from "./lagacy/LegacyNotes"
 
-export const Notes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
+export interface NotesProps {
+  zIndex: number
+}
+
+export const Notes: FC<NotesProps> = (props) => {
+  return <GLFallback component={_Notes} fallback={LegacyNotes} {...props} />
+}
+
+const _Notes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
   const {
     pianoRollStore: { notes, selectedTrack },
   } = useStores()

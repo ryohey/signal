@@ -144,4 +144,5 @@ export const NoteShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
+    (vertexArray) => new NoteBuffer(vertexArray),
   )

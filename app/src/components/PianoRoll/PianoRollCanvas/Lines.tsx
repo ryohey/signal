@@ -1,4 +1,5 @@
 import { useTheme } from "@emotion/react"
+import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
@@ -7,13 +8,22 @@ import { KeySignature } from "../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../gl/color"
 import { useStores } from "../../../hooks/useStores"
 import { HorizontalGrid } from "./HorizontalGrid"
+import { LegacyLines } from "./lagacy/LegacyLines"
 
 function keySignatureToConditions(keySignature: KeySignature) {
   const intervals = KeySignature.getIntervals(keySignature)
   return new Array(12).fill(false).map((_, i) => intervals.includes(i % 12))
 }
 
-export const Lines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
+export interface LinesProps {
+  zIndex: number
+}
+
+export const Lines: FC<LinesProps> = (props) => {
+  return <GLFallback component={_Lines} fallback={LegacyLines} {...props} />
+}
+
+const _Lines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
   const theme = useTheme()
   const {
     pianoRollStore: {

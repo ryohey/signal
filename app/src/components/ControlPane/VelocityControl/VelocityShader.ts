@@ -12,7 +12,7 @@ export interface IVelocityData {
   isSelected: boolean
 }
 
-export class VelocityBuffer
+class VelocityBuffer
   implements
     InstancedBuffer<(Rect & IVelocityData)[], "position" | "bounds" | "state">
 {
@@ -139,4 +139,5 @@ export const VelocityShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
+    (vertexArray) => new VelocityBuffer(vertexArray),
   )
