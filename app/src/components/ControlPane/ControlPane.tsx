@@ -1,9 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import { observer } from "mobx-react-lite"
-import React, { FC, useCallback, useRef } from "react"
+import React, { FC, useRef } from "react"
 import { Layout } from "../../Constants"
+import { useControlPane } from "../../hooks/useControlPane"
 import { useStores } from "../../hooks/useStores"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
 import { ControlName } from "./ControlName"
@@ -62,33 +62,31 @@ const Toolbar = styled.div`
   }
 `
 
-const TabBar: FC<TabBarProps> = React.memo(
-  observer(({ onSelect, selectedMode }) => {
-    const { controlStore, rootViewStore } = useStores()
-    const { controlModes } = controlStore
+const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
+  const { rootViewStore } = useStores()
+  const { controlModes } = useControlPane()
 
-    return (
-      <Toolbar>
-        {controlModes.map((mode, i) => (
-          <TabButton
-            selected={isEqualControlMode(selectedMode, mode)}
-            onMouseDown={() => onSelect(mode)}
-            key={i}
-          >
-            <NoWrap>
-              <ControlName mode={mode} />
-            </NoWrap>
-          </TabButton>
-        ))}
-        <TabButtonBase
-          onClick={() => (rootViewStore.openControlSettingDialog = true)}
+  return (
+    <Toolbar>
+      {controlModes.map((mode, i) => (
+        <TabButton
+          selected={isEqualControlMode(selectedMode, mode)}
+          onMouseDown={() => onSelect(mode)}
+          key={i}
         >
-          <DotsHorizontalIcon style={{ width: "1rem" }} />
-        </TabButtonBase>
-      </Toolbar>
-    )
-  }),
-)
+          <NoWrap>
+            <ControlName mode={mode} />
+          </NoWrap>
+        </TabButton>
+      ))}
+      <TabButtonBase
+        onClick={() => (rootViewStore.openControlSettingDialog = true)}
+      >
+        <DotsHorizontalIcon style={{ width: "1rem" }} />
+      </TabButtonBase>
+    </Toolbar>
+  )
+})
 
 const Parent = styled.div`
   width: 100%;
@@ -113,16 +111,10 @@ const Content = styled.div`
 const TAB_HEIGHT = 30
 const BORDER_WIDTH = 1
 
-const ControlPane: FC = observer(() => {
+const ControlPane: FC = () => {
   const ref = useRef(null)
   const containerSize = useComponentSize(ref)
-  const { controlStore } = useStores()
-  const { controlMode: mode } = controlStore
-
-  const onSelectTab = useCallback(
-    (m: ControlMode) => (controlStore.controlMode = m),
-    [],
-  )
+  const { controlMode: mode, setControlMode } = useControlPane()
 
   const controlSize = {
     width: containerSize.width - Layout.keyWidth - BORDER_WIDTH,
@@ -140,10 +132,10 @@ const ControlPane: FC = observer(() => {
 
   return (
     <Parent ref={ref}>
-      <TabBar onSelect={onSelectTab} selectedMode={mode} />
+      <TabBar onSelect={setControlMode} selectedMode={mode} />
       <Content>{control}</Content>
     </Parent>
   )
-})
+}
 
 export default ControlPane

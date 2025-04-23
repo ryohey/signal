@@ -2,15 +2,12 @@ import { Point } from "../../../../entities/geometry/Point"
 import { ControlSelection } from "../../../../entities/selection/ControlSelection"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
+import { useControlPane } from "../../../../hooks/useControlPane"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useCreateSelectionGesture = () => {
-  const {
-    pianoRollStore,
-    controlStore,
-    controlStore: { quantizer },
-    player,
-  } = useStores()
+  const { pianoRollStore, controlStore, player } = useStores()
+  const { setSelectedEventIds, setSelection, quantizer } = useControlPane()
 
   return {
     onMouseDown(
@@ -21,7 +18,7 @@ export const useCreateSelectionGesture = () => {
         selection: ControlSelection,
       ) => number[],
     ) {
-      controlStore.selectedEventIds = []
+      setSelectedEventIds([])
 
       const startTick = quantizer.round(controlTransform.getTick(startPoint.x))
 
@@ -32,29 +29,28 @@ export const useCreateSelectionGesture = () => {
         player.position = startTick
       }
 
-      controlStore.selection = {
+      setSelection({
         fromTick: startTick,
         toTick: startTick,
-      }
+      })
 
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const local = Point.add(startPoint, delta)
           const endTick = quantizer.round(controlTransform.getTick(local.x))
-          controlStore.selection = {
+          setSelection({
             fromTick: Math.min(startTick, endTick),
             toTick: Math.max(startTick, endTick),
-          }
+          })
         },
         onMouseUp: () => {
-          const { selection } = controlStore
+          const { selection } = controlStore // read latest value from store
           if (selection === null) {
             return
           }
 
-          controlStore.selectedEventIds =
-            getControllerEventIdsInSelection(selection)
-          controlStore.selection = null
+          setSelectedEventIds(getControllerEventIdsInSelection(selection))
+          setSelection(null)
         },
       })
     },

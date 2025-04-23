@@ -1,9 +1,8 @@
 import { MIDIControlEvents } from "midifile-ts"
-import { observer } from "mobx-react-lite"
 import React, { FC, useMemo } from "react"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
 import { Size } from "../../../entities/geometry/Size"
-import { useStores } from "../../../hooks/useStores"
+import { useControlPane } from "../../../hooks/useControlPane"
 import LineGraphControl from "../LineGraph/LineGraph"
 
 export type ValueEventGraphProps = Size & {
@@ -47,10 +46,8 @@ const labelFormatterForType = (
 }
 
 export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
-  observer(({ width, height, type }) => {
-    const {
-      controlStore: { controlValueEvents: events },
-    } = useStores()
+  ({ width, height, type }) => {
+    const { controlValueEvents: events } = useControlPane()
 
     const axis = useMemo(() => axisForType(type), [type])
     const maxValue = useMemo(() => maxValueForType(type), [type])
@@ -67,5 +64,5 @@ export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
         axisLabelFormatter={labelFormatter}
       />
     )
-  }),
+  },
 )

@@ -3,6 +3,7 @@ import { Point } from "../../../../entities/geometry/Point"
 import { Selection } from "../../../../entities/selection/Selection"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
+import { useControlPane } from "../../../../hooks/useControlPane"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useSelectNoteGesture = (): MouseGesture => {
@@ -10,8 +11,8 @@ export const useSelectNoteGesture = (): MouseGesture => {
     pianoRollStore,
     pianoRollStore: { transform, quantizer },
     player,
-    controlStore,
   } = useStores()
+  const { setSelectedEventIds } = useControlPane()
 
   return {
     onMouseDown(e) {
@@ -23,7 +24,7 @@ export const useSelectNoteGesture = (): MouseGesture => {
         player.position = quantizer.round(start.tick)
       }
 
-      controlStore.selectedEventIds = []
+      setSelectedEventIds([])
       pianoRollStore.selection = Selection.fromPoints(start, start)
 
       observeDrag2(e, {

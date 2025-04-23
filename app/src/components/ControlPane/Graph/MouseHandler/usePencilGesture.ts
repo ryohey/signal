@@ -6,12 +6,14 @@ import { ControlCoordTransform } from "../../../../entities/transform/ControlCoo
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
+import { useControlPane } from "../../../../hooks/useControlPane"
 import { useStores } from "../../../../hooks/useStores"
 
 export const usePencilGesture = (): MouseGesture<
   [Point, ControlCoordTransform, ValueEventType]
 > => {
-  const { controlStore, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
+  const { setSelectedEventIds, setSelection } = useControlPane()
   const createTrackEvent = useCreateEvent()
   const updateValueEvents = useUpdateValueEvents()
   const pushHistory = usePushHistory()
@@ -20,8 +22,8 @@ export const usePencilGesture = (): MouseGesture<
     onMouseDown(e, startPoint, transform, type) {
       pushHistory()
 
-      controlStore.selectedEventIds = []
-      controlStore.selection = null
+      setSelectedEventIds([])
+      setSelection(null)
       pianoRollStore.selection = null
       pianoRollStore.selectedNoteIds = []
 

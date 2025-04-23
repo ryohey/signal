@@ -5,15 +5,17 @@ import {
   isControlEventsClipboardData,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
+import { useControlPane } from "../hooks/useControlPane"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
   const {
-    controlStore: { selectedEventIds, selectedTrack },
+    pianoRollStore: { selectedTrack },
     player,
     pushHistory,
   } = useStores()
+  const { selectedEventIds } = useControlPane()
 
   return <T extends ControllerEvent | PitchBendEvent>(event: T) => {
     if (selectedTrack === undefined) {
@@ -41,10 +43,10 @@ export const useCreateOrUpdateControlEventsValue = () => {
 
 export const useDeleteControlSelection = () => {
   const {
-    controlStore,
-    controlStore: { selectedEventIds, selectedTrack },
+    pianoRollStore: { selectedTrack },
     pushHistory,
   } = useStores()
+  const { selectedEventIds, setSelection } = useControlPane()
 
   return () => {
     if (selectedTrack === undefined || selectedEventIds.length === 0) {
@@ -55,23 +57,15 @@ export const useDeleteControlSelection = () => {
 
     // Remove selected notes and selected notes
     selectedTrack.removeEvents(selectedEventIds)
-    controlStore.selection = null
-  }
-}
-
-export const useResetControlSelection = () => {
-  const { controlStore } = useStores()
-
-  return () => {
-    controlStore.selection = null
-    controlStore.selectedEventIds = []
+    setSelection(null)
   }
 }
 
 export const useCopyControlSelection = () => {
   const {
-    controlStore: { selectedEventIds, selectedTrack },
+    pianoRollStore: { selectedTrack },
   } = useStores()
+  const { selectedEventIds } = useControlPane()
 
   return () => {
     if (selectedTrack === undefined || selectedEventIds.length === 0) {
@@ -139,10 +133,10 @@ export const usePasteControlSelection = () => {
 
 export const useDuplicateControlSelection = () => {
   const {
-    controlStore,
-    controlStore: { selectedEventIds, selectedTrack },
+    pianoRollStore: { selectedTrack },
     pushHistory,
   } = useStores()
+  const { selectedEventIds, setSelectedEventIds } = useControlPane()
 
   return () => {
     if (selectedTrack === undefined || selectedEventIds.length === 0) {
@@ -169,6 +163,6 @@ export const useDuplicateControlSelection = () => {
     const addedEvents = selectedTrack.transaction((it) =>
       notes.map((e) => it.createOrUpdate(e)),
     )
-    controlStore.selectedEventIds = addedEvents.map((e) => e.id)
+    setSelectedEventIds(addedEvents.map((e) => e.id))
   }
 }
