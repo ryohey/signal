@@ -8,58 +8,54 @@ import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
+import { useArrangeView } from "../hooks/useArrangeView"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import Track from "../track"
 import { batchUpdateNotesVelocity, BatchUpdateOperation } from "./track"
 
 export const useArrangeResizeSelection = () => {
-  const {
-    song: { tracks },
-    arrangeViewStore,
-    arrangeViewStore: { quantizer },
-  } = useStores()
+  const rootStore = useStores()
+  const { quantizer, setSelection } = useArrangeView()
 
   return (start: ArrangePoint, end: ArrangePoint) => {
+    const {
+      song: { tracks },
+    } = rootStore
     // 選択範囲作成時 (確定前) のドラッグ中
     // Drag during selection (before finalization)
-    arrangeViewStore.selection = ArrangeSelection.fromPoints(
-      start,
-      end,
-      quantizer,
-      tracks.length,
+    setSelection(
+      ArrangeSelection.fromPoints(start, end, quantizer, tracks.length),
     )
   }
 }
 
 export const useArrangeEndSelection = () => {
-  const {
-    arrangeViewStore,
-    song: { tracks },
-  } = useStores()
+  const rootStore = useStores()
+  const { setSelectedEventIds } = useArrangeView()
 
   return () => {
-    const { selection } = arrangeViewStore
+    const {
+      song: { tracks },
+      arrangeViewStore: { selection }, // read selection from store to use latest value
+    } = rootStore
     if (selection) {
-      arrangeViewStore.selectedEventIds = getEventsInSelection(
-        tracks,
-        selection,
-      )
+      setSelectedEventIds(getEventsInSelection(tracks, selection))
     }
   }
 }
 
 export const useArrangeMoveSelection = () => {
-  const {
-    arrangeViewStore,
-    arrangeViewStore: { quantizer },
-    song: { tracks },
-  } = useStores()
-
+  const rootStore = useStores()
+  const { quantizer } = useArrangeView()
   const arrangeMoveSelectionBy = useArrangeMoveSelectionBy()
 
   return (point: ArrangePoint) => {
-    const { selection } = arrangeViewStore
+    const {
+      song: { tracks },
+      arrangeViewStore: { selection }, // read selection from store to use latest value
+    } = rootStore
+
     if (selection === null) {
       return
     }
@@ -83,13 +79,16 @@ export const useArrangeMoveSelection = () => {
 }
 
 export const useArrangeMoveSelectionBy = () => {
-  const {
-    arrangeViewStore: s,
-    song: { tracks },
-  } = useStores()
+  const rootStore = useStores()
+  const { setSelection, setSelectedEventIds } = useArrangeView()
 
   return (delta: ArrangePoint) => {
-    if (s.selection === null) {
+    const {
+      song: { tracks },
+      arrangeViewStore: { selection, selectedEventIds }, // read selection from store to use latest value
+    } = rootStore
+
+    if (selection === null) {
       return
     }
 
@@ -98,18 +97,18 @@ export const useArrangeMoveSelectionBy = () => {
     }
 
     // Move selection range
-    const selection = ArrangeSelection.moved(s.selection, delta)
+    const newSelection = ArrangeSelection.moved(selection, delta)
 
-    s.selection = selection
+    setSelection(newSelection)
 
     // Move notes
     const updates = []
-    for (const [trackIndexStr, selectedEventIds] of Object.entries(
-      s.selectedEventIds,
+    for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
+      selectedEventIds,
     )) {
       const trackIndex = parseInt(trackIndexStr, 10)
       const track = tracks[trackIndex]
-      const events = selectedEventIds
+      const events = selectedEventIdsValue
         .map((id) => track.getEventById(id))
         .filter(isNotUndefined)
 
@@ -138,16 +137,16 @@ export const useArrangeMoveSelectionBy = () => {
         const events = tracks[u.destinationTrackIndex].addEvents(u.events)
         ids[u.destinationTrackIndex] = events.map((e) => e.id)
       }
-      s.selectedEventIds = ids
+      setSelectedEventIds(ids)
     }
   }
 }
 
 export const useArrangeCopySelection = () => {
   const {
-    arrangeViewStore: { selection, selectedEventIds },
     song: { tracks },
   } = useStores()
+  const { selection, selectedEventIds } = useArrangeView()
 
   return () => {
     if (selection === null) {
@@ -177,9 +176,9 @@ export const useArrangePasteSelection = () => {
   const {
     song: { tracks },
     player,
-    arrangeViewStore: { selectedTrackIndex },
     pushHistory,
   } = useStores()
+  const { selectedTrackIndex } = useArrangeView()
 
   return () => {
     const text = clipboard.readText()
@@ -215,19 +214,20 @@ export const useArrangePasteSelection = () => {
 
 export const useArrangeDeleteSelection = () => {
   const {
-    arrangeViewStore: s,
     song: { tracks },
     pushHistory,
   } = useStores()
+  const { setSelection, selectedEventIds, setSelectedEventIds } =
+    useArrangeView()
 
   return () => {
     pushHistory()
 
-    for (const trackIndex in s.selectedEventIds) {
-      tracks[trackIndex].removeEvents(s.selectedEventIds[trackIndex])
+    for (const trackIndex in selectedEventIds) {
+      tracks[trackIndex].removeEvents(selectedEventIds[trackIndex])
     }
-    s.selection = null
-    s.selectedEventIds = []
+    setSelectedEventIds({})
+    setSelection(null)
   }
 }
 
@@ -249,11 +249,8 @@ function getEventsInSelection(tracks: Track[], selection: ArrangeSelection) {
 }
 
 export const useArrangeTransposeSelection = () => {
-  const {
-    song,
-    pushHistory,
-    arrangeViewStore: { selectedEventIds },
-  } = useStores()
+  const { song, pushHistory } = useStores()
+  const { selectedEventIds } = useArrangeView()
 
   return (deltaPitch: number) => {
     pushHistory()
@@ -264,10 +261,10 @@ export const useArrangeTransposeSelection = () => {
 export const useArrangeDuplicateSelection = () => {
   const {
     song: { tracks },
-    arrangeViewStore,
-    arrangeViewStore: { selection, selectedEventIds },
     pushHistory,
   } = useStores()
+  const { selection, selectedEventIds, setSelection, setSelectedEventIds } =
+    useArrangeView()
 
   return () => {
     if (selection === null) {
@@ -296,26 +293,25 @@ export const useArrangeDuplicateSelection = () => {
       addedEventIds[trackIndex] = newEvent.map((e) => e.id)
     }
 
-    arrangeViewStore.selection = {
+    setSelection({
       fromTick: selection.fromTick + deltaTick,
       fromTrackIndex: selection.fromTrackIndex,
       toTick: selection.toTick + deltaTick,
       toTrackIndex: selection.toTrackIndex,
-    }
+    })
 
-    arrangeViewStore.selectedEventIds = addedEventIds
+    setSelectedEventIds(addedEventIds)
   }
 }
 
 export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
   const {
-    arrangeViewStore,
     song: { tracks },
     pushHistory,
   } = useStores()
+  const { selectedEventIds } = useArrangeView()
 
   return (operation: BatchUpdateOperation) => {
-    const { selectedEventIds } = arrangeViewStore
     pushHistory()
 
     for (const [trackIndexStr, eventIds] of Object.entries(selectedEventIds)) {

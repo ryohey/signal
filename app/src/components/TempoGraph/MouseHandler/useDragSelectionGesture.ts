@@ -8,17 +8,14 @@ import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useStores } from "../../../hooks/useStores"
+import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
 export const useDragSelectionGesture = (): MouseGesture<
   [number, Point, TempoCoordTransform]
 > => {
-  const {
-    song: { conductorTrack },
-    tempoEditorStore,
-    tempoEditorStore: { quantizer },
-    pushHistory,
-  } = useStores()
+  const { song, pushHistory } = useStores()
+  const { selectedEventIds, setSelectedEventIds, quantizer } = useTempoEditor()
 
   return {
     onMouseDown(
@@ -27,17 +24,19 @@ export const useDragSelectionGesture = (): MouseGesture<
       startPoint: Point,
       transform: TempoCoordTransform,
     ) {
+      const { conductorTrack } = song
+
       if (conductorTrack === undefined) {
         return
       }
 
       pushHistory()
 
-      if (!tempoEditorStore.selectedEventIds.includes(hitEventId)) {
-        tempoEditorStore.selectedEventIds = [hitEventId]
+      if (!selectedEventIds.includes(hitEventId)) {
+        setSelectedEventIds([hitEventId])
       }
 
-      const events = tempoEditorStore.selectedEventIds
+      const events = selectedEventIds
         .map(
           (id) =>
             conductorTrack.getEventById(

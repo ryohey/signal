@@ -6,20 +6,20 @@ import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useStores } from "../../../hooks/useStores"
+import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { setTempoMidiEvent } from "../../../midi/MidiEvent"
 import { isSetTempoEvent } from "../../../track"
 
 export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const {
-    song,
-    tempoEditorStore: { quantizer },
-    pushHistory,
-  } = useStores()
+  const { song, pushHistory } = useStores()
+  const { quantizer } = useTempoEditor()
+
   return {
     onMouseDown(e, startPoint, transform) {
-      const track = song.conductorTrack
+      const { conductorTrack: track } = song
+
       if (track === undefined) {
         return
       }

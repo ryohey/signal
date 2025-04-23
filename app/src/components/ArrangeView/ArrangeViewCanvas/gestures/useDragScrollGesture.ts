@@ -2,22 +2,23 @@ import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
-import { useStores } from "../../../../hooks/useStores"
+import { useArrangeView } from "../../../../hooks/useArrangeView"
 
 export const useDragScrollGesture = (): MouseGesture<[], React.MouseEvent> => {
   const {
-    arrangeViewStore,
-    arrangeViewStore: { scrollLeft, scrollTop },
-  } = useStores()
+    scrollLeft,
+    scrollTop,
+    setScrollLeftInPixels,
+    setScrollTop,
+    setAutoScroll,
+  } = useArrangeView()
 
-  const setScrollLeft = useCallback((v: number) => {
-    arrangeViewStore.setScrollLeftInPixels(v)
-    arrangeViewStore.autoScroll = false
-  }, [])
-
-  const setScrollTop = useCallback(
-    (v: number) => arrangeViewStore.setScrollTop(v),
-    [],
+  const setScrollLeft = useCallback(
+    (v: number) => {
+      setScrollLeftInPixels(v)
+      setAutoScroll(false)
+    },
+    [setScrollLeftInPixels, setAutoScroll],
   )
 
   const onMouseDown = useCallback(

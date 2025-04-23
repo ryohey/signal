@@ -2,7 +2,6 @@ import { computed, makeObservable, observable } from "mobx"
 import { Layout } from "../Constants"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { Point } from "../entities/geometry/Point"
-import { Rect } from "../entities/geometry/Rect"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import Quantizer from "../quantizer"
@@ -13,7 +12,7 @@ import { TickScrollStore } from "./TickScrollStore"
 
 export default class TempoEditorStore {
   readonly rulerStore: RulerStore
-  private readonly tickScrollStore: TickScrollStore
+  readonly tickScrollStore: TickScrollStore
 
   scrollLeftTicks: number = 0
   scaleX: number = 1
@@ -44,19 +43,13 @@ export default class TempoEditorStore {
       scrollLeft: computed,
       transform: computed,
       items: computed,
-      cursorX: computed,
-      contentWidth: computed,
       controlPoints: computed,
-      selectionRect: computed,
+      quantizer: computed,
     })
   }
 
   setUpAutorun() {
     this.tickScrollStore.setUpAutoScroll()
-  }
-
-  setScrollLeftInPixels(x: number) {
-    this.tickScrollStore.setScrollLeftInPixels(x)
   }
 
   get scrollLeft(): number {
@@ -68,18 +61,10 @@ export default class TempoEditorStore {
     return new TempoCoordTransform(pixelsPerTick, this.canvasHeight)
   }
 
-  get cursorX(): number {
-    return this.transform.getX(this.rootStore.player.position)
-  }
-
   get items() {
     const { transform, canvasWidth, scrollLeft } = this
     const events = this.rootStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
-  }
-
-  get contentWidth() {
-    return this.tickScrollStore.contentWidth
   }
 
   get quantizer(): Quantizer {
@@ -94,17 +79,6 @@ export default class TempoEditorStore {
       ...pointToCircleRect(p.bounds, circleRadius),
       id: p.id,
     }))
-  }
-
-  get selectionRect() {
-    const { selection, transform } = this
-    return selection != null
-      ? TempoSelection.getBounds(selection, transform)
-      : null
-  }
-
-  hitTest(point: Point): number | undefined {
-    return this.controlPoints.find((r) => Rect.containsPoint(r, point))?.id
   }
 }
 

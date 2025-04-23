@@ -1,23 +1,25 @@
 import { Point } from "../../../entities/geometry/Point"
 import { Range } from "../../../entities/geometry/Range"
+import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
 import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useStores } from "../../../hooks/useStores"
+import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { isSetTempoEvent } from "../../../track"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const {
-    song: { conductorTrack },
-    tempoEditorStore,
-  } = useStores()
+  const { song } = useStores()
+  const { setSelectedEventIds, setSelection } = useTempoEditor()
+  let selection: TempoSelection | null = null
 
   return {
     onMouseDown(e, startPoint, transform) {
+      const { conductorTrack } = song
       if (conductorTrack === undefined) {
         return
       }
@@ -25,12 +27,12 @@ export const useCreateSelectionGesture = (): MouseGesture<
       const start = transform.fromPosition(startPoint)
       const startClientPos = getClientPos(e)
 
-      tempoEditorStore.selectedEventIds = []
+      setSelectedEventIds([])
 
-      tempoEditorStore.selection = {
+      setSelection({
         fromTick: start.tick,
         toTick: start.tick,
-      }
+      })
 
       observeDrag({
         onMouseMove: (e) => {
@@ -38,27 +40,28 @@ export const useCreateSelectionGesture = (): MouseGesture<
           const deltaPx = Point.sub(posPx, startClientPos)
           const local = Point.add(startPoint, deltaPx)
           const end = transform.fromPosition(local)
-          tempoEditorStore.selection = {
+          selection = {
             fromTick: Math.min(start.tick, end.tick),
             toTick: Math.max(start.tick, end.tick),
           }
+          setSelection(selection)
         },
         onMouseUp: () => {
-          const { selection } = tempoEditorStore
           if (selection === null) {
             return
           }
 
-          tempoEditorStore.selectedEventIds = conductorTrack.events
-            .filter(isSetTempoEvent)
-            .filter(
-              isEventInRange(
-                Range.create(selection.fromTick, selection.toTick),
-              ),
-            )
-            .map((e) => e.id)
-
-          tempoEditorStore.selection = null
+          setSelectedEventIds(
+            conductorTrack.events
+              .filter(isSetTempoEvent)
+              .filter(
+                isEventInRange(
+                  Range.create(selection.fromTick, selection.toTick),
+                ),
+              )
+              .map((e) => e.id),
+          )
+          setSelection(null)
         },
       })
     },

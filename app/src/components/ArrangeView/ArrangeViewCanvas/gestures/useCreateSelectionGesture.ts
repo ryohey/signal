@@ -7,17 +7,16 @@ import { Point } from "../../../../entities/geometry/Point"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
+import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, Point],
   MouseEvent
 > => {
-  const {
-    player,
-    arrangeViewStore,
-    arrangeViewStore: { trackTransform },
-  } = useStores()
+  const { player } = useStores()
+  const { trackTransform, setSelectedTrackIndex, resetSelection, quantizer } =
+    useArrangeView()
 
   const arrangeEndSelection = useArrangeEndSelection()
   const arrangeResizeSelection = useArrangeResizeSelection()
@@ -25,13 +24,13 @@ export const useCreateSelectionGesture = (): MouseGesture<
   return {
     onMouseDown(_e, startClientPos, startPosPx) {
       const startPos = trackTransform.getArrangePoint(startPosPx)
-      arrangeViewStore.resetSelection()
+      resetSelection()
 
       if (!player.isPlaying) {
-        player.position = arrangeViewStore.quantizer.round(startPos.tick)
+        player.position = quantizer.round(startPos.tick)
       }
 
-      arrangeViewStore.selectedTrackIndex = Math.floor(startPos.trackIndex)
+      setSelectedTrackIndex(Math.floor(startPos.trackIndex))
 
       observeDrag({
         onMouseMove: (e) => {

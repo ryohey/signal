@@ -2,11 +2,11 @@ import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { useSelectTrack } from "../../actions"
 import { isTouchPadEvent } from "../../helpers/touchpad"
+import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useStores } from "../../hooks/useStores"
 import { TrackId } from "../../track"
@@ -68,22 +68,30 @@ const HeaderList = styled.div`
   border-right: 1px solid ${({ theme }) => theme.dividerColor};
 `
 
-export const ArrangeView: FC = observer(() => {
+export const ArrangeView: FC = () => {
   const {
-    arrangeViewStore,
-    arrangeViewStore: {
-      trackHeight,
-      contentWidth,
-      contentHeight,
-      transform,
-      scrollLeft,
-      scrollTop,
-      scrollBy,
-      selectedTrackIndex,
-    },
-    router,
-    song: { tracks },
-  } = useStores()
+    tracks,
+    trackHeight,
+    contentWidth,
+    contentHeight,
+    transform,
+    scrollLeft,
+    scaleY,
+    scrollTop,
+    scrollBy,
+    rulerStore,
+    setCanvasWidth,
+    setCanvasHeight,
+    selectedTrackIndex,
+    setScrollLeftInPixels,
+    setAutoScroll,
+    setScrollTop,
+    setScaleX,
+    setScaleY,
+    scaleAroundPointX,
+    setSelectedTrackIndex,
+  } = useArrangeView()
+  const { router } = useStores()
   const selectTrack = useSelectTrack()
   const rulerSelectionGesture = useRulerSelectionGesture()
 
@@ -91,51 +99,44 @@ export const ArrangeView: FC = observer(() => {
   const size = useComponentSize(ref)
 
   const setScrollLeft = useCallback((v: number) => {
-    arrangeViewStore.setScrollLeftInPixels(v)
-    arrangeViewStore.autoScroll = false
+    setScrollLeftInPixels(v)
+    setAutoScroll(false)
   }, [])
-  const setScrollTop = useCallback(
-    (v: number) => arrangeViewStore.setScrollTop(v),
-    [],
-  )
 
   const containerWidth = size.width
 
   const theme = useTheme()
 
   useEffect(() => {
-    arrangeViewStore.canvasWidth = size.width
+    setCanvasWidth(containerWidth)
   }, [size.width])
 
   useEffect(() => {
-    arrangeViewStore.canvasHeight = size.height
+    setCanvasHeight(size.height)
   }, [size.height])
 
   const onClickScaleUpHorizontal = useCallback(
-    () => arrangeViewStore.scaleAroundPointX(0.2, 0),
-    [arrangeViewStore],
+    () => scaleAroundPointX(0.2, 0),
+    [scaleAroundPointX],
   )
   const onClickScaleDownHorizontal = useCallback(
-    () => arrangeViewStore.scaleAroundPointX(-0.2, 0),
-    [arrangeViewStore],
+    () => scaleAroundPointX(-0.2, 0),
+    [scaleAroundPointX],
   )
   const onClickScaleResetHorizontal = useCallback(
-    () => (arrangeViewStore.scaleX = 1),
-    [arrangeViewStore],
+    () => setScaleX(1),
+    [setScaleX],
   )
 
   const onClickScaleUpVertical = useCallback(
-    () => arrangeViewStore.setScaleY(arrangeViewStore.scaleY * (1 + 0.2)),
-    [arrangeViewStore],
+    () => setScaleY(scaleY * (1 + 0.2)),
+    [setScaleY, scaleY],
   )
   const onClickScaleDownVertical = useCallback(
-    () => arrangeViewStore.setScaleY(arrangeViewStore.scaleY * (1 - 0.2)),
-    [arrangeViewStore],
+    () => setScaleY(scaleY * (1 - 0.2)),
+    [setScaleY, scaleY],
   )
-  const onClickScaleResetVertical = useCallback(
-    () => arrangeViewStore.setScaleY(1),
-    [arrangeViewStore],
-  )
+  const onClickScaleResetVertical = useCallback(() => setScaleY(1), [setScaleY])
 
   const { onContextMenu, menuProps } = useContextMenu()
   const { onContextMenu: onTrackContextMenu, menuProps: trackMenuProps } =
@@ -149,21 +150,21 @@ export const ArrangeView: FC = observer(() => {
           ? 0.02 * e.deltaY
           : 0.01 * e.deltaX
         scaleYDelta = clamp(scaleYDelta, -0.15, 0.15) // prevent acceleration to zoom too fast
-        arrangeViewStore.setScaleY(arrangeViewStore.scaleY * (1 + scaleYDelta))
+        setScaleY(scaleY * (1 + scaleYDelta))
       } else if (e.altKey || e.ctrlKey) {
         // horizontal zoom
         const scaleFactor = isTouchPadEvent(e.nativeEvent) ? 0.01 : -0.01
         const scaleXDelta = clamp(e.deltaY * scaleFactor, -0.15, 0.15) // prevent acceleration to zoom too fast
-        arrangeViewStore.scaleAroundPointX(scaleXDelta, e.nativeEvent.offsetX)
+        scaleAroundPointX(scaleXDelta, e.nativeEvent.offsetX)
       } else {
         const scaleFactor = isTouchPadEvent(e.nativeEvent)
           ? 1
           : 20 * transform.pixelsPerKey * WHEEL_SCROLL_RATE
         const deltaY = e.deltaY * scaleFactor
-        arrangeViewStore.scrollBy(-e.deltaX, -deltaY)
+        scrollBy(-e.deltaX, -deltaY)
       }
     },
-    [arrangeViewStore, scrollBy],
+    [setScaleY, scaleY, scaleAroundPointX, scrollBy],
   )
 
   const openTrack = (trackId: TrackId) => {
@@ -185,10 +186,10 @@ export const ArrangeView: FC = observer(() => {
               style={{ height: trackHeight }}
               key={i}
               isSelected={i === selectedTrackIndex}
-              onClick={() => (arrangeViewStore.selectedTrackIndex = i)}
+              onClick={() => setSelectedTrackIndex(i)}
               onDoubleClick={() => openTrack(t.id)}
               onContextMenu={(e) => {
-                arrangeViewStore.selectedTrackIndex = i
+                setSelectedTrackIndex(i)
                 onTrackContextMenu(e)
               }}
             >
@@ -221,7 +222,7 @@ export const ArrangeView: FC = observer(() => {
           }}
         >
           <CanvasPianoRuler
-            rulerStore={arrangeViewStore.rulerStore}
+            rulerStore={rulerStore}
             {...rulerSelectionGesture}
             style={{
               background: theme.backgroundColor,
@@ -282,4 +283,4 @@ export const ArrangeView: FC = observer(() => {
       <ArrangeTrackContextMenu {...trackMenuProps} />
     </Wrapper>
   )
-})
+}

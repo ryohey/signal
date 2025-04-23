@@ -1,27 +1,21 @@
-import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useTempoEditor } from "../../hooks/useTempoEditor"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
 
-export const TempoGraphQuantizeSelector: FC = observer(() => {
-  const { tempoEditorStore } = useStores()
-  const { quantize, isQuantizeEnabled } = tempoEditorStore
-
-  const onSelectQuantize = useCallback(
-    (denominator: number) => (tempoEditorStore.quantize = denominator),
-    [tempoEditorStore],
-  )
+export const TempoGraphQuantizeSelector: FC = () => {
+  const { quantize, setQuantize, isQuantizeEnabled, setQuantizeEnabled } =
+    useTempoEditor()
 
   const onClickQuantizeSwitch = useCallback(() => {
-    tempoEditorStore.isQuantizeEnabled = !tempoEditorStore.isQuantizeEnabled
-  }, [tempoEditorStore])
+    setQuantizeEnabled(!isQuantizeEnabled)
+  }, [setQuantizeEnabled, isQuantizeEnabled])
 
   return (
     <QuantizeSelector
       value={quantize}
       enabled={isQuantizeEnabled}
-      onSelect={onSelectQuantize}
+      onSelect={setQuantize}
       onClickSwitch={onClickQuantizeSwitch}
     />
   )
-})
+}

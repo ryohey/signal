@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import {
   useCopyTempoSelection,
@@ -8,13 +7,13 @@ import {
   useResetTempoSelection,
 } from "../../actions/tempo"
 import { isTempoEventsClipboardData } from "../../clipboard/clipboardTypes"
-import { useStores } from "../../hooks/useStores"
+import { useTempoEditor } from "../../hooks/useTempoEditor"
 import clipboard from "../../services/Clipboard"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 import { isFocusable } from "./isFocusable"
 
-export const TempoEditorKeyboardShortcut: FC = observer(() => {
-  const { tempoEditorStore } = useStores()
+export const TempoEditorKeyboardShortcut: FC = () => {
+  const { setMouseMode } = useTempoEditor()
   const resetTempoSelection = useResetTempoSelection()
   const deleteTempoSelection = useDeleteTempoSelection()
   const copyTempoSelection = useCopyTempoSelection()
@@ -26,11 +25,11 @@ export const TempoEditorKeyboardShortcut: FC = observer(() => {
       actions={[
         {
           code: "Digit1",
-          run: () => (tempoEditorStore.mouseMode = "pencil"),
+          run: () => setMouseMode("pencil"),
         },
         {
           code: "Digit2",
-          run: () => (tempoEditorStore.mouseMode = "selection"),
+          run: () => setMouseMode("selection"),
         },
         { code: "Escape", run: resetTempoSelection },
         { code: "Backspace", run: deleteTempoSelection },
@@ -75,4 +74,4 @@ export const TempoEditorKeyboardShortcut: FC = observer(() => {
       }}
     />
   )
-})
+}
