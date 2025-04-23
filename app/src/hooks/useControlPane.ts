@@ -24,9 +24,6 @@ export function useControlPane() {
   const selectedEventIds = useMobxStore(
     ({ controlStore }) => controlStore.selectedEventIds,
   )
-  const controlValueEvents = useMobxStore(
-    ({ controlStore }) => controlStore.controlValueEvents,
-  )
   const scrollLeft = useMobxStore(
     ({ pianoRollStore }) => pianoRollStore.scrollLeft,
   )
@@ -46,7 +43,6 @@ export function useControlPane() {
     controlModes,
     selection,
     selectedEventIds,
-    controlValueEvents,
     scrollLeft,
     cursorX,
     transform,

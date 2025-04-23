@@ -1,14 +1,9 @@
 import { cloneDeep } from "lodash"
-import { ControllerEvent, MIDIControlEvents, PitchBendEvent } from "midifile-ts"
+import { MIDIControlEvents } from "midifile-ts"
 import { makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { ControlSelection } from "../entities/selection/ControlSelection"
-import {
-  TrackEventOf,
-  isControllerEventWithType,
-  isPitchBendEvent,
-} from "../track"
 import PianoRollStore from "./PianoRollStore"
 
 export type ControlMode = { type: "velocity" } | ValueEventType
@@ -101,22 +96,5 @@ export class ControlStore {
 
   restore(serialized: SerializedControlStore) {
     this.controlModes = serialized.controlModes
-  }
-
-  get controlValueEvents(): (
-    | TrackEventOf<ControllerEvent>
-    | TrackEventOf<PitchBendEvent>
-  )[] {
-    const { controlMode } = this
-    switch (controlMode.type) {
-      case "velocity":
-        throw new Error("don't use this method for velocity")
-      case "pitchBend":
-        return this.pianoRollStore.filteredEvents(isPitchBendEvent)
-      case "controller":
-        return this.pianoRollStore.filteredEvents(
-          isControllerEventWithType(controlMode.controllerType),
-        )
-    }
   }
 }
