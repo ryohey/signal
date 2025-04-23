@@ -5,11 +5,15 @@ import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function useControlPane() {
-  const { controlStore } = useStores()
-  const { rulerStore } = controlStore
+  const { controlStore, pianoRollStore } = useStores()
+  const { rulerStore } = pianoRollStore
 
-  const cursor = useMobxStore(({ controlStore }) => controlStore.cursor)
-  const mouseMode = useMobxStore(({ controlStore }) => controlStore.mouseMode)
+  const cursor = useMobxStore(
+    ({ pianoRollStore }) => pianoRollStore.controlCursor,
+  )
+  const mouseMode = useMobxStore(
+    ({ pianoRollStore }) => pianoRollStore.mouseMode,
+  )
   const controlMode = useMobxStore(
     ({ controlStore }) => controlStore.controlMode,
   )
@@ -23,10 +27,16 @@ export function useControlPane() {
   const controlValueEvents = useMobxStore(
     ({ controlStore }) => controlStore.controlValueEvents,
   )
-  const scrollLeft = useMobxStore(({ controlStore }) => controlStore.scrollLeft)
-  const cursorX = useMobxStore(({ controlStore }) => controlStore.cursorX)
-  const transform = useMobxStore(({ controlStore }) => controlStore.transform)
-  const quantizer = useMobxStore(({ controlStore }) => controlStore.quantizer)
+  const scrollLeft = useMobxStore(
+    ({ pianoRollStore }) => pianoRollStore.scrollLeft,
+  )
+  const cursorX = useMobxStore(({ pianoRollStore }) => pianoRollStore.cursorX)
+  const transform = useMobxStore(
+    ({ pianoRollStore }) => pianoRollStore.transform,
+  )
+  const quantizer = useMobxStore(
+    ({ pianoRollStore }) => pianoRollStore.quantizer,
+  )
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
 
   return {

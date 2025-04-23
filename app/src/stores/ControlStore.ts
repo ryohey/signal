@@ -1,6 +1,6 @@
 import { cloneDeep } from "lodash"
 import { ControllerEvent, MIDIControlEvents, PitchBendEvent } from "midifile-ts"
-import { computed, makeObservable, observable } from "mobx"
+import { makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { ControlSelection } from "../entities/selection/ControlSelection"
@@ -84,14 +84,6 @@ export class ControlStore {
       selection: observable,
       selectedEventIds: observable,
       controlModes: observable,
-      scrollLeft: computed,
-      cursorX: computed,
-      transform: computed,
-      rulerStore: computed,
-      selectedTrack: computed,
-      quantizer: computed,
-      mouseMode: computed,
-      cursor: computed,
     })
 
     makePersistable(this, {
@@ -126,37 +118,5 @@ export class ControlStore {
           isControllerEventWithType(controlMode.controllerType),
         )
     }
-  }
-
-  get scrollLeft() {
-    return this.pianoRollStore.scrollLeft
-  }
-
-  get cursorX() {
-    return this.pianoRollStore.cursorX
-  }
-
-  get transform() {
-    return this.pianoRollStore.transform
-  }
-
-  get rulerStore() {
-    return this.pianoRollStore.rulerStore
-  }
-
-  get selectedTrack() {
-    return this.pianoRollStore.selectedTrack
-  }
-
-  get quantizer() {
-    return this.pianoRollStore.quantizer
-  }
-
-  get mouseMode() {
-    return this.pianoRollStore.mouseMode
-  }
-
-  get cursor() {
-    return this.pianoRollStore.controlCursor
   }
 }
