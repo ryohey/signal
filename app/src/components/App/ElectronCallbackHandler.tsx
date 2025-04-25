@@ -21,13 +21,13 @@ import {
   useTransposeSelection,
 } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
-import { useRedo, useUndo } from "../../actions/history"
 import {
   useCopySelectionGlobal,
   useCutSelectionGlobal,
   usePasteSelectionGlobal,
 } from "../../actions/hotkey"
 import { useCloudFile } from "../../hooks/useCloudFile"
+import { useHistory } from "../../hooks/useHistory"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
@@ -55,8 +55,7 @@ export const ElectronCallbackHandler: FC = observer(() => {
   const selectPreviousNote = useSelectPreviousNote()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
-  const undo = useUndo()
-  const redo = useRedo()
+  const { undo, redo } = useHistory()
   const setSong = useSetSong()
   const exportSong = useExportSong()
 

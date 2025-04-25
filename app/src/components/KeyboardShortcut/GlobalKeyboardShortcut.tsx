@@ -14,7 +14,7 @@ import {
   useToggleSolo,
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
-import { useRedo, useUndo } from "../../actions/history"
+import { useHistory } from "../../hooks/useHistory"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
@@ -32,8 +32,7 @@ export const GlobalKeyboardShortcut: FC = observer(() => {
   const toggleMute = useToggleMute()
   const toggleGhost = useToggleGhost()
   const toggleRecording = useToggleRecording()
-  const undo = useUndo()
-  const redo = useRedo()
+  const { undo, redo } = useHistory()
   const openSongFile = useOpenSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()

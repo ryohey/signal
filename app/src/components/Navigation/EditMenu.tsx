@@ -11,7 +11,7 @@ import {
   useSelectPreviousNote,
   useTransposeSelection,
 } from "../../actions"
-import { useRedo, useUndo } from "../../actions/history"
+import { useHistory } from "../../hooks/useHistory"
 import { useStores } from "../../hooks/useStores"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
@@ -19,8 +19,7 @@ import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
   const { historyStore, pianoRollStore } = useStores()
-  const undo = useUndo()
-  const redo = useRedo()
+  const { undo, redo } = useHistory()
   const copySelection = useCopySelection()
   const pasteSelection = usePasteSelection()
   const deleteSelection = useDeleteSelection()
