@@ -8,6 +8,7 @@ import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
 import { tickToMillisec } from "../helpers/bpm"
 import { useControlPane } from "../hooks/useControlPane"
+import { useHistory } from "../hooks/useHistory"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
@@ -38,8 +39,9 @@ export const useTransposeSelection = () => {
     song,
     pianoRollStore,
     pianoRollStore: { selectedTrackIndex, selection, selectedNoteIds },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
+
   return (deltaPitch: number) => {
     pushHistory()
 
@@ -114,8 +116,9 @@ export const useDeleteSelection = () => {
   const {
     pianoRollStore,
     pianoRollStore: { selection, selectedNoteIds, selectedTrack },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     if (
       selectedTrack === undefined ||
@@ -138,8 +141,9 @@ export const usePasteSelection = () => {
   const {
     player: { position },
     pianoRollStore: { selectedTrack },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     if (selectedTrack === undefined) {
       return
@@ -168,8 +172,9 @@ export const useDuplicateSelection = () => {
   const {
     pianoRollStore,
     pianoRollStore: { selection, selectedNoteIds, selectedTrack },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     if (
       selectedTrack === undefined ||
@@ -294,8 +299,9 @@ export const useQuantizeSelectedNotes = () => {
       selectedNoteIds,
       enabledQuantizer: quantizer,
     },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     if (selectedTrack === undefined || selectedNoteIds.length === 0) {
       return

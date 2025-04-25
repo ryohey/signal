@@ -1,4 +1,5 @@
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useHistory } from "../hooks/useHistory"
 import { useStores } from "../hooks/useStores"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
@@ -71,7 +72,9 @@ export const useOpenSong = () => {
 }
 
 export const useAddTrack = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     pushHistory()
     song.addTrack(emptyTrack(Math.min(song.tracks.length - 1, 0xf)))
@@ -79,7 +82,8 @@ export const useAddTrack = () => {
 }
 
 export const useRemoveTrack = () => {
-  const { song, pianoRollStore, pushHistory } = useStores()
+  const { song, pianoRollStore } = useStores()
+  const { pushHistory } = useHistory()
   const {
     selectedTrackIndex: arrangeSelectedTrackIndex,
     setSelectedTrackIndex: setArrangeSelectedTrackIndex,
@@ -114,7 +118,9 @@ export const useSelectTrack = () => {
 }
 
 export const useInsertTrack = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
+
   return (trackIndex: number) => {
     pushHistory()
     song.insertTrack(emptyTrack(song.tracks.length - 1), trackIndex)
@@ -122,7 +128,9 @@ export const useInsertTrack = () => {
 }
 
 export const useDuplicateTrack = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
+
   return (trackId: TrackId) => {
     const track = song.getTrack(trackId)
     if (track === undefined) {

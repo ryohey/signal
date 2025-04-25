@@ -3,14 +3,15 @@ import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { useHistory } from "../../../../hooks/useHistory"
 import { useStores } from "../../../../hooks/useStores"
 import { TrackEventOf } from "../../../../track"
 
 export const useDragSelectionGesture = () => {
   const {
     pianoRollStore: { selectedTrack },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
   const controlPane = useControlPane()
   const { quantizer, setSelectedEventIds } = controlPane
   let { selectedEventIds } = controlPane

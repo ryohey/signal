@@ -5,6 +5,7 @@ import { MouseGesture } from "../../../gesture/MouseGesture"
 import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useHistory } from "../../../hooks/useHistory"
 import { useStores } from "../../../hooks/useStores"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { setTempoMidiEvent } from "../../../midi/MidiEvent"
@@ -13,7 +14,8 @@ import { isSetTempoEvent } from "../../../track"
 export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
   const { quantizer } = useTempoEditor()
 
   return {

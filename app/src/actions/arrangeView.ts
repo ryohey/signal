@@ -9,6 +9,7 @@ import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useHistory } from "../hooks/useHistory"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import Track from "../track"
@@ -176,8 +177,8 @@ export const useArrangePasteSelection = () => {
   const {
     song: { tracks },
     player,
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
 
   return () => {
@@ -215,8 +216,8 @@ export const useArrangePasteSelection = () => {
 export const useArrangeDeleteSelection = () => {
   const {
     song: { tracks },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
   const { setSelection, selectedEventIds, setSelectedEventIds } =
     useArrangeView()
 
@@ -249,7 +250,8 @@ function getEventsInSelection(tracks: Track[], selection: ArrangeSelection) {
 }
 
 export const useArrangeTransposeSelection = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (deltaPitch: number) => {
@@ -261,8 +263,8 @@ export const useArrangeTransposeSelection = () => {
 export const useArrangeDuplicateSelection = () => {
   const {
     song: { tracks },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
   const { selection, selectedEventIds, setSelection, setSelectedEventIds } =
     useArrangeView()
 
@@ -307,8 +309,8 @@ export const useArrangeDuplicateSelection = () => {
 export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
   const {
     song: { tracks },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (operation: BatchUpdateOperation) => {

@@ -5,6 +5,7 @@ import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
+import { useHistory } from "../hooks/useHistory"
 import { useStores } from "../hooks/useStores"
 import {
   panMidiEvent,
@@ -23,7 +24,8 @@ import Track, {
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
   return (id: number, microsecondsPerBeat: number) => {
     const track = song.conductorTrack
     if (track === undefined) {
@@ -39,7 +41,8 @@ export const useChangeTempo = () => {
 /* events */
 
 export const useChangeNotesVelocity = () => {
-  const { pianoRollStore, pushHistory } = useStores()
+  const { pianoRollStore } = useStores()
+  const { pushHistory } = useHistory()
   return (noteIds: number[], velocity: number) => {
     const { selectedTrack } = pianoRollStore
     if (selectedTrack === undefined) {
@@ -57,7 +60,8 @@ export const useChangeNotesVelocity = () => {
 }
 
 export const useCreateEvent = () => {
-  const { player, pianoRollStore, pushHistory } = useStores()
+  const { player, pianoRollStore } = useStores()
+  const { pushHistory } = useHistory()
   const { quantizer, selectedTrack } = pianoRollStore
   return (e: AnyChannelEvent, tick?: number) => {
     if (selectedTrack === undefined) {
@@ -195,6 +199,7 @@ export const updateEventsInRange =
 
 export const useUpdateValueEvents = () => {
   const { pianoRollStore } = useStores()
+
   return (type: ValueEventType) =>
     updateEventsInRange(
       pianoRollStore.selectedTrack,
@@ -211,6 +216,7 @@ export const useMuteNote = () => {
     pianoRollStore: { selectedTrack },
   } = useStores()
   const stopNote = useStopNote()
+
   return (noteNumber: number) => {
     if (selectedTrack === undefined || selectedTrack.channel == undefined) {
       return
@@ -222,8 +228,10 @@ export const useMuteNote = () => {
 /* track meta */
 
 export const useSetTrackName = () => {
-  const { pianoRollStore, pushHistory } = useStores()
+  const { pianoRollStore } = useStores()
+  const { pushHistory } = useHistory()
   const { selectedTrack } = pianoRollStore
+
   return (name: string) => {
     if (selectedTrack === undefined) {
       return
@@ -234,7 +242,9 @@ export const useSetTrackName = () => {
 }
 
 export const useSetTrackVolume = () => {
-  const { song, player, pushHistory } = useStores()
+  const { song, player } = useStores()
+  const { pushHistory } = useHistory()
+
   return (trackId: TrackId, volume: number) => {
     pushHistory()
     const track = song.getTrack(trackId)
@@ -251,7 +261,9 @@ export const useSetTrackVolume = () => {
 }
 
 export const useSetTrackPan = () => {
-  const { song, player, pushHistory } = useStores()
+  const { song, player } = useStores()
+  const { pushHistory } = useHistory()
+
   return (trackId: TrackId, pan: number) => {
     pushHistory()
     const track = song.getTrack(trackId)
@@ -268,7 +280,9 @@ export const useSetTrackPan = () => {
 }
 
 export const useSetTrackInstrument = () => {
-  const { song, player, pushHistory } = useStores()
+  const { song, player } = useStores()
+  const { pushHistory } = useHistory()
+
   return (trackId: TrackId, programNumber: number) => {
     pushHistory()
     const track = song.getTrack(trackId)
@@ -287,7 +301,7 @@ export const useSetTrackInstrument = () => {
 }
 
 export const useToggleGhostTrack = () => {
-  const { pianoRollStore, pushHistory } = useStores()
+  const { pianoRollStore } = useStores()
   return (trackId: TrackId) => {
     pushHistory()
     if (pianoRollStore.notGhostTrackIds.has(trackId)) {
@@ -299,7 +313,9 @@ export const useToggleGhostTrack = () => {
 }
 
 export const useToggleAllGhostTracks = () => {
-  const { song, pianoRollStore, pushHistory } = useStores()
+  const { song, pianoRollStore } = useStores()
+  const { pushHistory } = useHistory()
+
   return () => {
     pushHistory()
     if (
@@ -315,7 +331,9 @@ export const useToggleAllGhostTracks = () => {
 }
 
 export const useAddTimeSignature = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
+
   return (tick: number, numerator: number, denominator: number) => {
     const measureStartTick = Measure.getMeasureStart(
       song.measures,
@@ -338,7 +356,9 @@ export const useAddTimeSignature = () => {
 }
 
 export const useUpdateTimeSignature = () => {
-  const { song, pushHistory } = useStores()
+  const { song } = useStores()
+  const { pushHistory } = useHistory()
+
   return (id: number, numerator: number, denominator: number) => {
     pushHistory()
     song.conductorTrack?.updateEvent(id, {
@@ -375,8 +395,11 @@ export const batchUpdateNotesVelocity = (
 }
 
 export const useBatchUpdateSelectedNotesVelocity = () => {
-  const { pianoRollStore, pushHistory } = useStores()
-  const { selectedTrack, selectedNoteIds } = pianoRollStore
+  const {
+    pianoRollStore: { selectedTrack, selectedNoteIds },
+  } = useStores()
+  const { pushHistory } = useHistory()
+
   return (operation: BatchUpdateOperation) => {
     if (selectedTrack === undefined) {
       return

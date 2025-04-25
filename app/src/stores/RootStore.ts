@@ -148,10 +148,6 @@ export default class RootStore {
     await this.metronomeSynth.loadSoundFont(data)
   }
 
-  get pushHistory() {
-    return () => this.historyStore.push()
-  }
-
   get songStore(): SongStore {
     return this
   }
