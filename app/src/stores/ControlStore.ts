@@ -74,10 +74,10 @@ export class ControlStore {
 
   constructor() {
     makeObservable(this, {
-      controlMode: observable,
+      controlMode: observable.ref,
       selection: observable,
       selectedEventIds: observable,
-      controlModes: observable,
+      controlModes: observable.shallow,
     })
 
     makePersistable(this, {
