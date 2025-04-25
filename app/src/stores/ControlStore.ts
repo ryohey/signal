@@ -4,7 +4,6 @@ import { makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { ControlSelection } from "../entities/selection/ControlSelection"
-import PianoRollStore from "./PianoRollStore"
 
 export type ControlMode = { type: "velocity" } | ValueEventType
 
@@ -73,7 +72,7 @@ export class ControlStore {
 
   controlModes: ControlMode[] = defaultControlModes
 
-  constructor(private readonly pianoRollStore: PianoRollStore) {
+  constructor() {
     makeObservable(this, {
       controlMode: observable,
       selection: observable,

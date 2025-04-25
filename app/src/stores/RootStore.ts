@@ -98,7 +98,7 @@ export default class RootStore {
     this.midiRecorder = new MIDIRecorder(this.player, this)
 
     this.pianoRollStore = new PianoRollStore(this)
-    this.controlStore = new ControlStore(this.pianoRollStore)
+    this.controlStore = new ControlStore()
     this.soundFontStore = new SoundFontStore(this.synth)
 
     const preview = previewMidiInput(this)
