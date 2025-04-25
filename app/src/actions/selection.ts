@@ -7,6 +7,7 @@ import { Rect } from "../entities/geometry/Rect"
 import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
 import { tickToMillisec } from "../helpers/bpm"
+import { useControlPane } from "../hooks/useControlPane"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
@@ -210,13 +211,14 @@ export const useSelectNote = () => {
   const {
     pianoRollStore,
     pianoRollStore: { selectedTrack },
-    controlStore,
   } = useStores()
+  const { setSelectedEventIds } = useControlPane()
+
   return (noteId: number) => {
     if (selectedTrack === undefined) {
       return
     }
-    controlStore.selectedEventIds = []
+    setSelectedEventIds([])
     pianoRollStore.selectedNoteIds = [noteId]
   }
 }
@@ -318,14 +320,15 @@ export const useSelectAllNotes = () => {
   const {
     pianoRollStore,
     pianoRollStore: { selectedTrack },
-    controlStore,
   } = useStores()
+  const { setSelectedEventIds } = useControlPane()
+
   return () => {
     if (selectedTrack) {
       pianoRollStore.selectedNoteIds = selectedTrack.events
         .filter(isNoteEvent)
         .map((note) => note.id)
-      controlStore.selectedEventIds = []
+      setSelectedEventIds([])
     }
   }
 }

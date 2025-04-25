@@ -6,6 +6,7 @@ import {
   isControlEventsClipboardData,
   isPianoNotesClipboardData,
 } from "../../clipboard/clipboardTypes"
+import { useControlPane } from "../../hooks/useControlPane"
 import { useStores } from "../../hooks/useStores"
 import clipboard from "../../services/Clipboard"
 import { KeyboardShortcut } from "./KeyboardShortcut"
@@ -16,7 +17,8 @@ import { usePianoNotesKeyboardShortcutActions } from "./pianoNotesKeyboardShortc
 const SCROLL_DELTA = 24
 
 export const PianoRollKeyboardShortcut: FC = observer(() => {
-  const { pianoRollStore, controlStore } = useStores()
+  const { pianoRollStore } = useStores()
+  const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const pianoNotesKeyboardShortcutActions =
     usePianoNotesKeyboardShortcutActions()
   const controlPaneKeyboardShortcutActions =
@@ -52,7 +54,7 @@ export const PianoRollKeyboardShortcut: FC = observer(() => {
         ...(pianoRollStore.selectedNoteIds.length > 0
           ? pianoNotesKeyboardShortcutActions()
           : []),
-        ...(controlStore.selectedEventIds.length > 0
+        ...(controlSelectedEventIds.length > 0
           ? controlPaneKeyboardShortcutActions()
           : []),
         {

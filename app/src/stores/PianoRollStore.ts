@@ -1,4 +1,4 @@
-import { clamp, cloneDeep, max, maxBy, min, minBy } from "lodash"
+import { clamp, cloneDeep, max, min } from "lodash"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
 import { Layout, MaxNoteNumber } from "../Constants"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
@@ -346,35 +346,6 @@ export default class PianoRollStore {
       return Selection.getBounds(this.selection, this.transform)
     }
     return null
-  }
-
-  filteredEvents<T extends TrackEvent>(filter: (e: TrackEvent) => e is T): T[] {
-    const {
-      windowedEvents,
-      scrollLeft,
-      canvasWidth,
-      transform,
-      selectedTrack,
-    } = this
-
-    const controllerEvents = (selectedTrack?.events ?? []).filter(filter)
-    const events = windowedEvents.filter(filter)
-
-    // Add controller events in the outside of the visible area
-
-    const tickStart = transform.getTick(scrollLeft)
-    const tickEnd = transform.getTick(scrollLeft + canvasWidth)
-
-    const prevEvent = maxBy(
-      controllerEvents.filter((e) => e.tick < tickStart),
-      (e) => e.tick,
-    )
-    const nextEvent = minBy(
-      controllerEvents.filter((e) => e.tick > tickEnd),
-      (e) => e.tick,
-    )
-
-    return [prevEvent, ...events, nextEvent].filter(isNotUndefined)
   }
 
   get currentVolume(): number | undefined {

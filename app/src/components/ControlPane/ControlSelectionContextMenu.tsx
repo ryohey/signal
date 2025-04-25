@@ -6,7 +6,7 @@ import {
   useDuplicateControlSelection,
   usePasteControlSelection,
 } from "../../actions/control"
-import { useStores } from "../../hooks/useStores"
+import { useControlPane } from "../../hooks/useControlPane"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -19,8 +19,8 @@ import { MenuItem } from "../ui/Menu"
 export const ControlSelectionContextMenu: FC<ContextMenuProps> = observer(
   (props) => {
     const { handleClose } = props
-    const { controlStore } = useStores()
-    const isEventSelected = controlStore.selectedEventIds.length > 0
+    const { selectedEventIds } = useControlPane()
+    const isEventSelected = selectedEventIds.length > 0
     const copyControlSelection = useCopyControlSelection()
     const deleteControlSelection = useDeleteControlSelection()
     const duplicateControlSelection = useDuplicateControlSelection()

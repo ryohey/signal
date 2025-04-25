@@ -10,7 +10,7 @@ import { Rect } from "../../../entities/geometry/Rect"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { useContextMenu } from "../../../hooks/useContextMenu"
-import { useStores } from "../../../hooks/useStores"
+import { useControlPane } from "../../../hooks/useControlPane"
 import { pointToCircleRect } from "../../../stores/TempoEditorStore"
 import { TrackEventOf } from "../../../track"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
@@ -49,9 +49,7 @@ const LineGraph = observer(
     axis,
     axisLabelFormatter = (v) => v.toString(),
   }: LineGraphProps<T>) => {
-    const {
-      controlStore: { scrollLeft, transform, cursor, mouseMode },
-    } = useStores()
+    const { scrollLeft, transform, cursor, mouseMode } = useControlPane()
     const theme = useTheme()
     const createOrUpdateControlEventsValue =
       useCreateOrUpdateControlEventsValue()

@@ -2,19 +2,19 @@ import {
   useCopyControlSelection,
   useDeleteControlSelection,
   useDuplicateControlSelection,
-  useResetControlSelection,
 } from "../../actions/control"
+import { useControlPane } from "../../hooks/useControlPane"
 
 export const useControlPaneKeyboardShortcutActions = () => {
-  const resetControlSelection = useResetControlSelection()
+  const { resetSelection } = useControlPane()
   const deleteControlSelection = useDeleteControlSelection()
   const copyControlSelection = useCopyControlSelection()
   const duplicateControlSelection = useDuplicateControlSelection()
 
   return () => [
-    { code: "Escape", run: () => resetControlSelection() },
-    { code: "Backspace", run: () => deleteControlSelection() },
-    { code: "Delete", run: () => deleteControlSelection() },
+    { code: "Escape", run: resetSelection },
+    { code: "Backspace", run: deleteControlSelection },
+    { code: "Delete", run: deleteControlSelection },
     {
       code: "KeyC",
       metaKey: true,

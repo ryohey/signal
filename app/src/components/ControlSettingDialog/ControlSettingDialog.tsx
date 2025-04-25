@@ -5,6 +5,7 @@ import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
 import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
 import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
+import { useControlPane } from "../../hooks/useControlPane"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -74,7 +75,8 @@ const InsertButton = styled(Button)`
 `
 
 export const ControlSettingDialog = observer(() => {
-  const { rootViewStore, controlStore } = useStores()
+  const { rootViewStore } = useStores()
+  const { controlModes, setControlModes } = useControlPane()
   const { openControlSettingDialog: open } = rootViewStore
   const [selectedLeftMode, setSelectedLeftMode] = useState<ControlMode | null>(
     null,
@@ -82,11 +84,10 @@ export const ControlSettingDialog = observer(() => {
   const [selectedRightMode, setSelectedRightMode] =
     useState<ControlMode | null>(null)
 
-  const leftModes = controlStore.controlModes
+  const leftModes = controlModes
 
   const rightModes = getAllControlModes().filter(
-    (mode) =>
-      !controlStore.controlModes.some((m) => isEqualControlMode(m, mode)),
+    (mode) => !controlModes.some((m) => isEqualControlMode(m, mode)),
   )
 
   const leftItems = leftModes.map((mode) => ({
@@ -108,15 +109,17 @@ export const ControlSettingDialog = observer(() => {
 
   const onClickAdd = () => {
     if (selectedRightMode) {
-      controlStore.controlModes.push(selectedRightMode)
+      setControlModes([...controlModes, selectedRightMode])
       setSelectedRightMode(null)
     }
   }
 
   const onClickRemove = () => {
     if (selectedLeftMode) {
-      controlStore.controlModes = controlStore.controlModes.filter(
-        (mode) => !isEqualControlMode(mode, selectedLeftMode),
+      setControlModes(
+        controlModes.filter(
+          (mode) => !isEqualControlMode(mode, selectedLeftMode),
+        ),
       )
       setSelectedLeftMode(null)
     }
@@ -132,15 +135,11 @@ export const ControlSettingDialog = observer(() => {
     if (fromIndex === -1 || toIndex === -1) {
       return
     }
-    controlStore.controlModes = arrayMove(
-      controlStore.controlModes,
-      fromIndex,
-      toIndex,
-    )
+    setControlModes(arrayMove(controlModes, fromIndex, toIndex))
   }
 
   const onClickRestoreDefaults = () => {
-    controlStore.controlModes = defaultControlModes
+    setControlModes(defaultControlModes)
   }
 
   return (

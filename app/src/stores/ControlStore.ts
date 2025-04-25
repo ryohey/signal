@@ -1,15 +1,9 @@
 import { cloneDeep } from "lodash"
-import { ControllerEvent, MIDIControlEvents, PitchBendEvent } from "midifile-ts"
-import { computed, makeObservable, observable } from "mobx"
+import { MIDIControlEvents } from "midifile-ts"
+import { makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { ControlSelection } from "../entities/selection/ControlSelection"
-import {
-  TrackEventOf,
-  isControllerEventWithType,
-  isPitchBendEvent,
-} from "../track"
-import PianoRollStore from "./PianoRollStore"
 
 export type ControlMode = { type: "velocity" } | ValueEventType
 
@@ -78,20 +72,12 @@ export class ControlStore {
 
   controlModes: ControlMode[] = defaultControlModes
 
-  constructor(private readonly pianoRollStore: PianoRollStore) {
+  constructor() {
     makeObservable(this, {
-      controlMode: observable,
+      controlMode: observable.ref,
       selection: observable,
       selectedEventIds: observable,
-      controlModes: observable,
-      scrollLeft: computed,
-      cursorX: computed,
-      transform: computed,
-      rulerStore: computed,
-      selectedTrack: computed,
-      quantizer: computed,
-      mouseMode: computed,
-      cursor: computed,
+      controlModes: observable.shallow,
     })
 
     makePersistable(this, {
@@ -109,54 +95,5 @@ export class ControlStore {
 
   restore(serialized: SerializedControlStore) {
     this.controlModes = serialized.controlModes
-  }
-
-  get controlValueEvents(): (
-    | TrackEventOf<ControllerEvent>
-    | TrackEventOf<PitchBendEvent>
-  )[] {
-    const { controlMode } = this
-    switch (controlMode.type) {
-      case "velocity":
-        throw new Error("don't use this method for velocity")
-      case "pitchBend":
-        return this.pianoRollStore.filteredEvents(isPitchBendEvent)
-      case "controller":
-        return this.pianoRollStore.filteredEvents(
-          isControllerEventWithType(controlMode.controllerType),
-        )
-    }
-  }
-
-  get scrollLeft() {
-    return this.pianoRollStore.scrollLeft
-  }
-
-  get cursorX() {
-    return this.pianoRollStore.cursorX
-  }
-
-  get transform() {
-    return this.pianoRollStore.transform
-  }
-
-  get rulerStore() {
-    return this.pianoRollStore.rulerStore
-  }
-
-  get selectedTrack() {
-    return this.pianoRollStore.selectedTrack
-  }
-
-  get quantizer() {
-    return this.pianoRollStore.quantizer
-  }
-
-  get mouseMode() {
-    return this.pianoRollStore.mouseMode
-  }
-
-  get cursor() {
-    return this.pianoRollStore.controlCursor
   }
 }
