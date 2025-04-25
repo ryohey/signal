@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useState } from "react"
 import { useAddTimeSignature } from "../../actions"
+import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
@@ -21,7 +22,8 @@ export interface RulerContextMenuProps extends ContextMenuProps {
 export const RulerContextMenu: FC<RulerContextMenuProps> = observer(
   ({ rulerStore, tick, ...props }) => {
     const { handleClose } = props
-    const { song, player } = useStores()
+    const { player } = useStores()
+    const song = useSong()
     const addTimeSignature = useAddTimeSignature()
     const [isOpenTimeSignatureDialog, setOpenTimeSignatureDialog] =
       useState(false)

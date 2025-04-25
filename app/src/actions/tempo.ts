@@ -5,13 +5,14 @@ import {
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useHistory } from "../hooks/useHistory"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { useTempoEditor } from "../hooks/useTempoEditor"
 import clipboard from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
-  const { song } = useStores()
+  const song = useSong()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useTempoEditor()
 
@@ -40,7 +41,7 @@ export const useResetTempoSelection = () => {
 }
 
 export const useCopyTempoSelection = () => {
-  const { song } = useStores()
+  const song = useSong()
   const { selectedEventIds } = useTempoEditor()
 
   return () => {
@@ -76,10 +77,8 @@ export const useCopyTempoSelection = () => {
 }
 
 export const usePasteTempoSelection = () => {
-  const {
-    song: { conductorTrack },
-    player,
-  } = useStores()
+  const { player } = useStores()
+  const { conductorTrack } = useSong()
   const { pushHistory } = useHistory()
 
   return () => {
@@ -110,7 +109,7 @@ export const usePasteTempoSelection = () => {
 }
 
 export const useDuplicateTempoSelection = () => {
-  const { song } = useStores()
+  const song = useSong()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
 

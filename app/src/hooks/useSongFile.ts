@@ -3,10 +3,10 @@ import { ChangeEvent } from "react"
 import { useCreateSong, useOpenSong, useSaveSong } from "../actions"
 import { saveFile, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
-import { useStores } from "./useStores"
+import { useSong } from "./useSong"
 
 export const useSongFile = () => {
-  const { song } = useStores()
+  const song = useSong()
   const toast = useToast()
   const localized = useLocalization()
   const createSong = useCreateSong()

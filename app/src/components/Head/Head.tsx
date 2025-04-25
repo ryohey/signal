@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { Helmet } from "react-helmet-async"
-import { useStores } from "../../hooks/useStores"
+import { useSong } from "../../hooks/useSong"
 import Song from "../../song"
 
 export const Head: FC = observer(() => {
-  const { song } = useStores()
+  const song = useSong()
 
   return (
     <Helmet>

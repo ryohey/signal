@@ -2,6 +2,7 @@ import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { useLocalization } from "../localize/useLocalization"
 import Song from "../song"
@@ -10,7 +11,8 @@ const waitForAnimationFrame = () =>
   new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
 export const useExportSong = () => {
-  const { song, synth, exportStore } = useStores()
+  const { synth, exportStore } = useStores()
+  const song = useSong()
   const localized = useLocalization()
   const dialog = useDialog()
 

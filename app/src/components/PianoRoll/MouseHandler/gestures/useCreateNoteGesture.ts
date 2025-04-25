@@ -1,16 +1,17 @@
 import { NoteNumber } from "../../../../entities/unit/NoteNumber"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
+import { useSong } from "../../../../hooks/useSong"
 import { useStores } from "../../../../hooks/useStores"
 import { NoteEvent } from "../../../../track"
 import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
 export const useCreateNoteGesture = (): MouseGesture => {
   const {
-    song: { timebase },
     pianoRollStore,
     pianoRollStore: { transform, selectedTrack, quantizer, newNoteVelocity },
   } = useStores()
+  const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const dragNoteCenterAction = useDragNoteCenterGesture()
 

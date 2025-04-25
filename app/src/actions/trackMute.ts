@@ -1,8 +1,10 @@
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { TrackId } from "../track"
 
 export const useToggleMuteTrack = () => {
-  const { song, trackMute, player } = useStores()
+  const { trackMute, player } = useStores()
+  const song = useSong()
 
   return (trackId: TrackId) => {
     const channel = song.getTrack(trackId)?.channel
@@ -20,7 +22,8 @@ export const useToggleMuteTrack = () => {
 }
 
 export const useToggleSoloTrack = () => {
-  const { song, trackMute, player } = useStores()
+  const { trackMute, player } = useStores()
+  const song = useSong()
 
   return (trackId: TrackId) => {
     const channel = song.getTrack(trackId)?.channel

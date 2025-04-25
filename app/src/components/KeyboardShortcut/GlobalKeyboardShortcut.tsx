@@ -15,6 +15,7 @@ import {
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
 import { useHistory } from "../../hooks/useHistory"
+import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
@@ -22,7 +23,8 @@ import { FileInput } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
 export const GlobalKeyboardShortcut: FC = observer(() => {
-  const { rootViewStore, router, player, song } = useStores()
+  const { rootViewStore, router, player } = useStores()
+  const song = useSong()
   const rewindOneBar = useRewindOneBar()
   const fastForwardOneBar = useFastForwardOneBar()
   const stop = useStop()

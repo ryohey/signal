@@ -9,6 +9,7 @@ import { isNotUndefined } from "../helpers/array"
 import { tickToMillisec } from "../helpers/bpm"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
@@ -36,10 +37,10 @@ export function eventsInSelection(events: TrackEvent[], selection: Selection) {
 
 export const useTransposeSelection = () => {
   const {
-    song,
     pianoRollStore,
     pianoRollStore: { selectedTrackIndex, selection, selectedNoteIds },
   } = useStores()
+  const song = useSong()
   const { pushHistory } = useHistory()
 
   return (deltaPitch: number) => {
@@ -240,8 +241,8 @@ const sortedNotes = (notes: NoteEvent[]): NoteEvent[] =>
 const useSelectNeighborNote = () => {
   const {
     pianoRollStore: { selectedTrack, selectedNoteIds },
-    song,
   } = useStores()
+  const song = useSong()
   const selectNote = useSelectNote()
   const startNote = useStartNote()
   const stopNote = useStopNote()

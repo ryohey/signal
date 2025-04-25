@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite"
 import { FC, PropsWithChildren, useCallback } from "react"
 import { useSetSong } from "../../actions"
 import { songFromFile } from "../../actions/file"
-import { useStores } from "../../hooks/useStores"
+import { useSong } from "../../hooks/useSong"
 import { useLocalization } from "../../localize/useLocalization"
 
 const Container = styled.div`
@@ -15,7 +15,7 @@ const Container = styled.div`
 `
 
 export const DropZone: FC<PropsWithChildren> = observer(({ children }) => {
-  const { song } = useStores()
+  const song = useSong()
   const localized = useLocalization()
   const setSong = useSetSong()
 

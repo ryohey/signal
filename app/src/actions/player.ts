@@ -1,4 +1,5 @@
 import { Measure } from "../entities/measure/Measure"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
@@ -12,7 +13,9 @@ export const useStop = () => {
 }
 
 export const useRewindOneBar = () => {
-  const { song, player, pianoRollStore } = useStores()
+  const { player, pianoRollStore } = useStores()
+  const song = useSong()
+
   return () => {
     const tick = Measure.getPreviousMeasureTick(
       song.measures,
@@ -29,7 +32,9 @@ export const useRewindOneBar = () => {
 }
 
 export const useFastForwardOneBar = () => {
-  const { song, player, pianoRollStore } = useStores()
+  const { player, pianoRollStore } = useStores()
+  const song = useSong()
+
   return () => {
     const tick = Measure.getNextMeasureTick(
       song.measures,
@@ -49,7 +54,9 @@ export const useFastForwardOneBar = () => {
 }
 
 export const useNextTrack = () => {
-  const { pianoRollStore, song } = useStores()
+  const { pianoRollStore } = useStores()
+  const song = useSong()
+
   return () => {
     pianoRollStore.selectedTrackIndex = Math.min(
       pianoRollStore.selectedTrackIndex + 1,

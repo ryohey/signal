@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
 import { useSetTrackInstrument, useStartNote, useStopNote } from "../../actions"
 import { isNotUndefined } from "../../helpers/array"
+import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { getCategoryIndex } from "../../midi/GM"
@@ -159,9 +160,8 @@ const InstrumentBrowserWrapper: FC = observer(() => {
     },
     pianoRollStore,
     player,
-    song,
   } = useStores()
-
+  const song = useSong()
   const startNote = useStartNote()
   const stopNote = useStopNote()
   const setTrackInstrumentAction = useSetTrackInstrument()
