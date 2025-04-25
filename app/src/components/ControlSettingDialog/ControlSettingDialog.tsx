@@ -109,7 +109,7 @@ export const ControlSettingDialog = observer(() => {
 
   const onClickAdd = () => {
     if (selectedRightMode) {
-      controlModes.push(selectedRightMode)
+      setControlModes([...controlModes, selectedRightMode])
       setSelectedRightMode(null)
     }
   }
