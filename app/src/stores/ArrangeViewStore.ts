@@ -200,7 +200,7 @@ export default class ArrangeViewStore {
     return new Quantizer(this.rootStore, this.quantize, true)
   }
 
-  get selectedTrackId(): TrackId {
-    return this.rootStore.song.tracks[this.selectedTrackIndex].id
+  get selectedTrackId(): TrackId | undefined {
+    return this.rootStore.song.tracks[this.selectedTrackIndex]?.id
   }
 }
