@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
+import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useStores } from "../../hooks/useStores"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
@@ -10,6 +11,7 @@ export const InstrumentButton: FC = observer(() => {
     pianoRollStore,
     pianoRollStore: { selectedTrack },
   } = useStores()
+  const { setSetting, setOpen } = useInstrumentBrowser()
 
   const onClickInstrument = useCallback(() => {
     const track = selectedTrack
@@ -17,12 +19,12 @@ export const InstrumentButton: FC = observer(() => {
       return
     }
     const programNumber = track.programNumber
-    pianoRollStore.instrumentBrowserSetting = {
+    setSetting({
       isRhythmTrack: track.isRhythmTrack,
       programNumber: programNumber ?? 0,
-    }
-    pianoRollStore.openInstrumentBrowser = true
-  }, [pianoRollStore, selectedTrack])
+    })
+    setOpen(true)
+  }, [pianoRollStore, selectedTrack, setOpen, setSetting])
 
   if (selectedTrack === undefined) {
     return <></>

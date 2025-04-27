@@ -13,6 +13,7 @@ import {
   useToggleSoloTrack,
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
+import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useStores } from "../../hooks/useStores"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import Track from "../../track/Track"
@@ -135,6 +136,7 @@ const ControlButton = styled.div<{ active?: boolean }>`
 
 export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const { pianoRollStore, rootViewStore, trackMute, router } = useStores()
+  const { setSetting, setOpen } = useInstrumentBrowser()
   const toggleMuteTrack = useToggleMuteTrack()
   const toggleSoloTrack = useToggleSoloTrack()
   const toggleGhostTrack = useToggleGhostTrack()
@@ -155,12 +157,12 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
     if (track.isConductorTrack) {
       return
     }
-    pianoRollStore.openInstrumentBrowser = true
-    pianoRollStore.instrumentBrowserSetting = {
+    setOpen(true)
+    setSetting({
       programNumber: track.programNumber ?? 0,
       isRhythmTrack: track.isRhythmTrack,
-    }
-  }, [])
+    })
+  }, [setSetting, pianoRollStore, track])
   const onClickMute: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation()

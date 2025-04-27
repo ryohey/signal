@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
 import { useSetTrackInstrument, useStartNote, useStopNote } from "../../actions"
 import { isNotUndefined } from "../../helpers/array"
+import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { usePlayer } from "../../hooks/usePlayer"
 import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
@@ -154,13 +155,9 @@ const InstrumentBrowser: FC<InstrumentBrowserProps> = ({
 
 const InstrumentBrowserWrapper: FC = observer(() => {
   const {
-    pianoRollStore: {
-      selectedTrack: track,
-      instrumentBrowserSetting,
-      openInstrumentBrowser,
-    },
-    pianoRollStore,
+    pianoRollStore: { selectedTrack: track },
   } = useStores()
+  const { isOpen, setting, setSetting, setOpen } = useInstrumentBrowser()
   const { isPlaying, sendEvent } = usePlayer()
   const song = useSong()
   const startNote = useStartNote()
@@ -175,7 +172,7 @@ const InstrumentBrowserWrapper: FC = observer(() => {
     return <></>
   }
 
-  const close = () => (pianoRollStore.openInstrumentBrowser = false)
+  const close = () => setOpen(false)
   const setTrackInstrument = (programNumber: number) =>
     setTrackInstrumentAction(track.id, programNumber)
 
@@ -222,19 +219,19 @@ const InstrumentBrowserWrapper: FC = observer(() => {
 
       setStopNoteTimeout(timeout)
     }
-    pianoRollStore.instrumentBrowserSetting = setting
+    setSetting(setting)
   }
 
   return (
     <InstrumentBrowser
-      isOpen={openInstrumentBrowser}
-      setting={instrumentBrowserSetting}
+      isOpen={isOpen}
+      setting={setting}
       onChange={onChange}
       onClickCancel={() => {
         close()
       }}
       onClickOK={() => {
-        if (instrumentBrowserSetting.isRhythmTrack) {
+        if (setting.isRhythmTrack) {
           track.channel = 9
           setTrackInstrument(0)
         } else {
@@ -250,7 +247,7 @@ const InstrumentBrowserWrapper: FC = observer(() => {
               ) || 0
             track.channel = availableChannel
           }
-          setTrackInstrument(instrumentBrowserSetting.programNumber)
+          setTrackInstrument(setting.programNumber)
         }
 
         close()
