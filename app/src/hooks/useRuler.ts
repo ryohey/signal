@@ -120,17 +120,23 @@ export function useRuler(rulerStore: RulerStore) {
     setLoopBegin,
     setLoopEnd,
     seek: setPosition,
-    selectTimeSignature: (id: number) => {
-      rulerStore.selectedTimeSignatureEventIds = [id]
-    },
-    clearSelectedTimeSignature: () => {
+    selectTimeSignature: useCallback(
+      (id: number) => {
+        rulerStore.selectedTimeSignatureEventIds = [id]
+      },
+      [rulerStore],
+    ),
+    clearSelectedTimeSignature: useCallback(() => {
       rulerStore.selectedTimeSignatureEventIds = []
-    },
-    updateTimeSignature: (numerator: number, denominator: number) => {
-      rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
-        updateTimeSignature(id, numerator, denominator)
-      })
-    },
+    }, [rulerStore]),
+    updateTimeSignature: useCallback(
+      (numerator: number, denominator: number) => {
+        rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
+          updateTimeSignature(id, numerator, denominator)
+        })
+      },
+      [rulerStore, updateTimeSignature],
+    ),
     getTick,
     getQuantizedTick,
   }
