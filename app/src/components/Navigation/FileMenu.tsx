@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
+import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
-import { useStores } from "../../hooks/useStores"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
-  const { song } = useStores()
+  const song = useSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
 

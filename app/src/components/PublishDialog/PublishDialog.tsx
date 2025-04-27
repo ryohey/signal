@@ -5,6 +5,7 @@ import OpenInNewIcon from "mdi-react/OpenInNewIcon"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useEffect, useState } from "react"
 import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
+import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { Localized, useLocalization } from "../../localize/useLocalization"
 import {
@@ -22,7 +23,7 @@ type PublishState = "publishable" | "published" | "notPublishable"
 export const PublishDialog: FC = observer(() => {
   const { songStore, rootViewStore, cloudSongRepository, userRepository } =
     useStores()
-  const { song } = songStore
+  const song = useSong()
   const publishSong = usePublishSong()
   const unpublishSong = useUnpublishSong()
   const { openPublishDialog: open } = rootViewStore
@@ -56,7 +57,6 @@ export const PublishDialog: FC = observer(() => {
   )
 
   const onClickPublish = async () => {
-    const { song } = songStore
     try {
       setIsLoading(true)
       const user = await userRepository.getCurrentUser()
@@ -74,7 +74,6 @@ export const PublishDialog: FC = observer(() => {
   }
 
   const onClickUnpublish = async () => {
-    const { song } = songStore
     try {
       setIsLoading(true)
       await unpublishSong(song)

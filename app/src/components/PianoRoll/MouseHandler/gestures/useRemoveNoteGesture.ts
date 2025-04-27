@@ -1,14 +1,15 @@
 import { Point } from "../../../../entities/geometry/Point"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
+import { useHistory } from "../../../../hooks/useHistory"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useRemoveNoteGesture = (): MouseGesture => {
   const {
     pianoRollStore,
     pianoRollStore: { selectedTrack },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
 
   const removeEvent = (eventId: number) => {
     if (selectedTrack === undefined) {

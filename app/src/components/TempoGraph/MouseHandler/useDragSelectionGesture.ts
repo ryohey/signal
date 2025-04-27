@@ -7,14 +7,16 @@ import { isNotUndefined } from "../../../helpers/array"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useStores } from "../../../hooks/useStores"
+import { useHistory } from "../../../hooks/useHistory"
+import { useSong } from "../../../hooks/useSong"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
 export const useDragSelectionGesture = (): MouseGesture<
   [number, Point, TempoCoordTransform]
 > => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds, quantizer } = useTempoEditor()
 
   return {

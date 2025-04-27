@@ -3,6 +3,7 @@ import { Range } from "../../../../entities/geometry/Range"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
+import { useHistory } from "../../../../hooks/useHistory"
 import { useStores } from "../../../../hooks/useStores"
 import {
   DraggableArea,
@@ -41,8 +42,8 @@ export const useMoveDraggableGesture = (): MouseGesture<
   const {
     pianoRollStore,
     pianoRollStore: { isQuantizeEnabled, transform, quantizer },
-    pushHistory,
   } = useStores()
+  const { pushHistory } = useHistory()
 
   return {
     onMouseDown(e, draggable, subDraggables = [], callback = {}) {

@@ -6,13 +6,13 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
-import { useStores } from "../../../../hooks/useStores"
+import { useHistory } from "../../../../hooks/useHistory"
 
 export const useMoveSelectionGesture = (): MouseGesture<
   [Point, Rect],
   MouseEvent
 > => {
-  const { pushHistory } = useStores()
+  const { pushHistory } = useHistory()
   const { trackTransform } = useArrangeView()
   const arrangeMoveSelection = useArrangeMoveSelection()
 

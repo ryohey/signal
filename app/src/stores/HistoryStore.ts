@@ -4,8 +4,8 @@ interface Serializable<T> {
 }
 
 export default class HistoryStore<State> {
-  undoHistory: State[] = []
-  redoHistory: State[] = []
+  private undoHistory: State[] = []
+  private redoHistory: State[] = []
 
   constructor(private readonly serializable: Serializable<State>) {}
 
@@ -18,6 +18,7 @@ export default class HistoryStore<State> {
   get hasUndo() {
     return this.undoHistory.length > 0
   }
+
   undo() {
     const currentState = this.serializable.serialize()
     const state = this.undoHistory.pop()
@@ -30,6 +31,7 @@ export default class HistoryStore<State> {
   get hasRedo() {
     return this.redoHistory.length > 0
   }
+
   redo() {
     const currentState = this.serializable.serialize()
     const state = this.redoHistory.pop()

@@ -1,5 +1,4 @@
 import { useCreateEvent, useUpdateValueEvents } from "../../../../actions"
-import { usePushHistory } from "../../../../actions/history"
 import { ValueEventType } from "../../../../entities/event/ValueEventType"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
@@ -7,6 +6,7 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { useHistory } from "../../../../hooks/useHistory"
 import { useStores } from "../../../../hooks/useStores"
 
 export const usePencilGesture = (): MouseGesture<
@@ -16,7 +16,7 @@ export const usePencilGesture = (): MouseGesture<
   const { setSelectedEventIds, setSelection } = useControlPane()
   const createTrackEvent = useCreateEvent()
   const updateValueEvents = useUpdateValueEvents()
-  const pushHistory = usePushHistory()
+  const { pushHistory } = useHistory()
 
   return {
     onMouseDown(e, startPoint, transform, type) {

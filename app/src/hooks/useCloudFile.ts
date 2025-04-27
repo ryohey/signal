@@ -5,11 +5,12 @@ import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
 import { emptySong } from "../song"
+import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 export const useCloudFile = () => {
-  const { songStore, rootViewStore } = useStores()
-  const { song } = songStore
+  const { rootViewStore } = useStores()
+  const song = useSong()
   const toast = useToast()
   const prompt = usePrompt()
   const dialog = useDialog()
@@ -23,7 +24,6 @@ export const useCloudFile = () => {
   const createSong = useCreateSong()
 
   const saveOrCreateSong = async () => {
-    const { song } = songStore
     if (song.cloudSongId !== null) {
       if (song.name.length === 0) {
         const text = await prompt.show({
@@ -66,7 +66,6 @@ export const useCloudFile = () => {
   // true: saved or not necessary
   // false: canceled
   const saveIfNeeded = async (): Promise<boolean> => {
-    const { song } = songStore
     if (song.isSaved) {
       return true
     }

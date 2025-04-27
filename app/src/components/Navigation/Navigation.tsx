@@ -5,6 +5,7 @@ import Settings from "mdi-react/SettingsIcon"
 import { observer } from "mobx-react-lite"
 import { CSSProperties, FC, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import ArrangeIcon from "../../images/icons/arrange.svg"
 import PianoIcon from "../../images/icons/piano.svg"
@@ -83,19 +84,20 @@ export const IconStyle: CSSProperties = {
 }
 
 export const Navigation: FC = observer(() => {
-  const { rootViewStore, router } = useStores()
+  const { rootViewStore } = useStores()
+  const { path, setPath } = useRouter()
 
   const onClickPianoRollTab = useCallback(() => {
-    router.path = "/track"
-  }, [router])
+    setPath("/track")
+  }, [setPath])
 
   const onClickArrangeTab = useCallback(() => {
-    router.path = "/arrange"
-  }, [router])
+    setPath("/arrange")
+  }, [setPath])
 
   const onClickTempoTab = useCallback(() => {
-    router.path = "/tempo"
-  }, [router])
+    setPath("/tempo")
+  }, [setPath])
 
   const onClickSettings = useCallback(() => {
     rootViewStore.openSettingDialog = true
@@ -119,7 +121,7 @@ export const Navigation: FC = observer(() => {
         delayDuration={500}
       >
         <Tab
-          className={router.path === "/track" ? "active" : undefined}
+          className={path === "/track" ? "active" : undefined}
           onMouseDown={onClickPianoRollTab}
         >
           <PianoIcon style={IconStyle} viewBox="0 0 128 128" />
@@ -138,7 +140,7 @@ export const Navigation: FC = observer(() => {
         delayDuration={500}
       >
         <Tab
-          className={router.path === "/arrange" ? "active" : undefined}
+          className={path === "/arrange" ? "active" : undefined}
           onMouseDown={onClickArrangeTab}
         >
           <ArrangeIcon style={IconStyle} viewBox="0 0 128 128" />
@@ -157,7 +159,7 @@ export const Navigation: FC = observer(() => {
         delayDuration={500}
       >
         <Tab
-          className={router.path === "/tempo" ? "active" : undefined}
+          className={path === "/tempo" ? "active" : undefined}
           onMouseDown={onClickTempoTab}
         >
           <TempoIcon style={IconStyle} viewBox="0 0 128 128" />

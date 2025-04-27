@@ -4,13 +4,16 @@ import {
   isTempoEventsClipboardData,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
-import { useStores } from "../hooks/useStores"
+import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
+import { useSong } from "../hooks/useSong"
 import { useTempoEditor } from "../hooks/useTempoEditor"
 import clipboard from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useTempoEditor()
 
   return () => {
@@ -38,7 +41,7 @@ export const useResetTempoSelection = () => {
 }
 
 export const useCopyTempoSelection = () => {
-  const { song } = useStores()
+  const song = useSong()
   const { selectedEventIds } = useTempoEditor()
 
   return () => {
@@ -74,11 +77,9 @@ export const useCopyTempoSelection = () => {
 }
 
 export const usePasteTempoSelection = () => {
-  const {
-    song: { conductorTrack },
-    player,
-    pushHistory,
-  } = useStores()
+  const { position } = usePlayer()
+  const { conductorTrack } = useSong()
+  const { pushHistory } = useHistory()
 
   return () => {
     if (conductorTrack === undefined) {
@@ -99,7 +100,7 @@ export const usePasteTempoSelection = () => {
 
     const events = obj.events.map((e) => ({
       ...e,
-      tick: e.tick + player.position,
+      tick: e.tick + position,
     }))
     conductorTrack.transaction((it) => {
       events.forEach((e) => it.createOrUpdate(e))
@@ -108,7 +109,8 @@ export const usePasteTempoSelection = () => {
 }
 
 export const useDuplicateTempoSelection = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
 
   return () => {

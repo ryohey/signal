@@ -8,8 +8,8 @@ import { KeySignature } from "../../entities/scale/KeySignature"
 import { noteNameWithOctString } from "../../helpers/noteNumberString"
 import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
+import { usePreviewNote } from "../../hooks/usePreviewNote"
 import { useStores } from "../../hooks/useStores"
-import { noteOffMidiEvent, noteOnMidiEvent } from "../../midi/MidiEvent"
 import { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { PianoKeysContextMenu } from "./PianoKeysContextMenu"
@@ -207,18 +207,17 @@ function drawKeys(
 export const PianoKeys: FC = observer(() => {
   const theme = useTheme()
   const {
-    pianoRollStore,
     pianoRollStore: {
       keySignature,
       transform: { numberOfKeys, pixelsPerKey: keyHeight },
       previewingNoteNumbers,
     },
-    player,
   } = useStores()
   const width = Layout.keyWidth
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())
   const { onContextMenu, menuProps } = useContextMenu()
+  const { previewNoteOn, previewNoteOff } = usePreviewNote()
   const selectedKeys = new Set([...touchingKeys, ...previewingNoteNumbers])
 
   const draw = useCallback(
@@ -264,11 +263,9 @@ export const PianoKeys: FC = observer(() => {
         x: e.nativeEvent.offsetX,
         y: e.nativeEvent.offsetY,
       }
-      const { selectedTrack } = pianoRollStore
-      const channel = selectedTrack?.channel ?? 0
 
       let prevNoteNumber = posToNoteNumber(startPosition.x, startPosition.y)
-      player.sendEvent(noteOnMidiEvent(0, channel, prevNoteNumber, 127))
+      previewNoteOn(prevNoteNumber)
 
       setTouchingKeys(new Set([prevNoteNumber]))
 
@@ -277,19 +274,19 @@ export const PianoKeys: FC = observer(() => {
           const pos = Point.add(startPosition, delta)
           const noteNumber = posToNoteNumber(pos.x, pos.y)
           if (noteNumber !== prevNoteNumber) {
-            player.sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
-            player.sendEvent(noteOnMidiEvent(0, channel, noteNumber, 127))
+            previewNoteOff()
+            previewNoteOn(noteNumber)
             prevNoteNumber = noteNumber
             setTouchingKeys(new Set([noteNumber]))
           }
         },
         onMouseUp() {
-          player.sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
+          previewNoteOff()
           setTouchingKeys(new Set())
         },
       })
     },
-    [numberOfKeys, keyHeight],
+    [numberOfKeys, keyHeight, previewNoteOn, previewNoteOff, blackKeyWidth],
   )
 
   return (

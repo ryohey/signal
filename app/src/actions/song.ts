@@ -1,4 +1,7 @@
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
@@ -15,8 +18,8 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
-  const { songStore, trackMute, pianoRollStore, player, historyStore } =
-    useStores()
+  const { songStore, trackMute, pianoRollStore, historyStore } = useStores()
+  const { stop, reset, setPosition } = usePlayer()
 
   const {
     setSelection: setArrangeSelection,
@@ -40,9 +43,9 @@ export const useSetSong = () => {
 
     historyStore.clear()
 
-    player.stop()
-    player.reset()
-    player.position = 0
+    stop()
+    reset()
+    setPosition(0)
   }
 }
 
@@ -52,7 +55,7 @@ export const useCreateSong = () => {
 }
 
 export const useSaveSong = () => {
-  const { song } = useStores()
+  const song = useSong()
   return () => {
     song.isSaved = true
     downloadSongAsMidi(song)
@@ -71,7 +74,9 @@ export const useOpenSong = () => {
 }
 
 export const useAddTrack = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
+
   return () => {
     pushHistory()
     song.addTrack(emptyTrack(Math.min(song.tracks.length - 1, 0xf)))
@@ -79,7 +84,9 @@ export const useAddTrack = () => {
 }
 
 export const useRemoveTrack = () => {
-  const { song, pianoRollStore, pushHistory } = useStores()
+  const { pianoRollStore } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
   const {
     selectedTrackIndex: arrangeSelectedTrackIndex,
     setSelectedTrackIndex: setArrangeSelectedTrackIndex,
@@ -114,7 +121,9 @@ export const useSelectTrack = () => {
 }
 
 export const useInsertTrack = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
+
   return (trackIndex: number) => {
     pushHistory()
     song.insertTrack(emptyTrack(song.tracks.length - 1), trackIndex)
@@ -122,7 +131,9 @@ export const useInsertTrack = () => {
 }
 
 export const useDuplicateTrack = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
+
   return (trackId: TrackId) => {
     const track = song.getTrack(trackId)
     if (track === undefined) {

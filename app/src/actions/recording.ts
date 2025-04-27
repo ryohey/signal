@@ -1,14 +1,17 @@
+import { usePlayer } from "../hooks/usePlayer"
 import { useStores } from "../hooks/useStores"
 
 export const useToggleRecording = () => {
-  const { midiRecorder, player } = useStores()
+  const { midiRecorder } = useStores()
+  const { play, stop } = usePlayer()
+
   return () => {
     if (midiRecorder.isRecording) {
       midiRecorder.isRecording = false
-      player.stop()
+      stop()
     } else {
       midiRecorder.isRecording = true
-      player.play()
+      play()
     }
   }
 }

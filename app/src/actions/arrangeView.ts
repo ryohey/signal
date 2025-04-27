@@ -9,6 +9,9 @@ import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
+import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import Track from "../track"
@@ -143,9 +146,7 @@ export const useArrangeMoveSelectionBy = () => {
 }
 
 export const useArrangeCopySelection = () => {
-  const {
-    song: { tracks },
-  } = useStores()
+  const { tracks } = useSong()
   const { selection, selectedEventIds } = useArrangeView()
 
   return () => {
@@ -173,11 +174,9 @@ export const useArrangeCopySelection = () => {
 }
 
 export const useArrangePasteSelection = () => {
-  const {
-    song: { tracks },
-    player,
-    pushHistory,
-  } = useStores()
+  const { position } = usePlayer()
+  const { tracks } = useSong()
+  const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
 
   return () => {
@@ -195,7 +194,7 @@ export const useArrangePasteSelection = () => {
     for (const trackIndex in obj.notes) {
       const notes = obj.notes[trackIndex].map((note) => ({
         ...note,
-        tick: note.tick + player.position,
+        tick: note.tick + position,
       }))
 
       const isRulerSelected = selectedTrackIndex < 0
@@ -213,10 +212,8 @@ export const useArrangePasteSelection = () => {
 }
 
 export const useArrangeDeleteSelection = () => {
-  const {
-    song: { tracks },
-    pushHistory,
-  } = useStores()
+  const { tracks } = useSong()
+  const { pushHistory } = useHistory()
   const { setSelection, selectedEventIds, setSelectedEventIds } =
     useArrangeView()
 
@@ -249,7 +246,8 @@ function getEventsInSelection(tracks: Track[], selection: ArrangeSelection) {
 }
 
 export const useArrangeTransposeSelection = () => {
-  const { song, pushHistory } = useStores()
+  const song = useSong()
+  const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (deltaPitch: number) => {
@@ -259,10 +257,8 @@ export const useArrangeTransposeSelection = () => {
 }
 
 export const useArrangeDuplicateSelection = () => {
-  const {
-    song: { tracks },
-    pushHistory,
-  } = useStores()
+  const { tracks } = useSong()
+  const { pushHistory } = useHistory()
   const { selection, selectedEventIds, setSelection, setSelectedEventIds } =
     useArrangeView()
 
@@ -305,10 +301,8 @@ export const useArrangeDuplicateSelection = () => {
 }
 
 export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
-  const {
-    song: { tracks },
-    pushHistory,
-  } = useStores()
+  const { tracks } = useSong()
+  const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (operation: BatchUpdateOperation) => {

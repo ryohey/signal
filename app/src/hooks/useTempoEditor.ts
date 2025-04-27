@@ -4,6 +4,7 @@ import { Rect } from "../entities/geometry/Rect"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
 
 export function useTempoEditor() {
@@ -45,7 +46,7 @@ export function useTempoEditor() {
   const contentWidth = useMobxStore(
     ({ tempoEditorStore: { tickScrollStore } }) => tickScrollStore.contentWidth,
   )
-  const playerPosition = useMobxStore(({ player }) => player.position)
+  const { position: playerPosition } = usePlayer()
 
   const selectionRect = useMemo(
     () =>

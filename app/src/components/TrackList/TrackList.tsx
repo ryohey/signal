@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useSong } from "../../hooks/useSong"
 import { DraggableList } from "../ControlSettingDialog/DraggableList"
 import { AddTrackButton } from "./AddTrackButton"
 import { TrackListItem } from "./TrackListItem"
@@ -14,7 +14,7 @@ const List = styled.div`
 `
 
 export const TrackList: FC = observer(() => {
-  const { song } = useStores()
+  const song = useSong()
 
   return (
     <List>

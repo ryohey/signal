@@ -5,7 +5,7 @@ import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
-import { useStores } from "./useStores"
+import { usePlayer } from "./usePlayer"
 
 const TIME_SIGNATURE_HIT_WIDTH = 20
 
@@ -22,7 +22,6 @@ export interface RulerTimeSignature {
 }
 
 export function useRuler(rulerStore: RulerStore) {
-  const { player } = useStores()
   const updateTimeSignature = useUpdateTimeSignature()
   const { parent } = rulerStore
 
@@ -36,7 +35,7 @@ export function useRuler(rulerStore: RulerStore) {
     () => rulerStore.selectedTimeSignatureEventIds,
     [rulerStore],
   )
-  const loop = useMobxStore(({ player }) => player.loop)
+  const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
 
   const timeSignatureHitTest = useCallback(
     (tick: number) => {
@@ -118,22 +117,26 @@ export function useRuler(rulerStore: RulerStore) {
     timeSignatures: rulerTimeSignatures,
     transform,
     timeSignatureHitTest,
-    setLoopBegin: (tick: number) => player.setLoopBegin(tick),
-    setLoopEnd: (tick: number) => player.setLoopEnd(tick),
-    seek: (tick: number) => {
-      player.position = tick
-    },
-    selectTimeSignature: (id: number) => {
-      rulerStore.selectedTimeSignatureEventIds = [id]
-    },
-    clearSelectedTimeSignature: () => {
+    setLoopBegin,
+    setLoopEnd,
+    seek: setPosition,
+    selectTimeSignature: useCallback(
+      (id: number) => {
+        rulerStore.selectedTimeSignatureEventIds = [id]
+      },
+      [rulerStore],
+    ),
+    clearSelectedTimeSignature: useCallback(() => {
       rulerStore.selectedTimeSignatureEventIds = []
-    },
-    updateTimeSignature: (numerator: number, denominator: number) => {
-      rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
-        updateTimeSignature(id, numerator, denominator)
-      })
-    },
+    }, [rulerStore]),
+    updateTimeSignature: useCallback(
+      (numerator: number, denominator: number) => {
+        rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
+          updateTimeSignature(id, numerator, denominator)
+        })
+      },
+      [rulerStore, updateTimeSignature],
+    ),
     getTick,
     getQuantizedTick,
   }

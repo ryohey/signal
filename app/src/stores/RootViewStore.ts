@@ -2,7 +2,6 @@ import { makeObservable, observable } from "mobx"
 import { TrackEvent } from "../track"
 
 export default class RootViewStore {
-  isArrangeViewSelected: boolean = false
   openFileDrawer = false
   openEditDrawer = false
   openHelp = false
@@ -19,7 +18,6 @@ export default class RootViewStore {
 
   constructor() {
     makeObservable(this, {
-      isArrangeViewSelected: observable,
       openFileDrawer: observable,
       openEditDrawer: observable,
       openHelp: observable,

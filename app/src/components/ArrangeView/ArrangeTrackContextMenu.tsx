@@ -27,18 +27,20 @@ export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
       >
         <Localized name="add-track" />
       </MenuItem>
-      {selectedTrackIndex > 0 && tracks.length > 2 && (
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            removeTrack(selectedTrackId)
-            handleClose()
-          }}
-        >
-          <Localized name="delete-track" />
-        </MenuItem>
-      )}
-      {selectedTrackIndex > 0 && (
+      {selectedTrackIndex > 0 &&
+        tracks.length > 2 &&
+        selectedTrackId !== undefined && (
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation()
+              removeTrack(selectedTrackId)
+              handleClose()
+            }}
+          >
+            <Localized name="delete-track" />
+          </MenuItem>
+        )}
+      {selectedTrackIndex > 0 && selectedTrackId !== undefined && (
         <MenuItem
           onClick={(e) => {
             e.stopPropagation()

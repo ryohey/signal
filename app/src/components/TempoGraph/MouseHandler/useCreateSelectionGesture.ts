@@ -6,14 +6,14 @@ import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useStores } from "../../../hooks/useStores"
+import { useSong } from "../../../hooks/useSong"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { isSetTempoEvent } from "../../../track"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const { song } = useStores()
+  const song = useSong()
   const { setSelectedEventIds, setSelection } = useTempoEditor()
   let selection: TempoSelection | null = null
 

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
-import InstrumentBrowser from "../InstrumentBrowser/InstrumentBrowser"
+import { InstrumentBrowser } from "../InstrumentBrowser/InstrumentBrowser"
 import { Toolbar } from "../Toolbar/Toolbar"
 import { TrackListMenuButton } from "../TrackList/TrackListMenuButton"
 import { EventListButton } from "./EventListButton"

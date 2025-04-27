@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useRouter } from "../../hooks/useRouter"
 import { ArrangeEditor } from "../ArrangeView/ArrangeEditor"
 import { BuildInfo } from "../BuildInfo"
 import { CloudFileDialog } from "../CloudFileDialog/CloudFileDialog"
@@ -37,9 +36,8 @@ const Column = styled.div`
   flex-direction: column;
 `
 
-const Routes: FC = observer(() => {
-  const { router } = useStores()
-  const path = router.path
+const Routes: FC = () => {
+  const { path } = useRouter()
   return (
     <>
       {path === "/track" && <PianoRollEditor />}
@@ -47,7 +45,7 @@ const Routes: FC = observer(() => {
       {path === "/arrange" && <ArrangeEditor />}
     </>
   )
-})
+}
 
 export const RootView: FC = () => (
   <>
