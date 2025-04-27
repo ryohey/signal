@@ -1,5 +1,6 @@
-import { useSelectNote, useStartNote, useStopNote } from "../../../../actions"
+import { useSelectNote } from "../../../../actions"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useStores } from "../../../../hooks/useStores"
 import { isNoteEvent } from "../../../../track"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
@@ -11,9 +12,8 @@ const useDragNoteEdgeGesture =
       pianoRollStore: { selectedTrack, selectedNoteIds },
     } = useStores()
     const selectNote = useSelectNote()
-    const startNote = useStartNote()
-    const stopNote = useStopNote()
     const moveDraggableAction = useMoveDraggableGesture()
+    const { previewNoteOn, previewNoteOff } = usePreviewNote()
 
     return {
       onMouseDown(e, noteId) {
@@ -37,9 +37,7 @@ const useDragNoteEdgeGesture =
 
         const newSelectedNoteIds = pianoRollStore.selectedNoteIds
 
-        const { channel } = selectedTrack
-        startNote({ ...note, channel })
-        let playingNoteNumber = note.noteNumber
+        previewNoteOn(note.noteNumber)
 
         moveDraggableAction.onMouseDown(
           e,
@@ -61,21 +59,13 @@ const useDragNoteEdgeGesture =
               if (oldPosition.tick !== newPosition.tick) {
                 pianoRollStore.lastNoteDuration = newNote.duration
               }
-              if (
-                oldPosition.noteNumber !== newPosition.noteNumber &&
-                newNote.noteNumber !== playingNoteNumber
-              ) {
-                stopNote({ noteNumber: playingNoteNumber, channel })
-                startNote({
-                  noteNumber: newNote.noteNumber,
-                  channel,
-                  velocity: newNote.velocity,
-                })
-                playingNoteNumber = newNote.noteNumber
+              if (oldPosition.noteNumber !== newPosition.noteNumber) {
+                previewNoteOff()
+                previewNoteOn(newNote.noteNumber)
               }
             },
             onMouseUp() {
-              stopNote({ noteNumber: playingNoteNumber, channel })
+              previewNoteOff()
             },
             onClick(e) {
               if (!e.shiftKey) {

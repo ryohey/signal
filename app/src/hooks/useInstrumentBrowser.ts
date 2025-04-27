@@ -1,22 +1,22 @@
 import { difference, groupBy, map, range } from "lodash"
-import { useCallback, useMemo, useState } from "react"
-import { useSetTrackInstrument, useStartNote, useStopNote } from "../actions"
+import { useCallback, useMemo } from "react"
+import { useSetTrackInstrument } from "../actions"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { isNotUndefined } from "../helpers/array"
 import { getCategoryIndex } from "../midi/GM"
 import { programChangeMidiEvent } from "../midi/MidiEvent"
 import { useMobxStore } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
+import { usePreviewNote } from "./usePreviewNote"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 export function useInstrumentBrowser() {
   const { pianoRollStore } = useStores()
   const { isPlaying, sendEvent } = usePlayer()
-  const startNote = useStartNote()
-  const stopNote = useStopNote()
   const setTrackInstrumentAction = useSetTrackInstrument()
   const song = useSong()
+  const { previewNoteOn } = usePreviewNote()
 
   const track = useMobxStore(
     ({ pianoRollStore }) => pianoRollStore.selectedTrack,
@@ -34,11 +34,6 @@ export function useInstrumentBrowser() {
       (presets) => ({ presets }),
     )
   }, [])
-
-  const [stopNoteTimeout, setStopNoteTimeout] = useState<NodeJS.Timeout | null>(
-    null,
-  )
-
   const setSetting = useCallback(
     (setting: InstrumentSetting) =>
       (pianoRollStore.instrumentBrowserSetting = setting),
@@ -95,38 +90,14 @@ export function useInstrumentBrowser() {
         }
         sendEvent(programChangeMidiEvent(0, channel, programNumber))
         if (!isPlaying) {
-          const noteNumber = 64
-
-          // if note is already playing, stop it immediately and cancel the timeout
-          if (stopNoteTimeout !== null) {
-            clearTimeout(stopNoteTimeout)
-            stopNote({
-              noteNumber,
-              channel,
-            })
-          }
-
-          startNote({
-            noteNumber,
-            velocity: 100,
-            channel,
-          })
-          const timeout = setTimeout(() => {
-            stopNote({
-              noteNumber,
-              channel,
-            })
-            setStopNoteTimeout(null)
-          }, 500)
-
-          setStopNoteTimeout(timeout)
+          previewNoteOn(64, 500)
         }
         setSetting({
           programNumber,
           isRhythmTrack: setting.isRhythmTrack,
         })
       },
-      [pianoRollStore, setSetting, setting, track],
+      [setSetting, setting, track, previewNoteOn],
     ),
     onClickOK,
   }
