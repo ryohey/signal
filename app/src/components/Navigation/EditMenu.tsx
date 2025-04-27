@@ -131,7 +131,7 @@ export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
         <HotKey>{envString.cmdOrCtrl}+C</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickPaste} disabled={!anySelectedNotes}>
+      <MenuItem onClick={onClickPaste}>
         <Localized name="paste" />
         <HotKey>{envString.cmdOrCtrl}+V</HotKey>
       </MenuItem>
