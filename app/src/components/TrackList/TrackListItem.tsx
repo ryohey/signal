@@ -136,7 +136,7 @@ const ControlButton = styled.div<{ active?: boolean }>`
 `
 
 export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
-  const { pianoRollStore, rootViewStore, trackMute } = useStores()
+  const { pianoRollStore, trackMute } = useStores()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
   const toggleMuteTrack = useToggleMuteTrack()
@@ -145,9 +145,7 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const toggleAllGhostTracks = useToggleAllGhostTracks()
   const selectTrack = useSelectTrack()
 
-  const selected =
-    !rootViewStore.isArrangeViewSelected &&
-    track.id === pianoRollStore.selectedTrackId
+  const selected = track.id === pianoRollStore.selectedTrackId
   const mute = trackMute.isMuted(track.id)
   const solo = trackMute.isSolo(track.id)
   const ghostTrack = !pianoRollStore.notGhostTrackIds.has(track.id)
