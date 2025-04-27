@@ -18,8 +18,8 @@ import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
-  const { historyStore, pianoRollStore } = useStores()
-  const { undo, redo } = useHistory()
+  const { pianoRollStore } = useStores()
+  const { hasUndo, hasRedo, undo, redo } = useHistory()
   const copySelection = useCopySelection()
   const pasteSelection = usePasteSelection()
   const deleteSelection = useDeleteSelection()
@@ -109,12 +109,12 @@ export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
 
   return (
     <>
-      <MenuItem onClick={onClickUndo} disabled={!historyStore.hasUndo}>
+      <MenuItem onClick={onClickUndo} disabled={!hasUndo}>
         <Localized name="undo" />
         <HotKey>{envString.cmdOrCtrl}+Z</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickRedo} disabled={!historyStore.hasRedo}>
+      <MenuItem onClick={onClickRedo} disabled={!hasRedo}>
         <Localized name="redo" />
         <HotKey>{envString.cmdOrCtrl}+Shift+Z</HotKey>
       </MenuItem>
