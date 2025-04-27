@@ -16,6 +16,7 @@ import {
 import { hasFSAccess } from "../../actions/file"
 import { useHistory } from "../../hooks/useHistory"
 import { usePlayer } from "../../hooks/usePlayer"
+import { useRouter } from "../../hooks/useRouter"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
@@ -24,7 +25,8 @@ import { FileInput } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
 export const GlobalKeyboardShortcut: FC = observer(() => {
-  const { rootViewStore, router } = useStores()
+  const { rootViewStore } = useStores()
+  const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
   const song = useSong()
   const rewindOneBar = useRewindOneBar()
@@ -138,19 +140,19 @@ export const GlobalKeyboardShortcut: FC = observer(() => {
           {
             code: "Digit1",
             metaKey: true,
-            run: () => (router.path = "/track"),
+            run: () => setPath("/track"),
           },
           // Switch to arrange roll (Meta-2)
           {
             code: "Digit2",
             metaKey: true,
-            run: () => (router.path = "/arrange"),
+            run: () => setPath("/arrange"),
           },
           // Switch to tempo roll (Meta-3)
           {
             code: "Digit3",
             metaKey: true,
-            run: () => (router.path = "/tempo"),
+            run: () => setPath("/tempo"),
           },
           // Save (Meta-S)
           {

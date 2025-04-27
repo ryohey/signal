@@ -14,6 +14,7 @@ import {
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import Track from "../../track/Track"
@@ -135,7 +136,8 @@ const ControlButton = styled.div<{ active?: boolean }>`
 `
 
 export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
-  const { pianoRollStore, rootViewStore, trackMute, router } = useStores()
+  const { pianoRollStore, rootViewStore, trackMute } = useStores()
+  const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
   const toggleMuteTrack = useToggleMuteTrack()
   const toggleSoloTrack = useToggleSoloTrack()
@@ -189,9 +191,9 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
     [track.id, toggleAllGhostTracks, toggleGhostTrack],
   )
   const onSelectTrack = useCallback(() => {
-    router.pushTrack()
+    setPath("/track")
     selectTrack(track.id)
-  }, [track.id, selectTrack])
+  }, [track.id, selectTrack, setPath])
   const onClickChannel = useCallback(() => {
     setDialogOpened(true)
   }, [])

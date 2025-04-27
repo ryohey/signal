@@ -9,6 +9,7 @@ import {
   isPianoNotesClipboardData,
 } from "../clipboard/clipboardTypes"
 import { useControlPane } from "../hooks/useControlPane"
+import { useRouter } from "../hooks/useRouter"
 import { useStores } from "../hooks/useStores"
 import Clipboard from "../services/Clipboard"
 import {
@@ -23,7 +24,8 @@ import {
 } from "./tempo"
 
 export const useCopySelectionGlobal = () => {
-  const { router, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
+  const { path } = useRouter()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const copySelection = useCopySelection()
   const arrangeCopySelection = useArrangeCopySelection()
@@ -31,7 +33,7 @@ export const useCopySelectionGlobal = () => {
   const copyControlSelection = useCopyControlSelection()
 
   return () => {
-    switch (router.path) {
+    switch (path) {
       case "/track":
         if (pianoRollStore.selectedNoteIds.length > 0) {
           copySelection()
@@ -50,7 +52,8 @@ export const useCopySelectionGlobal = () => {
 }
 
 export const useCutSelectionGlobal = () => {
-  const { router, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
+  const { path } = useRouter()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const copySelection = useCopySelection()
   const deleteSelection = useDeleteSelection()
@@ -62,7 +65,7 @@ export const useCutSelectionGlobal = () => {
   const deleteControlSelection = useDeleteControlSelection()
 
   return () => {
-    switch (router.path) {
+    switch (path) {
       case "/track":
         if (pianoRollStore.selectedNoteIds.length > 0) {
           copySelection()
@@ -85,14 +88,14 @@ export const useCutSelectionGlobal = () => {
 }
 
 export const usePasteSelectionGlobal = () => {
-  const { router } = useStores()
+  const { path } = useRouter()
   const pasteSelection = usePasteSelection()
   const arrangePasteSelection = useArrangePasteSelection()
   const pasteTempoSelection = usePasteTempoSelection()
   const pasteControlSelection = usePasteControlSelection()
 
   return () => {
-    switch (router.path) {
+    switch (path) {
       case "/track": {
         const text = Clipboard.readText()
         if (!text || text.length === 0) {

@@ -8,7 +8,7 @@ import { useSelectTrack } from "../../actions"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
-import { useStores } from "../../hooks/useStores"
+import { useRouter } from "../../hooks/useRouter"
 import { TrackId } from "../../track"
 import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { TrackName } from "../TrackList/TrackName"
@@ -91,7 +91,7 @@ export const ArrangeView: FC = () => {
     scaleAroundPointX,
     setSelectedTrackIndex,
   } = useArrangeView()
-  const { router } = useStores()
+  const { setPath } = useRouter()
   const selectTrack = useSelectTrack()
   const rulerSelectionGesture = useRulerSelectionGesture()
 
@@ -168,7 +168,7 @@ export const ArrangeView: FC = () => {
   )
 
   const openTrack = (trackId: TrackId) => {
-    router.pushTrack()
+    setPath("/track")
     selectTrack(trackId)
   }
 
