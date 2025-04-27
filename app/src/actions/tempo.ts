@@ -5,8 +5,8 @@ import {
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import { useTempoEditor } from "../hooks/useTempoEditor"
 import clipboard from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
@@ -77,7 +77,7 @@ export const useCopyTempoSelection = () => {
 }
 
 export const usePasteTempoSelection = () => {
-  const { player } = useStores()
+  const { position } = usePlayer()
   const { conductorTrack } = useSong()
   const { pushHistory } = useHistory()
 
@@ -100,7 +100,7 @@ export const usePasteTempoSelection = () => {
 
     const events = obj.events.map((e) => ({
       ...e,
-      tick: e.tick + player.position,
+      tick: e.tick + position,
     }))
     conductorTrack.transaction((it) => {
       events.forEach((e) => it.createOrUpdate(e))

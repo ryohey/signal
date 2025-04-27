@@ -8,6 +8,7 @@ import { KeySignature } from "../../entities/scale/KeySignature"
 import { noteNameWithOctString } from "../../helpers/noteNumberString"
 import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
+import { usePlayer } from "../../hooks/usePlayer"
 import { useStores } from "../../hooks/useStores"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../../midi/MidiEvent"
 import { Theme } from "../../theme/Theme"
@@ -213,8 +214,8 @@ export const PianoKeys: FC = observer(() => {
       transform: { numberOfKeys, pixelsPerKey: keyHeight },
       previewingNoteNumbers,
     },
-    player,
   } = useStores()
+  const { sendEvent } = usePlayer()
   const width = Layout.keyWidth
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())
@@ -268,7 +269,7 @@ export const PianoKeys: FC = observer(() => {
       const channel = selectedTrack?.channel ?? 0
 
       let prevNoteNumber = posToNoteNumber(startPosition.x, startPosition.y)
-      player.sendEvent(noteOnMidiEvent(0, channel, prevNoteNumber, 127))
+      sendEvent(noteOnMidiEvent(0, channel, prevNoteNumber, 127))
 
       setTouchingKeys(new Set([prevNoteNumber]))
 
@@ -277,14 +278,14 @@ export const PianoKeys: FC = observer(() => {
           const pos = Point.add(startPosition, delta)
           const noteNumber = posToNoteNumber(pos.x, pos.y)
           if (noteNumber !== prevNoteNumber) {
-            player.sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
-            player.sendEvent(noteOnMidiEvent(0, channel, noteNumber, 127))
+            sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
+            sendEvent(noteOnMidiEvent(0, channel, noteNumber, 127))
             prevNoteNumber = noteNumber
             setTouchingKeys(new Set([noteNumber]))
           }
         },
         onMouseUp() {
-          player.sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
+          sendEvent(noteOffMidiEvent(0, channel, prevNoteNumber, 0))
           setTouchingKeys(new Set())
         },
       })

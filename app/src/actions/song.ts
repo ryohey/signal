@@ -1,5 +1,6 @@
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { downloadSongAsMidi } from "../midi/midiConversion"
@@ -17,8 +18,8 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
-  const { songStore, trackMute, pianoRollStore, player, historyStore } =
-    useStores()
+  const { songStore, trackMute, pianoRollStore, historyStore } = useStores()
+  const { stop, reset, setPosition } = usePlayer()
 
   const {
     setSelection: setArrangeSelection,
@@ -42,9 +43,9 @@ export const useSetSong = () => {
 
     historyStore.clear()
 
-    player.stop()
-    player.reset()
-    player.position = 0
+    stop()
+    reset()
+    setPosition(0)
   }
 }
 

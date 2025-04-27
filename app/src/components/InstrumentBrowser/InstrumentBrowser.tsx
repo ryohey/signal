@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
 import { useSetTrackInstrument, useStartNote, useStopNote } from "../../actions"
 import { isNotUndefined } from "../../helpers/array"
+import { usePlayer } from "../../hooks/usePlayer"
 import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
@@ -159,8 +160,8 @@ const InstrumentBrowserWrapper: FC = observer(() => {
       openInstrumentBrowser,
     },
     pianoRollStore,
-    player,
   } = useStores()
+  const { isPlaying, sendEvent } = usePlayer()
   const song = useSong()
   const startNote = useStartNote()
   const stopNote = useStopNote()
@@ -193,8 +194,8 @@ const InstrumentBrowserWrapper: FC = observer(() => {
     if (channel === undefined) {
       return
     }
-    player.sendEvent(programChangeMidiEvent(0, channel, setting.programNumber))
-    if (!player.isPlaying) {
+    sendEvent(programChangeMidiEvent(0, channel, setting.programNumber))
+    if (!isPlaying) {
       const noteNumber = 64
 
       // if note is already playing, stop it immediately and cancel the timeout

@@ -7,14 +7,15 @@ import {
 import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
   const {
     pianoRollStore: { selectedTrack },
-    player,
   } = useStores()
+  const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
 
@@ -36,7 +37,7 @@ export const useCreateOrUpdateControlEventsValue = () => {
     } else {
       selectedTrack.createOrUpdate({
         ...event,
-        tick: player.position,
+        tick: position,
       })
     }
   }
@@ -101,8 +102,8 @@ export const useCopyControlSelection = () => {
 export const usePasteControlSelection = () => {
   const {
     pianoRollStore: { selectedTrack },
-    player,
   } = useStores()
+  const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
   return () => {
@@ -124,7 +125,7 @@ export const usePasteControlSelection = () => {
 
     const events = obj.events.map((e) => ({
       ...e,
-      tick: e.tick + player.position,
+      tick: e.tick + position,
     }))
     selectedTrack.transaction((it) =>
       events.forEach((e) => it.createOrUpdate(e)),

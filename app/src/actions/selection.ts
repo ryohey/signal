@@ -9,6 +9,7 @@ import { isNotUndefined } from "../helpers/array"
 import { tickToMillisec } from "../helpers/bpm"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
@@ -140,9 +141,9 @@ export const useDeleteSelection = () => {
 
 export const usePasteSelection = () => {
   const {
-    player: { position },
     pianoRollStore: { selectedTrack },
   } = useStores()
+  const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
   return () => {

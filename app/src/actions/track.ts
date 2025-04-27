@@ -6,6 +6,7 @@ import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import {
@@ -61,9 +62,12 @@ export const useChangeNotesVelocity = () => {
 }
 
 export const useCreateEvent = () => {
-  const { player, pianoRollStore } = useStores()
+  const {
+    pianoRollStore: { quantizer, selectedTrack },
+  } = useStores()
+  const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { quantizer, selectedTrack } = pianoRollStore
+
   return (e: AnyChannelEvent, tick?: number) => {
     if (selectedTrack === undefined) {
       throw new Error("selected track is undefined")
@@ -71,13 +75,13 @@ export const useCreateEvent = () => {
     pushHistory()
     const id = selectedTrack.createOrUpdate({
       ...e,
-      tick: quantizer.round(tick ?? player.position),
+      tick: quantizer.round(tick ?? position),
     }).id
 
     // 即座に反映する
     // Reflect immediately
     if (tick !== undefined) {
-      player.sendEvent(e)
+      sendEvent(e)
     }
 
     return id
@@ -243,7 +247,7 @@ export const useSetTrackName = () => {
 }
 
 export const useSetTrackVolume = () => {
-  const { player } = useStores()
+  const { position, sendEvent } = usePlayer()
   const song = useSong()
   const { pushHistory } = useHistory()
 
@@ -254,16 +258,16 @@ export const useSetTrackVolume = () => {
       return
     }
 
-    track.setVolume(volume, player.position)
+    track.setVolume(volume, position)
 
     if (track.channel !== undefined) {
-      player.sendEvent(volumeMidiEvent(0, track.channel, volume))
+      sendEvent(volumeMidiEvent(0, track.channel, volume))
     }
   }
 }
 
 export const useSetTrackPan = () => {
-  const { player } = useStores()
+  const { position, sendEvent } = usePlayer()
   const song = useSong()
   const { pushHistory } = useHistory()
 
@@ -274,16 +278,16 @@ export const useSetTrackPan = () => {
       return
     }
 
-    track.setPan(pan, player.position)
+    track.setPan(pan, position)
 
     if (track.channel !== undefined) {
-      player.sendEvent(panMidiEvent(0, track.channel, pan))
+      sendEvent(panMidiEvent(0, track.channel, pan))
     }
   }
 }
 
 export const useSetTrackInstrument = () => {
-  const { player } = useStores()
+  const { sendEvent } = usePlayer()
   const song = useSong()
   const { pushHistory } = useHistory()
 
@@ -299,7 +303,7 @@ export const useSetTrackInstrument = () => {
     // 即座に反映する
     // Reflect immediately
     if (track.channel !== undefined) {
-      player.sendEvent(programChangeMidiEvent(0, track.channel, programNumber))
+      sendEvent(programChangeMidiEvent(0, track.channel, programNumber))
     }
   }
 }

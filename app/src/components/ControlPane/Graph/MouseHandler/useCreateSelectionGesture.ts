@@ -3,10 +3,12 @@ import { ControlSelection } from "../../../../entities/selection/ControlSelectio
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { usePlayer } from "../../../../hooks/usePlayer"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useCreateSelectionGesture = () => {
-  const { pianoRollStore, controlStore, player } = useStores()
+  const { pianoRollStore, controlStore } = useStores()
+  const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds, setSelection, quantizer } = useControlPane()
 
   return {
@@ -25,8 +27,8 @@ export const useCreateSelectionGesture = () => {
       pianoRollStore.selection = null
       pianoRollStore.selectedNoteIds = []
 
-      if (!player.isPlaying) {
-        player.position = startTick
+      if (!isPlaying) {
+        setPosition(startTick)
       }
 
       setSelection({

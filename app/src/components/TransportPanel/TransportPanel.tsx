@@ -9,6 +9,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
 import { useFastForwardOneBar, useRewindOneBar, useStop } from "../../actions"
 import { useToggleRecording } from "../../actions/recording"
+import { usePlayer } from "../../hooks/usePlayer"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { CircularProgress } from "../ui/CircularProgress"
@@ -67,7 +68,6 @@ export const Right = styled.div`
 
 export const TransportPanel: FC = observer(() => {
   const {
-    player,
     midiDeviceStore,
     midiRecorder,
     soundFontStore,
@@ -75,7 +75,7 @@ export const TransportPanel: FC = observer(() => {
     synthGroup: { isMetronomeEnabled },
   } = useStores()
 
-  const { isPlaying, loop } = player
+  const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
   const isRecording = midiRecorder.isRecording
   const canRecording =
     Object.values(midiDeviceStore.enabledInputs).filter((e) => e).length > 0
@@ -85,15 +85,15 @@ export const TransportPanel: FC = observer(() => {
   const fastForwardOneBar = useFastForwardOneBar()
   const toggleRecording = useToggleRecording()
 
-  const onClickPlay = () => player.playOrPause()
+  const onClickPlay = playOrPause
   const onClickStop = stop
   const onClickBackward = rewindOneBar
   const onClickForward = fastForwardOneBar
   const onClickRecord = toggleRecording
-  const onClickEnableLoop = () => player.toggleEnableLoop()
+  const onClickEnableLoop = toggleEnableLoop
   const onClickMetronone = useCallback(() => {
     synthGroup.isMetronomeEnabled = !synthGroup.isMetronomeEnabled
-  }, [player])
+  }, [synthGroup])
 
   return (
     <Toolbar>

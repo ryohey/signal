@@ -8,13 +8,13 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
-import { useStores } from "../../../../hooks/useStores"
+import { usePlayer } from "../../../../hooks/usePlayer"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, Point],
   MouseEvent
 > => {
-  const { player } = useStores()
+  const { isPlaying, setPosition } = usePlayer()
   const { trackTransform, setSelectedTrackIndex, resetSelection, quantizer } =
     useArrangeView()
 
@@ -26,8 +26,8 @@ export const useCreateSelectionGesture = (): MouseGesture<
       const startPos = trackTransform.getArrangePoint(startPosPx)
       resetSelection()
 
-      if (!player.isPlaying) {
-        player.position = quantizer.round(startPos.tick)
+      if (!isPlaying) {
+        setPosition(quantizer.round(startPos.tick))
       }
 
       setSelectedTrackIndex(Math.floor(startPos.trackIndex))

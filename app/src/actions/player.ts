@@ -1,51 +1,56 @@
 import { Measure } from "../entities/measure/Measure"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
 export const useStop = () => {
-  const { player, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
+  const { stop, setPosition } = usePlayer()
+
   return () => {
-    player.stop()
-    player.position = 0
+    stop()
+    setPosition(0)
     pianoRollStore.setScrollLeftInTicks(0)
   }
 }
 
 export const useRewindOneBar = () => {
-  const { player, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
   const song = useSong()
+  const { position, setPosition } = usePlayer()
 
   return () => {
     const tick = Measure.getPreviousMeasureTick(
       song.measures,
-      player.position,
+      position,
       song.timebase,
     )
-    player.position = tick
+    setPosition(tick)
 
     // make sure player doesn't move out of sight to the left
-    if (player.position < pianoRollStore.scrollLeftTicks) {
-      pianoRollStore.setScrollLeftInTicks(player.position)
+    if (position < pianoRollStore.scrollLeftTicks) {
+      pianoRollStore.setScrollLeftInTicks(position)
     }
   }
 }
 
 export const useFastForwardOneBar = () => {
-  const { player, pianoRollStore } = useStores()
+  const { pianoRollStore } = useStores()
   const song = useSong()
+  const { position, setPosition } = usePlayer()
 
   return () => {
     const tick = Measure.getNextMeasureTick(
       song.measures,
-      player.position,
+      position,
       song.timebase,
     )
-    player.position = tick
+    setPosition(tick)
 
     // make sure player doesn't move out of sight to the right
     const { transform, scrollLeft } = pianoRollStore
-    const x = transform.getX(player.position)
+    const x = transform.getX(position)
     const screenX = x - scrollLeft
     if (screenX > pianoRollStore.canvasWidth * 0.7) {
       pianoRollStore.setScrollLeftInPixels(x - pianoRollStore.canvasWidth * 0.7)
@@ -108,6 +113,7 @@ export const useToggleGhost = () => {
     pianoRollStore: { selectedTrackId },
     pianoRollStore,
   } = useStores()
+
   return () => {
     if (pianoRollStore.notGhostTrackIds.has(selectedTrackId)) {
       pianoRollStore.notGhostTrackIds.delete(selectedTrackId)
@@ -118,7 +124,9 @@ export const useToggleGhost = () => {
 }
 
 export const useStartNote = () => {
-  const { player, synthGroup } = useStores()
+  const { synthGroup } = useStores()
+  const { sendEvent } = usePlayer()
+
   return (
     {
       channel,
@@ -132,15 +140,13 @@ export const useStartNote = () => {
     delayTime = 0,
   ) => {
     synthGroup.activate()
-    player.sendEvent(
-      noteOnMidiEvent(0, channel, noteNumber, velocity),
-      delayTime,
-    )
+    sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
   }
 }
 
 export const useStopNote = () => {
-  const { player } = useStores()
+  const { sendEvent } = usePlayer()
+
   return (
     {
       channel,
@@ -151,6 +157,6 @@ export const useStopNote = () => {
     },
     delayTime = 0,
   ) => {
-    player.sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
+    sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
   }
 }

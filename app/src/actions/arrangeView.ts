@@ -10,6 +10,7 @@ import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useHistory } from "../hooks/useHistory"
+import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
@@ -173,7 +174,7 @@ export const useArrangeCopySelection = () => {
 }
 
 export const useArrangePasteSelection = () => {
-  const { player } = useStores()
+  const { position } = usePlayer()
   const { tracks } = useSong()
   const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
@@ -193,7 +194,7 @@ export const useArrangePasteSelection = () => {
     for (const trackIndex in obj.notes) {
       const notes = obj.notes[trackIndex].map((note) => ({
         ...note,
-        tick: note.tick + player.position,
+        tick: note.tick + position,
       }))
 
       const isRulerSelected = selectedTrackIndex < 0

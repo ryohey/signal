@@ -15,6 +15,7 @@ import {
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
 import { useHistory } from "../../hooks/useHistory"
+import { usePlayer } from "../../hooks/usePlayer"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
@@ -23,7 +24,8 @@ import { FileInput } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
 export const GlobalKeyboardShortcut: FC = observer(() => {
-  const { rootViewStore, router, player } = useStores()
+  const { rootViewStore, router } = useStores()
+  const { playOrPause } = usePlayer()
   const song = useSong()
   const rewindOneBar = useRewindOneBar()
   const fastForwardOneBar = useFastForwardOneBar()
@@ -92,7 +94,7 @@ export const GlobalKeyboardShortcut: FC = observer(() => {
       <KeyboardShortcut
         actions={[
           // Play/Pause (Space)
-          { code: "Space", run: () => player.playOrPause() },
+          { code: "Space", run: playOrPause },
           // Undo (Meta-Z)
           {
             code: "KeyZ",

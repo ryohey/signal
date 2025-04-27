@@ -4,14 +4,15 @@ import { Selection } from "../../../../entities/selection/Selection"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { usePlayer } from "../../../../hooks/usePlayer"
 import { useStores } from "../../../../hooks/useStores"
 
 export const useSelectNoteGesture = (): MouseGesture => {
   const {
     pianoRollStore,
     pianoRollStore: { transform, quantizer },
-    player,
   } = useStores()
+  const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
   return {
@@ -20,8 +21,8 @@ export const useSelectNoteGesture = (): MouseGesture => {
       const start = transform.getNotePoint(local)
       const startPos = local
 
-      if (!player.isPlaying) {
-        player.position = quantizer.round(start.tick)
+      if (!isPlaying) {
+        setPosition(quantizer.round(start.tick))
       }
 
       setSelectedEventIds([])

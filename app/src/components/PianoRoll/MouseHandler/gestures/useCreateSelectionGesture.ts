@@ -4,6 +4,7 @@ import { Selection } from "../../../../entities/selection/Selection"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { usePlayer } from "../../../../hooks/usePlayer"
 import { useStores } from "../../../../hooks/useStores"
 
 // 選択範囲外でクリックした場合は選択範囲をリセット
@@ -11,8 +12,8 @@ export const useCreateSelectionGesture = (): MouseGesture => {
   const {
     pianoRollStore,
     pianoRollStore: { transform, quantizer, selectedTrack },
-    player,
   } = useStores()
+  const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
   return {
@@ -25,8 +26,8 @@ export const useCreateSelectionGesture = (): MouseGesture => {
       const start = transform.getNotePointFractional(local)
       const startPos = local
 
-      if (!player.isPlaying) {
-        player.position = quantizer.round(start.tick)
+      if (!isPlaying) {
+        setPosition(quantizer.round(start.tick))
       }
 
       setSelectedEventIds([])
