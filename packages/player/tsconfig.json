@@ -11,12 +11,12 @@
     "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
-    "lib": ["es2019", "dom"],
+    "lib": ["es2019", "dom", "ESNext.Collection"],
     "strictNullChecks": true,
     "alwaysStrict": true,
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": true
   },
   "include": ["src/**/*"]
 }
