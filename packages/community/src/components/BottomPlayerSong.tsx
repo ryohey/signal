@@ -5,7 +5,7 @@ import { Link } from "wouter"
 import { Localized } from "../localize/useLocalization.js"
 
 const Avatar = styled.img`
-  border: 1px ${({ theme }) => theme.dividerColor} solid;
+  border: 1px var(--color-divider) solid;
   border-radius: 999px;
   width: 2rem;
   height: 2rem;
@@ -23,7 +23,7 @@ const Wrapper = styled.div`
 const Author = styled.a`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   font-size: 90%;
   text-decoration: none;
 
@@ -33,7 +33,7 @@ const Author = styled.a`
 `
 
 const Title = styled.a`
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   display: block;
   font-weight: 600;
   font-size: 130%;

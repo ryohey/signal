@@ -7,16 +7,16 @@ import { Tooltip } from "../ui/Tooltip"
 import { CircleButton } from "./CircleButton"
 
 export const StyledButton = styled(CircleButton)`
-  color: ${({ theme }) => theme.onSurfaceColor};
-  background: ${({ theme }) => theme.themeColor};
+  color: var(--color-on-surface);
+  background: var(--color-theme);
 
   &:hover {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
     opacity: 0.8;
   }
 
   &.active {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
   }
 `
 

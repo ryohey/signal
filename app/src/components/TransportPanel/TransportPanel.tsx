@@ -23,8 +23,8 @@ const Toolbar = styled.div`
   align-items: center;
   justify-content: center;
   padding: 0.25rem 1rem;
-  background: ${({ theme }) => theme.backgroundColor};
-  border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  background: var(--color-background);
+  border-top: 1px solid var(--color-divider);
   height: 3rem;
   box-sizing: border-box;
 `
@@ -43,9 +43,9 @@ const MetronomeButton = styled(CircleButton)<{ active: boolean }>`
 `
 
 const TimestampText = styled.div`
-  font-family: ${({ theme }) => theme.monoFont};
+  font-family: var(--font-mono);
   font-size: 0.9rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const Timestamp: FC = observer(() => {
@@ -55,7 +55,7 @@ const Timestamp: FC = observer(() => {
 })
 
 export const ToolbarSeparator = styled.div`
-  background: ${({ theme }) => theme.dividerColor};
+  background: var(--color-divider);
   margin: 0.4em 1em;
   width: 1px;
   height: 1rem;

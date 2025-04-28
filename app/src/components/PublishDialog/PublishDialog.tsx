@@ -138,7 +138,7 @@ export const PublishDialog: FC = observer(() => {
 const SongLink = styled.a`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   text-decoration: none;
   margin-bottom: 1rem;
 
@@ -150,7 +150,7 @@ const SongLink = styled.a`
 const Divider = styled.div`
   margin: 1rem 0 0 0;
   height: 1px;
-  background: ${({ theme }) => theme.dividerColor};
+  background: var(--color-divider);
 `
 
 const getCloudSongUrl = (cloudSongId: string) =>

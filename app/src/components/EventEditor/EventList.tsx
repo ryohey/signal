@@ -16,7 +16,7 @@ const Container = styled.div`
 
 const Header = styled.div`
   height: ${Layout.rulerHeight};
-  border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
+  border-bottom: 1px solid var(--color-divider);
   /* scroll bar width */
   padding-right: 14px;
 `
@@ -27,7 +27,7 @@ export const Row = styled.div`
   grid-template-columns: 5em 1fr 5em 5em;
 
   &:focus {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 
@@ -35,7 +35,7 @@ export const Cell = styled.div`
   padding: 0.5rem;
 
   &:focus-within {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 

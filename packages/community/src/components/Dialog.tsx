@@ -2,9 +2,9 @@ import { keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
 import {
   Content,
-  DialogProps as Props,
   Overlay,
   Portal,
+  DialogProps as Props,
   Root,
 } from "@radix-ui/react-dialog"
 import { FC } from "react"
@@ -37,9 +37,9 @@ const StyledOverlay = styled(Overlay)`
 `
 
 const StyledContent = styled(Content)`
-  background-color: ${({ theme }) => theme.backgroundColor};
+  background-color: var(--color-background);
   border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 3rem ${({ theme }) => theme.shadowColor};
+  box-shadow: 0 0.5rem 3rem var(--color-shadow);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -74,7 +74,7 @@ export const Dialog: FC<DialogProps> = ({ children, style, ...props }) => (
 
 export const DialogTitle = styled.div`
   font-size: 1.25rem;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   margin-bottom: 1.5rem;
 `
 

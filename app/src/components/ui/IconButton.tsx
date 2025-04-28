@@ -14,6 +14,6 @@ export const IconButton = styled.button<{ active?: boolean }>`
   cursor: pointer;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `

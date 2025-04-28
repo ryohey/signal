@@ -20,7 +20,7 @@ const Content = styled.div`
 const Username = styled.div`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   font-size: 90%;
 `
 
@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   border-radius: 0.5rem;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
 
     .arrow {
       display: block;
@@ -86,14 +86,14 @@ const PlayCount = styled.div`
   display: flex;
   align-items: center;
   margin-right: 1rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const Time = styled.div`
   display: flex;
   align-items: center;
   margin-right: 1rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   flex-shrink: 0;
   min-width: 4rem;
 `
@@ -103,8 +103,8 @@ const Tag = styled.div`
   align-items: center;
   padding: 0.2rem 0.5rem;
   border-radius: 0.5rem;
-  background: ${({ theme }) => theme.highlightColor};
-  color: ${({ theme }) => theme.textColor};
+  background: var(--color-highlight);
+  color: var(--color-text);
   font-size: 90%;
   margin-right: 0.5rem;
 `

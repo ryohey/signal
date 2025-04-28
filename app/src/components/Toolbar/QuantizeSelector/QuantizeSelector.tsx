@@ -29,7 +29,7 @@ const DotLabel = styled(FiberManualRecord)`
 `
 
 const TripletLabel = styled.span`
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   font-size: 70%;
   padding: 0 0.24em;
 `
@@ -42,7 +42,7 @@ const Value = styled.div`
   min-width: 3em;
   pointer-events: none;
   font-size: 0.9rem;
-  font-family: ${({ theme }) => theme.monoFont};
+  font-family: var(--font-mono);
 `
 
 const Note = styled(MusicNote)`

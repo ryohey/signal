@@ -10,12 +10,12 @@ const Wrapper = styled.div`
   padding: 0.5rem 1rem;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   border-radius: 0.5rem;
   margin: 0.5rem;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 

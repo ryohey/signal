@@ -8,7 +8,7 @@ import { TrackListItem } from "./TrackListItem"
 
 const List = styled.div`
   overflow-y: auto;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   min-width: 14rem;
   flex-grow: 1;
 `

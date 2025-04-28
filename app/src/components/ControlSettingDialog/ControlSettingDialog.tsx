@@ -54,7 +54,7 @@ const Pane = styled.div`
   flex-grow: 1;
   flex-basis: 0;
   overflow: auto;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
 `
 
 const CenterPane = styled.div`
@@ -66,7 +66,7 @@ const CenterPane = styled.div`
 `
 
 const InsertButton = styled(Button)`
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   display: flex;
   align-items: center;
   margin-bottom: 1rem;

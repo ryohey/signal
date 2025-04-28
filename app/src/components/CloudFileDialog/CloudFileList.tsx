@@ -29,7 +29,7 @@ const ArrowDown = styled(ArrowDownward)`
 const HeaderCell = styled.div`
   display: flex;
   align-items: center;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   font-weight: ${({ isSelected }: { isSelected?: boolean }) =>
     isSelected ? "bold" : "normal"};
   cursor: pointer;
@@ -37,7 +37,7 @@ const HeaderCell = styled.div`
   box-sizing: border-box;
 
   &:hover {
-    background: ${({ theme }) => theme.secondaryBackgroundColor};
+    background: var(--color-background-secondary);
   }
 `
 
@@ -58,7 +58,7 @@ const Body = styled.div`
   overflow-y: auto;
 
   tr:hover td {
-    background: ${({ theme }) => theme.secondaryBackgroundColor};
+    background: var(--color-background-secondary);
   }
 `
 

@@ -18,7 +18,7 @@ const TrackNameWrapper = styled.span`
 const Input = styled.input`
   font-size: inherit;
   font-family: inherit;
-  border: ${({ theme }) => theme.dividerColor} 1px solid;
+  border: var(--color-divider) 1px solid;
   color: inherit;
   height: 2rem;
   padding: 0 0.5rem;

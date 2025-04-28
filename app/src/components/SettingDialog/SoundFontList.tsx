@@ -26,7 +26,7 @@ const Overlay = styled.div`
   left: 0;
   background-color: ${({ theme }) =>
     Color(theme.backgroundColor).alpha(0.5).toString()};
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -78,7 +78,7 @@ interface SoundFontRowProps {
 
 const Remove = styled(RemoveIcon)`
   width: 1rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const RowWrapper = styled.div`

@@ -10,7 +10,7 @@ import { StyledFirebaseAuth } from "./StyledFirebaseAuth"
 
 const Title = styled.div`
   font-size: 1.25rem;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   margin-bottom: 1.5rem;
 `
 

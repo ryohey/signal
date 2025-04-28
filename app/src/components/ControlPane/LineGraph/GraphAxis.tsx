@@ -20,10 +20,10 @@ const Values = styled.div`
 const Value = styled.div`
   padding: 0.3em;
   font-size: 90%;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
     cursor: default;
   }
 `

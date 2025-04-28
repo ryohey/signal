@@ -30,7 +30,7 @@ export const SongTitle = styled.h1`
 `
 
 const Author = styled.p`
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   margin: 0.25rem 0 0 0;
 `
 
@@ -57,7 +57,7 @@ const HeaderRight = styled.div`
 const Content = styled.div``
 
 const Metadata = styled.div`
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 `
 
@@ -67,7 +67,7 @@ const Actions = styled.div`
 `
 
 const ActionButton = styled(Button)`
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   margin-right: 0.5rem;
 `
 
@@ -79,7 +79,7 @@ const PlayCount = styled.div`
   display: flex;
   align-items: center;
   margin-right: 1rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 export const SongPage: FC<SongPageProps> = observer(({ songId }) => {

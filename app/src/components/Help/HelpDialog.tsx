@@ -32,8 +32,8 @@ const Key = styled.div`
   border: 1px solid white;
   border-radius: 4px;
   padding: 0.1em 0.5em 0.2em 0.5em;
-  background: ${({ theme }) => theme.textColor};
-  color: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-text);
+  color: var(--color-background);
   box-shadow: inset 0 -2px 0 0px #0000006b;
 `
 

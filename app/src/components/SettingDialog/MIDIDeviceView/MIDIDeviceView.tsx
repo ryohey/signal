@@ -48,7 +48,7 @@ const DeviceRow: FC<ListItem> = ({ device, isSelected, onCheck }) => {
 const DeviceList = styled.div``
 
 const Notice = styled.div`
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const Spacer = styled.div`

@@ -27,7 +27,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   position: relative;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   overflow: hidden;
 `
 
@@ -37,8 +37,8 @@ const LeftTopSpace = styled.div`
   top: 0;
   width: 100%;
   box-sizing: border-box;
-  border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
-  background: ${({ theme }) => theme.backgroundColor};
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-background);
 `
 
 const LeftBottomSpace = styled.div`
@@ -46,7 +46,7 @@ const LeftBottomSpace = styled.div`
   left: 0;
   bottom: 0;
   width: 100%;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
 `
 
 const TrackHeader = styled.div<{ isSelected: boolean }>`
@@ -54,7 +54,7 @@ const TrackHeader = styled.div<{ isSelected: boolean }>`
   padding: 0 0.5rem;
   box-sizing: border-box;
   display: flex;
-  border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
+  border-bottom: 1px solid var(--color-divider);
   align-items: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -65,7 +65,7 @@ const TrackHeader = styled.div<{ isSelected: boolean }>`
 
 const HeaderList = styled.div`
   position: relative;
-  border-right: 1px solid ${({ theme }) => theme.dividerColor};
+  border-right: 1px solid var(--color-divider);
 `
 
 export const ArrangeView: FC = () => {

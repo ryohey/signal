@@ -8,7 +8,7 @@ const StyledSelect = styled.select`
   appearance: none;
   border: none;
   background: inherit;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border: 1px solid var(--color-divider);
   border-radius: 0.25rem;
   height: 3rem;
   padding: 0 1rem;
@@ -22,12 +22,12 @@ const StyledSelect = styled.select`
   outline: none;
 
   &:focus {
-    border-color: ${({ theme }) => theme.themeColor};
+    border-color: var(--color-theme);
   }
 
   option {
-    color: ${({ theme }) => theme.textColor};
-    background: ${({ theme }) => theme.backgroundColor};
+    color: var(--color-text);
+    background: var(--color-background);
   }
 `
 

@@ -4,7 +4,7 @@ import Info from "mdi-react/InformationIcon"
 import { CSSProperties, FC } from "react"
 
 const Wrapper = styled.div`
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   display: flex;
   padding: 1rem;
   border-radius: 0.5rem;

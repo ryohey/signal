@@ -18,10 +18,10 @@ export type TooltipProps = TooltipProviderProps & {
 
 const StyledContent = styled(Content)`
   background: ${({ theme }) => Color(theme.backgroundColor).darken(0.2).hex()};
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   padding: 0.5rem;
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 3rem ${({ theme }) => theme.shadowColor};
+  box-shadow: 0 1rem 3rem var(--color-shadow);
 `
 
 export const Tooltip: FC<TooltipProps> = ({

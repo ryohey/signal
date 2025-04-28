@@ -15,7 +15,7 @@ const NavBackButton = styled.button`
 
   &:hover {
     background: none;
-    color: ${({ theme }) => theme.secondaryTextColor};
+    color: var(--color-text-secondary);
   }
 `
 

@@ -19,7 +19,7 @@ const TabButtonBase = styled.div`
   background: transparent;
   -webkit-appearance: none;
   padding: 0.5em 0.8em;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   outline: none;
   font-size: 0.75rem;
   cursor: default;
@@ -29,7 +29,7 @@ const TabButtonBase = styled.div`
   flex-shrink: 0;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 
@@ -93,7 +93,7 @@ const Parent = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.darkBackgroundColor};
+  background: var(--color-background-dark);
 `
 
 const Content = styled.div`

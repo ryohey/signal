@@ -7,7 +7,7 @@ export const ContextMenuHotKey = styled.div`
   font-size: 0.9em;
   flex-grow: 1;
   text-align: right;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   margin-left: 2em;
 `
 
@@ -21,10 +21,10 @@ const Wrapper = styled.div`
 
 const Content = styled.div`
   position: absolute;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 3rem ${({ theme }) => theme.shadowColor};
-  border: 1px solid ${({ theme }) => theme.popupBorderColor};
+  box-shadow: 0 1rem 3rem var(--color-shadow);
+  border: 1px solid var(--color-popup-border);
   padding: 0.5rem 0;
 `
 

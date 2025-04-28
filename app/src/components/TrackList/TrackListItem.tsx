@@ -42,7 +42,7 @@ const Container = styled.div<{ selected: boolean }>`
   outline: none;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 
@@ -53,7 +53,7 @@ const Label = styled.div`
 `
 
 const Instrument = styled.div`
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   overflow: hidden;
   white-space: nowrap;
@@ -77,18 +77,18 @@ const Controls = styled.div`
 
 const ChannelName = styled.div`
   flex-shrink: 0;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   font-size: 0.625rem;
   display: flex;
   align-items: center;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border: 1px solid var(--color-divider);
   padding: 0 0.25rem;
   cursor: pointer;
   height: 1.25rem;
   margin-left: 0.25rem;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 
@@ -126,7 +126,7 @@ const ControlButton = styled.div<{ active?: boolean }>`
   outline: none;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 
   svg {

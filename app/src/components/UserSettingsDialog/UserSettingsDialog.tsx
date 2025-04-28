@@ -11,7 +11,7 @@ const UserIcon = styled.img`
   width: 3rem;
   height: 3rem;
   border-radius: 1.5rem;
-  border: 2px solid ${({ theme }) => theme.dividerColor};
+  border: 2px solid var(--color-divider);
   box-sizing: border-box;
 `
 
@@ -45,7 +45,7 @@ const Content = styled.div`
 `
 
 const DeleteButton = styled(Button)`
-  color: ${({ theme }) => theme.redColor};
+  color: var(--color-red);
 `
 
 export const UserSettingsDialog: FC = observer(() => {

@@ -6,14 +6,14 @@ const Button = styled.div`
   display: inline-flex;
   width: 1.25rem;
   height: 1.25rem;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border: 1px solid var(--color-divider);
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
 `
 
 const CheckIcon = styled(CircleIcon)`
-  fill: ${({ theme }) => theme.textColor};
+  fill: var(--color-text);
   width: 0.7rem;
   height: 0.7rem;
 `
@@ -24,14 +24,14 @@ const RowWrapper = styled.div`
   align-items: center;
 
   &:hover ${Button} {
-    border-color: ${({ theme }) => theme.secondaryTextColor};
+    border-color: var(--color-text-secondary);
   }
 `
 
 const RowLabel = styled.span`
   margin-left: 0.5rem;
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 export interface RadioButtonProps {

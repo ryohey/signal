@@ -5,6 +5,25 @@ export const GlobalCSS = () => {
   return (
     <Global
       styles={css`
+        /* theme */
+        :root {
+          --font-sans: ${theme.font};
+          --font-canvas: ${theme.canvasFont};
+          --color-theme: ${theme.themeColor};
+          --color-background: ${theme.backgroundColor};
+          --color-background-secondary: ${theme.secondaryBackgroundColor};
+          --color-background-dark: ${theme.darkBackgroundColor};
+          --color-divider: ${theme.dividerColor};
+          --color-text: ${theme.textColor};
+          --color-text-secondary: ${theme.secondaryTextColor};
+          --color-text-tertiary: ${theme.tertiaryTextColor};
+          --color-shadow: ${theme.shadowColor};
+          --color-highlight: ${theme.highlightColor};
+          --color-green: ${theme.greenColor};
+          --color-red: ${theme.redColor};
+          --color-yellow: ${theme.yellowColor};
+        }
+
         html {
           font-size: 16px;
         }

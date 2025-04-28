@@ -29,7 +29,7 @@ const StyledRoot = styled(Root)`
 `
 
 const StyledTrack = styled(Track)`
-  background-color: ${({ theme }) => theme.tertiaryTextColor};
+  background-color: var(--color-text-tertiary);
   position: relative;
   flex-grow: 1;
   border-radius: 9999px;
@@ -38,7 +38,7 @@ const StyledTrack = styled(Track)`
 
 const StyledRange = styled(Range)`
   position: absolute;
-  background-color: ${({ theme }) => theme.textColor};
+  background-color: var(--color-text);
   border-radius: 9999px;
   height: 100%;
 `
@@ -47,12 +47,12 @@ const StyledThumb = styled(Thumb)`
   display: block;
   width: 0.75rem;
   height: 0.75rem;
-  background-color: ${({ theme }) => theme.textColor};
-  box-shadow: 0 0.1rem 1rem ${({ theme }) => theme.shadowColor};
+  background-color: var(--color-text);
+  box-shadow: 0 0.1rem 1rem var(--color-shadow);
   border-radius: 999px;
 
   &:hover {
-    background-color: ${({ theme }) => theme.secondaryTextColor};
+    background-color: var(--color-text-secondary);
   }
 
   &:focus {
@@ -64,7 +64,7 @@ const Mark = styled.div`
   width: 0.1rem;
   height: 100%;
   position: absolute;
-  background-color: ${({ theme }) => theme.textColor};
+  background-color: var(--color-text);
 `
 
 export const Slider: FC<SliderProps> = ({

@@ -5,8 +5,8 @@ import { FC, ReactNode } from "react"
 import { Label } from "./Label"
 
 const StyledRoot = styled(Root)`
-  border: 1px solid ${({ theme }) => theme.dividerColor};
-  background-color: ${({ theme }) => theme.backgroundColor};
+  border: 1px solid var(--color-divider);
+  background-color: var(--color-background);
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 0.25rem;
@@ -15,7 +15,7 @@ const StyledRoot = styled(Root)`
   justify-content: center;
 
   &:hover {
-    border-color: ${({ theme }) => theme.secondaryTextColor};
+    border-color: var(--color-text-secondary);
   }
 `
 
@@ -26,7 +26,7 @@ const StyledIndicator = styled(Indicator)`
 `
 
 const CheckIcon = styled(Check)`
-  fill: ${({ theme }) => theme.textColor};
+  fill: var(--color-text);
   width: 1rem;
   height: 1rem;
 `

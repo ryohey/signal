@@ -47,11 +47,11 @@ const Root = styled(Portal.Root)`
 
 const Content = styled.div`
   margin: 0 auto;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   padding: 1rem;
   border-radius: 0.5rem;
   font-size: 0.8rem;
-  box-shadow: 0 0.5rem 3rem ${({ theme }) => theme.shadowColor};
+  box-shadow: 0 0.5rem 3rem var(--color-shadow);
   display: flex;
   align-items: center;
 
