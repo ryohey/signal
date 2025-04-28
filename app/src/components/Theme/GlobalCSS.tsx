@@ -5,6 +5,39 @@ export const GlobalCSS = () => {
   return (
     <Global
       styles={css`
+        /* theme */
+        :root {
+          --font-sans: ${theme.font};
+          --font-mono: ${theme.monoFont};
+          --font-canvas: ${theme.canvasFont};
+          --color-theme: ${theme.themeColor};
+          --color-on-surface: ${theme.onSurfaceColor};
+          --color-background: ${theme.backgroundColor};
+          --color-background-secondary: ${theme.secondaryBackgroundColor};
+          --color-background-dark: ${theme.darkBackgroundColor};
+          --color-editor-background: ${theme.editorBackgroundColor};
+          --color-editor-grid: ${theme.editorGridColor};
+          --color-editor-grid-secondary: ${theme.editorSecondaryGridColor};
+          --color-divider: ${theme.dividerColor};
+          --color-popup-border: ${theme.popupBorderColor};
+          --color-text: ${theme.textColor};
+          --color-text-secondary: ${theme.secondaryTextColor};
+          --color-text-tertiary: ${theme.tertiaryTextColor};
+          --color-piano-key-black: ${theme.pianoKeyBlack};
+          --color-piano-key-white: ${theme.pianoKeyWhite};
+          --color-piano-lane-black: ${theme.pianoBlackKeyLaneColor};
+          --color-piano-lane-white: ${theme.pianoWhiteKeyLaneColor};
+          --color-piano-lane-highlighted: ${theme.pianoHighlightedLaneColor};
+          --color-piano-lane-edge: ${theme.pianoLaneEdgeColor};
+          --color-ghost-note: ${theme.ghostNoteColor};
+          --color-record: ${theme.recordColor};
+          --color-shadow: ${theme.shadowColor};
+          --color-highlight: ${theme.highlightColor};
+          --color-green: ${theme.greenColor};
+          --color-red: ${theme.redColor};
+          --color-yellow: ${theme.yellowColor};
+        }
+
         html {
           font-size: 16px;
         }
