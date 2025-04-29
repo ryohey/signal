@@ -49,7 +49,7 @@ const LeftBottomSpace = styled.div`
   background: var(--color-background);
 `
 
-const TrackHeader = styled.div<{ isSelected: boolean }>`
+const TrackHeader = styled.div`
   width: 8rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
@@ -59,8 +59,11 @@ const TrackHeader = styled.div<{ isSelected: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.secondaryBackgroundColor : theme.backgroundColor};
+  background: var(--color-background);
+
+  &[data-selected="true"] {
+    background-color: var(--color-background-secondary);
+  }
 `
 
 const HeaderList = styled.div`
@@ -185,7 +188,7 @@ export const ArrangeView: FC = () => {
             <TrackHeader
               style={{ height: trackHeight }}
               key={i}
-              isSelected={i === selectedTrackIndex}
+              data-selected={i === selectedTrackIndex}
               onClick={() => setSelectedTrackIndex(i)}
               onDoubleClick={() => openTrack(t.id)}
               onContextMenu={(e) => {

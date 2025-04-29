@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 
-export const IconButton = styled.button<{ active?: boolean }>`
+export const IconButton = styled.button`
   width: 2rem;
   height: 2rem;
   display: flex;
@@ -9,8 +9,7 @@ export const IconButton = styled.button<{ active?: boolean }>`
   border: none;
   border-radius: 999px;
   background: none;
-  color: ${({ theme, active }) =>
-    active ? theme.textColor : theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   cursor: pointer;
 
   &:hover {

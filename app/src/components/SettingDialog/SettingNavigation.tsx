@@ -6,13 +6,15 @@ import { Button } from "../ui/Button"
 export type SettingRoute = "general" | "midi" | "soundfont"
 const routes: SettingRoute[] = ["general", "midi", "soundfont"]
 
-const RouteItem = styled(Button)<{ selected: boolean }>`
+const RouteItem = styled(Button)`
   display: flex;
   font-size: 0.875rem;
   align-items: center;
   margin-bottom: 0.5rem;
-  background: ${({ theme, selected }) =>
-    selected ? theme.highlightColor : "inherit"};
+
+  &[data-selected="true"] {
+    background: var(--color-highlight);
+  }
 `
 
 const Container = styled.div`
@@ -40,7 +42,11 @@ export const SettingNavigation: FC<{
   return (
     <Container>
       {routes.map((r) => (
-        <RouteItem key={r} selected={route === r} onClick={() => onChange(r)}>
+        <RouteItem
+          key={r}
+          data-selected={route === r}
+          onClick={() => onChange(r)}
+        >
           <RouteName key={r} route={r} />
         </RouteItem>
       ))}

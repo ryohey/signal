@@ -38,11 +38,13 @@ const getAllControlModes = (): ControlMode[] =>
     range(0, 128).map((i) => ({ type: "controller", controllerType: i })),
   )
 
-const Item = styled.div<{ isSelected: boolean }>`
+const Item = styled.div`
   padding: 0.5rem 1rem;
-  background: ${({ theme, isSelected }) =>
-    isSelected ? theme.themeColor : "transparent"};
   white-space: nowrap;
+
+  &[data-selected="true"] {
+    background: var(--color-theme);
+  }
 `
 
 const Content = styled.div`
@@ -157,7 +159,7 @@ export const ControlSettingDialog = observer(() => {
               render={(item) => (
                 <Item
                   key={controlModeKey(item.mode)}
-                  isSelected={item.isSelected}
+                  data-selected={item.isSelected}
                   onClick={() => {
                     setSelectedLeftMode(item.mode)
                     setSelectedRightMode(null)
@@ -180,7 +182,7 @@ export const ControlSettingDialog = observer(() => {
             {rightItems.map((item) => (
               <Item
                 key={controlModeKey(item.mode)}
-                isSelected={item.isSelected}
+                data-selected={item.isSelected}
                 onClick={() => {
                   setSelectedLeftMode(null)
                   setSelectedRightMode(item.mode)

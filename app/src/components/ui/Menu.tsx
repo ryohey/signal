@@ -52,19 +52,25 @@ export const Menu: FC<MenuProps> = ({
   )
 }
 
-const StyledLi = styled.li<{ disabled?: boolean }>`
+const StyledLi = styled.li`
   font-size: 0.8rem;
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.secondaryTextColor : theme.textColor};
+  color: var(--color-text);
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
   cursor: pointer;
 
   &:hover {
-    background: ${({ theme, disabled }) =>
-      disabled ? "transparent" : theme.highlightColor};
+    background: var(--color-highlight);
+  }
+
+  &[data-disabled="true"] {
+    color: var(--color-text-secondary);
+    pointer-events: none;
+
+    &:hover {
+      background: transparent;
+    }
   }
 `
 
@@ -75,8 +81,14 @@ export type MenuItemProps = React.DetailedHTMLProps<
   disabled?: boolean
 }
 
-export const MenuItem: FC<MenuItemProps> = ({ children, ...props }) => (
-  <StyledLi {...props}>{children}</StyledLi>
+export const MenuItem: FC<MenuItemProps> = ({
+  children,
+  disabled = false,
+  ...props
+}) => (
+  <StyledLi {...props} data-disabled={disabled}>
+    {children}
+  </StyledLi>
 )
 
 export const MenuDivider = styled.hr`

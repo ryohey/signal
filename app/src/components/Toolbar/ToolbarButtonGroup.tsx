@@ -11,15 +11,13 @@ export const ToolbarButtonGroup = styled.div`
   flex-shrink: 0;
 `
 
-const _ToolbarButtonGroupItem = styled.button<{ selected?: boolean }>`
+const _ToolbarButtonGroupItem = styled.button`
   outline: none;
   -webkit-appearance: none;
   min-width: auto;
   padding: 0 0.5rem;
-  color: ${({ theme, selected }) =>
-    selected ? theme.onSurfaceColor : theme.textColor};
-  background: ${({ theme, selected }) =>
-    selected ? theme.themeColor : theme.secondaryBackgroundColor};
+  color: var(--color-text);
+  background: var(--color-background-dark);
   text-transform: none;
   height: 2rem;
   overflow: hidden;
@@ -41,8 +39,12 @@ const _ToolbarButtonGroupItem = styled.button<{ selected?: boolean }>`
   }
 
   &:hover {
-    background: ${({ theme, selected }) =>
-      selected ? theme.themeColor : theme.highlightColor};
+    background: var(--color-highlight);
+  }
+
+  &[data-selected="true"] {
+    color: var(--color-on-surface);
+    background: var(--color-theme);
   }
 `
 
@@ -50,14 +52,15 @@ export const ToolbarButtonGroupItem = forwardRef<
   HTMLButtonElement,
   React.PropsWithChildren<
     Omit<ComponentProps<typeof _ToolbarButtonGroupItem>, "tabIndex">
-  >
->(({ children, onMouseDown, ...props }, ref) => (
+  > & { selected?: boolean }
+>(({ children, onMouseDown, selected = false, ...props }, ref) => (
   <_ToolbarButtonGroupItem
     {...props}
     onMouseDown={(e) => {
       e.preventDefault()
       onMouseDown?.(e)
     }}
+    data-selected={selected}
     tabIndex={-1}
     ref={ref}
   >

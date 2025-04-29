@@ -28,12 +28,10 @@ export type TrackListItemProps = {
   track: Track
 }
 
-const Container = styled.div<{ selected: boolean }>`
-  background-color: ${({ theme, selected }) =>
-    selected ? theme.highlightColor : "transparent"};
+const Container = styled.div`
+  background-color: transparent;
   border: 1px solid;
-  border-color: ${({ theme, selected }) =>
-    selected ? theme.dividerColor : "transparent"};
+  border-color: transparent;
   display: flex;
   align-items: center;
   padding: 0.5rem 0.5rem;
@@ -43,6 +41,11 @@ const Container = styled.div<{ selected: boolean }>`
 
   &:hover {
     background: var(--color-highlight);
+  }
+
+  &[data-selected="true"] {
+    background-color: var(--color-highlight);
+    border-color: var(--color-divider);
   }
 `
 
@@ -60,14 +63,17 @@ const Instrument = styled.div`
   text-overflow: ellipsis;
 `
 
-const Name = styled.div<{ selected: boolean }>`
+const Name = styled.div`
   font-weight: 600;
-  color: ${({ theme, selected }) =>
-    selected ? theme.textColor : theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   padding-right: 0.5em;
   font-size: 0.875rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &[data-selected="true"] {
+    color: var(--color-text);
+  }
 `
 
 const Controls = styled.div`
@@ -92,7 +98,7 @@ const ChannelName = styled.div`
   }
 `
 
-const Icon = styled.div<{ selected: boolean; color: string }>`
+const Icon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,17 +108,24 @@ const Icon = styled.div<{ selected: boolean; color: string }>`
   border-radius: 1.3rem;
   margin-right: 0.5rem;
   flex-shrink: 0;
-  background: ${({ theme, selected }) =>
-    selected ? theme.backgroundColor : theme.secondaryBackgroundColor};
-  border: 2px solid ${({ color }) => color};
+  background: var(--color-background-secondary);
+  border: 2px solid;
   box-sizing: border-box;
+
+  &[data-selected="true"] {
+    background: var(--color-background);
+  }
 `
 
-const IconInner = styled.div<{ selected: boolean }>`
-  opacity: ${({ selected }) => (selected ? 1 : 0.5)};
+const IconInner = styled.div`
+  opacity: 0.5;
+
+  &[data-selected="true"] {
+    opacity: 1;
+  }
 `
 
-const ControlButton = styled.div<{ active?: boolean }>`
+const ControlButton = styled.div`
   width: 1.9rem;
   height: 1.9rem;
   margin-right: 0.25rem;
@@ -120,8 +133,7 @@ const ControlButton = styled.div<{ active?: boolean }>`
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  color: ${({ theme, active }) =>
-    active ? theme.textColor : theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   cursor: pointer;
   outline: none;
 
@@ -132,6 +144,10 @@ const ControlButton = styled.div<{ active?: boolean }>`
   svg {
     width: 1.1rem;
     height: 1.1rem;
+  }
+
+  &[data-selected="true"] {
+    color: var(--color-text);
   }
 `
 
@@ -208,21 +224,23 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   return (
     <>
       <Container
-        selected={selected}
+        data-selected={selected}
         onMouseDown={onSelectTrack}
         onContextMenu={onContextMenu}
         tabIndex={-1}
       >
         <Icon
-          selected={selected}
-          color={color}
+          data-selected={selected}
+          style={{
+            borderColor: color,
+          }}
           onDoubleClick={onDoubleClickIcon}
         >
-          <IconInner selected={selected}>{emoji}</IconInner>
+          <IconInner data-selected={selected}>{emoji}</IconInner>
         </Icon>
         <div>
           <Label>
-            <Name selected={selected}>
+            <Name data-selected={selected}>
               <TrackName track={track} />
             </Name>
             <Instrument>
@@ -231,21 +249,21 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
           </Label>
           <Controls>
             <ControlButton
-              active={solo}
+              data-active={solo}
               onMouseDown={onClickSolo}
               tabIndex={-1}
             >
               <Headset />
             </ControlButton>
             <ControlButton
-              active={mute}
+              data-active={mute}
               onMouseDown={onClickMute}
               tabIndex={-1}
             >
               {mute ? <VolumeOff /> : <VolumeUp />}
             </ControlButton>
             <ControlButton
-              active={ghostTrack}
+              data-active={ghostTrack}
               onMouseDown={onClickGhostTrack}
               tabIndex={-1}
             >

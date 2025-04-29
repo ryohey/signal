@@ -30,14 +30,16 @@ const HeaderCell = styled.div`
   display: flex;
   align-items: center;
   background: var(--color-background);
-  font-weight: ${({ isSelected }: { isSelected?: boolean }) =>
-    isSelected ? "bold" : "normal"};
   cursor: pointer;
   padding: 0 1rem;
   box-sizing: border-box;
 
   &:hover {
     background: var(--color-background-secondary);
+  }
+
+  &[data-selected="true"] {
+    font-weight: bold;
   }
 `
 
@@ -124,7 +126,7 @@ export const CloudFileList = observer(() => {
               cloudFileStore.selectedColumn = "name"
             }
           }}
-          isSelected={selectedColumn === "name"}
+          data-selected={selectedColumn === "name"}
         >
           <Localized name="name" />
           <div style={{ width: "0.5rem" }}></div>
@@ -140,7 +142,7 @@ export const CloudFileList = observer(() => {
               cloudFileStore.selectedColumn = "date"
             }
           }}
-          isSelected={selectedColumn === "date"}
+          data-selected={selectedColumn === "date"}
         >
           {sortLabel}
           <Menu

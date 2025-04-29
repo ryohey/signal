@@ -33,14 +33,17 @@ const TabButtonBase = styled.div`
   }
 `
 
-const TabButton = styled(TabButtonBase)<{ selected: boolean }>`
-  width: 8em;
+const TabButton = styled(TabButtonBase)`
+  width: 7rem;
   overflow: hidden;
   border-bottom: 1px solid;
-  border-color: ${({ theme, selected }) =>
-    selected ? theme.themeColor : "transparent"};
-  color: ${({ theme, selected }) =>
-    selected ? theme.textColor : theme.secondaryTextColor};
+  border-color: transparent;
+  color: var(--color-text-secondary);
+
+  &[data-selected="true"] {
+    border-color: var(--color-theme);
+    color: var(--color-text);
+  }
 `
 
 const NoWrap = styled.span`
@@ -70,7 +73,7 @@ const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
     <Toolbar>
       {controlModes.map((mode, i) => (
         <TabButton
-          selected={isEqualControlMode(selectedMode, mode)}
+          data-selected={isEqualControlMode(selectedMode, mode)}
           onMouseDown={() => onSelect(mode)}
           key={i}
         >
