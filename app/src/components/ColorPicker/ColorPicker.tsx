@@ -5,16 +5,13 @@ import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
 
-const numColumn = 8
-
 export interface ColorPickerProps {
   open: boolean
   onSelect: (color: string | null) => void
   onClose: () => void
 }
 
-const ColorItem = styled.div<{ color: string }>`
-  background-color: ${({ color }) => color};
+const ColorItem = styled.div`
   height: 2rem;
 
   &:hover {
@@ -26,7 +23,7 @@ const ColorItem = styled.div<{ color: string }>`
 const Container = styled.div`
   display: grid;
   padding: 2px;
-  grid-template-columns: repeat(${numColumn}, 2rem);
+  grid-template-columns: repeat(8, 2rem);
 `
 
 export const ColorPicker: FC<ColorPickerProps> = ({
@@ -61,7 +58,7 @@ export const ColorPicker: FC<ColorPickerProps> = ({
           {colors.map((color) => (
             <ColorItem
               key={color}
-              color={color}
+              style={{ backgroundColor: color }}
               onClick={() => _onSelect(color)}
             />
           ))}
