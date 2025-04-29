@@ -23,11 +23,11 @@ export const Tab = styled.div`
   height: 2rem;
   font-size: 0.75rem;
   border-radius: 0.2rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   cursor: pointer;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
   &:active {
     background: ${({ theme }) =>

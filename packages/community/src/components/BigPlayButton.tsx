@@ -5,15 +5,15 @@ import { FC } from "react"
 import { CircleButton } from "./CircleButton.js"
 
 export const StyledButton = styled(CircleButton)`
-  background: ${({ theme }) => theme.themeColor};
+  background: var(--color-theme);
 
   &:hover {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
     opacity: 0.8;
   }
 
   &.active {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
   }
 
   svg {

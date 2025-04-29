@@ -7,7 +7,7 @@ export const Button = styled.button`
   background: transparent;
   border: none;
   border-radius: 0.2rem;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   padding: 0.5rem 1rem;
   cursor: pointer;
   height: 2rem;
@@ -15,7 +15,7 @@ export const Button = styled.button`
   font-size: 0.8rem;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
   &:active {
     background: ${({ theme }) =>
@@ -24,7 +24,7 @@ export const Button = styled.button`
 `
 
 export const PrimaryButton = styled(Button)`
-  background: ${({ theme }) => theme.themeColor};
+  background: var(--color-theme);
 
   &:hover {
     background: ${({ theme }) => Color(theme.themeColor).darken(0.1).hex()};

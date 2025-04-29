@@ -31,8 +31,8 @@ const Container = styled.div`
   position: absolute;
   white-space: nowrap;
   opacity: 0.8;
-  background: ${({ theme }) => theme.themeColor};
-  color: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-theme);
+  color: var(--color-background);
   padding: 0.1em 0.3em;
   border-radius: 0 0.3em 0.3em 0;
   margin: 0.2em 0 0 0;

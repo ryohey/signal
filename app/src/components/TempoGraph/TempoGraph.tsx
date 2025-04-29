@@ -12,8 +12,8 @@ import { TempoGraphCanvas } from "./TempoGraphCanvas/TempoGraphCanvas"
 const Wrapper = styled.div`
   position: relative;
   flex-grow: 1;
-  background: ${({ theme }) => theme.backgroundColor};
-  color: ${({ theme }) => theme.secondaryTextColor};
+  background: var(--color-background);
+  color: var(--color-text-secondary);
 `
 
 export const TempoGraph: FC = () => {

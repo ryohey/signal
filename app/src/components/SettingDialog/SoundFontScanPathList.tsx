@@ -59,12 +59,12 @@ export const SoundFontScanPathList: FC = observer(() => {
 
 const ScanPathLabel = styled.span`
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const Remove = styled(RemoveIcon)`
   width: 1rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const RowWrapper = styled.div`

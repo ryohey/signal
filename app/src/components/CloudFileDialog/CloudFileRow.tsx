@@ -17,7 +17,7 @@ const Container = styled.div`
   overflow: hidden;
 
   &:hover {
-    background: ${({ theme }) => theme.secondaryBackgroundColor};
+    background: var(--color-background-secondary);
   }
 `
 

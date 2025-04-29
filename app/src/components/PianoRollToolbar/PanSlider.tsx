@@ -19,7 +19,7 @@ const Label = styled.div`
   display: flex;
   align-items: center;
   margin-right: 0.5rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const PAN_CENTER = 64

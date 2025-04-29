@@ -4,16 +4,16 @@ export const LinearProgress = styled.progress`
   width: 100%;
   -moz-appearance: none;
   -webkit-appearance: none;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
 
   &::-webkit-progress-bar {
-    background: ${({ theme }) => theme.secondaryBackgroundColor};
+    background: var(--color-background-secondary);
     border-radius: 0.25rem;
     height: 0.5rem;
   }
 
   &::-webkit-progress-value {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
     border-radius: 0.25rem;
     height: 100%;
   }
@@ -25,7 +25,7 @@ export const LinearProgress = styled.progress`
   box-sizing: border-box;
 
   &::-moz-progress-bar {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
     border-radius: 0.25rem;
     height: 100%;
   }

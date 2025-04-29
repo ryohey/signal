@@ -12,7 +12,7 @@ export const StyledFirebaseAuth = styled(FirebaseAuthUI)`
     align-items: center;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    border: 1px solid ${({ theme }) => theme.dividerColor};
+    border: 1px solid var(--color-divider);
     background: inherit !important;
     color: inherit;
     min-height: 3rem;
@@ -21,7 +21,7 @@ export const StyledFirebaseAuth = styled(FirebaseAuthUI)`
     cursor: pointer;
 
     &:hover {
-      background: ${({ theme }) => theme.highlightColor} !important;
+      background: var(--color-highlight) !important;
     }
   }
 

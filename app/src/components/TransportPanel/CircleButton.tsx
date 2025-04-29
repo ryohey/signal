@@ -7,14 +7,14 @@ export const CircleButton = styled.div`
   border-radius: 100%;
   margin: 0.25rem;
   padding: 0.4rem;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 
   svg {

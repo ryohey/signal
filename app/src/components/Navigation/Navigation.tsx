@@ -20,7 +20,7 @@ import { UserButton } from "./UserButton"
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  background: ${({ theme }) => theme.darkBackgroundColor};
+  background: var(--color-background-dark);
   height: 3rem;
   flex-shrink: 0;
   -webkit-app-region: drag;
@@ -44,18 +44,18 @@ export const Tab = styled.div`
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   border-top: solid 0.1rem transparent;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   cursor: pointer;
   -webkit-app-region: none;
 
   &.active {
-    color: ${({ theme }) => theme.textColor};
-    background: ${({ theme }) => theme.backgroundColor};
-    border-top-color: ${({ theme }) => theme.themeColor};
+    color: var(--color-text);
+    background: var(--color-background);
+    border-top-color: var(--color-theme);
   }
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 
   a {

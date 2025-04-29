@@ -9,15 +9,15 @@ export interface SelectBoxProps<T> {
 
 const Select = styled.div`
   overflow: auto;
-  background-color: ${({ theme }) => theme.darkBackgroundColor};
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  background-color: var(--color-background-dark);
+  border: 1px solid var(--color-divider);
   max-height: 22rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 
   &:focus {
-    outline: ${({ theme }) => theme.themeColor} 1px solid;
+    outline: var(--color-theme) 1px solid;
   }
 `
 
@@ -33,7 +33,7 @@ const _Option = styled.div`
   user-select: none;
 
   &.checked {
-    background: ${({ theme }) => theme.themeColor};
+    background: var(--color-theme);
   }
 `
 

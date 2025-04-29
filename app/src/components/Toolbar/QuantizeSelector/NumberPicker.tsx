@@ -13,9 +13,9 @@ export interface NumberPickerProps {
 
 const Value = styled.div`
   font-size: 150%;
-  font-family: ${({ theme }) => theme.monoFont};
-  background: ${({ theme }) => theme.backgroundColor};
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  font-family: var(--font-mono);
+  background: var(--color-background);
+  border: 1px solid var(--color-divider);
   width: 2em;
   padding: 0.25em;
   text-align: center;
@@ -27,11 +27,11 @@ const Container = styled.div`
   align-items: center;
 
   svg {
-    color: ${({ theme }) => theme.secondaryTextColor};
+    color: var(--color-text-secondary);
   }
 
   svg:hover {
-    color: ${({ theme }) => theme.textColor};
+    color: var(--color-text);
   }
 `
 

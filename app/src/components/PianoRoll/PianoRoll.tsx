@@ -16,7 +16,7 @@ import { StyledSplitPane } from "./StyledSplitPane"
 
 const Parent = styled.div`
   flex-grow: 1;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   position: relative;
 `
 
@@ -32,7 +32,7 @@ const Alpha = styled.div`
 `
 
 const Beta = styled.div`
-  border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  border-top: 1px solid var(--color-divider);
   height: calc(100% - 17px);
 `
 

@@ -43,7 +43,7 @@ const CreateButton = styled.a`
   background: transparent;
   border: none;
   border-radius: 0.2rem;
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   padding: 0 0.5rem;
   cursor: pointer;
   height: 2rem;
@@ -54,7 +54,7 @@ const CreateButton = styled.a`
   margin-right: 1rem;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
   &:active {
     background: ${({ theme }) =>

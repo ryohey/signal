@@ -4,7 +4,7 @@ import { CircularProgress } from "../ui/CircularProgress"
 import { Dialog, DialogContent } from "./Dialog"
 
 const Message = styled.div`
-  color: ${({ theme }) => theme.textColor};
+  color: var(--color-text);
   margin-left: 1rem;
   display: flex;
   align-items: center;

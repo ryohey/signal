@@ -8,5 +8,5 @@ export const Toolbar: FC<React.PropsWithChildren<unknown>> = styled.div`
   height: 3rem;
   box-sizing: border-box;
 
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
 `

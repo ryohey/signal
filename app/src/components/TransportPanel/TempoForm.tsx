@@ -17,7 +17,7 @@ const TempoInput = styled(NumberInput)`
   width: 5em;
   text-align: center;
   outline: none;
-  font-family: ${({ theme }) => theme.monoFont};
+  font-family: var(--font-mono);
   font-size: 1rem;
   padding: 0.3rem 0;
 
@@ -36,11 +36,11 @@ const TempoWrapper = styled.div`
 
   label {
     font-size: 0.6rem;
-    color: ${({ theme }) => theme.secondaryTextColor};
+    color: var(--color-text-secondary);
   }
 
   &:focus-within {
-    border: 1px solid ${({ theme }) => theme.dividerColor};
+    border: 1px solid var(--color-divider);
     background: #ffffff14;
   }
 `

@@ -19,7 +19,7 @@ const TabButtonBase = styled.div`
   background: transparent;
   -webkit-appearance: none;
   padding: 0.5em 0.8em;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   outline: none;
   font-size: 0.75rem;
   cursor: default;
@@ -29,18 +29,21 @@ const TabButtonBase = styled.div`
   flex-shrink: 0;
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
   }
 `
 
-const TabButton = styled(TabButtonBase)<{ selected: boolean }>`
-  width: 8em;
+const TabButton = styled(TabButtonBase)`
+  width: 7rem;
   overflow: hidden;
   border-bottom: 1px solid;
-  border-color: ${({ theme, selected }) =>
-    selected ? theme.themeColor : "transparent"};
-  color: ${({ theme, selected }) =>
-    selected ? theme.textColor : theme.secondaryTextColor};
+  border-color: transparent;
+  color: var(--color-text-secondary);
+
+  &[data-selected="true"] {
+    border-color: var(--color-theme);
+    color: var(--color-text);
+  }
 `
 
 const NoWrap = styled.span`
@@ -52,7 +55,7 @@ const NoWrap = styled.span`
 const Toolbar = styled.div`
   box-sizing: border-box;
   display: flex;
-  margin-left: ${Layout.keyWidth}px;
+  margin-left: var(--size-key-width);
   height: 2rem;
   flex-shrink: 0;
   overflow-x: auto;
@@ -70,7 +73,7 @@ const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
     <Toolbar>
       {controlModes.map((mode, i) => (
         <TabButton
-          selected={isEqualControlMode(selectedMode, mode)}
+          data-selected={isEqualControlMode(selectedMode, mode)}
           onMouseDown={() => onSelect(mode)}
           key={i}
         >
@@ -93,7 +96,7 @@ const Parent = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.darkBackgroundColor};
+  background: var(--color-background-dark);
 `
 
 const Content = styled.div`

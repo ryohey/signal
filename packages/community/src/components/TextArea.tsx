@@ -5,7 +5,7 @@ export const TextArea = styled.textarea`
   appearance: none;
   border: none;
   background: inherit;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border: 1px solid var(--color-divider);
   border-radius: 0.25rem;
   min-height: 8em;
   padding: 1rem 1rem;
@@ -17,6 +17,6 @@ export const TextArea = styled.textarea`
   outline: none;
 
   &:focus {
-    border-color: ${({ theme }) => theme.themeColor};
+    border-color: var(--color-theme);
   }
 `

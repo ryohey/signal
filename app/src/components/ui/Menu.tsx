@@ -19,10 +19,10 @@ export type MenuProps = PropsWithChildren<{
 
 const StyledContent = styled(Content)`
   min-width: 8rem;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 3rem ${({ theme }) => theme.shadowColor};
-  border: 1px solid ${({ theme }) => theme.popupBorderColor};
+  box-shadow: 0 1rem 3rem var(--color-shadow);
+  border: 1px solid var(--color-popup-border);
   margin: 0 1rem;
   padding: 0.5rem 0;
 `
@@ -52,19 +52,25 @@ export const Menu: FC<MenuProps> = ({
   )
 }
 
-const StyledLi = styled.li<{ disabled?: boolean }>`
+const StyledLi = styled.li`
   font-size: 0.8rem;
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.secondaryTextColor : theme.textColor};
+  color: var(--color-text);
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
   cursor: pointer;
 
   &:hover {
-    background: ${({ theme, disabled }) =>
-      disabled ? "transparent" : theme.highlightColor};
+    background: var(--color-highlight);
+  }
+
+  &[data-disabled="true"] {
+    color: var(--color-text-secondary);
+    pointer-events: none;
+
+    &:hover {
+      background: transparent;
+    }
   }
 `
 
@@ -75,13 +81,19 @@ export type MenuItemProps = React.DetailedHTMLProps<
   disabled?: boolean
 }
 
-export const MenuItem: FC<MenuItemProps> = ({ children, ...props }) => (
-  <StyledLi {...props}>{children}</StyledLi>
+export const MenuItem: FC<MenuItemProps> = ({
+  children,
+  disabled = false,
+  ...props
+}) => (
+  <StyledLi {...props} data-disabled={disabled}>
+    {children}
+  </StyledLi>
 )
 
 export const MenuDivider = styled.hr`
   border: none;
-  border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  border-top: 1px solid var(--color-divider);
 `
 
 const slideUpAndFade = keyframes`
@@ -151,10 +163,10 @@ const StyledSubContent = styled(SubContent)`
     animation-name: ${slideLeftAndFade};
   }
 
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 3rem ${({ theme }) => theme.shadowColor};
-  border: 1px solid ${({ theme }) => theme.popupBorderColor};
+  box-shadow: 0 1rem 3rem var(--color-shadow);
+  border: 1px solid var(--color-popup-border);
   padding: 0.5rem 0;
 `
 
@@ -183,6 +195,6 @@ export const MenuHotKey = styled.div`
   font-size: 0.9em;
   flex-grow: 1;
   text-align: right;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   margin-left: 2em;
 `

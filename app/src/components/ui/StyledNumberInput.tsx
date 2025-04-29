@@ -6,7 +6,7 @@ export const StyledNumberInput = styled(NumberInput)`
   appearance: none;
   border: none;
   background: inherit;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border: 1px solid var(--color-divider);
   border-radius: 0.25rem;
   height: 3rem;
   padding: 0 1rem;
@@ -15,10 +15,10 @@ export const StyledNumberInput = styled(NumberInput)`
   box-sizing: border-box;
   color: inherit;
   font-size: 1rem;
-  font-family: ${({ theme }) => theme.monoFont};
+  font-family: var(--font-mono);
   outline: none;
 
   &:focus {
-    border-color: ${({ theme }) => theme.themeColor};
+    border-color: var(--color-theme);
   }
 `

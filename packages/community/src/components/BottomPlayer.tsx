@@ -11,7 +11,7 @@ import { CircleButton } from "./CircleButton.js"
 import { PlayButton } from "./PlayButton.js"
 
 const Wrapper = styled.div`
-  border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  border-top: 1px solid var(--color-divider);
   padding: 1rem 0;
 `
 

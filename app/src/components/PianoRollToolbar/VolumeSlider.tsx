@@ -19,7 +19,7 @@ const Container = styled.div`
 const VolumeIcon = styled(VolumeUp)`
   width: 1.3rem;
   height: 2rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
   margin-right: 0.5rem;
 `
 

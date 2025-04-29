@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import React, { FC } from "react"
-import { Layout } from "../../../Constants"
 
 const Parent = styled.div`
   text-align: right;
-  width: ${Layout.keyWidth}px;
+  width: var(--size-key-width);
   padding-right: 0.3em;
   box-sizing: border-box;
 `
@@ -20,10 +19,10 @@ const Values = styled.div`
 const Value = styled.div`
   padding: 0.3em;
   font-size: 90%;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: var(--color-highlight);
     cursor: default;
   }
 `

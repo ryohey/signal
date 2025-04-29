@@ -9,10 +9,10 @@ export type MenuProps = PropsWithChildren<{
 }>
 
 const StyledContent = styled(Content)`
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  background: var(--color-background-secondary);
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 3rem ${({ theme }) => theme.shadowColor};
-  border: 1px solid ${({ theme }) => theme.backgroundColor};
+  box-shadow: 0 1rem 3rem var(--color-shadow);
+  border: 1px solid var(--color-background);
   margin: 0 1rem;
   padding: 0.5rem 0;
 `
@@ -71,5 +71,5 @@ export const MenuItem: FC<MenuItemProps> = ({ children, ...props }) => (
 
 export const MenuDivider = styled.hr`
   border: none;
-  border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  border-top: 1px solid var(--color-divider);
 `

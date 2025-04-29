@@ -14,7 +14,7 @@ const BetaLabel = styled.span`
   font-size: 0.8rem;
   padding: 0.1rem 0.4rem;
   margin-left: 1em;
-  color: ${({ theme }) => theme.secondaryTextColor};
+  color: var(--color-text-secondary);
 `
 
 const Description = styled.div`

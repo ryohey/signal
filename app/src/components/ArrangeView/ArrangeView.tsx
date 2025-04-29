@@ -27,7 +27,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   position: relative;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   overflow: hidden;
 `
 
@@ -36,9 +36,10 @@ const LeftTopSpace = styled.div`
   left: 0;
   top: 0;
   width: 100%;
+  height: var(--size-ruler-height);
   box-sizing: border-box;
-  border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
-  background: ${({ theme }) => theme.backgroundColor};
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-background);
 `
 
 const LeftBottomSpace = styled.div`
@@ -46,26 +47,29 @@ const LeftBottomSpace = styled.div`
   left: 0;
   bottom: 0;
   width: 100%;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
 `
 
-const TrackHeader = styled.div<{ isSelected: boolean }>`
+const TrackHeader = styled.div`
   width: 8rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
   display: flex;
-  border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
+  border-bottom: 1px solid var(--color-divider);
   align-items: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.secondaryBackgroundColor : theme.backgroundColor};
+  background: var(--color-background);
+
+  &[data-selected="true"] {
+    background-color: var(--color-background-secondary);
+  }
 `
 
 const HeaderList = styled.div`
   position: relative;
-  border-right: 1px solid ${({ theme }) => theme.dividerColor};
+  border-right: 1px solid var(--color-divider);
 `
 
 export const ArrangeView: FC = () => {
@@ -185,7 +189,7 @@ export const ArrangeView: FC = () => {
             <TrackHeader
               style={{ height: trackHeight }}
               key={i}
-              isSelected={i === selectedTrackIndex}
+              data-selected={i === selectedTrackIndex}
               onClick={() => setSelectedTrackIndex(i)}
               onDoubleClick={() => openTrack(t.id)}
               onContextMenu={(e) => {
@@ -199,7 +203,7 @@ export const ArrangeView: FC = () => {
         </div>
         <LeftBottomSpace style={{ height: BAR_WIDTH }} />
       </HeaderList>
-      <LeftTopSpace style={{ height: Layout.rulerHeight }} />
+      <LeftTopSpace />
       <div
         style={{
           display: "flex",

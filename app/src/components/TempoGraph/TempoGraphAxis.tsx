@@ -7,9 +7,9 @@ const Container = styled.div`
   position: absolute;
   left: 0;
   height: 100%;
-  background: ${({ theme }) => theme.backgroundColor};
+  background: var(--color-background);
   pointer-events: none;
-  border-right: 1px solid ${({ theme }) => theme.dividerColor};
+  border-right: 1px solid var(--color-divider);
   box-shadow: 0px 0px 5px 0 rgba(0, 0, 0, 0.1);
 `
 

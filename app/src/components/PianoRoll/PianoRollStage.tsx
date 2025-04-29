@@ -17,15 +17,15 @@ const Container = styled.div``
 
 const ContentPosition = styled.div`
   position: absolute;
-  left: ${Layout.keyWidth}px;
+  left: var(--size-key-width);
 `
 
 const RulerPosition = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  padding-left: ${Layout.keyWidth}px;
-  height: ${Layout.rulerHeight}px;
+  padding-left: var(--size-key-width);
+  height: var(--size-ruler-height);
 `
 
 const PianoKeyPosition = styled.div`
