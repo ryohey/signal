@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import React, { FC } from "react"
-import { Layout } from "../../../Constants"
 
 const Parent = styled.div`
   text-align: right;
-  width: ${Layout.keyWidth}px;
+  width: var(--size-key-width);
   padding-right: 0.3em;
   box-sizing: border-box;
 `

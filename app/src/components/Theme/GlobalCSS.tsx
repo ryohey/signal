@@ -1,4 +1,5 @@
 import { css, Global, useTheme } from "@emotion/react"
+import { Layout } from "../../Constants"
 
 export const GlobalCSS = () => {
   const theme = useTheme()
@@ -36,6 +37,9 @@ export const GlobalCSS = () => {
           --color-green: ${theme.greenColor};
           --color-red: ${theme.redColor};
           --color-yellow: ${theme.yellowColor};
+          --size-key-width: ${Layout.keyWidth}px;
+          --size-key-height: ${Layout.keyHeight}px;
+          --size-ruler-height: ${Layout.rulerHeight}px;
         }
 
         html {

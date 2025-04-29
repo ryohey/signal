@@ -55,7 +55,7 @@ const NoWrap = styled.span`
 const Toolbar = styled.div`
   box-sizing: border-box;
   display: flex;
-  margin-left: ${Layout.keyWidth}px;
+  margin-left: var(--size-key-width);
   height: 2rem;
   flex-shrink: 0;
   overflow-x: auto;

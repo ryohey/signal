@@ -15,7 +15,7 @@ const Container = styled.div`
 `
 
 const Header = styled.div`
-  height: ${Layout.rulerHeight};
+  height: var(--size-ruler-height);
   border-bottom: 1px solid var(--color-divider);
   /* scroll bar width */
   padding-right: 14px;

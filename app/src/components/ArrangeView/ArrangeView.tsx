@@ -36,6 +36,7 @@ const LeftTopSpace = styled.div`
   left: 0;
   top: 0;
   width: 100%;
+  height: var(--size-ruler-height);
   box-sizing: border-box;
   border-bottom: 1px solid var(--color-divider);
   background: var(--color-background);
@@ -202,7 +203,7 @@ export const ArrangeView: FC = () => {
         </div>
         <LeftBottomSpace style={{ height: BAR_WIDTH }} />
       </HeaderList>
-      <LeftTopSpace style={{ height: Layout.rulerHeight }} />
+      <LeftTopSpace />
       <div
         style={{
           display: "flex",
