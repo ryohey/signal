@@ -1,12 +1,12 @@
 import { MouseGesture } from "../../../../gesture/MouseGesture"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const useAddNoteToSelectionGesture = (): MouseGesture<[number]> => {
-  const { pianoRollStore } = useStores()
+  const { selectedNoteIds, setSelectedNoteIds } = usePianoRoll()
 
   return {
     onMouseDown(_e, noteId) {
-      pianoRollStore.selectedNoteIds.push(noteId)
+      setSelectedNoteIds([...selectedNoteIds, noteId])
     },
   }
 }

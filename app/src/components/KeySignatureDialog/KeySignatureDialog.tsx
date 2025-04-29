@@ -1,8 +1,7 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { Scale } from "../../entities/scale/Scale"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -48,68 +47,69 @@ const Column = styled.div`
   flex-direction: column;
 `
 
-export const KeySignatureDialog: FC<KeySignatureDialogProps> = observer(
-  ({ open, onOpenChange }) => {
-    const { pianoRollStore } = useStores()
-    const onClose = () => onOpenChange(false)
+export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
+  open,
+  onOpenChange,
+}) => {
+  const { keySignature, setKeySignature } = usePianoRoll()
+  const onClose = () => onOpenChange(false)
 
-    return (
-      <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
-        <DialogTitle>
-          <Localized name="scale" />
-        </DialogTitle>
-        <DialogContent>
-          <Row style={{ gap: "1rem" }}>
-            <Column style={{ gap: "0.5rem", minWidth: "5rem" }}>
-              <Label>
-                <Localized name="key" />
-              </Label>
-              <Select
-                value={pianoRollStore.keySignature?.key}
-                onChange={(e) => {
-                  const key = parseInt(e.target.value)
-                  pianoRollStore.keySignature = {
-                    scale: pianoRollStore.keySignature?.scale ?? "major",
-                    key,
-                  }
-                }}
-              >
-                {keyNames.map((name, i) => (
-                  <option key={i} value={i}>
-                    {name}
-                  </option>
-                ))}
-              </Select>
-            </Column>
-            <Column style={{ gap: "0.5rem", minWidth: "5rem" }}>
-              <Label>
-                <Localized name="scale" />
-              </Label>
-              <Select
-                value={pianoRollStore.keySignature?.scale}
-                onChange={(e) => {
-                  const scale = e.target.value as Scale
-                  pianoRollStore.keySignature = {
-                    key: pianoRollStore.keySignature?.key ?? 0,
-                    scale: scale,
-                  }
-                }}
-              >
-                {Scale.values.map((name, i) => (
-                  <option key={i} value={name}>
-                    <ScaleName scale={name} />
-                  </option>
-                ))}
-              </Select>
-            </Column>
-          </Row>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>
-            <Localized name="close" />
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  },
-)
+  return (
+    <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
+      <DialogTitle>
+        <Localized name="scale" />
+      </DialogTitle>
+      <DialogContent>
+        <Row style={{ gap: "1rem" }}>
+          <Column style={{ gap: "0.5rem", minWidth: "5rem" }}>
+            <Label>
+              <Localized name="key" />
+            </Label>
+            <Select
+              value={keySignature?.key}
+              onChange={(e) => {
+                const key = parseInt(e.target.value)
+                setKeySignature({
+                  scale: keySignature?.scale ?? "major",
+                  key,
+                })
+              }}
+            >
+              {keyNames.map((name, i) => (
+                <option key={i} value={i}>
+                  {name}
+                </option>
+              ))}
+            </Select>
+          </Column>
+          <Column style={{ gap: "0.5rem", minWidth: "5rem" }}>
+            <Label>
+              <Localized name="scale" />
+            </Label>
+            <Select
+              value={keySignature?.scale}
+              onChange={(e) => {
+                const scale = e.target.value as Scale
+                setKeySignature({
+                  key: keySignature?.key ?? 0,
+                  scale: scale,
+                })
+              }}
+            >
+              {Scale.values.map((name, i) => (
+                <option key={i} value={name}>
+                  <ScaleName scale={name} />
+                </option>
+              ))}
+            </Select>
+          </Column>
+        </Row>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>
+          <Localized name="close" />
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}

@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { observer } from "mobx-react-lite"
 import React, { FC, useCallback, useMemo, useRef } from "react"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import { Layout } from "../../Constants"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
 import { TrackEvent } from "../../track"
 import { EventListItem } from "./EventListItem"
@@ -39,10 +38,9 @@ export const Cell = styled.div`
   }
 `
 
-const EventList: FC = observer(() => {
-  const {
-    pianoRollStore: { selectedTrack, selectedNoteIds: selectedEventIds = [] },
-  } = useStores()
+const EventList: FC = () => {
+  const { selectedTrack, selectedNoteIds: selectedEventIds = [] } =
+    usePianoRoll()
 
   const events = useMemo(() => {
     const { events = [] } = selectedTrack || {}
@@ -85,7 +83,7 @@ const EventList: FC = observer(() => {
       </FixedSizeList>
     </Container>
   )
-})
+}
 
 const ItemRenderer = ({ index, style, data }: ListChildComponentProps) => {
   const { events, setSelectedEventIds } = data

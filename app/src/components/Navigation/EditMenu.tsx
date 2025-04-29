@@ -12,13 +12,14 @@ import {
   useTransposeSelection,
 } from "../../actions"
 import { useHistory } from "../../hooks/useHistory"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
-  const { pianoRollStore } = useStores()
+  const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
+    usePianoRoll()
   const { hasUndo, hasRedo, undo, redo } = useHistory()
   const copySelection = useCopySelection()
   const pasteSelection = usePasteSelection()
@@ -29,7 +30,7 @@ export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
   const selectPreviousNote = useSelectPreviousNote()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
-  const anySelectedNotes = pianoRollStore.selectedNoteIds.length > 0
+  const anySelectedNotes = selectedNoteIds.length > 0
 
   const onClickUndo = async () => {
     close()
@@ -99,12 +100,12 @@ export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
 
   const onClickTranspose = () => {
     close()
-    pianoRollStore.openTransposeDialog = true
+    setOpenTransposeDialog(true)
   }
 
   const onClickVelocity = () => {
     close()
-    pianoRollStore.openVelocityDialog = true
+    setOpenVelocityDialog(true)
   }
 
   return (
