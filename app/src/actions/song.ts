@@ -117,6 +117,7 @@ export const useSelectTrack = () => {
   const { pianoRollStore } = useStores()
   return (trackId: TrackId) => {
     pianoRollStore.selectedTrackId = trackId
+    pianoRollStore.previewingNoteNumbers.clear()
   }
 }
 
