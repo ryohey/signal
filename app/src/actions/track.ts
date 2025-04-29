@@ -44,10 +44,9 @@ export const useChangeTempo = () => {
 /* events */
 
 export const useChangeNotesVelocity = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, setNewNoteVelocity } = usePianoRoll()
   const { pushHistory } = useHistory()
   return (noteIds: number[], velocity: number) => {
-    const { selectedTrack } = pianoRollStore
     if (selectedTrack === undefined) {
       return
     }
@@ -58,7 +57,7 @@ export const useChangeNotesVelocity = () => {
         velocity: velocity,
       })),
     )
-    pianoRollStore.newNoteVelocity = velocity
+    setNewNoteVelocity(velocity)
   }
 }
 
@@ -88,14 +87,13 @@ export const useCreateEvent = () => {
 }
 
 export const useUpdateVelocitiesInRange = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
   return (
     startTick: number,
     startValue: number,
     endTick: number,
     endValue: number,
   ) => {
-    const { selectedTrack, selectedNoteIds } = pianoRollStore
     if (selectedTrack === undefined) {
       return
     }
@@ -202,12 +200,12 @@ export const updateEventsInRange =
   }
 
 export const useUpdateValueEvents = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, quantizer } = usePianoRoll()
 
   return (type: ValueEventType) =>
     updateEventsInRange(
-      pianoRollStore.selectedTrack,
-      pianoRollStore.quantizer,
+      selectedTrack,
+      quantizer,
       ValueEventType.getEventPredicate(type),
       ValueEventType.getEventFactory(type),
     )
@@ -402,9 +400,7 @@ export const batchUpdateNotesVelocity = (
 }
 
 export const useBatchUpdateSelectedNotesVelocity = () => {
-  const {
-    pianoRollStore: { selectedTrack, selectedNoteIds },
-  } = useStores()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
   return (operation: BatchUpdateOperation) => {

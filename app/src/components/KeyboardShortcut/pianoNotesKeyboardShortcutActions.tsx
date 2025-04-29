@@ -19,8 +19,7 @@ export const usePianoNotesKeyboardShortcutActions = () => {
   const duplicateSelection = useDuplicateSelection()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
-  const { setMouseMode, resetSelection, setOpenTransposeDialog } =
-    usePianoRoll()
+  const { mouseMode, resetSelection, setOpenTransposeDialog } = usePianoRoll()
 
   return () => [
     {
@@ -80,13 +79,13 @@ export const usePianoNotesKeyboardShortcutActions = () => {
     {
       code: "ArrowRight",
       run: selectNextNote,
-      enabled: () => setMouseMode("pencil"),
+      enabled: () => mouseMode === "pencil",
     },
     {
       code: "ArrowLeft",
       run: selectPreviousNote,
-      enabled: () => setMouseMode("pencil"),
+      enabled: () => mouseMode === "pencil",
     },
-    { code: "Escape", run: () => resetSelection() },
+    { code: "Escape", run: resetSelection },
   ]
 }

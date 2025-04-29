@@ -4,7 +4,7 @@ import { NotePoint } from "../../../../entities/transform/NotePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import {
   DraggableArea,
   PianoRollDraggable,
@@ -40,14 +40,19 @@ export const useMoveDraggableGesture = (): MouseGesture<
   [PianoRollDraggable, PianoRollDraggable[]?, MoveDraggableCallback?]
 > => {
   const {
-    pianoRollStore,
-    pianoRollStore: { isQuantizeEnabled, transform, quantizer },
-  } = useStores()
+    isQuantizeEnabled,
+    transform,
+    quantizer,
+    getDraggablePosition,
+    getLocal,
+    getDraggableArea,
+    updateDraggable
+  } = usePianoRoll()
   const { pushHistory } = useHistory()
 
   return {
     onMouseDown(e, draggable, subDraggables = [], callback = {}) {
-      const draggablePosition = pianoRollStore.getDraggablePosition(draggable)
+      const draggablePosition = getDraggablePosition(draggable)
 
       if (draggablePosition === null) {
         return
@@ -55,12 +60,12 @@ export const useMoveDraggableGesture = (): MouseGesture<
 
       let isChanged = false
 
-      const startPos = pianoRollStore.getLocal(e)
+      const startPos = getLocal(e)
       const notePoint = transform.getNotePoint(startPos)
       const offset = NotePoint.sub(draggablePosition, notePoint)
 
       const subDraggablePositions = subDraggables.map((subDraggable) =>
-        pianoRollStore.getDraggablePosition(subDraggable),
+        getDraggablePosition(subDraggable),
       )
 
       observeDrag2(e, {
@@ -68,7 +73,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
           const quantize = !e2.shiftKey && isQuantizeEnabled
           const minLength = quantize ? quantizer.unit : MIN_LENGTH
 
-          const draggableArea = pianoRollStore.getDraggableArea(
+          const draggableArea = getDraggableArea(
             draggable,
             minLength,
           )
@@ -77,7 +82,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
             return
           }
 
-          const currentPosition = pianoRollStore.getDraggablePosition(draggable)
+          const currentPosition = getDraggablePosition(draggable)
 
           if (currentPosition === null) {
             return
@@ -112,7 +117,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
                 return null
               }
 
-              const subDraggableArea = pianoRollStore.getDraggableArea(
+              const subDraggableArea = getDraggableArea(
                 subDraggable,
                 minLength,
               )
@@ -131,7 +136,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
             pushHistory()
           }
 
-          pianoRollStore.updateDraggable(draggable, newPosition)
+          updateDraggable(draggable, newPosition)
 
           subDraggables.forEach((subDraggable, i) => {
             const subDraggablePosition = newSubDraggablePositions[i]
@@ -143,7 +148,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
               return
             }
 
-            pianoRollStore.updateDraggable(subDraggable, subDraggablePosition)
+            updateDraggable(subDraggable, subDraggablePosition)
           })
 
           callback?.onChange?.(e2, {

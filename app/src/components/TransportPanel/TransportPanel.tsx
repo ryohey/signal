@@ -10,6 +10,7 @@ import { FC, useCallback } from "react"
 import { useFastForwardOneBar, useRewindOneBar, useStop } from "../../actions"
 import { useToggleRecording } from "../../actions/recording"
 import { usePlayer } from "../../hooks/usePlayer"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { CircularProgress } from "../ui/CircularProgress"
@@ -56,9 +57,8 @@ const TimestampText = styled.div`
 `
 
 const Timestamp: FC = observer(() => {
-  const { pianoRollStore } = useStores()
-  const mbtTime = pianoRollStore.currentMBTTime
-  return <TimestampText>{mbtTime}</TimestampText>
+  const { currentMBTTime } = usePianoRoll()
+  return <TimestampText>{currentMBTTime}</TimestampText>
 })
 
 export const ToolbarSeparator = styled.div`

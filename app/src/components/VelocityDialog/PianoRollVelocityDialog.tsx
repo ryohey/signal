@@ -4,16 +4,16 @@ import {
   BatchUpdateOperation,
   useBatchUpdateSelectedNotesVelocity,
 } from "../../actions"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { VelocityDialog } from "./VelocityDialog"
 
 export const PianoRollVelocityDialog = observer(() => {
-  const { pianoRollStore } = useStores()
+  const { openVelocityDialog, newNoteVelocity, setOpenVelocityDialog } = usePianoRoll()
   const batchUpdateSelectedNotesVelocity = useBatchUpdateSelectedNotesVelocity()
 
   const onClose = useCallback(
-    () => (pianoRollStore.openVelocityDialog = false),
-    [pianoRollStore],
+    () => setOpenVelocityDialog(false),
+    [setOpenVelocityDialog],
   )
 
   const onClickOK = useCallback(
@@ -22,15 +22,15 @@ export const PianoRollVelocityDialog = observer(() => {
         type: operationType,
         value,
       })
-      pianoRollStore.openVelocityDialog = false
+      setOpenVelocityDialog(false)
     },
-    [pianoRollStore, batchUpdateSelectedNotesVelocity],
+    [setOpenVelocityDialog, batchUpdateSelectedNotesVelocity],
   )
 
   return (
     <VelocityDialog
-      open={pianoRollStore.openVelocityDialog}
-      value={pianoRollStore.newNoteVelocity}
+      open={openVelocityDialog}
+      value={newNoteVelocity}
       onClickOK={onClickOK}
       onClose={onClose}
     />

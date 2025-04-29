@@ -8,15 +8,15 @@ import {
   isPitchBendEvent,
 } from "../track"
 import { useControlPane } from "./useControlPane"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
+import { usePianoRoll } from "./usePianoRoll"
 
 export function useControlValueEvents() {
   const { controlMode, scrollLeft, transform } = useControlPane()
-  const windowedEvents = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.windowedEvents,
-  )
-  const selectedTrackEvents = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.selectedTrack?.events ?? [],
+  const { windowedEvents, selectedTrack } = usePianoRoll()
+  const selectedTrackEvents = useMobxSelector(
+    () => selectedTrack?.events ?? [],
+    [selectedTrack],
   )
 
   const filter = useMemo(() => {

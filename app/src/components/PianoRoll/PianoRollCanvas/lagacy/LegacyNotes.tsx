@@ -3,16 +3,15 @@ import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { colorToVec4 } from "../../../../gl/color"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { PianoNoteItem } from "../../../../stores/PianoRollStore"
 import { trackColorToCSSColor } from "../../../../track/TrackColor"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 
+// we still need to use observer to track selectedTrack changes
 export const LegacyNotes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
-  const {
-    pianoRollStore: { notes, selectedTrack },
-  } = useStores()
+  const { notes, selectedTrack } = usePianoRoll()
   const theme = useTheme()
 
   if (selectedTrack === undefined) {

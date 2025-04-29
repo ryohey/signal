@@ -3,17 +3,10 @@ import { Range } from "../entities/geometry/Range"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import { isNoteEvent, TrackId } from "../track"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { usePianoRoll } from "./usePianoRoll"
 
 export function useGhostNotes(trackId: TrackId) {
-  const transform = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.transform,
-  )
-  const scrollLeft = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.scrollLeft,
-  )
-  const canvasWidth = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.canvasWidth,
-  )
+  const { transform, scrollLeft, canvasWidth } = usePianoRoll()
   const track = useMobxStore(({ song }) => song.getTrack(trackId))
   const events = useMobxSelector(() => track?.events ?? [], [track])
 

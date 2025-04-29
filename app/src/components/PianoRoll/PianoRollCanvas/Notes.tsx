@@ -4,7 +4,7 @@ import Color from "color"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
-import { useStores } from "../../../hooks/useStores"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { trackColorToCSSColor } from "../../../track/TrackColor"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
@@ -18,10 +18,9 @@ export const Notes: FC<NotesProps> = (props) => {
   return <GLFallback component={_Notes} fallback={LegacyNotes} {...props} />
 }
 
+// we still need to use observer to track selectedTrack changes
 const _Notes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
-  const {
-    pianoRollStore: { notes, selectedTrack },
-  } = useStores()
+  const { notes, selectedTrack } = usePianoRoll()
   const theme = useTheme()
 
   if (selectedTrack === undefined) {

@@ -9,7 +9,7 @@ import { noteNameWithOctString } from "../../helpers/noteNumberString"
 import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { usePreviewNote } from "../../hooks/usePreviewNote"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { PianoKeysContextMenu } from "./PianoKeysContextMenu"
@@ -207,12 +207,10 @@ function drawKeys(
 export const PianoKeys: FC = observer(() => {
   const theme = useTheme()
   const {
-    pianoRollStore: {
-      keySignature,
-      transform: { numberOfKeys, pixelsPerKey: keyHeight },
-      previewingNoteNumbers,
-    },
-  } = useStores()
+    keySignature,
+    transform: { numberOfKeys, pixelsPerKey: keyHeight },
+    previewingNoteNumbers,
+  } = usePianoRoll()
   const width = Layout.keyWidth
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())

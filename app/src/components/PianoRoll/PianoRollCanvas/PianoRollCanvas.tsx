@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite"
 import { FC, MouseEventHandler, useCallback, useEffect, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useContextMenu } from "../../../hooks/useContextMenu"
-import { useStores } from "../../../hooks/useStores"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
@@ -18,17 +18,17 @@ import { Notes } from "./Notes"
 export const PianoRollCanvas: FC<PianoRollStageProps> = observer(
   ({ width, height }) => {
     const {
-      pianoRollStore,
-      pianoRollStore: {
-        notesCursor,
-        scrollLeft,
-        scrollTop,
-        rulerStore: { beats },
-        cursorX,
-        selectionBounds,
-        ghostTrackIds,
-      },
-    } = useStores()
+      notesCursor,
+      scrollLeft,
+      scrollTop,
+      rulerStore: { beats },
+      cursorX,
+      selectionBounds,
+      ghostTrackIds,
+      mouseMode,
+      setCanvasWidth,
+      setCanvasHeight,
+    } = usePianoRoll()
 
     const mouseHandler = useNoteMouseGesture()
 
@@ -36,20 +36,23 @@ export const PianoRollCanvas: FC<PianoRollStageProps> = observer(
 
     const theme = useTheme()
 
-    const handleContextMenu: MouseEventHandler = useCallback((e) => {
-      if (pianoRollStore.mouseMode === "selection") {
-        e.stopPropagation()
-        onContextMenu(e)
-        return
-      }
-    }, [])
+    const handleContextMenu: MouseEventHandler = useCallback(
+      (e) => {
+        if (mouseMode === "selection") {
+          e.stopPropagation()
+          onContextMenu(e)
+          return
+        }
+      },
+      [mouseMode, onContextMenu],
+    )
 
     useEffect(() => {
-      pianoRollStore.canvasWidth = width
+      setCanvasWidth(width)
     }, [width])
 
     useEffect(() => {
-      pianoRollStore.canvasHeight = height
+      setCanvasHeight(height)
     }, [height])
 
     const scrollXMatrix = useMemo(

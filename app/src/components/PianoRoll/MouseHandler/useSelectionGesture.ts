@@ -1,7 +1,7 @@
 import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
 import { MouseGesture } from "../../../gesture/MouseGesture"
-import { useStores } from "../../../hooks/useStores"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useCreateSelectionGesture } from "./gestures/useCreateSelectionGesture"
 import { useDragSelectionLeftEdgeGesture } from "./gestures/useDragSelectionLeftEdgeGesture"
 import { useDragSelectionRightEdgeGesture } from "./gestures/useDragSelectionRightEdgeGesture"
@@ -11,10 +11,7 @@ import { CursorProvider } from "./useNoteMouseGesture"
 export const MIN_LENGTH = 10
 
 export const useSelectionGesture = (): MouseGesture & CursorProvider => {
-  const {
-    pianoRollStore,
-    pianoRollStore: { selectionBounds, selectedNoteIds },
-  } = useStores()
+  const { getLocal, selectionBounds, selectedNoteIds } = usePianoRoll()
   const moveSelectionAction = useMoveSelectionGesture()
   const dragSelectionLeftEdgeAction = useDragSelectionLeftEdgeGesture()
   const dragSelectionRightEdgeAction = useDragSelectionRightEdgeGesture()
@@ -26,7 +23,7 @@ export const useSelectionGesture = (): MouseGesture & CursorProvider => {
         return null
       }
 
-      const local = pianoRollStore.getLocal(e)
+      const local = getLocal(e)
 
       if (e.button === 0) {
         if (selectionBounds !== null) {
@@ -52,7 +49,7 @@ export const useSelectionGesture = (): MouseGesture & CursorProvider => {
       return null
     },
     getCursor(e: MouseEvent) {
-      const local = pianoRollStore.getLocal(e)
+      const local = getLocal(e)
       const type =
         selectionBounds === null
           ? "outside"

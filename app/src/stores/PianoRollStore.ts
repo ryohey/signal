@@ -134,6 +134,7 @@ export default class PianoRollStore {
       currentMBTTime: computed,
       cursorX: computed,
       quantizer: computed,
+      enabledQuantizer: computed,
       controlCursor: computed,
       selectedTrack: computed,
       setScrollLeftInPixels: action,

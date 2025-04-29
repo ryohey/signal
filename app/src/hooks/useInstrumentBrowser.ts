@@ -1,49 +1,25 @@
 import { difference, groupBy, map, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { isNotUndefined } from "../helpers/array"
 import { getCategoryIndex } from "../midi/GM"
 import { programChangeMidiEvent } from "../midi/MidiEvent"
-import { useMobxStore } from "./useMobxSelector"
+import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { usePreviewNote } from "./usePreviewNote"
 import { useSong } from "./useSong"
-import { useStores } from "./useStores"
 
 export function useInstrumentBrowser() {
-  const { pianoRollStore } = useStores()
+  const {
+    selectedTrack: track,
+    instrumentBrowserSetting: setting,
+    setInstrumentBrowserSetting: setSetting,
+    setOpenInstrumentBrowser: setOpen,
+  } = usePianoRoll()
   const { isPlaying, sendEvent } = usePlayer()
   const setTrackInstrumentAction = useSetTrackInstrument()
   const song = useSong()
   const { previewNoteOn } = usePreviewNote()
-
-  const track = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.selectedTrack,
-  )
-  const setting = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.instrumentBrowserSetting,
-  )
-
-  const presetCategories = useMemo(() => {
-    const presets = range(0, 128).map((programNumber) => ({
-      programNumber,
-    }))
-    return map(
-      groupBy(presets, (p) => getCategoryIndex(p.programNumber)),
-      (presets) => ({ presets }),
-    )
-  }, [])
-  const setSetting = useCallback(
-    (setting: InstrumentSetting) =>
-      (pianoRollStore.instrumentBrowserSetting = setting),
-    [pianoRollStore],
-  )
-
-  const setOpen = useCallback(
-    (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
-    [pianoRollStore],
-  )
 
   const onClickOK = useCallback(() => {
     if (track === undefined) {
@@ -70,18 +46,26 @@ export function useInstrumentBrowser() {
     }
 
     setOpen(false)
-  }, [pianoRollStore, setting, setSetting, track, song])
+  }, [setting, setSetting, track, song, setOpen, setTrackInstrumentAction])
 
   return {
     setting,
     setSetting,
     get isOpen() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.openInstrumentBrowser,
-      )
+      return usePianoRoll().openInstrumentBrowser
     },
     setOpen,
-    presetCategories,
+    get presetCategories() {
+      return useMemo(() => {
+        const presets = range(0, 128).map((programNumber) => ({
+          programNumber,
+        }))
+        return map(
+          groupBy(presets, (p) => getCategoryIndex(p.programNumber)),
+          (presets) => ({ presets }),
+        )
+      }, [])
+    },
     onChangeInstrument: useCallback(
       (programNumber: number) => {
         const channel = track?.channel

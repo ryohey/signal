@@ -1,15 +1,15 @@
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const useDragScrollGesture = (): MouseGesture => {
-  const { pianoRollStore } = useStores()
+  const { scrollBy, setAutoScroll } = usePianoRoll()
   return {
     onMouseDown() {
       observeDrag({
         onMouseMove: (e: MouseEvent) => {
-          pianoRollStore.scrollBy(e.movementX, e.movementY)
-          pianoRollStore.autoScroll = false
+          scrollBy(e.movementX, e.movementY)
+          setAutoScroll(false)
         },
       })
     },

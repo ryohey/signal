@@ -1,16 +1,14 @@
 import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
 import { TrackInstrumentName } from "../TrackList/InstrumentName"
 
+// we still need to use observer to track selectedTrack changes
 export const InstrumentButton: FC = observer(() => {
-  const {
-    pianoRollStore,
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { setSetting, setOpen } = useInstrumentBrowser()
 
   const onClickInstrument = useCallback(() => {
@@ -24,7 +22,7 @@ export const InstrumentButton: FC = observer(() => {
       programNumber: programNumber ?? 0,
     })
     setOpen(true)
-  }, [pianoRollStore, selectedTrack, setOpen, setSetting])
+  }, [selectedTrack, setOpen, setSetting])
 
   if (selectedTrack === undefined) {
     return <></>

@@ -3,7 +3,7 @@ import styled from "@emotion/styled"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { Layout } from "../../Constants"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import CanvasPianoRuler from "./CanvasPianoRuler"
 import { PianoKeys } from "./PianoKeys"
 import { PianoRollCanvas } from "./PianoRollCanvas/PianoRollCanvas"
@@ -36,8 +36,7 @@ const PianoKeyPosition = styled.div`
 
 export const PianoRollStage: FC<PianoRollStageProps> = observer(
   ({ width, height }) => {
-    const { pianoRollStore } = useStores()
-    const { scrollTop } = pianoRollStore
+    const { scrollTop, rulerStore } = usePianoRoll()
 
     const theme = useTheme()
 
@@ -55,7 +54,7 @@ export const PianoRollStage: FC<PianoRollStageProps> = observer(
             borderBottom: `1px solid ${theme.dividerColor}`,
           }}
         >
-          <CanvasPianoRuler rulerStore={pianoRollStore.rulerStore} />
+          <CanvasPianoRuler rulerStore={rulerStore} />
         </RulerPosition>
       </Container>
     )

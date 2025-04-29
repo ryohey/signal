@@ -1,4 +1,5 @@
 import { max, min } from "lodash"
+import { useCallback } from "react"
 import {
   PianoNotesClipboardData,
   isPianoNotesClipboardData,
@@ -322,12 +323,12 @@ export const useSelectAllNotes = () => {
   const { selectedTrack, setSelectedNoteIds } = usePianoRoll()
   const { setSelectedEventIds } = useControlPane()
 
-  return () => {
+  return useCallback(() => {
     if (selectedTrack) {
       setSelectedNoteIds(
         selectedTrack.events.filter(isNoteEvent).map((note) => note.id),
       )
       setSelectedEventIds([])
     }
-  }
+  }, [selectedTrack, setSelectedNoteIds, setSelectedEventIds])
 }

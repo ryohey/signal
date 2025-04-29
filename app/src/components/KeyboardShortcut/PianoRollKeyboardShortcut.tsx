@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { usePasteSelection, useSelectAllNotes } from "../../actions"
 import { usePasteControlSelection } from "../../actions/control"
@@ -16,7 +15,7 @@ import { usePianoNotesKeyboardShortcutActions } from "./pianoNotesKeyboardShortc
 
 const SCROLL_DELTA = 24
 
-export const PianoRollKeyboardShortcut: FC = observer(() => {
+export const PianoRollKeyboardShortcut: FC = () => {
   const { selectedNoteIds, scrollBy, setMouseMode } = usePianoRoll()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const pianoNotesKeyboardShortcutActions =
@@ -94,4 +93,4 @@ export const PianoRollKeyboardShortcut: FC = observer(() => {
       onPaste={onPaste}
     />
   )
-})
+}

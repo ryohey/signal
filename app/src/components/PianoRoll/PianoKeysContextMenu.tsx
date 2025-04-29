@@ -1,22 +1,21 @@
-import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
 import { ContextMenu, ContextMenuProps } from "../ContextMenu/ContextMenu"
 import { KeySignatureDialog } from "../KeySignatureDialog/KeySignatureDialog"
 import { MenuItem } from "../ui/Menu"
 
-export const PianoKeysContextMenu: FC<ContextMenuProps> = observer((props) => {
+export const PianoKeysContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props
-  const { pianoRollStore } = useStores()
+  const { keySignature, setKeySignature } = usePianoRoll()
   const [isKeySignatureDialogOpen, setKeySignatureDialogOpen] = useState(false)
 
   const onClickShowScale = () => {
-    if (pianoRollStore.keySignature === null) {
-      pianoRollStore.keySignature = {
+    if (keySignature === null) {
+      setKeySignature({
         scale: "major",
         key: 0,
-      }
+      })
     }
 
     setKeySignatureDialogOpen(true)
@@ -24,7 +23,7 @@ export const PianoKeysContextMenu: FC<ContextMenuProps> = observer((props) => {
   }
 
   const onClickHideScale = () => {
-    pianoRollStore.keySignature = null
+    setKeySignature(null)
     handleClose()
   }
 
@@ -34,10 +33,7 @@ export const PianoKeysContextMenu: FC<ContextMenuProps> = observer((props) => {
         <MenuItem onClick={onClickShowScale}>
           <Localized name="show-scale" />
         </MenuItem>
-        <MenuItem
-          onClick={onClickHideScale}
-          disabled={pianoRollStore.keySignature === null}
-        >
+        <MenuItem onClick={onClickHideScale} disabled={keySignature === null}>
           <Localized name="hide-scale" />
         </MenuItem>
       </ContextMenu>
@@ -47,4 +43,4 @@ export const PianoKeysContextMenu: FC<ContextMenuProps> = observer((props) => {
       />
     </>
   )
-})
+}

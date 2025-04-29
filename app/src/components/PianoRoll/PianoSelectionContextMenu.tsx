@@ -7,7 +7,7 @@ import {
   useQuantizeSelectedNotes,
   useTransposeSelection,
 } from "../../actions"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -20,8 +20,9 @@ import { MenuDivider, MenuItem } from "../ui/Menu"
 export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
   (props) => {
     const { handleClose } = props
-    const { pianoRollStore } = useStores()
-    const isNoteSelected = pianoRollStore.selectedNoteIds.length > 0
+    const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
+      usePianoRoll()
+    const isNoteSelected = selectedNoteIds.length > 0
 
     const copySelection = useCopySelection()
     const deleteSelection = useDeleteSelection()
@@ -72,12 +73,12 @@ export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
     }
 
     const onClickTranspose = () => {
-      pianoRollStore.openTransposeDialog = true
+      setOpenTransposeDialog(true)
       handleClose()
     }
 
     const onClickVelocity = () => {
-      pianoRollStore.openVelocityDialog = true
+      setOpenVelocityDialog(true)
       handleClose()
     }
 

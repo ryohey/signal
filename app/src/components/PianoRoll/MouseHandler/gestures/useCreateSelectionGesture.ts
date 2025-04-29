@@ -4,15 +4,20 @@ import { Selection } from "../../../../entities/selection/Selection"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
-import { useStores } from "../../../../hooks/useStores"
 
 // 選択範囲外でクリックした場合は選択範囲をリセット
 export const useCreateSelectionGesture = (): MouseGesture => {
   const {
-    pianoRollStore,
-    pianoRollStore: { transform, quantizer, selectedTrack },
-  } = useStores()
+    transform,
+    quantizer,
+    selectedTrack,
+    getLocal,
+    setSelection,
+    setSelectedNoteIds,
+  } = usePianoRoll()
+  let { selection } = usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
@@ -22,7 +27,7 @@ export const useCreateSelectionGesture = (): MouseGesture => {
         return
       }
 
-      const local = pianoRollStore.getLocal(e)
+      const local = getLocal(e)
       const start = transform.getNotePointFractional(local)
       const startPos = local
 
@@ -31,30 +36,28 @@ export const useCreateSelectionGesture = (): MouseGesture => {
       }
 
       setSelectedEventIds([])
-      pianoRollStore.selection = Selection.fromPoints(start, start)
+      setSelection(Selection.fromPoints(start, start))
 
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const offsetPos = Point.add(startPos, delta)
           const end = transform.getNotePointFractional(offsetPos)
-          pianoRollStore.selection = Selection.fromPoints(
+          selection = Selection.fromPoints(
             { ...start, tick: quantizer.round(start.tick) },
             { ...end, tick: quantizer.round(end.tick) },
           )
+          setSelection(selection)
         },
-
         onMouseUp: () => {
-          const { selection } = pianoRollStore
           if (selection === null) {
             return
           }
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
-          pianoRollStore.selectedNoteIds = eventsInSelection(
-            selectedTrack.events,
-            selection,
-          ).map((e) => e.id)
+          setSelectedNoteIds(
+            eventsInSelection(selectedTrack.events, selection).map((e) => e.id),
+          )
         },
       })
     },

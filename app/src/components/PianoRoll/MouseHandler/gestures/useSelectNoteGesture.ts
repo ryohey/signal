@@ -4,20 +4,25 @@ import { Selection } from "../../../../entities/selection/Selection"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
-import { useStores } from "../../../../hooks/useStores"
 
 export const useSelectNoteGesture = (): MouseGesture => {
   const {
-    pianoRollStore,
-    pianoRollStore: { transform, quantizer },
-  } = useStores()
+    transform,
+    quantizer,
+    getLocal,
+    setSelection,
+    selectedTrack,
+    setSelectedNoteIds
+  } = usePianoRoll()
+  let { selection } = usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
   return {
     onMouseDown(e) {
-      const local = pianoRollStore.getLocal(e)
+      const local = getLocal(e)
       const start = transform.getNotePoint(local)
       const startPos = local
 
@@ -26,29 +31,30 @@ export const useSelectNoteGesture = (): MouseGesture => {
       }
 
       setSelectedEventIds([])
-      pianoRollStore.selection = Selection.fromPoints(start, start)
+      selection = Selection.fromPoints(start, start)
+      setSelection(selection)
 
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const offsetPos = Point.add(startPos, delta)
           const end = transform.getNotePoint(offsetPos)
-          pianoRollStore.selection = Selection.fromPoints(start, end)
+          selection = Selection.fromPoints(start, end)
+          setSelection(selection)
         },
 
         onMouseUp: () => {
-          const { selection, selectedTrack } = pianoRollStore
           if (selection === null || selectedTrack === undefined) {
             return
           }
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
-          pianoRollStore.selectedNoteIds = eventsInSelection(
+          setSelectedNoteIds(eventsInSelection(
             selectedTrack.events,
             selection,
-          ).map((e) => e.id)
+          ).map((e) => e.id))
 
-          pianoRollStore.selection = null
+          setSelection(null)
         },
       })
     },

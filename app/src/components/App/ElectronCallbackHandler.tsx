@@ -28,6 +28,7 @@ import {
 } from "../../actions/hotkey"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useHistory } from "../../hooks/useHistory"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
@@ -39,8 +40,8 @@ export const ElectronCallbackHandler: FC = observer(() => {
     songStore: { song },
     authStore: { isLoggedIn },
     rootViewStore,
-    pianoRollStore,
   } = useStores()
+  const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
   const localized = useLocalization()
   const localSongFile = useSongFile()
   const cloudSongFile = useCloudFile()
@@ -166,11 +167,11 @@ export const ElectronCallbackHandler: FC = observer(() => {
       onTransposeUpOctave={() => transposeSelection(12)}
       onTransposeDownOctave={() => transposeSelection(-12)}
       onTranspose={() => {
-        pianoRollStore.openTransposeDialog = true
+        setOpenTransposeDialog(true)
       }}
       onQuantize={quantizeSelectedNotes}
       onVelocity={() => {
-        pianoRollStore.openVelocityDialog = true
+        setOpenVelocityDialog(true)
       }}
       onOpenSetting={() => {
         rootViewStore.openSettingDialog = true

@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react"
 import { useStartNote, useStopNote } from "../actions"
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
+import { usePianoRoll } from "./usePianoRoll"
 
 export function usePreviewNote() {
   const startNote = useStartNote()
@@ -9,9 +10,7 @@ export function usePreviewNote() {
   const [stopNoteTimeout, setStopNoteTimeout] = useState<NodeJS.Timeout | null>(
     null,
   )
-  const selectedTrack = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.selectedTrack,
-  )
+  const { selectedTrack } = usePianoRoll()
   const channel = useMobxSelector(() => selectedTrack?.channel, [selectedTrack])
 
   const previewNoteOff = useCallback(() => {

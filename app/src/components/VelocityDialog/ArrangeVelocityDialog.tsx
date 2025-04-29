@@ -1,17 +1,14 @@
-import { observer } from "mobx-react-lite"
 import { useCallback } from "react"
 import {
   BatchUpdateOperation,
   useArrangeBatchUpdateSelectedNotesVelocity,
 } from "../../actions"
 import { useArrangeView } from "../../hooks/useArrangeView"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { VelocityDialog } from "./VelocityDialog"
 
-export const ArrangeVelocityDialog = observer(() => {
-  const {
-    pianoRollStore: { newNoteVelocity },
-  } = useStores()
+export const ArrangeVelocityDialog = () => {
+  const { newNoteVelocity } = usePianoRoll()
   const { openVelocityDialog, setOpenTransposeDialog } = useArrangeView()
   const arrangeBatchUpdateSelectedNotesVelocity =
     useArrangeBatchUpdateSelectedNotesVelocity()
@@ -40,4 +37,4 @@ export const ArrangeVelocityDialog = observer(() => {
       onClose={onClose}
     />
   )
-})
+}

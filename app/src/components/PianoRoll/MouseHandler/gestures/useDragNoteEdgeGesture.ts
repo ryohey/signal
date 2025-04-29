@@ -1,16 +1,17 @@
 import { useSelectNote } from "../../../../actions"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
-import { useStores } from "../../../../hooks/useStores"
 import { isNoteEvent } from "../../../../track"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 const useDragNoteEdgeGesture =
   (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
     const {
-      pianoRollStore,
-      pianoRollStore: { selectedTrack, selectedNoteIds },
-    } = useStores()
+      selectedTrack, 
+      selectedNoteIds,
+      setLastNoteDuration,
+    } = usePianoRoll()
     const selectNote = useSelectNote()
     const moveDraggableAction = useMoveDraggableGesture()
     const { previewNoteOn, previewNoteOff } = usePreviewNote()
@@ -35,7 +36,7 @@ const useDragNoteEdgeGesture =
           selectNote(noteId)
         }
 
-        const newSelectedNoteIds = pianoRollStore.selectedNoteIds
+        const newSelectedNoteIds = selectedNoteIds
 
         previewNoteOn(note.noteNumber)
 
@@ -57,7 +58,7 @@ const useDragNoteEdgeGesture =
               }
               // save last note duration
               if (oldPosition.tick !== newPosition.tick) {
-                pianoRollStore.lastNoteDuration = newNote.duration
+                setLastNoteDuration(newNote.duration)
               }
               if (oldPosition.noteNumber !== newPosition.noteNumber) {
                 previewNoteOff()
