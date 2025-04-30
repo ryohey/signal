@@ -7,10 +7,9 @@ import {
   TrackNameEvent,
 } from "midifile-ts"
 import { action, computed, makeObservable, observable, transaction } from "mobx"
-import { createModelSchema, list, primitive } from "serializr"
+import { createModelSchema, object, primitive } from "serializr"
 import { bpmToUSecPerBeat } from "../helpers/bpm"
-import { OrderedArray } from "../helpers/OrderedArray"
-import { pojo } from "../helpers/pojo"
+import { TickOrderedArray } from "../helpers/TickOrderedArray"
 import {
   programChangeMidiEvent,
   setTempoMidiEvent,
@@ -39,7 +38,7 @@ export const UNASSIGNED_TRACK_ID = -1 as TrackId
 
 export default class Track {
   id: TrackId = UNASSIGNED_TRACK_ID
-  private readonly _events: OrderedArray<TrackEvent, number>
+  private readonly _events = new TickOrderedArray<TrackEvent>()
   endOfTrack: number = 0
   channel: number | undefined = undefined
 
@@ -48,12 +47,6 @@ export default class Track {
   getEventById = (id: number): TrackEvent | undefined => this._events.get(id)
 
   constructor() {
-    this._events = new OrderedArray<TrackEvent, number>(
-      [],
-      (e) => e.tick,
-      false,
-    )
-
     makeObservable(this, {
       updateEvent: action,
       updateEvents: action,
@@ -332,7 +325,7 @@ export default class Track {
 
 createModelSchema(Track, {
   id: primitive(),
-  events: list(pojo),
+  _events: object(TickOrderedArray),
   lastEventId: primitive(),
   channel: primitive(),
 })

@@ -1,4 +1,6 @@
 import { makeObservable, observable } from "mobx"
+import { createModelSchema, list, map, primitive } from "serializr"
+import { pojo } from "./pojo"
 
 /**
  * A class that efficiently maintains array order using a key extractor
@@ -142,3 +144,9 @@ export class OrderedArray<
     })
   }
 }
+
+createModelSchema(OrderedArray, {
+  array: list(pojo),
+  descending: primitive(),
+  idToIndexMap: map(pojo),
+})
