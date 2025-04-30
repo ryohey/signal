@@ -10,42 +10,17 @@ import { useStores } from "./useStores"
 export function useTempoEditor() {
   const { tempoEditorStore } = useStores()
   const { rulerStore, tickScrollStore } = tempoEditorStore
-
-  const autoScroll = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.autoScroll,
+  const controlPoints = useMobxStore(
+    ({ tempoEditorStore }) => tempoEditorStore.controlPoints,
   )
   const selection = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.selection,
   )
+  const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
   const transform = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.transform,
   )
-  const items = useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)
-  const controlPoints = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.controlPoints,
-  )
-  const scrollLeft = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.scrollLeft,
-  )
-  const quantizer = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.quantizer,
-  )
-  const selectedEventIds = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.selectedEventIds,
-  )
-  const mouseMode = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.mouseMode,
-  )
-  const isQuantizeEnabled = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.isQuantizeEnabled,
-  )
-  const quantize = useMobxStore(
-    ({ tempoEditorStore }) => tempoEditorStore.quantize,
-  )
-  const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
-  const contentWidth = useMobxStore(
-    ({ tempoEditorStore: { tickScrollStore } }) => tickScrollStore.contentWidth,
-  )
+
   const { position: playerPosition } = usePlayer()
 
   const selectionRect = useMemo(
@@ -54,35 +29,59 @@ export function useTempoEditor() {
     [selection, transform],
   )
 
-  const hitTest = useCallback(
-    (point: Point) => {
-      return controlPoints.find((r) => Rect.containsPoint(r, point))?.id
-    },
-    [controlPoints],
-  )
-
   const cursorX = useMemo(
     () => transform.getX(playerPosition),
     [transform, playerPosition],
   )
 
   return {
-    autoScroll,
-    selectionRect,
     controlPoints,
-    hitTest,
-    items,
+    selection,
     transform,
-    scrollLeft,
-    quantizer,
-    isQuantizeEnabled,
-    quantize,
-    selectedEventIds,
-    mouseMode,
+    selectionRect,
     beats,
     cursorX,
-    contentWidth,
     rulerStore,
+    get autoScroll() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.autoScroll)
+    },
+    get items() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)
+    },
+    get scrollLeft() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.scrollLeft)
+    },
+    get quantizer() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.quantizer)
+    },
+    get selectedEventIds() {
+      return useMobxStore(
+        ({ tempoEditorStore }) => tempoEditorStore.selectedEventIds,
+      )
+    },
+    get mouseMode() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.mouseMode)
+    },
+    get isQuantizeEnabled() {
+      return useMobxStore(
+        ({ tempoEditorStore }) => tempoEditorStore.isQuantizeEnabled,
+      )
+    },
+    get quantize() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.quantize)
+    },
+    get contentWidth() {
+      return useMobxStore(
+        ({ tempoEditorStore: { tickScrollStore } }) =>
+          tickScrollStore.contentWidth,
+      )
+    },
+    hitTest: useCallback(
+      (point: Point) => {
+        return controlPoints.find((r) => Rect.containsPoint(r, point))?.id
+      },
+      [controlPoints],
+    ),
     setSelection: useCallback((selection: TempoSelection | null) => {
       tempoEditorStore.selection = selection
     }, []),

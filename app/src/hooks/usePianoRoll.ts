@@ -207,7 +207,10 @@ export function usePianoRoll() {
       [pianoRollStore],
     ),
     setMouseMode: useCallback(
-      (mode: PianoRollMouseMode) => (pianoRollStore.mouseMode = mode),
+      (mode: PianoRollMouseMode) => {
+        pianoRollStore.mouseMode = mode
+        pianoRollStore.notesCursor = mode === "pencil" ? "auto" : "crosshair"
+      },
       [pianoRollStore],
     ),
     setSelection: useCallback(
