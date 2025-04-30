@@ -9,6 +9,10 @@ export function useGhostNotes(trackId: TrackId) {
   const { transform, scrollLeft, canvasWidth } = usePianoRoll()
   const track = useMobxStore(({ song }) => song.getTrack(trackId))
   const events = useMobxSelector(() => track?.events ?? [], [track])
+  const isRhythmTrack = useMobxSelector(
+    () => track?.isRhythmTrack ?? false,
+    [track],
+  )
 
   const windowedEvents = useMemo(
     () =>
@@ -28,7 +32,7 @@ export function useGhostNotes(trackId: TrackId) {
   const notes = useMemo(
     () =>
       windowedEvents.map((e) => {
-        const rect = track?.isRhythmTrack
+        const rect = isRhythmTrack
           ? transform.getDrumRect(e)
           : transform.getRect(e)
         return {
@@ -38,8 +42,8 @@ export function useGhostNotes(trackId: TrackId) {
           isSelected: false,
         }
       }),
-    [windowedEvents, transform, track?.isRhythmTrack],
+    [windowedEvents, transform, isRhythmTrack],
   )
 
-  return { notes, isRhythmTrack: track?.isRhythmTrack ?? false }
+  return { notes, isRhythmTrack }
 }

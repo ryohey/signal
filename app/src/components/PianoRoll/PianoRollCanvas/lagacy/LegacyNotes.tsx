@@ -1,31 +1,15 @@
-import { useTheme } from "@emotion/react"
-import Color from "color"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { colorToVec4 } from "../../../../gl/color"
-import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useNoteColor } from "../../../../hooks/useNoteColor"
+import { useNotes } from "../../../../hooks/useNotes"
 import { PianoNoteItem } from "../../../../stores/PianoRollStore"
-import { trackColorToCSSColor } from "../../../../track/TrackColor"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 
-// we still need to use observer to track selectedTrack changes
-export const LegacyNotes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
-  const { notes, selectedTrack } = usePianoRoll()
-  const theme = useTheme()
-
-  if (selectedTrack === undefined) {
-    return <></>
-  }
-
-  const baseColor = Color(
-    selectedTrack.color !== undefined
-      ? trackColorToCSSColor(selectedTrack.color)
-      : theme.themeColor,
-  )
-  const borderColor = colorToVec4(baseColor.lighten(0.3))
-  const selectedColor = colorToVec4(baseColor.lighten(0.7))
-  const backgroundColor = Color(theme.backgroundColor)
+export const LegacyNotes: FC<{ zIndex: number }> = ({ zIndex }) => {
+  const { notes, isRhythmTrack } = useNotes()
+  const { borderColor, selectedColor, baseColor, backgroundColor } =
+    useNoteColor()
 
   const colorize = (item: PianoNoteItem) => ({
     ...item,
@@ -34,7 +18,7 @@ export const LegacyNotes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
       : colorToVec4(baseColor.mix(backgroundColor, 1 - item.velocity / 127)),
   })
 
-  if (selectedTrack.isRhythmTrack) {
+  if (isRhythmTrack) {
     return (
       <NoteCircles
         strokeColor={borderColor}
@@ -51,4 +35,4 @@ export const LegacyNotes: FC<{ zIndex: number }> = observer(({ zIndex }) => {
       zIndex={zIndex + 0.1}
     />
   )
-})
+}
