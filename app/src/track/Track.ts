@@ -1,6 +1,5 @@
 import isEqual from "lodash/isEqual"
 import omit from "lodash/omit"
-import sortBy from "lodash/sortBy"
 import {
   ControllerEvent,
   ProgramChangeEvent,
@@ -10,6 +9,7 @@ import {
 import { action, computed, makeObservable, observable, transaction } from "mobx"
 import { createModelSchema, list, primitive } from "serializr"
 import { bpmToUSecPerBeat } from "../helpers/bpm"
+import { OrderedArray } from "../helpers/OrderedArray"
 import { pojo } from "../helpers/pojo"
 import {
   programChangeMidiEvent,
@@ -39,15 +39,21 @@ export const UNASSIGNED_TRACK_ID = -1 as TrackId
 
 export default class Track {
   id: TrackId = UNASSIGNED_TRACK_ID
-  events: TrackEvent[] = []
+  private readonly _events: OrderedArray<TrackEvent, number>
+  endOfTrack: number = 0
   channel: number | undefined = undefined
 
   private lastEventId = 0
 
-  getEventById = (id: number): TrackEvent | undefined =>
-    this.events.find((e) => e.id === id)
+  getEventById = (id: number): TrackEvent | undefined => this._events.get(id)
 
   constructor() {
+    this._events = new OrderedArray<TrackEvent, number>(
+      [],
+      (e) => e.tick,
+      false,
+    )
+
     makeObservable(this, {
       updateEvent: action,
       updateEvents: action,
@@ -55,23 +61,23 @@ export default class Track {
       removeEvents: action,
       addEvent: action,
       addEvents: action,
-      sortByTick: action,
       name: computed,
-      endOfTrack: computed,
       programNumber: computed,
       isConductorTrack: computed,
       isRhythmTrack: computed,
       color: computed,
+      events: computed,
       id: observable,
-      events: observable.shallow,
       channel: observable,
+      endOfTrack: observable,
     })
   }
 
-  private _updateEvent<T extends TrackEvent>(
-    id: number,
-    obj: Partial<T>,
-  ): T | null {
+  get events(): TrackEvent[] {
+    return this._events.getArray()
+  }
+
+  updateEvent<T extends TrackEvent>(id: number, obj: Partial<T>): T | null {
     const index = this.events.findIndex((e) => e.id === id)
     if (index < 0) {
       console.warn(`unknown id: ${id}`)
@@ -91,24 +97,15 @@ export default class Track {
     return newObj
   }
 
-  updateEvent<T extends TrackEvent>(id: number, obj: Partial<T>): T | null {
-    const result = this._updateEvent(id, obj)
-    if (result) {
-      this.sortByTick()
-    }
-    return result
-  }
-
   updateEvents<T extends TrackEvent>(events: Partial<T>[]) {
     transaction(() => {
       events.forEach((event) => {
         if (event.id === undefined) {
           return
         }
-        this._updateEvent(event.id, event)
+        this.updateEvent(event.id, event)
       })
     })
-    this.sortByTick()
   }
 
   removeEvent(id: number) {
@@ -116,14 +113,12 @@ export default class Track {
   }
 
   removeEvents(ids: number[]) {
-    this.events = this.events.filter((e) => !ids.includes(e.id))
+    ids.forEach((id) => {
+      this._events.remove(id)
+    })
   }
 
-  // ソート、通知を行わない内部用の addEvent
-  // add the event without sorting, notification
-  private _addEvent<T extends TrackEvent>(
-    e: Omit<T, "id"> & { subtype?: string },
-  ): T {
+  addEvent<T extends TrackEvent>(e: Omit<T, "id"> & { subtype?: string }): T {
     if (!("tick" in e) || isNaN(e.tick)) {
       throw new Error("invalid event is added")
     }
@@ -134,14 +129,9 @@ export default class Track {
       ...omit(e, ["deltaTime", "channel"]),
       id: this.lastEventId++,
     } as T
-    this.events.push(newEvent)
+    this._events.add(newEvent)
+    this.updateEndOfTrack(newEvent)
     return newEvent
-  }
-
-  addEvent<T extends TrackEvent>(e: Omit<T, "id">): T {
-    const ev = this._addEvent(e)
-    this.didAddEvent()
-    return ev
   }
 
   addEvents<T extends TrackEvent>(events: Omit<T, "id">[]): T[] {
@@ -150,18 +140,9 @@ export default class Track {
 
       return events
         .filter((e) => (dontMoveChannelEvent ? e.type !== "channel" : true))
-        .map((e) => this._addEvent(e))
+        .map((e) => this.addEvent(e))
     })
-    this.didAddEvent()
     return result
-  }
-
-  didAddEvent() {
-    this.sortByTick()
-  }
-
-  sortByTick() {
-    this.events = sortBy(this.events, "tick")
   }
 
   transaction<T>(func: (track: Track) => T) {
@@ -213,6 +194,15 @@ export default class Track {
     )
   }
 
+  private updateEndOfTrack(newEvent: TrackEvent) {
+    if (isNoteEvent(newEvent)) {
+      this.endOfTrack = Math.max(
+        this.endOfTrack,
+        newEvent.tick + newEvent.duration,
+      )
+    }
+  }
+
   private setControllerValue = (
     controllerType: number,
     tick: number,
@@ -242,17 +232,9 @@ export default class Track {
   get name() {
     return getTrackNameEvent(this.events)?.text
   }
+
   get programNumber() {
     return getProgramNumberEvent(this.events)?.value
-  }
-  get endOfTrack() {
-    let maxTick = 0
-    // Use for loop instead of map/filter to avoid the error `Maximum call stack size exceeded`
-    for (const e of this.events) {
-      const tick = isNoteEvent(e) ? e.tick + e.duration : e.tick
-      maxTick = Math.max(maxTick, tick)
-    }
-    return maxTick
   }
 
   get color(): SignalTrackColorEvent | undefined {
