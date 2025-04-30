@@ -9,7 +9,6 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import {
   panMidiEvent,
   programChangeMidiEvent,
