@@ -8,12 +8,12 @@ import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
 export const useCreateNoteGesture = (): MouseGesture => {
   const {
-    transform, 
-    selectedTrack, 
-    quantizer, 
+    transform,
+    selectedTrack,
+    quantizer,
     newNoteVelocity,
     lastNoteDuration,
-    getLocal
+    getLocal,
   } = usePianoRoll()
   const { timebase } = useSong()
   const { pushHistory } = useHistory()

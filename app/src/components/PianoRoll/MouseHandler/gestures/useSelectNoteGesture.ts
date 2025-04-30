@@ -14,7 +14,7 @@ export const useSelectNoteGesture = (): MouseGesture => {
     getLocal,
     setSelection,
     selectedTrack,
-    setSelectedNoteIds
+    setSelectedNoteIds,
   } = usePianoRoll()
   let { selection } = usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
@@ -49,10 +49,9 @@ export const useSelectNoteGesture = (): MouseGesture => {
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
-          setSelectedNoteIds(eventsInSelection(
-            selectedTrack.events,
-            selection,
-          ).map((e) => e.id))
+          setSelectedNoteIds(
+            eventsInSelection(selectedTrack.events, selection).map((e) => e.id),
+          )
 
           setSelection(null)
         },

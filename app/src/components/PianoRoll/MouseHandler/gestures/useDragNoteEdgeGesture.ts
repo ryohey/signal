@@ -7,11 +7,8 @@ import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 const useDragNoteEdgeGesture =
   (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
-    const {
-      selectedTrack, 
-      selectedNoteIds,
-      setLastNoteDuration,
-    } = usePianoRoll()
+    const { selectedTrack, selectedNoteIds, setLastNoteDuration } =
+      usePianoRoll()
     const selectNote = useSelectNote()
     const moveDraggableAction = useMoveDraggableGesture()
     const { previewNoteOn, previewNoteOff } = usePreviewNote()

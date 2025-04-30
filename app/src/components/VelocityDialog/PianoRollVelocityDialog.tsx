@@ -8,7 +8,8 @@ import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { VelocityDialog } from "./VelocityDialog"
 
 export const PianoRollVelocityDialog = observer(() => {
-  const { openVelocityDialog, newNoteVelocity, setOpenVelocityDialog } = usePianoRoll()
+  const { openVelocityDialog, newNoteVelocity, setOpenVelocityDialog } =
+    usePianoRoll()
   const batchUpdateSelectedNotesVelocity = useBatchUpdateSelectedNotesVelocity()
 
   const onClose = useCallback(

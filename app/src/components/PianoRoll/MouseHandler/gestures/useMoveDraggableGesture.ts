@@ -46,7 +46,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
     getDraggablePosition,
     getLocal,
     getDraggableArea,
-    updateDraggable
+    updateDraggable,
   } = usePianoRoll()
   const { pushHistory } = useHistory()
 
@@ -73,10 +73,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
           const quantize = !e2.shiftKey && isQuantizeEnabled
           const minLength = quantize ? quantizer.unit : MIN_LENGTH
 
-          const draggableArea = getDraggableArea(
-            draggable,
-            minLength,
-          )
+          const draggableArea = getDraggableArea(draggable, minLength)
 
           if (draggableArea === null) {
             return
@@ -117,10 +114,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
                 return null
               }
 
-              const subDraggableArea = getDraggableArea(
-                subDraggable,
-                minLength,
-              )
+              const subDraggableArea = getDraggableArea(subDraggable, minLength)
 
               if (subDraggableArea === null) {
                 return null
