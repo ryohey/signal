@@ -1,10 +1,9 @@
-import { observer } from "mobx-react-lite"
 import { useCallback } from "react"
 import { useTransposeSelection } from "../../actions"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { TransposeDialog } from "./TransposeDialog"
 
-export const PianoRollTransposeDialog = observer(() => {
+export const PianoRollTransposeDialog = () => {
   const { openTransposeDialog, setOpenTransposeDialog } = usePianoRoll()
   const transposeSelection = useTransposeSelection()
 
@@ -28,4 +27,4 @@ export const PianoRollTransposeDialog = observer(() => {
       onClickOK={onClickOK}
     />
   )
-})
+}

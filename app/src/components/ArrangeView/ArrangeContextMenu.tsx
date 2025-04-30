@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
 import {
   useArrangeCopySelection,
@@ -17,7 +16,7 @@ import {
 } from "../ContextMenu/ContextMenu"
 import { MenuDivider, MenuItem } from "../ui/Menu"
 
-export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
+export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props
   const { selectedEventIds, setOpenVelocityDialog, setOpenTransposeDialog } =
     useArrangeView()
@@ -131,4 +130,4 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = observer((props) => {
       </MenuItem>
     </ContextMenu>
   )
-})
+}

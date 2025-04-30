@@ -1,6 +1,5 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
-import { observer } from "mobx-react-lite"
 import React, { FC, useCallback, useState } from "react"
 import { Layout } from "../../Constants"
 import { Point } from "../../entities/geometry/Point"
@@ -8,8 +7,8 @@ import { KeySignature } from "../../entities/scale/KeySignature"
 import { noteNameWithOctString } from "../../helpers/noteNumberString"
 import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
-import { usePreviewNote } from "../../hooks/usePreviewNote"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePreviewNote } from "../../hooks/usePreviewNote"
 import { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { PianoKeysContextMenu } from "./PianoKeysContextMenu"
@@ -204,7 +203,7 @@ function drawKeys(
   ctx.restore()
 }
 
-export const PianoKeys: FC = observer(() => {
+export const PianoKeys: FC = () => {
   const theme = useTheme()
   const {
     keySignature,
@@ -299,4 +298,4 @@ export const PianoKeys: FC = observer(() => {
       <PianoKeysContextMenu {...menuProps} />
     </>
   )
-})
+}

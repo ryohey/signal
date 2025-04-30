@@ -1,6 +1,5 @@
 import { useTheme } from "@emotion/react"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { observer } from "mobx-react-lite"
 import React, { MouseEventHandler, useCallback, useMemo } from "react"
 import { useCreateOrUpdateControlEventsValue } from "../../../actions/control"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
@@ -37,139 +36,136 @@ export interface LineGraphProps<T extends ControllerEvent | PitchBendEvent> {
   axisLabelFormatter?: (value: number) => string
 }
 
-const LineGraph = observer(
-  <T extends ControllerEvent | PitchBendEvent>({
-    maxValue,
-    events,
-    eventType,
-    width,
-    height,
-    lineWidth = 2,
-    circleRadius = 4,
-    axis,
-    axisLabelFormatter = (v) => v.toString(),
-  }: LineGraphProps<T>) => {
-    const { scrollLeft, transform, cursor, mouseMode } = useControlPane()
-    const theme = useTheme()
-    const createOrUpdateControlEventsValue =
-      useCreateOrUpdateControlEventsValue()
-    const handlePencilMouseDown = usePencilGesture()
-    const dragSelectionGesture = useDragSelectionGesture()
-    const createSelectionGesture = useCreateSelectionGesture()
+const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
+  maxValue,
+  events,
+  eventType,
+  width,
+  height,
+  lineWidth = 2,
+  circleRadius = 4,
+  axis,
+  axisLabelFormatter = (v) => v.toString(),
+}: LineGraphProps<T>) => {
+  const { scrollLeft, transform, cursor, mouseMode } = useControlPane()
+  const theme = useTheme()
+  const createOrUpdateControlEventsValue = useCreateOrUpdateControlEventsValue()
+  const handlePencilMouseDown = usePencilGesture()
+  const dragSelectionGesture = useDragSelectionGesture()
+  const createSelectionGesture = useCreateSelectionGesture()
 
-    const controlTransform = useMemo(
-      () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
-      [transform.horizontalId, maxValue, height, lineWidth],
-    )
+  const controlTransform = useMemo(
+    () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
+    [transform.horizontalId, maxValue, height, lineWidth],
+  )
 
-    const items = events.map((e) => ({
-      id: e.id,
-      ...controlTransform.toPosition(e.tick, e.value),
-    }))
+  const items = events.map((e) => ({
+    id: e.id,
+    ...controlTransform.toPosition(e.tick, e.value),
+  }))
 
-    const controlPoints = items.map((p) => ({
-      ...pointToCircleRect(p, circleRadius),
-      id: p.id,
-    }))
+  const controlPoints = items.map((p) => ({
+    ...pointToCircleRect(p, circleRadius),
+    id: p.id,
+  }))
 
-    const hitTest = useCallback(
-      (point: Point) =>
-        controlPoints.find((r) => Rect.containsPoint(r, point))?.id,
-      [controlPoints],
-    )
+  const hitTest = useCallback(
+    (point: Point) =>
+      controlPoints.find((r) => Rect.containsPoint(r, point))?.id,
+    [controlPoints],
+  )
 
-    const getLocal = (e: MouseEvent): Point => ({
-      x: e.offsetX + scrollLeft,
-      y: e.offsetY,
-    })
+  const getLocal = (e: MouseEvent): Point => ({
+    x: e.offsetX + scrollLeft,
+    y: e.offsetY,
+  })
 
-    const pencilMouseDown: MouseEventHandler = useCallback(
-      (ev) => {
-        const local = getLocal(ev.nativeEvent)
+  const pencilMouseDown: MouseEventHandler = useCallback(
+    (ev) => {
+      const local = getLocal(ev.nativeEvent)
 
-        handlePencilMouseDown.onMouseDown(
+      handlePencilMouseDown.onMouseDown(
+        ev.nativeEvent,
+        local,
+        controlTransform,
+        eventType,
+      )
+    },
+    [scrollLeft, controlTransform, eventType, handlePencilMouseDown],
+  )
+
+  const selectionMouseDown: MouseEventHandler = useCallback(
+    (ev) => {
+      const local = getLocal(ev.nativeEvent)
+      const hitEventId = hitTest(local)
+
+      if (hitEventId !== undefined) {
+        dragSelectionGesture.onMouseDown(
+          ev.nativeEvent,
+          hitEventId,
+          local,
+          controlTransform,
+        )
+      } else {
+        createSelectionGesture.onMouseDown(
           ev.nativeEvent,
           local,
           controlTransform,
-          eventType,
+          (s) =>
+            events
+              .filter(isEventInRange(Range.create(s.fromTick, s.toTick)))
+              .map((e) => e.id),
         )
-      },
-      [scrollLeft, controlTransform, eventType, handlePencilMouseDown],
-    )
+      }
+    },
+    [
+      controlTransform,
+      scrollLeft,
+      events,
+      eventType,
+      hitTest,
+      dragSelectionGesture,
+      createSelectionGesture,
+    ],
+  )
 
-    const selectionMouseDown: MouseEventHandler = useCallback(
-      (ev) => {
-        const local = getLocal(ev.nativeEvent)
-        const hitEventId = hitTest(local)
+  const onMouseDown =
+    mouseMode === "pencil" ? pencilMouseDown : selectionMouseDown
 
-        if (hitEventId !== undefined) {
-          dragSelectionGesture.onMouseDown(
-            ev.nativeEvent,
-            hitEventId,
-            local,
-            controlTransform,
-          )
-        } else {
-          createSelectionGesture.onMouseDown(
-            ev.nativeEvent,
-            local,
-            controlTransform,
-            (s) =>
-              events
-                .filter(isEventInRange(Range.create(s.fromTick, s.toTick)))
-                .map((e) => e.id),
-          )
-        }
-      },
-      [
-        controlTransform,
-        scrollLeft,
-        events,
-        eventType,
-        hitTest,
-        dragSelectionGesture,
-        createSelectionGesture,
-      ],
-    )
+  const onClickAxis = useCallback(
+    (value: number) => {
+      const event = ValueEventType.getEventFactory(eventType)(value)
+      createOrUpdateControlEventsValue(event)
+    },
+    [eventType, createOrUpdateControlEventsValue],
+  )
 
-    const onMouseDown =
-      mouseMode === "pencil" ? pencilMouseDown : selectionMouseDown
+  const { onContextMenu, menuProps } = useContextMenu()
 
-    const onClickAxis = useCallback(
-      (value: number) => {
-        const event = ValueEventType.getEventFactory(eventType)(value)
-        createOrUpdateControlEventsValue(event)
-      },
-      [eventType, createOrUpdateControlEventsValue],
-    )
-
-    const { onContextMenu, menuProps } = useContextMenu()
-
-    return (
-      <div
-        style={{
-          display: "flex",
-        }}
-      >
-        <GraphAxis
-          values={axis}
-          valueFormatter={axisLabelFormatter}
-          onClick={onClickAxis}
-        />
-        <LineGraphCanvas
-          style={{ cursor, backgroundColor: theme.editorBackgroundColor }}
-          onMouseDown={onMouseDown}
-          onContextMenu={onContextMenu}
-          width={width}
-          height={height}
-          maxValue={maxValue}
-          controlPoints={controlPoints}
-          items={items}
-        />
-        <ControlSelectionContextMenu {...menuProps} />
-      </div>
-    )
-  },
-)
+  return (
+    <div
+      style={{
+        display: "flex",
+      }}
+    >
+      <GraphAxis
+        values={axis}
+        valueFormatter={axisLabelFormatter}
+        onClick={onClickAxis}
+      />
+      <LineGraphCanvas
+        style={{ cursor, backgroundColor: theme.editorBackgroundColor }}
+        onMouseDown={onMouseDown}
+        onContextMenu={onContextMenu}
+        width={width}
+        height={height}
+        maxValue={maxValue}
+        controlPoints={controlPoints}
+        items={items}
+      />
+      <ControlSelectionContextMenu {...menuProps} />
+    </div>
+  )
+}
 
 export default React.memo(LineGraph)

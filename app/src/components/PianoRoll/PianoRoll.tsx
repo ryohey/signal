@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
@@ -36,7 +35,7 @@ const Beta = styled.div`
   height: calc(100% - 17px);
 `
 
-const PianoRollWrapper: FC = observer(() => {
+const PianoRollWrapper: FC = () => {
   const {
     scaleX,
     scaleY,
@@ -51,7 +50,6 @@ const PianoRollWrapper: FC = observer(() => {
     setScrollTopInPixels,
     setScrollLeftInPixels,
     scrollBy,
-    setMouseMode,
     setScaleX,
     setScaleY,
   } = usePianoRoll()
@@ -154,6 +152,6 @@ const PianoRollWrapper: FC = observer(() => {
       />
     </Parent>
   )
-})
+}
 
 export default PianoRollWrapper
