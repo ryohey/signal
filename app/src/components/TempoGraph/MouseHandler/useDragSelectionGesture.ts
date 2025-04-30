@@ -17,7 +17,8 @@ export const useDragSelectionGesture = (): MouseGesture<
 > => {
   const song = useSong()
   const { pushHistory } = useHistory()
-  const { selectedEventIds, setSelectedEventIds, quantizer } = useTempoEditor()
+  const { setSelectedEventIds, quantizer } = useTempoEditor()
+  let { selectedEventIds } = useTempoEditor()
 
   return {
     onMouseDown(
@@ -35,7 +36,8 @@ export const useDragSelectionGesture = (): MouseGesture<
       pushHistory()
 
       if (!selectedEventIds.includes(hitEventId)) {
-        setSelectedEventIds([hitEventId])
+        selectedEventIds = [hitEventId]
+        setSelectedEventIds(selectedEventIds)
       }
 
       const events = selectedEventIds
