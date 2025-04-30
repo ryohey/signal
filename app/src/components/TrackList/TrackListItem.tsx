@@ -14,8 +14,8 @@ import {
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
-import { useRouter } from "../../hooks/useRouter"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import Track from "../../track/Track"
@@ -147,7 +147,7 @@ const ControlButton = styled.div`
     height: 1.1rem;
   }
 
-  &[data-selected="true"] {
+  &[data-active="true"] {
     color: var(--color-text);
   }
 `
