@@ -45,6 +45,9 @@ export function useTempoEditor() {
     get autoScroll() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.autoScroll)
     },
+    get cursor() {
+      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.cursor)
+    },
     get items() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)
     },
