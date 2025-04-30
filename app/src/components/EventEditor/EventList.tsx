@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { observer } from "mobx-react-lite"
-import React, { FC, useCallback, useMemo, useRef } from "react"
+import React, { FC, useCallback, useRef } from "react"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import { Layout } from "../../Constants"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
 import { TrackEvent } from "../../track"
 import { EventListItem } from "./EventListItem"
@@ -39,19 +38,8 @@ export const Cell = styled.div`
   }
 `
 
-// we still need to use observer to track selectedTrack changes
-const EventList: FC = observer(() => {
-  const { selectedTrack, selectedNoteIds: selectedEventIds = [] } =
-    usePianoRoll()
-
-  const events = useMemo(() => {
-    const { events = [] } = selectedTrack || {}
-    if (selectedEventIds.length > 0) {
-      return events.filter((event) => selectedEventIds.indexOf(event.id) >= 0)
-    }
-    return events
-  }, [selectedTrack?.events, selectedEventIds])
-
+const EventList: FC = () => {
+  const { events } = useEventList()
   const ref = useRef<HTMLDivElement>(null)
   const size = useComponentSize(ref)
 
@@ -85,7 +73,7 @@ const EventList: FC = observer(() => {
       </FixedSizeList>
     </Container>
   )
-})
+}
 
 const ItemRenderer = ({ index, style, data }: ListChildComponentProps) => {
   const { events, setSelectedEventIds } = data
