@@ -1,3 +1,4 @@
+import { transaction } from "mobx"
 import { Point } from "../../../../entities/geometry/Point"
 import { Range } from "../../../../entities/geometry/Range"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
@@ -130,19 +131,21 @@ export const useMoveDraggableGesture = (): MouseGesture<
             pushHistory()
           }
 
-          updateDraggable(draggable, newPosition)
+          transaction(() => {
+            updateDraggable(draggable, newPosition)
 
-          subDraggables.forEach((subDraggable, i) => {
-            const subDraggablePosition = newSubDraggablePositions[i]
+            subDraggables.forEach((subDraggable, i) => {
+              const subDraggablePosition = newSubDraggablePositions[i]
 
-            if (
-              subDraggablePosition === null ||
-              subDraggablePosition === null
-            ) {
-              return
-            }
+              if (
+                subDraggablePosition === null ||
+                subDraggablePosition === null
+              ) {
+                return
+              }
 
-            updateDraggable(subDraggable, subDraggablePosition)
+              updateDraggable(subDraggable, subDraggablePosition)
+            })
           })
 
           callback?.onChange?.(e2, {
