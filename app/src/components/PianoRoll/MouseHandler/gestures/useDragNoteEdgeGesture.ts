@@ -33,7 +33,7 @@ const useDragNoteEdgeGesture =
           selectNote(noteId)
         }
 
-        const newSelectedNoteIds = selectedNoteIds
+        const newSelectedNoteIds = isSelected ? selectedNoteIds : [noteId]
 
         previewNoteOn(note.noteNumber)
 
