@@ -17,6 +17,8 @@ export const useExportSong = () => {
   const dialog = useDialog()
 
   return async (format: "WAV" | "MP3") => {
+    song.updateEndOfSong()
+
     if (!canExport(song)) {
       await dialog.show({
         title: localized["export"],

@@ -123,7 +123,7 @@ export default class Track {
       id: this.lastEventId++,
     } as T
     this._events.add(newEvent)
-    this.updateEndOfTrack(newEvent)
+    this.extendEndOfTrack(newEvent)
     return newEvent
   }
 
@@ -187,7 +187,17 @@ export default class Track {
     )
   }
 
-  private updateEndOfTrack(newEvent: TrackEvent) {
+  updateEndOfTrack() {
+    let maxTick = 0
+    // Use for loop instead of map/filter to avoid the error `Maximum call stack size exceeded`
+    for (const e of this.events) {
+      const tick = isNoteEvent(e) ? e.tick + e.duration : e.tick
+      maxTick = Math.max(maxTick, tick)
+    }
+    this.endOfTrack = maxTick
+  }
+
+  private extendEndOfTrack(newEvent: TrackEvent) {
     if (isNoteEvent(newEvent)) {
       this.endOfTrack = Math.max(
         this.endOfTrack,
@@ -328,4 +338,5 @@ createModelSchema(Track, {
   _events: object(TickOrderedArray),
   lastEventId: primitive(),
   channel: primitive(),
+  endOfTrack: primitive(),
 })
