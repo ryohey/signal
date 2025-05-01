@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC, ReactNode } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -56,14 +55,12 @@ const HotKey: FC<HotKeyProps> = ({ hotKeys, text }) => {
   )
 }
 
-export const HelpDialog: FC = observer(() => {
-  const { rootViewStore } = useStores()
-  const isOpen = rootViewStore.openHelp
-
-  const close = () => (rootViewStore.openHelp = false)
+export const HelpDialog: FC = () => {
+  const { openHelpDialog, setOpenHelpDialog } = useRootView()
+  const close = () => setOpenHelpDialog(false)
 
   return (
-    <Dialog open={isOpen} onOpenChange={close}>
+    <Dialog open={openHelpDialog} onOpenChange={close}>
       <DialogTitle>
         <Localized name="help" />
       </DialogTitle>
@@ -178,4 +175,4 @@ export const HelpDialog: FC = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}

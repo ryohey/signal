@@ -15,16 +15,16 @@ import {
 import { hasFSAccess } from "../../actions/file"
 import { useHistory } from "../../hooks/useHistory"
 import { usePlayer } from "../../hooks/usePlayer"
+import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
-import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
 import { FileInput } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
 export const GlobalKeyboardShortcut: FC = () => {
-  const { rootViewStore } = useStores()
+  const { setOpenHelpDialog } = useRootView()
   const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
   const song = useSong()
@@ -115,7 +115,7 @@ export const GlobalKeyboardShortcut: FC = () => {
           {
             code: "Slash",
             shiftKey: true,
-            run: () => (rootViewStore.openHelp = true),
+            run: () => setOpenHelpDialog(true),
           },
           // Stop (Enter)
           { code: "Enter", run: stop },

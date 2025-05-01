@@ -1,15 +1,18 @@
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
-import { ChangeEvent } from "react"
+import { ChangeEvent, useCallback } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
 import { emptySong } from "../song"
+import { useMobxStore } from "./useMobxSelector"
+import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 export const useCloudFile = () => {
-  const { rootViewStore } = useStores()
+  const { setOpenCloudFileDialog, setOpenPublishDialog } = useRootView()
+  const { cloudFileStore } = useStores()
   const song = useSong()
   const toast = useToast()
   const prompt = usePrompt()
@@ -90,6 +93,42 @@ export const useCloudFile = () => {
   }
 
   return {
+    get isLoading() {
+      return useMobxStore(({ cloudFileStore }) => cloudFileStore.isLoading)
+    },
+    get dateType() {
+      return useMobxStore(({ cloudFileStore }) => cloudFileStore.dateType)
+    },
+    get files() {
+      return useMobxStore(({ cloudFileStore }) => cloudFileStore.files)
+    },
+    get selectedColumn() {
+      return useMobxStore(({ cloudFileStore }) => cloudFileStore.selectedColumn)
+    },
+    get sortAscending() {
+      return useMobxStore(({ cloudFileStore }) => cloudFileStore.sortAscending)
+    },
+    setDateType: useCallback(
+      (type: "created" | "updated") => {
+        cloudFileStore.dateType = type
+      },
+      [cloudFileStore],
+    ),
+    setSelectedColumn: useCallback(
+      (column: "name" | "date") => {
+        cloudFileStore.selectedColumn = column
+      },
+      [cloudFileStore],
+    ),
+    setSortAscending: useCallback(
+      (ascending: boolean) => {
+        cloudFileStore.sortAscending = ascending
+      },
+      [cloudFileStore],
+    ),
+    loadFiles: useCallback(() => {
+      cloudFileStore.load()
+    }, [cloudFileStore]),
     async createNewSong() {
       try {
         if (!(await saveIfNeeded())) {
@@ -108,7 +147,7 @@ export const useCloudFile = () => {
         if (!(await saveIfNeeded())) {
           return
         }
-        rootViewStore.openCloudFileDialog = true
+        setOpenCloudFileDialog(true)
       } catch (e) {
         toast.error((e as Error).message)
       }
@@ -184,7 +223,7 @@ export const useCloudFile = () => {
       }
     },
     async publishSong() {
-      rootViewStore.openPublishDialog = true
+      setOpenPublishDialog(true)
     },
   }
 }

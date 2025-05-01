@@ -4,7 +4,7 @@ import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import React, { FC, useRef } from "react"
 import { Layout } from "../../Constants"
 import { useControlPane } from "../../hooks/useControlPane"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
 import { ControlName } from "./ControlName"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
@@ -66,7 +66,7 @@ const Toolbar = styled.div`
 `
 
 const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
-  const { rootViewStore } = useStores()
+  const { setOpenControlSettingDialog } = useRootView()
   const { controlModes } = useControlPane()
 
   return (
@@ -83,7 +83,7 @@ const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
         </TabButton>
       ))}
       <TabButtonBase
-        onClick={() => (rootViewStore.openControlSettingDialog = true)}
+        onClick={() => setOpenControlSettingDialog(true)}
       >
         <DotsHorizontalIcon style={{ width: "1rem" }} />
       </TabButtonBase>

@@ -29,6 +29,7 @@ import {
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useHistory } from "../../hooks/useHistory"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useRootView } from "../../hooks/useRootView"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
@@ -39,8 +40,8 @@ export const ElectronCallbackHandler: FC = observer(() => {
   const {
     songStore: { song },
     authStore: { isLoggedIn },
-    rootViewStore,
   } = useStores()
+  const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
   const localized = useLocalization()
   const localSongFile = useSongFile()
@@ -174,10 +175,10 @@ export const ElectronCallbackHandler: FC = observer(() => {
         setOpenVelocityDialog(true)
       }}
       onOpenSetting={() => {
-        rootViewStore.openSettingDialog = true
+        setOpenSettingDialog(true)
       }}
       onOpenHelp={() => {
-        rootViewStore.openHelp = true
+        setOpenHelpDialog(true)
       }}
       onBrowserSignInCompleted={async ({ credential: credentialJSON }) => {
         const credential = createCredential(credentialJSON)
