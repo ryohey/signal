@@ -1,5 +1,5 @@
 import { makeObservable, observable } from "mobx"
-import { createModelSchema, list, map, primitive } from "serializr"
+import { createModelSchema, list, mapAsArray, primitive } from "serializr"
 import { pojo } from "./pojo"
 
 /**
@@ -30,7 +30,7 @@ export class OrderedArray<
     })
   }
 
-  getArray(): ReadonlyArray<T> {
+  getArray(): readonly T[] {
     return this.array
   }
 
@@ -147,5 +147,5 @@ export class OrderedArray<
 createModelSchema(OrderedArray, {
   array: list(pojo),
   descending: primitive(),
-  lookupMap: map(pojo),
+  lookupMap: mapAsArray(pojo, "id"),
 })
