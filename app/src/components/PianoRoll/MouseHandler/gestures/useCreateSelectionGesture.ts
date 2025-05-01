@@ -54,6 +54,12 @@ export const useCreateSelectionGesture = (): MouseGesture => {
             return
           }
 
+          if (Selection.isEmpty(selection)) {
+            setSelection(null)
+            setSelectedNoteIds([])
+            return
+          }
+
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
           setSelectedNoteIds(
