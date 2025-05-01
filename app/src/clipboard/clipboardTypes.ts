@@ -23,7 +23,7 @@ export const isArrangeNotesClipboardData = (
 
 export interface ControlEventsClipboardData {
   type: "control_events"
-  events: TrackEvent[]
+  events: readonly TrackEvent[]
 }
 
 export const isControlEventsClipboardData = (

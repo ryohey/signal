@@ -66,7 +66,7 @@ export default class Track {
     })
   }
 
-  get events(): TrackEvent[] {
+  get events(): readonly TrackEvent[] {
     return this._events.getArray()
   }
 

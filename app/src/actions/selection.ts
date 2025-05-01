@@ -16,7 +16,10 @@ import clipboard from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
 import { useStartNote, useStopNote } from "./player"
 
-export function eventsInSelection(events: TrackEvent[], selection: Selection) {
+export function eventsInSelection(
+  events: readonly TrackEvent[],
+  selection: Selection,
+) {
   const selectionRect = {
     x: selection.fromTick,
     width: selection.toTick - selection.fromTick,

@@ -24,29 +24,31 @@ export const isTickBefore =
   <T extends { tick: number }>(e: T) =>
     e.tick <= tick
 
-export const getVolume = (events: TrackEvent[], tick: number) =>
+export const getVolume = (events: readonly TrackEvent[], tick: number) =>
   getLast(events.filter(isVolumeEvent).filter(isTickBefore(tick)))?.value
 
-export const getPan = (events: TrackEvent[], tick: number) =>
+export const getPan = (events: readonly TrackEvent[], tick: number) =>
   getLast(events.filter(isPanEvent).filter(isTickBefore(tick)))?.value
 
-export const getTrackNameEvent = (events: TrackEvent[]) =>
+export const getTrackNameEvent = (events: readonly TrackEvent[]) =>
   getLast(events.filter(isTrackNameEvent))
 
-export const getTempoEvent = (events: TrackEvent[], tick: number) =>
+export const getTempoEvent = (events: readonly TrackEvent[], tick: number) =>
   getLast(events.filter(isSetTempoEvent).filter(isTickBefore(tick)))
 
-export const getTimeSignatureEvent = (events: TrackEvent[], tick: number) =>
-  getLast(events.filter(isTimeSignatureEvent).filter(isTickBefore(tick)))
+export const getTimeSignatureEvent = (
+  events: readonly TrackEvent[],
+  tick: number,
+) => getLast(events.filter(isTimeSignatureEvent).filter(isTickBefore(tick)))
 
-export const getProgramNumberEvent = (events: TrackEvent[]) =>
+export const getProgramNumberEvent = (events: readonly TrackEvent[]) =>
   getLast(events.filter(isProgramChangeEvent))
 
-export const getEndOfTrackEvent = (events: TrackEvent[]) =>
+export const getEndOfTrackEvent = (events: readonly TrackEvent[]) =>
   getLast(events.filter(isEndOfTrackEvent))
 
 export const getTempo = (
-  events: TrackEvent[],
+  events: readonly TrackEvent[],
   tick: number,
 ): number | undefined => {
   const e = getTempoEvent(events, tick)
@@ -57,7 +59,10 @@ export const getTempo = (
 }
 
 // collect events which will be retained in the synthesizer
-export const getStatusEvents = (events: TrackEvent[], tick: number) => {
+export const getStatusEvents = (
+  events: readonly TrackEvent[],
+  tick: number,
+) => {
   const controlEvents = events
     .filter(isControllerEvent)
     .filter(isTickBefore(tick))

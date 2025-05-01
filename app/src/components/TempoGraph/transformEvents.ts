@@ -3,7 +3,7 @@ import { isSetTempoEvent, TrackEvent } from "../../track"
 import { TempoGraphItem } from "./TempoGraphItem"
 
 export const transformEvents = (
-  events: TrackEvent[],
+  events: readonly TrackEvent[],
   transform: TempoCoordTransform,
   maxX: number,
 ): TempoGraphItem[] => {
