@@ -82,6 +82,7 @@ export default class Track {
       return null
     }
     this._events.update(id, newObj)
+    this.extendEndOfTrack(newObj)
 
     if (process.env.NODE_ENV !== "production") {
       validateMidiEvent(newObj)
