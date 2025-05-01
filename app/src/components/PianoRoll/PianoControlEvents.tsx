@@ -54,7 +54,7 @@ function isDisplayControlEvent(e: TrackEvent): e is DisplayEvent {
 
 export interface PianoControlEventsProps {
   width: number
-  events: TrackEvent[]
+  events: readonly TrackEvent[]
   scrollLeft: number
   transform: TickTransform
   onDoubleClickMark: (group: DisplayEvent[]) => void

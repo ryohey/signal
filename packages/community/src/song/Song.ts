@@ -10,7 +10,7 @@ export type TrackEventOf<T> = DistributiveOmit<T, "deltaTime"> & {
 export type TrackEvent = TrackEventOf<AnyEvent>
 
 export interface Track {
-  events: TrackEvent[]
+  events: readonly TrackEvent[]
   endOfTrack: number
 }
 

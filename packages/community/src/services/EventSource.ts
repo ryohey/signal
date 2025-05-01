@@ -66,7 +66,7 @@ export const isTickBefore =
     e.tick <= tick
 
 // collect events which will be retained in the synthesizer
-const getStatusEvents = (events: TrackEvent[], tick: number) => {
+const getStatusEvents = (events: readonly TrackEvent[], tick: number) => {
   const controlEvents = events
     .filter(isControllerEvent)
     .filter(isTickBefore(tick))

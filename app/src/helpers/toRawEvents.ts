@@ -30,7 +30,7 @@ const fromSignalEvent = (e: TrackEvent): TrackEvent => {
   return e
 }
 
-export function toRawEvents(events: TrackEvent[]): AnyEvent[] {
+export function toRawEvents(events: readonly TrackEvent[]): AnyEvent[] {
   const a = flatten(events.map(fromSignalEvent).map(deassembleNote))
   const c = addDeltaTime(a)
   return c as AnyEvent[]

@@ -3,7 +3,7 @@ import { action, computed, makeObservable, observable, reaction } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
 import { Measure } from "../entities/measure/Measure"
 import { NoteNumber } from "../entities/unit/NoteNumber"
-import { isNotNull, isNotUndefined } from "../helpers/array"
+import { isNotNull } from "../helpers/array"
 import { collectAllEvents } from "../player/collectAllEvents"
 import Track, { isNoteEvent, isTimeSignatureEvent, TrackId } from "../track"
 
@@ -99,10 +99,12 @@ export default class Song {
   }
 
   get endOfSong(): number {
-    const eos = Math.max(
-      ...this.tracks.map((t) => t.endOfTrack).filter(isNotUndefined),
-    )
+    const eos = Math.max(...this.tracks.map((t) => t.endOfTrack))
     return (eos ?? 0) + END_MARGIN
+  }
+
+  updateEndOfSong() {
+    this.tracks.forEach((t) => t.updateEndOfTrack())
   }
 
   get allEvents(): PlayerEvent[] {

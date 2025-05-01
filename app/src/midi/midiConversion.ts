@@ -8,7 +8,6 @@ import {
   StreamSource,
   write as writeMidiFile,
 } from "midifile-ts"
-import { toJS } from "mobx"
 import { isNotNull } from "../helpers/array"
 import { downloadBlob } from "../helpers/Downloader"
 import { addDeltaTime, toRawEvents } from "../helpers/toRawEvents"
@@ -143,7 +142,7 @@ const setChannel =
   }
 
 export function songToMidiEvents(song: Song): AnyEvent[][] {
-  const tracks = toJS(song.tracks)
+  const tracks = song.tracks
   return tracks.map((t) => {
     const endOfTrack: EndOfTrackEvent = {
       deltaTime: 0,
