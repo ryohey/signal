@@ -5,14 +5,13 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
-import { useStores } from "../../../../hooks/useStores"
 
 export const useCreateSelectionGesture = () => {
-  const { controlStore } = useStores()
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds, setSelection, quantizer } = useControlPane()
+  let { selection } = useControlPane()
 
   return {
     onMouseDown(
@@ -34,27 +33,26 @@ export const useCreateSelectionGesture = () => {
         setPosition(startTick)
       }
 
-      setSelection({
+      selection = {
         fromTick: startTick,
         toTick: startTick,
-      })
+      }
+      setSelection(selection)
 
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const local = Point.add(startPoint, delta)
           const endTick = quantizer.round(controlTransform.getTick(local.x))
-          setSelection({
+          selection = {
             fromTick: Math.min(startTick, endTick),
             toTick: Math.max(startTick, endTick),
-          })
+          }
+          setSelection(selection)
         },
         onMouseUp: () => {
-          const { selection } = controlStore // read latest value from store
-          if (selection === null) {
-            return
-          }
-
-          setSelectedEventIds(getControllerEventIdsInSelection(selection))
+          setSelectedEventIds(
+            selection ? getControllerEventIdsInSelection(selection) : [],
+          )
           setSelection(null)
         },
       })

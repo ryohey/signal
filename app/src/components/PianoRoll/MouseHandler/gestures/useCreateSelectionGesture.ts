@@ -36,7 +36,8 @@ export const useCreateSelectionGesture = (): MouseGesture => {
       }
 
       setSelectedEventIds([])
-      setSelection(Selection.fromPoints(start, start))
+      selection = Selection.fromPoints(start, start)
+      setSelection(selection)
 
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
