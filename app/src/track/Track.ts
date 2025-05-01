@@ -81,7 +81,7 @@ export default class Track {
     if (isEqual(newObj, anObj)) {
       return null
     }
-    this.events[index] = newObj
+    this._events.update(id, newObj)
 
     if (process.env.NODE_ENV !== "production") {
       validateMidiEvent(newObj)

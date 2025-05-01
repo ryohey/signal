@@ -12,7 +12,7 @@ export class OrderedArray<
   readonly array: T[]
   private keyExtractor: (item: T) => K
   private descending: boolean
-  private idToIndexMap: Map<number, number>
+  private readonly lookupMap: Map<number, T>
 
   constructor(
     array: T[],
@@ -20,18 +20,17 @@ export class OrderedArray<
     descending: boolean = false,
   ) {
     this.array = array
+    this.lookupMap = new Map(array.map((item) => [item.id, item]))
     this.keyExtractor = keyExtractor
     this.descending = descending
-    this.idToIndexMap = new Map()
     this.sort()
-    this.updateIdToIndexMap()
 
     makeObservable(this, {
       array: observable.shallow,
     })
   }
 
-  getArray(): T[] {
+  getArray(): ReadonlyArray<T> {
     return this.array
   }
 
@@ -39,15 +38,7 @@ export class OrderedArray<
    * Get an element by its id in O(1) time
    */
   get(id: number): T | undefined {
-    const index = this.idToIndexMap.get(id)
-    return index !== undefined ? this.array[index] : undefined
-  }
-
-  private updateIdToIndexMap(): void {
-    this.idToIndexMap.clear()
-    for (let i = 0; i < this.array.length; i++) {
-      this.idToIndexMap.set(this.array[i].id, i)
-    }
+    return this.lookupMap.get(id)
   }
 
   private findInsertionIndex(element: T): number {
@@ -95,24 +86,32 @@ export class OrderedArray<
     return low
   }
 
-  add(element: T): T[] {
+  add(element: T): ReadonlyArray<T> {
     const insertionIndex = this.findInsertionIndex(element)
     this.array.splice(insertionIndex, 0, element)
-    this.updateIdToIndexMap()
+    this.lookupMap.set(element.id, element)
     return this.array
   }
 
-  remove(id: number): T[] {
-    const index = this.idToIndexMap.get(id)
+  remove(id: number): ReadonlyArray<T> {
+    const obj = this.lookupMap.get(id)
+    if (obj === undefined) {
+      return this.array
+    }
+    const index = this.array.indexOf(obj)
     if (index !== undefined) {
       this.array.splice(index, 1)
-      this.updateIdToIndexMap()
+      this.lookupMap.delete(id)
     }
     return this.array
   }
 
-  update(id: number, updatedElement: Partial<T>): T[] {
-    const index = this.idToIndexMap.get(id)
+  update(id: number, updatedElement: Partial<T>): ReadonlyArray<T> {
+    const obj = this.lookupMap.get(id)
+    if (obj === undefined) {
+      return this.array
+    }
+    const index = this.array.indexOf(obj)
     if (index !== undefined) {
       const originalElement = this.array[index]
       this.array.splice(index, 1)
@@ -121,7 +120,7 @@ export class OrderedArray<
 
       const newIndex = this.findInsertionIndex(updatedItem)
       this.array.splice(newIndex, 0, updatedItem)
-      this.updateIdToIndexMap()
+      this.lookupMap.set(updatedItem.id, updatedItem)
     }
     return this.array
   }
@@ -148,5 +147,5 @@ export class OrderedArray<
 createModelSchema(OrderedArray, {
   array: list(pojo),
   descending: primitive(),
-  idToIndexMap: map(pojo),
+  lookupMap: map(pojo),
 })
