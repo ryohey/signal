@@ -33,6 +33,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     scrollLeft: _scrollLeft,
     mouseMode,
     beats,
+    cursor,
     cursorX,
   } = useTempoEditor()
   const changeTempo = useChangeTempo()
@@ -125,7 +126,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       height={height}
       onMouseDown={onMouseDownGraph}
       onWheel={onWheelGraph}
-      style={style}
+      style={{ ...style, cursor }}
     >
       <Lines width={width} zIndex={0} />
       <Transform matrix={scrollXMatrix}>

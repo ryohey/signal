@@ -14,6 +14,7 @@ import {
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
@@ -146,13 +147,14 @@ const ControlButton = styled.div`
     height: 1.1rem;
   }
 
-  &[data-selected="true"] {
+  &[data-active="true"] {
     color: var(--color-text);
   }
 `
 
 export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
-  const { pianoRollStore, trackMute } = useStores()
+  const { selectedTrackId, notGhostTrackIds } = usePianoRoll()
+  const { trackMute } = useStores()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
   const toggleMuteTrack = useToggleMuteTrack()
@@ -161,10 +163,10 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const toggleAllGhostTracks = useToggleAllGhostTracks()
   const selectTrack = useSelectTrack()
 
-  const selected = track.id === pianoRollStore.selectedTrackId
+  const selected = track.id === selectedTrackId
   const mute = trackMute.isMuted(track.id)
   const solo = trackMute.isSolo(track.id)
-  const ghostTrack = !pianoRollStore.notGhostTrackIds.has(track.id)
+  const ghostTrack = !notGhostTrackIds.has(track.id)
   const channel = track.channel
   const { onContextMenu, menuProps } = useContextMenu()
   const [isDialogOpened, setDialogOpened] = useState(false)
@@ -178,7 +180,7 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
       programNumber: track.programNumber ?? 0,
       isRhythmTrack: track.isRhythmTrack,
     })
-  }, [setSetting, pianoRollStore, track])
+  }, [setSetting, track])
   const onClickMute: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation()

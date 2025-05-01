@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { TrackName } from "../TrackList/TrackName"
 
 const TrackNameWrapper = styled.span`
@@ -29,11 +29,9 @@ const Input = styled.input`
   outline: none;
 `
 
+// we still need to use observer to track selectedTrack changes
 export const TrackNameInput: FC = observer(() => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
-
+  const { selectedTrack } = usePianoRoll()
   const [isEditing, setEditing] = useState(false)
 
   if (selectedTrack === undefined) {

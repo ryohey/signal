@@ -1,7 +1,6 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback, GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
 import Color from "color"
-import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
@@ -23,7 +22,7 @@ export const VelocityItems: FC<VelocityItemsProps> = (props) => {
   )
 }
 
-const _VelocityItems: FC<VelocityItemsProps> = observer(({ rects, zIndex }) => {
+const _VelocityItems: FC<VelocityItemsProps> = ({ rects, zIndex }) => {
   const projectionMatrix = useProjectionMatrix()
   const theme = useTheme()
   const baseColor = Color(theme.themeColor)
@@ -49,4 +48,4 @@ const _VelocityItems: FC<VelocityItemsProps> = observer(({ rects, zIndex }) => {
       zIndex={zIndex}
     />
   )
-})
+}

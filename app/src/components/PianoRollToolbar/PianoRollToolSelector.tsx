@@ -1,17 +1,7 @@
-import { observer } from "mobx-react-lite"
-import { useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { ToolSelector } from "../Toolbar/ToolSelector"
 
-export const PianoRollToolSelector = observer(() => {
-  const { pianoRollStore } = useStores()
-  return (
-    <ToolSelector
-      mouseMode={pianoRollStore.mouseMode}
-      onSelect={useCallback(
-        (mouseMode: any) => (pianoRollStore.mouseMode = mouseMode),
-        [],
-      )}
-    />
-  )
-})
+export const PianoRollToolSelector = () => {
+  const { mouseMode, setMouseMode } = usePianoRoll()
+  return <ToolSelector mouseMode={mouseMode} onSelect={setMouseMode} />
+}

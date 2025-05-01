@@ -6,97 +6,104 @@ import { useStores } from "./useStores"
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
 
-  const autoScroll = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.autoScroll,
-  )
-  const canvasWidth = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.canvasWidth,
-  )
-  const canvasHeight = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.canvasHeight,
-  )
-  const cursorX = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.cursorX,
-  )
-  const scaleX = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleX)
-  const scaleY = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleY)
-  const trackHeight = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.trackHeight,
-  )
-  const contentWidth = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.contentWidth,
-  )
-  const contentHeight = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.contentHeight,
-  )
-  const notes = useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
-  const transform = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.transform,
-  )
-  const scrollLeft = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.scrollLeft,
-  )
-  const scrollTop = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.scrollTop,
-  )
-  const selectedTrackIndex = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.selectedTrackIndex,
-  )
-  const selectedTrackId = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.selectedTrackId,
-  )
-  const selection = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.selection,
-  )
-  const selectionRect = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.selectionRect,
-  )
-  const selectedEventIds = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.selectedEventIds,
-  )
-  const tracks = useMobxStore(({ song }) => song.tracks)
-  const quantize = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.quantize,
-  )
-  const quantizer = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.quantizer,
-  )
-  const trackTransform = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.trackTransform,
-  )
-  const openTransposeDialog = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.openTransposeDialog,
-  )
-  const openVelocityDialog = useMobxStore(
-    ({ arrangeViewStore }) => arrangeViewStore.openVelocityDialog,
-  )
-
   return {
-    tracks,
-    autoScroll,
-    canvasWidth,
-    canvasHeight,
-    cursorX,
-    notes,
-    scaleX,
-    scaleY,
-    trackHeight,
-    contentWidth,
-    contentHeight,
-    transform,
-    trackTransform,
-    scrollLeft,
-    scrollTop,
-    selectedTrackIndex,
-    selectedTrackId,
-    selection,
-    selectionRect,
-    selectedEventIds,
+    get autoScroll() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.autoScroll)
+    },
+    get canvasWidth() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.canvasWidth,
+      )
+    },
+    get canvasHeight() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.canvasHeight,
+      )
+    },
+    get cursorX() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.cursorX)
+    },
+    get scaleX() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleX)
+    },
+    get scaleY() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleY)
+    },
+    get trackHeight() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.trackHeight,
+      )
+    },
+    get contentWidth() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.contentWidth,
+      )
+    },
+    get contentHeight() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.contentHeight,
+      )
+    },
+    get notes() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
+    },
+    get transform() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.transform)
+    },
+    get scrollLeft() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollLeft)
+    },
+    get scrollTop() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollTop)
+    },
+    get selectedTrackIndex() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.selectedTrackIndex,
+      )
+    },
+    get selectedTrackId() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.selectedTrackId,
+      )
+    },
+    get selection() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.selection)
+    },
+    get selectionRect() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.selectionRect,
+      )
+    },
+    get selectedEventIds() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.selectedEventIds,
+      )
+    },
+    get tracks() {
+      return useMobxStore(({ song }) => song.tracks)
+    },
+    get quantize() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.quantize)
+    },
+    get quantizer() {
+      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.quantizer)
+    },
+    get trackTransform() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.trackTransform,
+      )
+    },
+    get openTransposeDialog() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.openTransposeDialog,
+      )
+    },
+    get openVelocityDialog() {
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.openVelocityDialog,
+      )
+    },
     rulerStore: arrangeViewStore.rulerStore,
-    quantize,
-    quantizer,
-    openTransposeDialog,
-    openVelocityDialog,
     setCanvasWidth: useCallback((width: number) => {
       arrangeViewStore.canvasWidth = width
     }, []),

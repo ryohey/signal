@@ -1,9 +1,8 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { Layout } from "../../Constants"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import CanvasPianoRuler from "./CanvasPianoRuler"
 import { PianoKeys } from "./PianoKeys"
 import { PianoRollCanvas } from "./PianoRollCanvas/PianoRollCanvas"
@@ -34,30 +33,26 @@ const PianoKeyPosition = styled.div`
   top: 0;
 `
 
-export const PianoRollStage: FC<PianoRollStageProps> = observer(
-  ({ width, height }) => {
-    const { pianoRollStore } = useStores()
-    const { scrollTop } = pianoRollStore
+export const PianoRollStage: FC<PianoRollStageProps> = ({ width, height }) => {
+  const { scrollTop, rulerStore } = usePianoRoll()
+  const theme = useTheme()
 
-    const theme = useTheme()
-
-    return (
-      <Container>
-        <ContentPosition style={{ top: Layout.rulerHeight }}>
-          <PianoRollCanvas width={width} height={height - Layout.rulerHeight} />
-        </ContentPosition>
-        <PianoKeyPosition style={{ top: -scrollTop + Layout.rulerHeight }}>
-          <PianoKeys />
-        </PianoKeyPosition>
-        <RulerPosition
-          style={{
-            background: theme.backgroundColor,
-            borderBottom: `1px solid ${theme.dividerColor}`,
-          }}
-        >
-          <CanvasPianoRuler rulerStore={pianoRollStore.rulerStore} />
-        </RulerPosition>
-      </Container>
-    )
-  },
-)
+  return (
+    <Container>
+      <ContentPosition style={{ top: Layout.rulerHeight }}>
+        <PianoRollCanvas width={width} height={height - Layout.rulerHeight} />
+      </ContentPosition>
+      <PianoKeyPosition style={{ top: -scrollTop + Layout.rulerHeight }}>
+        <PianoKeys />
+      </PianoKeyPosition>
+      <RulerPosition
+        style={{
+          background: theme.backgroundColor,
+          borderBottom: `1px solid ${theme.dividerColor}`,
+        }}
+      >
+        <CanvasPianoRuler rulerStore={rulerStore} />
+      </RulerPosition>
+    </Container>
+  )
+}

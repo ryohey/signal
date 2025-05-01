@@ -8,7 +8,7 @@ import {
   useSelectPreviousNote,
   useTransposeSelection,
 } from "../../actions"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 
 export const usePianoNotesKeyboardShortcutActions = () => {
   const selectNextNote = useSelectNextNote()
@@ -19,7 +19,7 @@ export const usePianoNotesKeyboardShortcutActions = () => {
   const duplicateSelection = useDuplicateSelection()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
-  const { pianoRollStore } = useStores()
+  const { mouseMode, resetSelection, setOpenTransposeDialog } = usePianoRoll()
 
   return () => [
     {
@@ -51,7 +51,7 @@ export const usePianoNotesKeyboardShortcutActions = () => {
     },
     {
       code: "KeyT",
-      run: () => (pianoRollStore.openTransposeDialog = true),
+      run: () => setOpenTransposeDialog(true),
     },
     { code: "Delete", run: deleteSelection },
     {
@@ -79,13 +79,13 @@ export const usePianoNotesKeyboardShortcutActions = () => {
     {
       code: "ArrowRight",
       run: selectNextNote,
-      enabled: () => pianoRollStore.mouseMode == "pencil",
+      enabled: () => mouseMode === "pencil",
     },
     {
       code: "ArrowLeft",
       run: selectPreviousNote,
-      enabled: () => pianoRollStore.mouseMode == "pencil",
+      enabled: () => mouseMode === "pencil",
     },
-    { code: "Escape", run: () => pianoRollStore.resetSelection() },
+    { code: "Escape", run: resetSelection },
   ]
 }

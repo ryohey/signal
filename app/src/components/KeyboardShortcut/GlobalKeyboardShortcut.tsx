@@ -1,5 +1,4 @@
 import { useToast } from "dialog-hooks"
-import { observer } from "mobx-react-lite"
 import { FC, useEffect } from "react"
 import {
   useFastForwardOneBar,
@@ -24,7 +23,7 @@ import { useLocalization } from "../../localize/useLocalization"
 import { FileInput } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
-export const GlobalKeyboardShortcut: FC = observer(() => {
+export const GlobalKeyboardShortcut: FC = () => {
   const { rootViewStore } = useStores()
   const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
@@ -208,4 +207,4 @@ export const GlobalKeyboardShortcut: FC = observer(() => {
       />
     </>
   )
-})
+}

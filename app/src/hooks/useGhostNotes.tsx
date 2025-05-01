@@ -1,43 +1,44 @@
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { Range } from "../entities/geometry/Range"
 import { isEventOverlapRange } from "../helpers/filterEvents"
-import { isNoteEvent, TrackId } from "../track"
+import { isNoteEvent, NoteEvent, TrackId } from "../track"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { usePianoRoll } from "./usePianoRoll"
 
 export function useGhostNotes(trackId: TrackId) {
-  const transform = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.transform,
-  )
-  const scrollLeft = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.scrollLeft,
-  )
-  const canvasWidth = useMobxStore(
-    ({ pianoRollStore }) => pianoRollStore.canvasWidth,
-  )
+  const { transform, scrollLeft, canvasWidth } = usePianoRoll()
   const track = useMobxStore(({ song }) => song.getTrack(trackId))
   const events = useMobxSelector(() => track?.events ?? [], [track])
+  const isRhythmTrack = useMobxSelector(
+    () => track?.isRhythmTrack ?? false,
+    [track],
+  )
+
+  const noteEvents = useMemo(() => events.filter(isNoteEvent), [events])
 
   const windowedEvents = useMemo(
     () =>
-      events
-        .filter(isNoteEvent)
-        .filter(
-          isEventOverlapRange(
-            Range.fromLength(
-              transform.getTick(scrollLeft),
-              transform.getTick(canvasWidth),
-            ),
+      noteEvents.filter(
+        isEventOverlapRange(
+          Range.fromLength(
+            transform.getTick(scrollLeft),
+            transform.getTick(canvasWidth),
           ),
         ),
-    [scrollLeft, canvasWidth, transform.horizontalId, events],
+      ),
+    [scrollLeft, canvasWidth, transform.horizontalId, noteEvents],
+  )
+
+  const getRect = useCallback(
+    (e: NoteEvent) =>
+      isRhythmTrack ? transform.getDrumRect(e) : transform.getRect(e),
+    [transform, isRhythmTrack],
   )
 
   const notes = useMemo(
     () =>
       windowedEvents.map((e) => {
-        const rect = track?.isRhythmTrack
-          ? transform.getDrumRect(e)
-          : transform.getRect(e)
+        const rect = getRect(e)
         return {
           ...rect,
           id: e.id,
@@ -45,8 +46,8 @@ export function useGhostNotes(trackId: TrackId) {
           isSelected: false,
         }
       }),
-    [windowedEvents, transform, track?.isRhythmTrack],
+    [windowedEvents, getRect],
   )
 
-  return { notes, isRhythmTrack: track?.isRhythmTrack ?? false }
+  return { notes, isRhythmTrack }
 }

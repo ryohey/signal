@@ -9,8 +9,8 @@ import {
   isPianoNotesClipboardData,
 } from "../clipboard/clipboardTypes"
 import { useControlPane } from "../hooks/useControlPane"
+import { usePianoRoll } from "../hooks/usePianoRoll"
 import { useRouter } from "../hooks/useRouter"
-import { useStores } from "../hooks/useStores"
 import Clipboard from "../services/Clipboard"
 import {
   useArrangeCopySelection,
@@ -24,7 +24,7 @@ import {
 } from "./tempo"
 
 export const useCopySelectionGlobal = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedNoteIds } = usePianoRoll()
   const { path } = useRouter()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const copySelection = useCopySelection()
@@ -35,7 +35,7 @@ export const useCopySelectionGlobal = () => {
   return () => {
     switch (path) {
       case "/track":
-        if (pianoRollStore.selectedNoteIds.length > 0) {
+        if (selectedNoteIds.length > 0) {
           copySelection()
         } else if (controlSelectedEventIds.length > 0) {
           copyControlSelection()
@@ -52,7 +52,7 @@ export const useCopySelectionGlobal = () => {
 }
 
 export const useCutSelectionGlobal = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedNoteIds } = usePianoRoll()
   const { path } = useRouter()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const copySelection = useCopySelection()
@@ -67,7 +67,7 @@ export const useCutSelectionGlobal = () => {
   return () => {
     switch (path) {
       case "/track":
-        if (pianoRollStore.selectedNoteIds.length > 0) {
+        if (selectedNoteIds.length > 0) {
           copySelection()
           deleteSelection()
         } else if (controlSelectedEventIds.length > 0) {

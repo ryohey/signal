@@ -1,17 +1,14 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
-import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
 import { Layout } from "../../../../Constants"
 import { colorToVec4 } from "../../../../gl/color"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { LegacyHorizontalGrid } from "./LegacyHorizontalGrid"
 
-export const LegacyLines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
+export const LegacyLines: FC<{ zIndex: number }> = ({ zIndex }) => {
   const theme = useTheme()
-  const {
-    pianoRollStore: { scrollTop, canvasWidth, canvasHeight, scaleY },
-  } = useStores()
+  const { scrollTop, canvasWidth, canvasHeight, scaleY } = usePianoRoll()
 
   const color = useMemo(
     () => colorToVec4(Color(theme.pianoLaneEdgeColor)),
@@ -40,4 +37,4 @@ export const LegacyLines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
       zIndex={zIndex}
     />
   )
-})
+}

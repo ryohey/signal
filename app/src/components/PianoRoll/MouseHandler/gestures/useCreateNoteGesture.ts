@@ -2,15 +2,19 @@ import { NoteNumber } from "../../../../entities/unit/NoteNumber"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
 import { useSong } from "../../../../hooks/useSong"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { NoteEvent } from "../../../../track"
 import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
 export const useCreateNoteGesture = (): MouseGesture => {
   const {
-    pianoRollStore,
-    pianoRollStore: { transform, selectedTrack, quantizer, newNoteVelocity },
-  } = useStores()
+    transform,
+    selectedTrack,
+    quantizer,
+    newNoteVelocity,
+    lastNoteDuration,
+    getLocal,
+  } = usePianoRoll()
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const dragNoteCenterAction = useDragNoteCenterGesture()
@@ -21,7 +25,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
         return
       }
 
-      const local = pianoRollStore.getLocal(e)
+      const local = getLocal(e)
       const { tick, noteNumber } = transform.getNotePoint(local)
 
       if (
@@ -40,7 +44,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
 
       const duration = selectedTrack.isRhythmTrack
         ? timebase / 8 // 32th note in the rhythm track
-        : (pianoRollStore.lastNoteDuration ?? quantizer.unit)
+        : (lastNoteDuration ?? quantizer.unit)
 
       const note = selectedTrack.addEvent({
         type: "channel",

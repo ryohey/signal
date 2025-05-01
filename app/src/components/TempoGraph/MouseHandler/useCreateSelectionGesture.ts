@@ -29,10 +29,11 @@ export const useCreateSelectionGesture = (): MouseGesture<
 
       setSelectedEventIds([])
 
-      setSelection({
+      selection = {
         fromTick: start.tick,
         toTick: start.tick,
-      })
+      }
+      setSelection(selection)
 
       observeDrag({
         onMouseMove: (e) => {

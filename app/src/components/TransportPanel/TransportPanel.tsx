@@ -9,6 +9,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
 import { useFastForwardOneBar, useRewindOneBar, useStop } from "../../actions"
 import { useToggleRecording } from "../../actions/recording"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { usePlayer } from "../../hooks/usePlayer"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
@@ -55,11 +56,10 @@ const TimestampText = styled.div`
   color: var(--color-text-secondary);
 `
 
-const Timestamp: FC = observer(() => {
-  const { pianoRollStore } = useStores()
-  const mbtTime = pianoRollStore.currentMBTTime
-  return <TimestampText>{mbtTime}</TimestampText>
-})
+const Timestamp: FC = () => {
+  const { currentMBTTime } = usePianoRoll()
+  return <TimestampText>{currentMBTTime}</TimestampText>
+}
 
 export const ToolbarSeparator = styled.div`
   background: var(--color-divider);

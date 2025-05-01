@@ -1,12 +1,12 @@
 import { MouseGesture } from "../../../../gesture/MouseGesture"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const useChangeToolGesture = (): MouseGesture => {
-  const { pianoRollStore } = useStores()
+  const { toggleTool, setNotesCursor } = usePianoRoll()
   return {
     onMouseDown() {
-      pianoRollStore.toggleTool()
-      pianoRollStore.notesCursor = "crosshair"
+      toggleTool()
+      setNotesCursor("crosshair")
     },
   }
 }

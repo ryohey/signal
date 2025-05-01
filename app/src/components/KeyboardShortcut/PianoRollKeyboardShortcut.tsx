@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { usePasteSelection, useSelectAllNotes } from "../../actions"
 import { usePasteControlSelection } from "../../actions/control"
@@ -7,7 +6,7 @@ import {
   isPianoNotesClipboardData,
 } from "../../clipboard/clipboardTypes"
 import { useControlPane } from "../../hooks/useControlPane"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import clipboard from "../../services/Clipboard"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 import { useControlPaneKeyboardShortcutActions } from "./controlPaneKeyboardShortcutActions"
@@ -16,8 +15,8 @@ import { usePianoNotesKeyboardShortcutActions } from "./pianoNotesKeyboardShortc
 
 const SCROLL_DELTA = 24
 
-export const PianoRollKeyboardShortcut: FC = observer(() => {
-  const { pianoRollStore } = useStores()
+export const PianoRollKeyboardShortcut: FC = () => {
+  const { selectedNoteIds, scrollBy, setMouseMode } = usePianoRoll()
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const pianoNotesKeyboardShortcutActions =
     usePianoNotesKeyboardShortcutActions()
@@ -51,7 +50,7 @@ export const PianoRollKeyboardShortcut: FC = observer(() => {
   return (
     <KeyboardShortcut
       actions={[
-        ...(pianoRollStore.selectedNoteIds.length > 0
+        ...(selectedNoteIds.length > 0
           ? pianoNotesKeyboardShortcutActions()
           : []),
         ...(controlSelectedEventIds.length > 0
@@ -60,30 +59,30 @@ export const PianoRollKeyboardShortcut: FC = observer(() => {
         {
           code: "ArrowUp",
           metaKey: true,
-          run: () => pianoRollStore.scrollBy(0, SCROLL_DELTA),
+          run: () => scrollBy(0, SCROLL_DELTA),
         },
         {
           code: "ArrowDown",
           metaKey: true,
-          run: () => pianoRollStore.scrollBy(0, -SCROLL_DELTA),
+          run: () => scrollBy(0, -SCROLL_DELTA),
         },
         {
           code: "ArrowRight",
           metaKey: true,
-          run: () => pianoRollStore.scrollBy(-SCROLL_DELTA, 0),
+          run: () => scrollBy(-SCROLL_DELTA, 0),
         },
         {
           code: "ArrowLeft",
           metaKey: true,
-          run: () => pianoRollStore.scrollBy(SCROLL_DELTA, 0),
+          run: () => scrollBy(SCROLL_DELTA, 0),
         },
         {
           code: "Digit1",
-          run: () => (pianoRollStore.mouseMode = "pencil"),
+          run: () => setMouseMode("pencil"),
         },
         {
           code: "Digit2",
-          run: () => (pianoRollStore.mouseMode = "selection"),
+          run: () => setMouseMode("selection"),
         },
         {
           code: "KeyA",
@@ -94,4 +93,4 @@ export const PianoRollKeyboardShortcut: FC = observer(() => {
       onPaste={onPaste}
     />
   )
-})
+}

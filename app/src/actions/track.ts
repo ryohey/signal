@@ -6,9 +6,9 @@ import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { useHistory } from "../hooks/useHistory"
+import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import {
   panMidiEvent,
   programChangeMidiEvent,
@@ -43,10 +43,9 @@ export const useChangeTempo = () => {
 /* events */
 
 export const useChangeNotesVelocity = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, setNewNoteVelocity } = usePianoRoll()
   const { pushHistory } = useHistory()
   return (noteIds: number[], velocity: number) => {
-    const { selectedTrack } = pianoRollStore
     if (selectedTrack === undefined) {
       return
     }
@@ -57,14 +56,12 @@ export const useChangeNotesVelocity = () => {
         velocity: velocity,
       })),
     )
-    pianoRollStore.newNoteVelocity = velocity
+    setNewNoteVelocity(velocity)
   }
 }
 
 export const useCreateEvent = () => {
-  const {
-    pianoRollStore: { quantizer, selectedTrack },
-  } = useStores()
+  const { quantizer, selectedTrack } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
 
@@ -89,14 +86,13 @@ export const useCreateEvent = () => {
 }
 
 export const useUpdateVelocitiesInRange = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
   return (
     startTick: number,
     startValue: number,
     endTick: number,
     endValue: number,
   ) => {
-    const { selectedTrack, selectedNoteIds } = pianoRollStore
     if (selectedTrack === undefined) {
       return
     }
@@ -203,12 +199,12 @@ export const updateEventsInRange =
   }
 
 export const useUpdateValueEvents = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack, quantizer } = usePianoRoll()
 
   return (type: ValueEventType) =>
     updateEventsInRange(
-      pianoRollStore.selectedTrack,
-      pianoRollStore.quantizer,
+      selectedTrack,
+      quantizer,
       ValueEventType.getEventPredicate(type),
       ValueEventType.getEventFactory(type),
     )
@@ -217,9 +213,7 @@ export const useUpdateValueEvents = () => {
 /* note */
 
 export const useMuteNote = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const stopNote = useStopNote()
 
   return (noteNumber: number) => {
@@ -233,9 +227,8 @@ export const useMuteNote = () => {
 /* track meta */
 
 export const useSetTrackName = () => {
-  const { pianoRollStore } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { pushHistory } = useHistory()
-  const { selectedTrack } = pianoRollStore
 
   return (name: string) => {
     if (selectedTrack === undefined) {
@@ -309,34 +302,34 @@ export const useSetTrackInstrument = () => {
 }
 
 export const useToggleGhostTrack = () => {
-  const { pianoRollStore } = useStores()
+  const { notGhostTrackIds, setNotGhostTrackIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
   return (trackId: TrackId) => {
     pushHistory()
-    if (pianoRollStore.notGhostTrackIds.has(trackId)) {
-      pianoRollStore.notGhostTrackIds.delete(trackId)
+    if (notGhostTrackIds.has(trackId)) {
+      notGhostTrackIds.delete(trackId)
     } else {
-      pianoRollStore.notGhostTrackIds.add(trackId)
+      notGhostTrackIds.add(trackId)
     }
+    setNotGhostTrackIds(notGhostTrackIds)
   }
 }
 
 export const useToggleAllGhostTracks = () => {
-  const { pianoRollStore } = useStores()
+  const { notGhostTrackIds, setNotGhostTrackIds } = usePianoRoll()
   const song = useSong()
   const { pushHistory } = useHistory()
 
   return () => {
     pushHistory()
-    if (
-      pianoRollStore.notGhostTrackIds.size > Math.floor(song.tracks.length / 2)
-    ) {
-      pianoRollStore.notGhostTrackIds = new Set()
+    if (notGhostTrackIds.size > Math.floor(song.tracks.length / 2)) {
+      setNotGhostTrackIds(new Set())
     } else {
       for (const track of song.tracks) {
-        pianoRollStore.notGhostTrackIds.add(track.id)
+        notGhostTrackIds.add(track.id)
       }
+      setNotGhostTrackIds(notGhostTrackIds)
     }
   }
 }
@@ -406,9 +399,7 @@ export const batchUpdateNotesVelocity = (
 }
 
 export const useBatchUpdateSelectedNotesVelocity = () => {
-  const {
-    pianoRollStore: { selectedTrack, selectedNoteIds },
-  } = useStores()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
   return (operation: BatchUpdateOperation) => {

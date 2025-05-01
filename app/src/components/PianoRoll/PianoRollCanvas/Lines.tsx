@@ -1,12 +1,11 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
-import { observer } from "mobx-react-lite"
 import { FC, useMemo } from "react"
 import { Layout } from "../../../Constants"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../gl/color"
-import { useStores } from "../../../hooks/useStores"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { HorizontalGrid } from "./HorizontalGrid"
 import { LegacyLines } from "./lagacy/LegacyLines"
 
@@ -23,17 +22,10 @@ export const Lines: FC<LinesProps> = (props) => {
   return <GLFallback component={_Lines} fallback={LegacyLines} {...props} />
 }
 
-const _Lines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
+const _Lines: FC<{ zIndex: number }> = ({ zIndex }) => {
   const theme = useTheme()
-  const {
-    pianoRollStore: {
-      scrollTop,
-      canvasWidth,
-      canvasHeight,
-      scaleY,
-      keySignature,
-    },
-  } = useStores()
+  const { scrollTop, canvasWidth, canvasHeight, scaleY, keySignature } =
+    usePianoRoll()
 
   const laneColors = useMemo(() => {
     const whiteLaneColor = colorToVec4(
@@ -95,4 +87,4 @@ const _Lines: FC<{ zIndex: number }> = observer(({ zIndex }) => {
       zIndex={zIndex}
     />
   )
-})
+}

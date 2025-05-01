@@ -1,6 +1,6 @@
 import { Point } from "../../../entities/geometry/Point"
 import { MouseGesture } from "../../../gesture/MouseGesture"
-import { useStores } from "../../../hooks/useStores"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { PianoNoteItem } from "../../../stores/PianoRollStore"
 import { useAddNoteToSelectionGesture } from "./gestures/useAddNoteToSelectionGesture"
 import { useCreateNoteGesture } from "./gestures/useCreateNoteGesture"
@@ -15,7 +15,7 @@ import { useSelectNoteGesture } from "./gestures/useSelectNoteGesture"
 import { CursorProvider } from "./useNoteMouseGesture"
 
 export const usePencilGesture = (): MouseGesture & CursorProvider => {
-  const { pianoRollStore } = useStores()
+  const { getLocal, getNotes, selectedTrack } = usePianoRoll()
   const removeNoteGesture = useRemoveNoteGesture()
   const createNoteGesture = useCreateNoteGesture()
   const selectNoteGesture = useSelectNoteGesture()
@@ -27,9 +27,9 @@ export const usePencilGesture = (): MouseGesture & CursorProvider => {
 
   return {
     onMouseDown(e: MouseEvent) {
-      const local = pianoRollStore.getLocal(e)
-      const items = pianoRollStore.getNotes(local)
-      const isDrum = pianoRollStore.selectedTrack?.isRhythmTrack ?? false
+      const local = getLocal(e)
+      const items = getNotes(local)
+      const isDrum = selectedTrack?.isRhythmTrack ?? false
 
       switch (e.button) {
         case 0: {
@@ -73,9 +73,9 @@ export const usePencilGesture = (): MouseGesture & CursorProvider => {
       }
     },
     getCursor(e: MouseEvent): string {
-      const local = pianoRollStore.getLocal(e)
-      const items = pianoRollStore.getNotes(local)
-      const isDrum = pianoRollStore.selectedTrack?.isRhythmTrack ?? false
+      const local = getLocal(e)
+      const items = getNotes(local)
+      const isDrum = selectedTrack?.isRhythmTrack ?? false
       if (items.length > 0) {
         const position = getPositionType(local, items[0], isDrum)
         return mousePositionToCursor(position)

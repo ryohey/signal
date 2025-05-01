@@ -7,14 +7,12 @@ import {
 import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
+import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
-import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
@@ -44,9 +42,7 @@ export const useCreateOrUpdateControlEventsValue = () => {
 }
 
 export const useDeleteControlSelection = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()
 
@@ -64,9 +60,7 @@ export const useDeleteControlSelection = () => {
 }
 
 export const useCopyControlSelection = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { selectedEventIds } = useControlPane()
 
   return () => {
@@ -100,9 +94,7 @@ export const useCopyControlSelection = () => {
 }
 
 export const usePasteControlSelection = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
@@ -134,9 +126,7 @@ export const usePasteControlSelection = () => {
 }
 
 export const useDuplicateControlSelection = () => {
-  const {
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { selectedTrack } = usePianoRoll()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
 

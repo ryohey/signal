@@ -1,8 +1,7 @@
 import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
-import { observer } from "mobx-react-lite"
 import { FC, ReactNode } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import EventList from "../EventEditor/EventList"
 import { PianoRollKeyboardShortcut } from "../KeyboardShortcut/PianoRollKeyboardShortcut"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
@@ -35,9 +34,8 @@ const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
   return <>{children}</>
 }
 
-export const PianoRollEditor: FC = observer(() => {
-  const { pianoRollStore } = useStores()
-  const { showTrackList, showEventList } = pianoRollStore
+export const PianoRollEditor: FC = () => {
+  const { showTrackList, showEventList } = usePianoRoll()
 
   return (
     <>
@@ -70,4 +68,4 @@ export const PianoRollEditor: FC = observer(() => {
       <PianoRollVelocityDialog />
     </>
   )
-})
+}

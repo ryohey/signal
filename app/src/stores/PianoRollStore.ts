@@ -14,6 +14,7 @@ import { isNotUndefined } from "../helpers/array"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import Quantizer from "../quantizer"
 import Track, {
+  NoteEvent,
   TrackEvent,
   TrackId,
   UNASSIGNED_TRACK_ID,
@@ -123,7 +124,7 @@ export default class PianoRollStore {
       scrollTop: computed,
       transform: computed,
       windowedEvents: computed,
-      allNotes: computed,
+      allNoteBounds: computed,
       notes: computed,
       selectedTrackIndex: computed,
       ghostTrackIds: computed,
@@ -134,6 +135,7 @@ export default class PianoRollStore {
       currentMBTTime: computed,
       cursorX: computed,
       quantizer: computed,
+      enabledQuantizer: computed,
       controlCursor: computed,
       selectedTrack: computed,
       setScrollLeftInPixels: action,
@@ -284,37 +286,42 @@ export default class PianoRollStore {
     )
   }
 
-  get allNotes(): PianoNoteItem[] {
-    const { transform, selectedTrack: track, selectedNoteIds } = this
+  get allNoteBounds(): { bounds: Rect; note: NoteEvent }[] {
+    const { transform, selectedTrack: track } = this
     if (track === undefined) {
       return []
     }
     const noteEvents = track.events.filter(isNoteEvent)
+    const getRect = track.isRhythmTrack
+      ? (e: NoteEvent) => transform.getDrumRect(e)
+      : (e: NoteEvent) => transform.getRect(e)
 
-    return noteEvents.map((e): PianoNoteItem => {
-      const rect = track.isRhythmTrack
-        ? transform.getDrumRect(e)
-        : transform.getRect(e)
-      const isSelected = selectedNoteIds.includes(e.id)
+    return noteEvents.map((e) => {
+      const bounds = getRect(e)
       return {
-        ...rect,
-        id: e.id,
-        velocity: e.velocity,
-        isSelected,
+        bounds,
+        note: e,
       }
     })
   }
 
   get notes(): PianoNoteItem[] {
-    const { scrollLeft, canvasWidth, selectedTrack: track, allNotes } = this
-    if (track === undefined) {
-      return []
-    }
+    const { scrollLeft, canvasWidth, allNoteBounds, selectedNoteIds } = this
 
     const range = Range.fromLength(scrollLeft, canvasWidth)
-    return allNotes.filter((n) =>
-      Range.intersects(Range.fromLength(n.x, n.width), range),
-    )
+    return allNoteBounds
+      .filter((n) =>
+        Range.intersects(Range.fromLength(n.bounds.x, n.bounds.width), range),
+      )
+      .map((n) => {
+        const isSelected = selectedNoteIds.includes(n.note.id)
+        return {
+          ...n.bounds,
+          id: n.note.id,
+          velocity: n.note.velocity,
+          isSelected,
+        }
+      })
   }
 
   get ghostTrackIds(): TrackId[] {

@@ -2,13 +2,12 @@ import { Point } from "../../../../entities/geometry/Point"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
-import { useStores } from "../../../../hooks/useStores"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const useRemoveNoteGesture = (): MouseGesture => {
-  const {
-    pianoRollStore,
-    pianoRollStore: { selectedTrack },
-  } = useStores()
+  const { setSelectedNoteIds, selectedTrack, getLocal, getNotes } =
+    usePianoRoll()
+  let { selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
   const removeEvent = (eventId: number) => {
@@ -17,15 +16,14 @@ export const useRemoveNoteGesture = (): MouseGesture => {
     }
     pushHistory()
     selectedTrack.removeEvent(eventId)
-    pianoRollStore.selectedNoteIds = pianoRollStore.selectedNoteIds.filter(
-      (id) => id !== eventId,
-    )
+    selectedNoteIds = selectedNoteIds.filter((id) => id !== eventId)
+    setSelectedNoteIds(selectedNoteIds)
   }
 
   return {
     onMouseDown(e) {
-      const startPos = pianoRollStore.getLocal(e)
-      const items = pianoRollStore.getNotes(startPos)
+      const startPos = getLocal(e)
+      const items = getNotes(startPos)
       if (items.length > 0) {
         removeEvent(items[0].id)
       }
@@ -33,7 +31,7 @@ export const useRemoveNoteGesture = (): MouseGesture => {
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const local = Point.add(startPos, delta)
-          const items = pianoRollStore.getNotes(local)
+          const items = getNotes(local)
           if (items.length > 0) {
             removeEvent(items[0].id)
           }

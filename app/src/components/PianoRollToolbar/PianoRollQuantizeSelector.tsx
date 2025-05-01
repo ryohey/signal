@@ -1,22 +1,21 @@
-import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
 
-export const PianoRollQuantizeSelector: FC = observer(() => {
-  const { pianoRollStore } = useStores()
-  const { quantize, isQuantizeEnabled } = pianoRollStore
+export const PianoRollQuantizeSelector: FC = () => {
+  const { quantize, isQuantizeEnabled, setQuantize, setIsQuantizeEnabled } =
+    usePianoRoll()
 
   const onSelectQuantize = useCallback(
     (denominator: number) => {
-      pianoRollStore.quantize = denominator
+      setQuantize(denominator)
     },
-    [pianoRollStore],
+    [setQuantize],
   )
 
   const onClickQuantizeSwitch = useCallback(() => {
-    pianoRollStore.isQuantizeEnabled = !pianoRollStore.isQuantizeEnabled
-  }, [pianoRollStore])
+    setIsQuantizeEnabled(!isQuantizeEnabled)
+  }, [isQuantizeEnabled, setIsQuantizeEnabled])
 
   return (
     <QuantizeSelector
@@ -26,4 +25,4 @@ export const PianoRollQuantizeSelector: FC = observer(() => {
       onClickSwitch={onClickQuantizeSwitch}
     />
   )
-})
+}

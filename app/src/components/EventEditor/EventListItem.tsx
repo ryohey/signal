@@ -1,6 +1,6 @@
 import isEqual from "lodash/isEqual"
 import React, { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { TrackEvent } from "../../track"
 import { getEventController } from "./EventController"
 import { Cell, Row } from "./EventList"
@@ -22,9 +22,7 @@ const equalEventListItemProps = (
 
 export const EventListItem: FC<EventListItemProps> = React.memo(
   ({ item, style, onClick }) => {
-    const {
-      pianoRollStore: { selectedTrack },
-    } = useStores()
+    const { selectedTrack } = usePianoRoll()
 
     const controller = getEventController(item)
 

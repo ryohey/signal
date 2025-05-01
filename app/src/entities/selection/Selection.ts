@@ -66,4 +66,11 @@ export namespace Selection {
   export function getTo(selection: Selection): NotePoint {
     return { tick: selection.toTick, noteNumber: selection.toNoteNumber }
   }
+
+  export const isEmpty = (selection: Selection): boolean => {
+    return (
+      selection.fromTick === selection.toTick ||
+      selection.fromNoteNumber === selection.toNoteNumber
+    )
+  }
 }
