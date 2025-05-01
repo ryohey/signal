@@ -228,7 +228,6 @@ describe("OrderedArray", () => {
     expect(dubArray.getArray().length).toBe(3) // All items should still be in the array
 
     // When removing by ID, it should remove the item referenced in the lookupMap
-    const beforeRemoveArray = [...dubArray.getArray()]
     dubArray.remove(2)
 
     // The array after removal should have one less item
