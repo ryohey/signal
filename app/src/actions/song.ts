@@ -20,7 +20,8 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
-  const { songStore, historyStore } = useStores()
+  const { songStore } = useStores()
+  const { clear: clearHistory } = useHistory()
   const { reset: resetTrackMute } = useTrackMute()
   const { stop, reset, setPosition } = usePlayer()
   const {
@@ -54,7 +55,7 @@ export const useSetSong = () => {
     setArrangeSelection(null)
     setArrangeSelectedEventIds({})
 
-    historyStore.clear()
+    clearHistory()
 
     stop()
     reset()
