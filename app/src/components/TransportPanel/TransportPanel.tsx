@@ -5,13 +5,9 @@ import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import Loop from "mdi-react/LoopIcon"
 import MetronomeIcon from "mdi-react/MetronomeIcon"
 import Stop from "mdi-react/StopIcon"
-import { observer } from "mobx-react-lite"
-import { FC, useCallback } from "react"
-import { useFastForwardOneBar, useRewindOneBar, useStop } from "../../actions"
-import { useToggleRecording } from "../../actions/recording"
+import { FC } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
-import { usePlayer } from "../../hooks/usePlayer"
-import { useStores } from "../../hooks/useStores"
+import { useTransportPanel } from "../../hooks/useTransportPanel"
 import { Localized } from "../../localize/useLocalization"
 import { CircularProgress } from "../ui/CircularProgress"
 import { Tooltip } from "../ui/Tooltip"
@@ -73,67 +69,56 @@ export const Right = styled.div`
   right: 1em;
 `
 
-export const TransportPanel: FC = observer(() => {
+export const TransportPanel: FC = () => {
   const {
-    midiDeviceStore,
-    midiRecorder,
-    soundFontStore,
-    synthGroup,
-    synthGroup: { isMetronomeEnabled },
-  } = useStores()
-
-  const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
-  const isRecording = midiRecorder.isRecording
-  const canRecording =
-    Object.values(midiDeviceStore.enabledInputs).filter((e) => e).length > 0
-  const isSynthLoading = soundFontStore.isLoading
-  const stop = useStop()
-  const rewindOneBar = useRewindOneBar()
-  const fastForwardOneBar = useFastForwardOneBar()
-  const toggleRecording = useToggleRecording()
-
-  const onClickPlay = playOrPause
-  const onClickStop = stop
-  const onClickBackward = rewindOneBar
-  const onClickForward = fastForwardOneBar
-  const onClickRecord = toggleRecording
-  const onClickEnableLoop = toggleEnableLoop
-  const onClickMetronone = useCallback(() => {
-    synthGroup.isMetronomeEnabled = !synthGroup.isMetronomeEnabled
-  }, [synthGroup])
+    rewindOneBar,
+    fastForwardOneBar,
+    stop,
+    play,
+    isPlaying,
+    isRecording,
+    toggleRecording,
+    toggleEnableLoop,
+    toggleMetronome,
+    isSynthLoading,
+    isLoopEnabled,
+    isLoopActive,
+    isMetronomeEnabled,
+    canRecording,
+  } = useTransportPanel()
 
   return (
     <Toolbar>
       <Tooltip title={<Localized name="rewind" />} side="top">
-        <CircleButton onMouseDown={onClickBackward}>
+        <CircleButton onMouseDown={rewindOneBar}>
           <FastRewind />
         </CircleButton>
       </Tooltip>
 
       <Tooltip title={<Localized name="stop" />} side="top">
-        <CircleButton onMouseDown={onClickStop}>
+        <CircleButton onMouseDown={stop}>
           <Stop />
         </CircleButton>
       </Tooltip>
 
-      <PlayButton onMouseDown={onClickPlay} isPlaying={isPlaying} />
+      <PlayButton onMouseDown={play} isPlaying={isPlaying} />
 
       {canRecording && (
         <Tooltip title={<Localized name="record" />} side="top">
-          <RecordButton onMouseDown={onClickRecord} data-active={isRecording}>
+          <RecordButton onMouseDown={toggleRecording} data-active={isRecording}>
             <FiberManualRecord />
           </RecordButton>
         </Tooltip>
       )}
 
       <Tooltip title={<Localized name="fast-forward" />} side="top">
-        <CircleButton onMouseDown={onClickForward}>
+        <CircleButton onMouseDown={fastForwardOneBar}>
           <FastForward />
         </CircleButton>
       </Tooltip>
 
-      {loop && (
-        <LoopButton onMouseDown={onClickEnableLoop} data-active={loop.enabled}>
+      {isLoopEnabled && (
+        <LoopButton onMouseDown={toggleEnableLoop} data-active={isLoopActive}>
           <Loop />
         </LoopButton>
       )}
@@ -141,7 +126,7 @@ export const TransportPanel: FC = observer(() => {
       <ToolbarSeparator />
 
       <MetronomeButton
-        onMouseDown={onClickMetronone}
+        onMouseDown={toggleMetronome}
         data-active={isMetronomeEnabled}
       >
         <MetronomeIcon />
@@ -160,4 +145,4 @@ export const TransportPanel: FC = observer(() => {
       )}
     </Toolbar>
   )
-})
+}
