@@ -144,6 +144,7 @@ export default class Song {
 
 createModelSchema(Song, {
   tracks: list(object(Track)),
+  name: primitive(),
   filepath: primitive(),
   timebase: primitive(),
   lastTrackId: primitive(),
