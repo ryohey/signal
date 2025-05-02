@@ -228,10 +228,13 @@ const PianoRuler: FC<PianoRulerProps> = ({
     [
       getTick,
       getQuantizedTick,
-      scrollLeft,
-      transform,
-      timeSignatures,
+      timeSignatureHitTest,
       clearSelectedTimeSignature,
+      onClickTimeSignature,
+      onClickRuler,
+      setRightClickTick,
+      onContextMenu,
+      _onMouseDown,
     ],
   )
 
