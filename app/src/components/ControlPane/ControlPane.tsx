@@ -82,9 +82,7 @@ const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
           </NoWrap>
         </TabButton>
       ))}
-      <TabButtonBase
-        onClick={() => setOpenControlSettingDialog(true)}
-      >
+      <TabButtonBase onClick={() => setOpenControlSettingDialog(true)}>
         <DotsHorizontalIcon style={{ width: "1rem" }} />
       </TabButtonBase>
     </Toolbar>
