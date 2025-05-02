@@ -13,6 +13,7 @@ const List = styled.div`
   flex-grow: 1;
 `
 
+// we still need to use observer to track song.tracks changes
 export const TrackList: FC = observer(() => {
   const song = useSong()
 

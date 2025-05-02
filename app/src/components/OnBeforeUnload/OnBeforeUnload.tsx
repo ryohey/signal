@@ -1,10 +1,9 @@
-import { observer } from "mobx-react-lite"
 import { useEffect } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
 
-export const OnBeforeUnload = observer(() => {
+export const OnBeforeUnload = () => {
   const { songStore } = useStores()
   const localized = useLocalization()
 
@@ -39,4 +38,4 @@ export const OnBeforeUnload = observer(() => {
     }
   }, [])
   return <></>
-})
+}

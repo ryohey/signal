@@ -2,7 +2,6 @@ import styled from "@emotion/styled"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
-import { observer } from "mobx-react-lite"
 import { CSSProperties, FC, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
@@ -83,7 +82,7 @@ export const IconStyle: CSSProperties = {
   fill: "currentColor",
 }
 
-export const Navigation: FC = observer(() => {
+export const Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
 
@@ -205,4 +204,4 @@ export const Navigation: FC = observer(() => {
       <UserButton />
     </Container>
   )
-})
+}

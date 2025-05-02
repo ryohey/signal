@@ -5,7 +5,6 @@ import {
   OAuthProvider,
   signInWithCredential,
 } from "firebase/auth"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 import { auth } from "../.././firebase/firebase"
@@ -25,22 +24,21 @@ import {
   useCutSelectionGlobal,
   usePasteSelectionGlobal,
 } from "../../actions/hotkey"
+import { useAuth } from "../../hooks/useAuth"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useExport } from "../../hooks/useExport"
 import { useHistory } from "../../hooks/useHistory"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
+import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
-import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
 import { songToMidi } from "../../midi/midiConversion"
 import { ElectronCallback } from "./ElectronCallback"
 
-export const ElectronCallbackHandler: FC = observer(() => {
-  const {
-    songStore: { song },
-    authStore: { isLoggedIn },
-  } = useStores()
+export const ElectronCallbackHandler: FC = () => {
+  const song = useSong()
+  const { isLoggedIn } = useAuth()
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
   const localized = useLocalization()
@@ -190,7 +188,7 @@ export const ElectronCallbackHandler: FC = observer(() => {
       }}
     />
   )
-})
+}
 
 function createCredential(credential: FirebaseCredential) {
   switch (credential.providerId) {

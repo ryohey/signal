@@ -1,5 +1,4 @@
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
@@ -7,7 +6,7 @@ import { Menu } from "../ui/Menu"
 import { EditMenu } from "./EditMenu"
 import { Tab } from "./Navigation"
 
-export const EditMenuButton: FC = observer(() => {
+export const EditMenuButton: FC = () => {
   const { openEditDrawer: isOpen, setOpenEditDrawer } = useRootView()
 
   const handleClose = () => setOpenEditDrawer(false)
@@ -37,4 +36,4 @@ export const EditMenuButton: FC = observer(() => {
       <EditMenu close={handleClose} />
     </Menu>
   )
-})
+}

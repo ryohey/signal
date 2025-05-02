@@ -1,6 +1,5 @@
 import styled from "@emotion/styled"
 import Add from "mdi-react/AddIcon"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { useAddTrack } from "../../actions"
 import { Localized } from "../../localize/useLocalization"
@@ -29,7 +28,7 @@ const Label = styled.div`
   font-size: 0.875rem;
 `
 
-export const AddTrackButton: FC = observer(() => {
+export const AddTrackButton: FC = () => {
   const addTrack = useAddTrack()
 
   return (
@@ -40,4 +39,4 @@ export const AddTrackButton: FC = observer(() => {
       </Label>
     </Wrapper>
   )
-})
+}

@@ -1,5 +1,4 @@
 import { useProgress } from "dialog-hooks"
-import { observer } from "mobx-react-lite"
 import { FC, useEffect, useState } from "react"
 import { useSetSong } from "../../actions"
 import { useLoadSongFromExternalMidiFile } from "../../actions/cloudSong"
@@ -9,7 +8,7 @@ import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
 import { InitializeErrorDialog } from "./InitializeErrorDialog"
 
-export const OnInit: FC = observer(() => {
+export const OnInit: FC = () => {
   const rootStore = useStores()
   const setSong = useSetSong()
   const loadSongFromExternalMidiFile = useLoadSongFromExternalMidiFile()
@@ -86,4 +85,4 @@ export const OnInit: FC = observer(() => {
       />
     </>
   )
-})
+}
