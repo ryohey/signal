@@ -1,25 +1,21 @@
 import { useToast } from "dialog-hooks"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { useLocalization } from "../../localize/useLocalization"
 import { SignInDialogContent } from "./SignInDialogContent"
 
-export const SignInDialog: FC = observer(() => {
-  const {
-    rootViewStore,
-    rootViewStore: { openSignInDialog },
-  } = useStores()
+export const SignInDialog: FC = () => {
+  const { openSignInDialog, setOpenSignInDialog } = useRootView()
   const toast = useToast()
   const localized = useLocalization()
 
   const onClose = useCallback(
-    () => (rootViewStore.openSignInDialog = false),
-    [rootViewStore],
+    () => setOpenSignInDialog(false),
+    [setOpenSignInDialog],
   )
 
   const signInSuccessWithAuthResult = async () => {
-    rootViewStore.openSignInDialog = false
+    setOpenSignInDialog(false)
     toast.success(localized["success-sign-in"])
   }
 
@@ -35,4 +31,4 @@ export const SignInDialog: FC = observer(() => {
       onFailure={signInFailure}
     />
   )
-})
+}

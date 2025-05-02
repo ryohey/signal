@@ -3,6 +3,7 @@ import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
+import { useTrackMute } from "../hooks/useTrackMute"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
 export const useStop = () => {
@@ -79,28 +80,17 @@ export const usePreviousTrack = () => {
 }
 
 export const useToggleSolo = () => {
-  const { trackMute } = useStores()
+  const { toggleSolo } = useTrackMute()
   const { selectedTrackId } = usePianoRoll()
 
-  return () => {
-    if (trackMute.isSolo(selectedTrackId)) {
-      trackMute.unsolo(selectedTrackId)
-    } else {
-      trackMute.solo(selectedTrackId)
-    }
-  }
+  return () => toggleSolo(selectedTrackId)
 }
 
 export const useToggleMute = () => {
-  const { trackMute } = useStores()
+  const { toggleMute } = useTrackMute()
   const { selectedTrackId } = usePianoRoll()
-  return () => {
-    if (trackMute.isMuted(selectedTrackId)) {
-      trackMute.unmute(selectedTrackId)
-    } else {
-      trackMute.mute(selectedTrackId)
-    }
-  }
+
+  return () => toggleMute(selectedTrackId)
 }
 
 export const useToggleGhost = () => {

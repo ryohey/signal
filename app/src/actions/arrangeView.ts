@@ -12,137 +12,54 @@ import { useArrangeView } from "../hooks/useArrangeView"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import clipboard from "../services/Clipboard"
 import Track from "../track"
 import { batchUpdateNotesVelocity, BatchUpdateOperation } from "./track"
 
-export const useArrangeResizeSelection = () => {
-  const rootStore = useStores()
-  const { quantizer, setSelection } = useArrangeView()
+// returns moved event ids
+export const moveEventsBetweenTracks = (
+  tracks: Track[],
+  eventIdForTrackIndex: { [trackIndex: number]: number[] },
+  delta: ArrangePoint,
+) => {
+  const updates = []
+  for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
+    eventIdForTrackIndex,
+  )) {
+    const trackIndex = parseInt(trackIndexStr, 10)
+    const track = tracks[trackIndex]
+    const events = selectedEventIdsValue
+      .map((id) => track.getEventById(id))
+      .filter(isNotUndefined)
 
-  return (start: ArrangePoint, end: ArrangePoint) => {
-    const {
-      song: { tracks },
-    } = rootStore
-    // 選択範囲作成時 (確定前) のドラッグ中
-    // Drag during selection (before finalization)
-    setSelection(
-      ArrangeSelection.fromPoints(start, end, quantizer, tracks.length),
-    )
-  }
-}
-
-export const useArrangeEndSelection = () => {
-  const rootStore = useStores()
-  const { setSelectedEventIds } = useArrangeView()
-
-  return () => {
-    const {
-      song: { tracks },
-      arrangeViewStore: { selection }, // read selection from store to use latest value
-    } = rootStore
-    if (selection) {
-      setSelectedEventIds(getEventsInSelection(tracks, selection))
+    if (delta.trackIndex === 0) {
+      track.updateEvents(
+        events.map((e) => ({
+          id: e.id,
+          tick: e.tick + delta.tick,
+        })),
+      )
+    } else {
+      updates.push({
+        sourceTrackIndex: trackIndex,
+        destinationTrackIndex: trackIndex + delta.trackIndex,
+        events: events.map((e) => ({
+          ...e,
+          tick: e.tick + delta.tick,
+        })),
+      })
     }
   }
-}
-
-export const useArrangeMoveSelection = () => {
-  const rootStore = useStores()
-  const { quantizer } = useArrangeView()
-  const arrangeMoveSelectionBy = useArrangeMoveSelectionBy()
-
-  return (point: ArrangePoint) => {
-    const {
-      song: { tracks },
-      arrangeViewStore: { selection }, // read selection from store to use latest value
-    } = rootStore
-
-    if (selection === null) {
-      return
+  if (delta.trackIndex !== 0) {
+    const ids: { [trackIndex: number]: number[] } = {}
+    for (const u of updates) {
+      tracks[u.sourceTrackIndex].removeEvents(u.events.map((e) => e.id))
+      const events = tracks[u.destinationTrackIndex].addEvents(u.events)
+      ids[u.destinationTrackIndex] = events.map((e) => e.id)
     }
-
-    // quantize
-    point = {
-      tick: quantizer.round(point.tick),
-      trackIndex: Math.round(point.trackIndex),
-    }
-
-    // clamp
-    point = ArrangePoint.clamp(
-      point,
-      tracks.length - (selection.toTrackIndex - selection.fromTrackIndex),
-    )
-
-    const delta = ArrangePoint.sub(point, ArrangeSelection.start(selection))
-
-    arrangeMoveSelectionBy(delta)
+    return ids
   }
-}
-
-export const useArrangeMoveSelectionBy = () => {
-  const rootStore = useStores()
-  const { setSelection, setSelectedEventIds } = useArrangeView()
-
-  return (delta: ArrangePoint) => {
-    const {
-      song: { tracks },
-      arrangeViewStore: { selection, selectedEventIds }, // read selection from store to use latest value
-    } = rootStore
-
-    if (selection === null) {
-      return
-    }
-
-    if (delta.tick === 0 && delta.trackIndex === 0) {
-      return
-    }
-
-    // Move selection range
-    const newSelection = ArrangeSelection.moved(selection, delta)
-
-    setSelection(newSelection)
-
-    // Move notes
-    const updates = []
-    for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
-      selectedEventIds,
-    )) {
-      const trackIndex = parseInt(trackIndexStr, 10)
-      const track = tracks[trackIndex]
-      const events = selectedEventIdsValue
-        .map((id) => track.getEventById(id))
-        .filter(isNotUndefined)
-
-      if (delta.trackIndex === 0) {
-        track.updateEvents(
-          events.map((e) => ({
-            id: e.id,
-            tick: e.tick + delta.tick,
-          })),
-        )
-      } else {
-        updates.push({
-          sourceTrackIndex: trackIndex,
-          destinationTrackIndex: trackIndex + delta.trackIndex,
-          events: events.map((e) => ({
-            ...e,
-            tick: e.tick + delta.tick,
-          })),
-        })
-      }
-    }
-    if (delta.trackIndex !== 0) {
-      const ids: { [key: number]: number[] } = {}
-      for (const u of updates) {
-        tracks[u.sourceTrackIndex].removeEvents(u.events.map((e) => e.id))
-        const events = tracks[u.destinationTrackIndex].addEvents(u.events)
-        ids[u.destinationTrackIndex] = events.map((e) => e.id)
-      }
-      setSelectedEventIds(ids)
-    }
-  }
+  return eventIdForTrackIndex
 }
 
 export const useArrangeCopySelection = () => {
@@ -229,7 +146,10 @@ export const useArrangeDeleteSelection = () => {
 }
 
 // returns { trackIndex: [eventId] }
-function getEventsInSelection(tracks: Track[], selection: ArrangeSelection) {
+export function getEventsInSelection(
+  tracks: Track[],
+  selection: ArrangeSelection,
+) {
   const ids: { [key: number]: number[] } = {}
   for (
     let trackIndex = selection.fromTrackIndex;

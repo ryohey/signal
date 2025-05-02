@@ -5,15 +5,16 @@ import { FC, useRef, useState } from "react"
 import { auth } from "../.././firebase/firebase"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { Menu, MenuItem } from "../ui/Menu"
 import { IconStyle, Tab, TabTitle } from "./Navigation"
 
 export const UserButton: FC = observer(() => {
   const {
-    rootViewStore,
     authStore: { authUser: user },
   } = useStores()
+  const { setOpenSignInDialog, setOpenUserSettingsDialog } = useRootView()
 
   const [open, setOpen] = useState(false)
 
@@ -21,7 +22,7 @@ export const UserButton: FC = observer(() => {
     if (isRunningInElectron()) {
       window.electronAPI.openAuthWindow()
     } else {
-      rootViewStore.openSignInDialog = true
+      setOpenSignInDialog(true)
     }
     setOpen(false)
   }
@@ -39,7 +40,7 @@ export const UserButton: FC = observer(() => {
   }
 
   const onClickUserSettings = () => {
-    rootViewStore.openUserSettingsDialog = true
+    setOpenUserSettingsDialog(true)
   }
 
   const theme = useTheme()

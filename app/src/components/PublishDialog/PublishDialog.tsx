@@ -5,6 +5,7 @@ import OpenInNewIcon from "mdi-react/OpenInNewIcon"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useEffect, useState } from "react"
 import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
+import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { Localized, useLocalization } from "../../localize/useLocalization"
@@ -21,12 +22,11 @@ import { LinkShare } from "../ui/LinkShare"
 type PublishState = "publishable" | "published" | "notPublishable"
 
 export const PublishDialog: FC = observer(() => {
-  const { songStore, rootViewStore, cloudSongRepository, userRepository } =
-    useStores()
+  const { songStore, cloudSongRepository, userRepository } = useStores()
+  const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
   const song = useSong()
   const publishSong = usePublishSong()
   const unpublishSong = useUnpublishSong()
-  const { openPublishDialog: open } = rootViewStore
   const [publishState, setPublishState] =
     useState<PublishState>("notPublishable")
   const [isLoading, setIsLoading] = useState(true)
@@ -52,8 +52,8 @@ export const PublishDialog: FC = observer(() => {
   }, [open])
 
   const onClose = useCallback(
-    () => (rootViewStore.openPublishDialog = false),
-    [rootViewStore],
+    () => setOpenPublishDialog(false),
+    [setOpenPublishDialog],
   )
 
   const onClickPublish = async () => {

@@ -3,10 +3,9 @@ import styled from "@emotion/styled"
 import { range } from "lodash"
 import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
 import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
-import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
 import { useControlPane } from "../../hooks/useControlPane"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import {
   ControlMode,
@@ -76,10 +75,10 @@ const InsertButton = styled(Button)`
   justify-content: center;
 `
 
-export const ControlSettingDialog = observer(() => {
-  const { rootViewStore } = useStores()
+export const ControlSettingDialog = () => {
+  const { openControlSettingDialog: open, setOpenControlSettingDialog } =
+    useRootView()
   const { controlModes, setControlModes } = useControlPane()
-  const { openControlSettingDialog: open } = rootViewStore
   const [selectedLeftMode, setSelectedLeftMode] = useState<ControlMode | null>(
     null,
   )
@@ -105,8 +104,8 @@ export const ControlSettingDialog = observer(() => {
   }))
 
   const onClose = useCallback(
-    () => (rootViewStore.openControlSettingDialog = false),
-    [rootViewStore],
+    () => setOpenControlSettingDialog(false),
+    [setOpenControlSettingDialog],
   )
 
   const onClickAdd = () => {
@@ -205,4 +204,4 @@ export const ControlSettingDialog = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}

@@ -1,9 +1,8 @@
-import { MouseEvent } from "react"
-import {
-  useArrangeEndSelection,
-  useArrangeResizeSelection,
-} from "../../../../actions"
+import { MouseEvent, useCallback } from "react"
+import { getEventsInSelection } from "../../../../actions"
 import { Point } from "../../../../entities/geometry/Point"
+import { ArrangeSelection } from "../../../../entities/selection/ArrangeSelection"
+import { ArrangePoint } from "../../../../entities/transform/ArrangePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
@@ -15,11 +14,22 @@ export const useCreateSelectionGesture = (): MouseGesture<
   MouseEvent
 > => {
   const { isPlaying, setPosition } = usePlayer()
-  const { trackTransform, setSelectedTrackIndex, resetSelection, quantizer } =
-    useArrangeView()
+  const {
+    trackTransform,
+    setSelectedTrackIndex,
+    resetSelection,
+    quantizer,
+    setSelection,
+    setSelectedEventIds,
+  } = useArrangeView()
+  const { tracks } = useArrangeView()
+  let selection: ArrangeSelection | null = null
 
-  const arrangeEndSelection = useArrangeEndSelection()
-  const arrangeResizeSelection = useArrangeResizeSelection()
+  const selectionFromPoints = useCallback(
+    (start: ArrangePoint, end: ArrangePoint) =>
+      ArrangeSelection.fromPoints(start, end, quantizer, tracks.length),
+    [quantizer, tracks.length],
+  )
 
   return {
     onMouseDown(_e, startClientPos, startPosPx) {
@@ -36,13 +46,14 @@ export const useCreateSelectionGesture = (): MouseGesture<
         onMouseMove: (e) => {
           const deltaPx = Point.sub(getClientPos(e), startClientPos)
           const selectionToPx = Point.add(startPosPx, deltaPx)
-          arrangeResizeSelection(
-            startPos,
-            trackTransform.getArrangePoint(selectionToPx),
-          )
+          const endPos = trackTransform.getArrangePoint(selectionToPx)
+          selection = selectionFromPoints(startPos, endPos)
+          setSelection(selection)
         },
         onMouseUp: () => {
-          arrangeEndSelection()
+          if (selection !== null) {
+            setSelectedEventIds(getEventsInSelection(tracks, selection))
+          }
         },
       })
     },

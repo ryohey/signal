@@ -1,27 +1,30 @@
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
 import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { Menu } from "../ui/Menu"
 import { EditMenu } from "./EditMenu"
 import { Tab } from "./Navigation"
 
 export const EditMenuButton: FC = observer(() => {
-  const { rootViewStore } = useStores()
-  const isOpen = rootViewStore.openEditDrawer
-  const handleClose = () => (rootViewStore.openEditDrawer = false)
+  const { openEditDrawer: isOpen, setOpenEditDrawer } = useRootView()
+
+  const handleClose = () => setOpenEditDrawer(false)
 
   const ref = useRef<HTMLDivElement>(null)
 
   return (
     <Menu
       open={isOpen}
-      onOpenChange={(open) => (rootViewStore.openEditDrawer = open)}
+      onOpenChange={setOpenEditDrawer}
       trigger={
         <Tab
           ref={ref}
-          onClick={useCallback(() => (rootViewStore.openEditDrawer = true), [])}
+          onClick={useCallback(
+            () => setOpenEditDrawer(true),
+            [setOpenEditDrawer],
+          )}
           id="tab-edit"
         >
           <span style={{ marginLeft: "0.25rem" }}>

@@ -6,6 +6,7 @@ import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
 import { useExportSong } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
+import { useRootView } from "../../hooks/useRootView"
 import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { Menu, MenuDivider, MenuItem, SubMenu } from "../ui/Menu"
@@ -16,13 +17,17 @@ import { Tab } from "./Navigation"
 
 export const FileMenuButton: FC = observer(() => {
   const {
-    rootViewStore,
     authStore: { authUser: user },
   } = useStores()
-  const isOpen = rootViewStore.openFileDrawer
-  const handleClose = () => (rootViewStore.openFileDrawer = false)
+  const {
+    openFileDrawer: isOpen,
+    setOpenFileDrawer,
+    setOpenSignInDialog,
+  } = useRootView()
   const exportSong = useExportSong()
   const theme = useTheme()
+
+  const handleClose = () => setOpenFileDrawer(false)
 
   const onClickExportWav = () => {
     handleClose()
@@ -39,11 +44,14 @@ export const FileMenuButton: FC = observer(() => {
   return (
     <Menu
       open={isOpen}
-      onOpenChange={(open) => (rootViewStore.openFileDrawer = open)}
+      onOpenChange={setOpenFileDrawer}
       trigger={
         <Tab
           ref={ref}
-          onClick={useCallback(() => (rootViewStore.openFileDrawer = true), [])}
+          onClick={useCallback(
+            () => setOpenFileDrawer(true),
+            [setOpenFileDrawer],
+          )}
           id="tab-file"
         >
           <span style={{ marginLeft: "0.25rem" }}>
@@ -65,7 +73,7 @@ export const FileMenuButton: FC = observer(() => {
           <MenuItem
             onClick={() => {
               handleClose()
-              rootViewStore.openSignInDialog = true
+              setOpenSignInDialog(true)
             }}
           >
             <CloudOutlined style={{ marginRight: "0.5em" }} />

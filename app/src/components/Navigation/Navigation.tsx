@@ -5,8 +5,8 @@ import Settings from "mdi-react/SettingsIcon"
 import { observer } from "mobx-react-lite"
 import { CSSProperties, FC, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
+import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
-import { useStores } from "../../hooks/useStores"
 import ArrangeIcon from "../../images/icons/arrange.svg"
 import PianoIcon from "../../images/icons/piano.svg"
 import TempoIcon from "../../images/icons/tempo.svg"
@@ -84,7 +84,7 @@ export const IconStyle: CSSProperties = {
 }
 
 export const Navigation: FC = observer(() => {
-  const { rootViewStore } = useStores()
+  const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
 
   const onClickPianoRollTab = useCallback(() => {
@@ -100,12 +100,12 @@ export const Navigation: FC = observer(() => {
   }, [setPath])
 
   const onClickSettings = useCallback(() => {
-    rootViewStore.openSettingDialog = true
-  }, [rootViewStore])
+    setOpenSettingDialog(true)
+  }, [setOpenSettingDialog])
 
   const onClickHelp = useCallback(() => {
-    rootViewStore.openHelp = true
-  }, [rootViewStore])
+    setOpenHelpDialog(true)
+  }, [setOpenHelpDialog])
 
   return (
     <Container>

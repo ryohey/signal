@@ -1,6 +1,5 @@
 import { useTheme } from "@emotion/react"
 import { LoopSetting } from "@signal-app/player"
-import { isEqual } from "lodash"
 import { TimeSignatureEvent } from "midifile-ts"
 import React, { FC, useCallback, useState } from "react"
 import { Layout } from "../../Constants"
@@ -228,10 +227,13 @@ const PianoRuler: FC<PianoRulerProps> = ({
     [
       getTick,
       getQuantizedTick,
-      scrollLeft,
-      transform,
-      timeSignatures,
+      timeSignatureHitTest,
       clearSelectedTimeSignature,
+      onClickTimeSignature,
+      onClickRuler,
+      setRightClickTick,
+      onContextMenu,
+      _onMouseDown,
     ],
   )
 
@@ -286,8 +288,4 @@ const PianoRuler: FC<PianoRulerProps> = ({
   )
 }
 
-function equals(props: PianoRulerProps, nextProps: PianoRulerProps) {
-  return isEqual(props.style, nextProps.style)
-}
-
-export default React.memo(PianoRuler, equals)
+export default PianoRuler

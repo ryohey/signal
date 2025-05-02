@@ -1,6 +1,5 @@
-import { observer } from "mobx-react-lite"
 import { useCallback } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -11,15 +10,12 @@ import {
 import { Button } from "../ui/Button"
 import { CloudFileList } from "./CloudFileList"
 
-export const CloudFileDialog = observer(() => {
-  const {
-    rootViewStore,
-    rootViewStore: { openCloudFileDialog },
-  } = useStores()
+export const CloudFileDialog = () => {
+  const { openCloudFileDialog, setOpenCloudFileDialog } = useRootView()
 
   const onClose = useCallback(
-    () => (rootViewStore.openCloudFileDialog = false),
-    [rootViewStore],
+    () => setOpenCloudFileDialog(false),
+    [setOpenCloudFileDialog],
   )
 
   return (
@@ -41,4 +37,4 @@ export const CloudFileDialog = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}
