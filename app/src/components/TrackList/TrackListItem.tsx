@@ -9,14 +9,13 @@ import {
   useSelectTrack,
   useToggleAllGhostTracks,
   useToggleGhostTrack,
-  useToggleMuteTrack,
-  useToggleSoloTrack,
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
+import { useTrackMute } from "../../hooks/useTrackMute"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import Track from "../../track/Track"
 import { trackColorToCSSColor } from "../../track/TrackColor"
@@ -157,8 +156,7 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const { trackMute } = useStores()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
-  const toggleMuteTrack = useToggleMuteTrack()
-  const toggleSoloTrack = useToggleSoloTrack()
+  const { toggleMuteTrack, toggleSoloTrack } = useTrackMute()
   const toggleGhostTrack = useToggleGhostTrack()
   const toggleAllGhostTracks = useToggleAllGhostTracks()
   const selectTrack = useSelectTrack()
