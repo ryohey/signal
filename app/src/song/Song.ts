@@ -1,5 +1,12 @@
 import { PlayerEvent } from "@signal-app/player"
-import { action, computed, makeObservable, observable, reaction } from "mobx"
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  toJS,
+} from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
 import { Measure } from "../entities/measure/Measure"
 import { NoteNumber } from "../entities/unit/NoteNumber"
@@ -40,10 +47,15 @@ export default class Song {
     })
 
     reaction(
-      () => [
-        this.tracks.map((t) => ({ channel: t.channel, events: t.events })),
-        this.name,
-      ],
+      () => {
+        return [
+          this.tracks.map((t) => ({
+            channel: t.channel,
+            events: toJS(t.events),
+          })),
+          this.name,
+        ]
+      },
       () => (this.isSaved = false),
     )
   }
@@ -148,4 +160,5 @@ createModelSchema(Song, {
   filepath: primitive(),
   timebase: primitive(),
   lastTrackId: primitive(),
+  isSaved: primitive(),
 })
