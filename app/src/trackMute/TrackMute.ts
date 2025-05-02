@@ -1,12 +1,4 @@
-import { makeObservable, observable } from "mobx"
 import { TrackId } from "../track/Track"
-import { ITrackMute } from "./ITrackMute"
-
-function updated<T>(obj: T, key: keyof T, value: unknown) {
-  return { ...obj, [key]: value }
-}
-
-type BoolMap = { [index: number]: boolean }
 
 /**
 
@@ -28,80 +20,86 @@ type BoolMap = { [index: number]: boolean }
   mute モードに遷移する
 
 */
-export default class TrackMute implements ITrackMute {
-  private mutes: BoolMap = {}
+export interface TrackMute {
+  mutes: { [trackId: TrackId]: boolean }
+  solos: { [trackId: TrackId]: boolean }
+}
 
-  private solos: BoolMap = {}
-
-  constructor() {
-    makeObservable<TrackMute, "mutes" | "solos">(this, {
-      mutes: observable,
-      solos: observable,
-    })
-  }
-
-  reset() {
-    this.mutes = {}
-    this.solos = {}
-  }
-
-  private _setMute(trackId: TrackId, isMute: boolean) {
-    if (this.isSoloMode()) {
-      return
+export namespace TrackMute {
+  function setMute(
+    trackMute: TrackMute,
+    trackId: TrackId,
+    isMute: boolean,
+  ): TrackMute {
+    if (isSoloMode(trackMute)) {
+      return trackMute // do nothing
     }
-    this.mutes = updated(this.mutes, trackId, isMute)
+    return {
+      ...trackMute,
+      mutes: {
+        ...trackMute.mutes,
+        [trackId]: isMute,
+      },
+    }
   }
 
-  private _getMute(trackId: TrackId) {
-    return this.mutes[trackId] || false
+  function getMute(trackMute: TrackMute, trackId: TrackId) {
+    return trackMute.mutes[trackId] || false
   }
 
-  private _setSolo(trackId: TrackId, isSolo: boolean) {
-    this.solos = updated(this.solos, trackId, isSolo)
+  function setSolo(
+    trackMute: TrackMute,
+    trackId: TrackId,
+    isSolo: boolean,
+  ): TrackMute {
+    return {
+      ...trackMute,
+      solos: {
+        ...trackMute.solos,
+        [trackId]: isSolo,
+      },
+    }
   }
 
-  private _getSolo(trackId: TrackId) {
-    return this.solos[trackId] || false
+  function getSolo(trackMute: TrackMute, trackId: TrackId) {
+    return trackMute.solos[trackId] || false
   }
 
-  mute(trackId: TrackId) {
-    this._setMute(trackId, true)
-  }
-
-  unmute(trackId: TrackId) {
-    this._setMute(trackId, false)
-  }
-
-  solo(trackId: TrackId) {
-    this._setSolo(trackId, true)
-  }
-
-  unsolo(trackId: TrackId) {
-    this._setSolo(trackId, false)
-  }
-
-  isSoloMode(): boolean {
+  export function isSoloMode(trackMute: TrackMute): boolean {
     // どれかひとつでも solo なら solo モード
     // Any one or Solo mode Solo mode
-    return Object.values(this.solos).some((s) => s)
+    return Object.values(trackMute.solos).some((s) => s)
   }
 
-  shouldPlayTrack(trackId: TrackId) {
-    if (this.isSoloMode()) {
-      return this._getSolo(trackId)
+  export function isSolo(trackMute: TrackMute, trackId: TrackId) {
+    return isSoloMode(trackMute) && trackMute.solos[trackId]
+  }
+
+  export function isMuted(trackMute: TrackMute, trackId: TrackId) {
+    return !shouldPlayTrack(trackMute, trackId)
+  }
+
+  export function mute(trackMute: TrackMute, trackId: TrackId): TrackMute {
+    return setMute(trackMute, trackId, true)
+  }
+
+  export function unmute(trackMute: TrackMute, trackId: TrackId): TrackMute {
+    return setMute(trackMute, trackId, false)
+  }
+
+  export function solo(trackMute: TrackMute, trackId: TrackId): TrackMute {
+    return setSolo(trackMute, trackId, true)
+  }
+
+  export function unsolo(trackMute: TrackMute, trackId: TrackId): TrackMute {
+    return setSolo(trackMute, trackId, false)
+  }
+
+  export function shouldPlayTrack(trackMute: TrackMute, trackId: TrackId) {
+    if (isSoloMode(trackMute)) {
+      return getSolo(trackMute, trackId)
     } else {
-      return !this._getMute(trackId)
+      return !getMute(trackMute, trackId)
     }
-  }
-
-  // 表示用のメソッド
-  // Method for display
-
-  isSolo(trackId: TrackId) {
-    return this.isSoloMode() && this.solos[trackId]
-  }
-
-  isMuted(trackId: TrackId) {
-    return !this.shouldPlayTrack(trackId)
   }
 }

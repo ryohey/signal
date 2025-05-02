@@ -14,11 +14,11 @@ import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRouter } from "../../hooks/useRouter"
-import { useStores } from "../../hooks/useStores"
 import { useTrackMute } from "../../hooks/useTrackMute"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import Track from "../../track/Track"
 import { trackColorToCSSColor } from "../../track/TrackColor"
+import { TrackMute } from "../../trackMute/TrackMute"
 import { TrackInstrumentName } from "./InstrumentName"
 import { TrackDialog } from "./TrackDialog"
 import { TrackListContextMenu } from "./TrackListContextMenu"
@@ -153,17 +153,18 @@ const ControlButton = styled.div`
 
 export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const { selectedTrackId, notGhostTrackIds } = usePianoRoll()
-  const { trackMute } = useStores()
+  const { trackMute } = useTrackMute()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
-  const { toggleMuteTrack, toggleSoloTrack } = useTrackMute()
+  const { toggleMute: toggleMuteTrack, toggleSolo: toggleSoloTrack } =
+    useTrackMute()
   const toggleGhostTrack = useToggleGhostTrack()
   const toggleAllGhostTracks = useToggleAllGhostTracks()
   const selectTrack = useSelectTrack()
 
   const selected = track.id === selectedTrackId
-  const mute = trackMute.isMuted(track.id)
-  const solo = trackMute.isSolo(track.id)
+  const mute = TrackMute.isMuted(trackMute, track.id)
+  const solo = TrackMute.isSolo(trackMute, track.id)
   const ghostTrack = !notGhostTrackIds.has(track.id)
   const channel = track.channel
   const { onContextMenu, menuProps } = useContextMenu()

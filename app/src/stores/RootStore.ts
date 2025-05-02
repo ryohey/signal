@@ -15,7 +15,6 @@ import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
 import Song, { emptySong } from "../song"
 import { UNASSIGNED_TRACK_ID } from "../track"
-import TrackMute from "../trackMute"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "./ArrangeViewStore"
@@ -34,6 +33,7 @@ import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
 import TempoEditorStore from "./TempoEditorStore"
 import { ThemeStore } from "./ThemeStore"
+import { TrackMuteStore } from "./TrackMuteStore"
 
 // we use any for now. related: https://github.com/Microsoft/TypeScript/issues/1897
 type Json = any
@@ -57,7 +57,7 @@ export default class RootStore {
   readonly userRepository = createUserRepository(firestore, auth)
 
   readonly router = new Router()
-  readonly trackMute = new TrackMute()
+  readonly trackMuteStore = new TrackMuteStore()
   readonly historyStore = new HistoryStore(this)
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
@@ -90,7 +90,7 @@ export default class RootStore {
     const context = new (window.AudioContext || window.webkitAudioContext)()
     this.synth = new SoundFontSynth(context)
     this.metronomeSynth = new SoundFontSynth(context)
-    this.synthGroup = new GroupOutput(this.trackMute, this.metronomeSynth)
+    this.synthGroup = new GroupOutput(this.trackMuteStore, this.metronomeSynth)
     this.synthGroup.outputs.push({ synth: this.synth, isEnabled: true })
 
     const eventSource = new EventSource(this)

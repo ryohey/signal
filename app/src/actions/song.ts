@@ -4,6 +4,7 @@ import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
+import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
 import { emptyTrack, TrackId, UNASSIGNED_TRACK_ID } from "../track"
@@ -19,7 +20,8 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
-  const { songStore, trackMute, historyStore } = useStores()
+  const { songStore, historyStore } = useStores()
+  const { reset: resetTrackMute } = useTrackMute()
   const { stop, reset, setPosition } = usePlayer()
   const {
     setNotGhostTrackIds,
@@ -37,7 +39,7 @@ export const useSetSong = () => {
 
   return (newSong: Song) => {
     songStore.song = newSong
-    trackMute.reset()
+    resetTrackMute()
 
     setScrollLeftInPixels(0)
     setNotGhostTrackIds(new Set())
