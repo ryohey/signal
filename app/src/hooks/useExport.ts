@@ -1,16 +1,45 @@
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
+import { useCallback } from "react"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import { useLocalization } from "../localize/useLocalization"
 import Song from "../song"
+import { useMobxStore } from "./useMobxSelector"
+import { useStores } from "./useStores"
+
+export function useExport() {
+  const { exportStore } = useStores()
+
+  return {
+    get openExportProgressDialog() {
+      return useMobxStore(
+        ({ exportStore }) => exportStore.openExportProgressDialog,
+      )
+    },
+    get progress() {
+      return useMobxStore(({ exportStore }) => exportStore.progress)
+    },
+    get exportSong() {
+      return useExportSong()
+    },
+    setOpenExportProgressDialog: useCallback(
+      (open: boolean) => {
+        exportStore.openExportProgressDialog = open
+      },
+      [exportStore],
+    ),
+    cancelExport: useCallback(() => {
+      exportStore.isCanceled = true
+    }, [exportStore]),
+  }
+}
 
 const waitForAnimationFrame = () =>
   new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
-export const useExportSong = () => {
+const useExportSong = () => {
   const { synth, exportStore } = useStores()
   const song = useSong()
   const localized = useLocalization()
@@ -68,16 +97,7 @@ export const useExportSong = () => {
   }
 }
 
-export const useCancelExport = () => {
-  const { exportStore } = useStores()
-
-  return () => {
-    exportStore.isCanceled = true
-  }
-}
-
-export const canExport = (song: Song) =>
-  song.allEvents.some((e) => e.tick >= 120)
+const canExport = (song: Song) => song.allEvents.some((e) => e.tick >= 120)
 
 const getEncoder = (format: "WAV" | "MP3") => {
   switch (format) {

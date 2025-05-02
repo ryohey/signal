@@ -12,7 +12,6 @@ import { auth } from "../.././firebase/firebase"
 import {
   useDeleteSelection,
   useDuplicateSelection,
-  useExportSong,
   useQuantizeSelectedNotes,
   useSelectAllNotes,
   useSelectNextNote,
@@ -27,6 +26,7 @@ import {
   usePasteSelectionGlobal,
 } from "../../actions/hotkey"
 import { useCloudFile } from "../../hooks/useCloudFile"
+import { useExport } from "../../hooks/useExport"
 import { useHistory } from "../../hooks/useHistory"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
@@ -59,7 +59,7 @@ export const ElectronCallbackHandler: FC = observer(() => {
   const transposeSelection = useTransposeSelection()
   const { undo, redo } = useHistory()
   const setSong = useSetSong()
-  const exportSong = useExportSong()
+  const { exportSong } = useExport()
 
   const saveFileAs = async () => {
     try {

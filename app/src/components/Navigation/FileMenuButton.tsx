@@ -3,9 +3,9 @@ import ChevronRight from "mdi-react/ChevronRightIcon"
 import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
 import { FC, useCallback, useRef } from "react"
-import { useExportSong } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
 import { useAuth } from "../../hooks/useAuth"
+import { useExport } from "../../hooks/useExport"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { Menu, MenuDivider, MenuItem, SubMenu } from "../ui/Menu"
@@ -21,7 +21,7 @@ export const FileMenuButton: FC = () => {
     setOpenFileDrawer,
     setOpenSignInDialog,
   } = useRootView()
-  const exportSong = useExportSong()
+  const { exportSong } = useExport()
   const theme = useTheme()
 
   const handleClose = () => setOpenFileDrawer(false)
