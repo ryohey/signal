@@ -7,7 +7,7 @@ function getTrackId(value: number): TrackId {
 
 describe("TrackMute", () => {
   it("not muted by default", () => {
-    let t: TrackMute = {
+    const t: TrackMute = {
       mutes: {},
       solos: {},
     }
