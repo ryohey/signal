@@ -2,7 +2,6 @@ import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { useToast } from "dialog-hooks"
 import OpenInNewIcon from "mdi-react/OpenInNewIcon"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback, useEffect, useState } from "react"
 import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
 import { useRootView } from "../../hooks/useRootView"
@@ -21,7 +20,7 @@ import { LinkShare } from "../ui/LinkShare"
 
 type PublishState = "publishable" | "published" | "notPublishable"
 
-export const PublishDialog: FC = observer(() => {
+export const PublishDialog: FC = () => {
   const { songStore, cloudSongRepository, userRepository } = useStores()
   const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
   const song = useSong()
@@ -133,7 +132,7 @@ export const PublishDialog: FC = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}
 
 const SongLink = styled.a`
   display: flex;

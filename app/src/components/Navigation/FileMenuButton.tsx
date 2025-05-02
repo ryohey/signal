@@ -2,12 +2,11 @@ import { useTheme } from "@emotion/react"
 import ChevronRight from "mdi-react/ChevronRightIcon"
 import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
-import { observer } from "mobx-react-lite"
 import { FC, useCallback, useRef } from "react"
-import { useExportSong } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
+import { useAuth } from "../../hooks/useAuth"
+import { useExport } from "../../hooks/useExport"
 import { useRootView } from "../../hooks/useRootView"
-import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { Menu, MenuDivider, MenuItem, SubMenu } from "../ui/Menu"
 import { CloudFileMenu } from "./CloudFileMenu"
@@ -15,16 +14,14 @@ import { FileMenu } from "./FileMenu"
 import { LegacyFileMenu } from "./LegacyFileMenu"
 import { Tab } from "./Navigation"
 
-export const FileMenuButton: FC = observer(() => {
-  const {
-    authStore: { authUser: user },
-  } = useStores()
+export const FileMenuButton: FC = () => {
+  const { authUser: user } = useAuth()
   const {
     openFileDrawer: isOpen,
     setOpenFileDrawer,
     setOpenSignInDialog,
   } = useRootView()
-  const exportSong = useExportSong()
+  const { exportSong } = useExport()
   const theme = useTheme()
 
   const handleClose = () => setOpenFileDrawer(false)
@@ -99,4 +96,4 @@ export const FileMenuButton: FC = observer(() => {
       </SubMenu>
     </Menu>
   )
-})
+}

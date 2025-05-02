@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async"
 import { useSong } from "../../hooks/useSong"
 import Song from "../../song"
 
+// we still need to use observer to track song property changes
 export const Head: FC = observer(() => {
   const song = useSong()
 

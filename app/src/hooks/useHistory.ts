@@ -14,5 +14,6 @@ export function useHistory() {
     pushHistory: useCallback(() => historyStore.push(), [historyStore]),
     undo: useCallback(() => historyStore.undo(), [historyStore]),
     redo: useCallback(() => historyStore.redo(), [historyStore]),
+    clear: useCallback(() => historyStore.clear(), [historyStore]),
   }
 }

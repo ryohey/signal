@@ -1,9 +1,8 @@
 import styled from "@emotion/styled"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
+import { useAuth } from "../../hooks/useAuth"
 import { useRootView } from "../../hooks/useRootView"
-import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
@@ -22,10 +21,8 @@ const UserCardWrapper = styled.div`
   gap: 1rem;
 `
 
-const UserCard = observer(() => {
-  const {
-    authStore: { authUser: user },
-  } = useStores()
+const UserCard = () => {
+  const { authUser: user } = useAuth()
 
   if (user === null) {
     return <></>
@@ -37,7 +34,7 @@ const UserCard = observer(() => {
       <p>{user.displayName}</p>
     </UserCardWrapper>
   )
-})
+}
 
 const Content = styled.div`
   display: flex;
@@ -49,15 +46,13 @@ const DeleteButton = styled(Button)`
   color: var(--color-red);
 `
 
-export const UserSettingsDialog: FC = observer(() => {
+export const UserSettingsDialog: FC = () => {
   const {
     openUserSettingsDialog,
     setOpenUserSettingsDialog,
     setOpenDeleteAccountDialog,
   } = useRootView()
-  const {
-    authStore: { authUser: user },
-  } = useStores()
+  const { authUser: user } = useAuth()
 
   const onClickCancel = () => {
     setOpenUserSettingsDialog(false)
@@ -97,4 +92,4 @@ export const UserSettingsDialog: FC = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}

@@ -1,7 +1,5 @@
-import { observer } from "mobx-react-lite"
 import { FC, useCallback } from "react"
-import { useCancelExport } from "../../actions"
-import { useStores } from "../../hooks/useStores"
+import { useExport } from "../../hooks/useExport"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -12,15 +10,18 @@ import {
 import { Button } from "../ui/Button"
 import { LinearProgress } from "../ui/LinearProgress"
 
-export const ExportProgressDialog: FC = observer(() => {
-  const { exportStore } = useStores()
-  const cancelExport = useCancelExport()
-  const { openExportProgressDialog: open, progress } = exportStore
+export const ExportProgressDialog: FC = () => {
+  const {
+    openExportProgressDialog: open,
+    setOpenExportProgressDialog: setOpen,
+    progress,
+    cancelExport,
+  } = useExport()
 
   const onClickCancel = useCallback(() => {
-    exportStore.openExportProgressDialog = false
+    setOpen(false)
     cancelExport()
-  }, [exportStore, cancelExport])
+  }, [setOpen, cancelExport])
 
   return (
     <Dialog open={open} style={{ minWidth: "20rem" }}>
@@ -37,4 +38,4 @@ export const ExportProgressDialog: FC = observer(() => {
       </DialogActions>
     </Dialog>
   )
-})
+}

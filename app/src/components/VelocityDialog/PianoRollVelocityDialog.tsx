@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { useCallback } from "react"
 import {
   BatchUpdateOperation,
@@ -7,7 +6,7 @@ import {
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { VelocityDialog } from "./VelocityDialog"
 
-export const PianoRollVelocityDialog = observer(() => {
+export const PianoRollVelocityDialog = () => {
   const { openVelocityDialog, newNoteVelocity, setOpenVelocityDialog } =
     usePianoRoll()
   const batchUpdateSelectedNotesVelocity = useBatchUpdateSelectedNotesVelocity()
@@ -36,4 +35,4 @@ export const PianoRollVelocityDialog = observer(() => {
       onClose={onClose}
     />
   )
-})
+}
