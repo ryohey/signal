@@ -4,7 +4,7 @@ import { TickTransform } from "../transform/TickTransform"
 import { Beat } from "./Beat"
 
 export type BeatWithX = Beat & {
-  x: number
+  readonly x: number
 }
 
 export namespace BeatWithX {

@@ -5,10 +5,10 @@ import { NoteCoordTransform } from "../transform/NoteCoordTransform"
 import { NotePoint } from "../transform/NotePoint"
 
 export interface Selection {
-  fromTick: number
-  fromNoteNumber: number
-  toTick: number
-  toNoteNumber: number
+  readonly fromTick: number
+  readonly fromNoteNumber: number
+  readonly toTick: number
+  readonly toNoteNumber: number
 }
 
 export namespace Selection {

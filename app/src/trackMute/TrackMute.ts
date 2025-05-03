@@ -21,8 +21,8 @@ import { TrackId } from "../track/Track"
 
 */
 export interface TrackMute {
-  mutes: { [trackId: TrackId]: boolean }
-  solos: { [trackId: TrackId]: boolean }
+  readonly mutes: { [trackId: TrackId]: boolean }
+  readonly solos: { [trackId: TrackId]: boolean }
 }
 
 export namespace TrackMute {
