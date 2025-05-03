@@ -370,8 +370,8 @@ export const useUpdateTimeSignature = () => {
 }
 
 export interface BatchUpdateOperation {
-  type: "set" | "add" | "multiply"
-  value: number
+  readonly type: "set" | "add" | "multiply"
+  readonly value: number
 }
 
 export const batchUpdateNotesVelocity = (

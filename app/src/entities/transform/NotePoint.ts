@@ -1,8 +1,8 @@
 import { NoteNumber } from "../unit/NoteNumber"
 
 export interface NotePoint {
-  tick: number
-  noteNumber: number
+  readonly tick: number
+  readonly noteNumber: number
 }
 
 export namespace NotePoint {

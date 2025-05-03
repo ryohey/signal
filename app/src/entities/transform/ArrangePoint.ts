@@ -1,6 +1,6 @@
 export interface ArrangePoint {
-  tick: number
-  trackIndex: number
+  readonly tick: number
+  readonly trackIndex: number
 }
 
 export namespace ArrangePoint {

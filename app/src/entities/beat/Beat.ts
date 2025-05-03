@@ -2,9 +2,9 @@ import { Range } from "../geometry/Range"
 import { Measure } from "../measure/Measure"
 
 export interface Beat {
-  measure: number
-  beat: number
-  tick: number
+  readonly measure: number
+  readonly beat: number
+  readonly tick: number
 }
 
 export namespace Beat {

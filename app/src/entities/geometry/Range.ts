@@ -1,4 +1,4 @@
-export type Range = [number, number]
+export type Range = readonly [number, number]
 
 export namespace Range {
   export function fromLength(start: number, length: number): Range {

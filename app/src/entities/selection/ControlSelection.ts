@@ -1,4 +1,4 @@
 export interface ControlSelection {
-  fromTick: number
-  toTick: number
+  readonly fromTick: number
+  readonly toTick: number
 }

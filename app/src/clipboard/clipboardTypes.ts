@@ -2,8 +2,8 @@ import { SetTempoEvent } from "midifile-ts"
 import { NoteEvent, TrackEvent, TrackEventOf } from "../track"
 
 export interface PianoNotesClipboardData {
-  type: "piano_notes"
-  notes: NoteEvent[]
+  readonly type: "piano_notes"
+  readonly notes: NoteEvent[]
 }
 
 export const isPianoNotesClipboardData = (
@@ -11,9 +11,9 @@ export const isPianoNotesClipboardData = (
 ): x is PianoNotesClipboardData => x.type === "piano_notes" && "notes" in x
 
 export interface ArrangeNotesClipboardData {
-  type: "arrange_notes"
-  notes: { [key: number]: TrackEvent[] }
-  selectedTrackIndex: number
+  readonly type: "arrange_notes"
+  readonly notes: { [key: number]: TrackEvent[] }
+  readonly selectedTrackIndex: number
 }
 
 export const isArrangeNotesClipboardData = (
@@ -22,8 +22,8 @@ export const isArrangeNotesClipboardData = (
   x.type === "arrange_notes" && "notes" in x && "selectedTrackIndex" in x
 
 export interface ControlEventsClipboardData {
-  type: "control_events"
-  events: readonly TrackEvent[]
+  readonly type: "control_events"
+  readonly events: readonly TrackEvent[]
 }
 
 export const isControlEventsClipboardData = (
@@ -32,8 +32,8 @@ export const isControlEventsClipboardData = (
   x.type === "control_events" && "events" in x
 
 export interface TempoEventsClipboardData {
-  type: "tempo_events"
-  events: TrackEventOf<SetTempoEvent>[]
+  readonly type: "tempo_events"
+  readonly events: TrackEventOf<SetTempoEvent>[]
 }
 
 export const isTempoEventsClipboardData = (

@@ -2,9 +2,9 @@ import { Beat } from "../beat/Beat"
 import { Range } from "../geometry/Range"
 
 interface TimeSignature {
-  tick: number
-  numerator: number
-  denominator: number
+  readonly tick: number
+  readonly numerator: number
+  readonly denominator: number
 }
 
 export interface Measure extends TimeSignature {

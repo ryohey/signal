@@ -4,7 +4,7 @@ import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 
 declare global {
   interface Window {
-    electronAPI: ElectronAPI
+    readonly electronAPI: ElectronAPI
   }
 }
 

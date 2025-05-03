@@ -2,10 +2,10 @@ import Quantizer from "../../quantizer"
 import { ArrangePoint } from "../transform/ArrangePoint"
 
 export interface ArrangeSelection {
-  fromTick: number
-  fromTrackIndex: number
-  toTick: number
-  toTrackIndex: number
+  readonly fromTick: number
+  readonly fromTrackIndex: number
+  readonly toTick: number
+  readonly toTrackIndex: number
 }
 
 export namespace ArrangeSelection {

@@ -2,8 +2,8 @@ import { Rect } from "../geometry/Rect"
 import { TempoCoordTransform } from "../transform/TempoCoordTransform"
 
 export interface TempoSelection {
-  fromTick: number
-  toTick: number
+  readonly fromTick: number
+  readonly toTick: number
 }
 
 export namespace TempoSelection {

@@ -13,8 +13,8 @@ import { Label } from "../ui/Label"
 import { SelectBox } from "./SelectBox"
 
 export interface InstrumentSetting {
-  programNumber: number
-  isRhythmTrack: boolean
+  readonly programNumber: number
+  readonly isRhythmTrack: boolean
 }
 
 const Finder = styled.div`

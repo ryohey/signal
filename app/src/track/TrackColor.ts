@@ -1,10 +1,10 @@
 import { vec4 } from "gl-matrix"
 
 export interface TrackColor {
-  red: number // 0 to 0xFF
-  green: number // 0 to 0xFF
-  blue: number // 0 to 0xFF
-  alpha: number // 0 to 0xFF (0 is transparent)
+  readonly red: number // 0 to 0xFF
+  readonly green: number // 0 to 0xFF
+  readonly blue: number // 0 to 0xFF
+  readonly alpha: number // 0 to 0xFF (0 is transparent)
 }
 
 export const trackColorToCSSColor = (color: TrackColor): string =>
