@@ -77,7 +77,7 @@ export default class PianoRollStore {
     isRhythmTrack: false,
     programNumber: 0,
   }
-  notGhostTrackIds: Set<TrackId> = new Set()
+  notGhostTrackIds: ReadonlySet<TrackId> = new Set()
   canvasWidth: number = 0
   canvasHeight: number = 0
   showTrackList = false

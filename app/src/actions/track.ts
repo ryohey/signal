@@ -5,6 +5,7 @@ import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
+import { addedSet, deletedSet } from "../helpers/set"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -308,11 +309,10 @@ export const useToggleGhostTrack = () => {
   return (trackId: TrackId) => {
     pushHistory()
     if (notGhostTrackIds.has(trackId)) {
-      notGhostTrackIds.delete(trackId)
+      setNotGhostTrackIds(deletedSet(notGhostTrackIds, trackId))
     } else {
-      notGhostTrackIds.add(trackId)
+      setNotGhostTrackIds(addedSet(notGhostTrackIds, trackId))
     }
-    setNotGhostTrackIds(notGhostTrackIds)
   }
 }
 
@@ -326,10 +326,7 @@ export const useToggleAllGhostTracks = () => {
     if (notGhostTrackIds.size > Math.floor(song.tracks.length / 2)) {
       setNotGhostTrackIds(new Set())
     } else {
-      for (const track of song.tracks) {
-        notGhostTrackIds.add(track.id)
-      }
-      setNotGhostTrackIds(notGhostTrackIds)
+      setNotGhostTrackIds(new Set(song.tracks.map((t) => t.id)))
     }
   }
 }
