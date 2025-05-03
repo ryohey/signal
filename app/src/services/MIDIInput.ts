@@ -1,4 +1,5 @@
 import { deserializeSingleEvent, Stream } from "midifile-ts"
+import { addedSet, deletedSet } from "../helpers/set"
 import RootStore from "../stores/RootStore"
 
 export class MIDIInput {
@@ -55,8 +56,14 @@ export const previewMidiInput =
     player.sendEvent(event)
 
     if (event.subtype === "noteOn") {
-      pianoRollStore.previewingNoteNumbers.add(event.noteNumber)
+      pianoRollStore.previewingNoteNumbers = addedSet(
+        pianoRollStore.previewingNoteNumbers,
+        event.noteNumber,
+      )
     } else if (event.subtype === "noteOff") {
-      pianoRollStore.previewingNoteNumbers.delete(event.noteNumber)
+      pianoRollStore.previewingNoteNumbers = deletedSet(
+        pianoRollStore.previewingNoteNumbers,
+        event.noteNumber,
+      )
     }
   }
