@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
+import { useSettings } from "../../hooks/useSettings"
 import { useStores } from "../../hooks/useStores"
 import {
   Language,
@@ -19,8 +20,8 @@ interface LanguageItem {
 }
 
 const LanguageSelect: FC = observer(() => {
-  const { settingStore } = useStores()
-  const language = useCurrentLanguage()
+  const { language, setLanguage } = useSettings()
+  const currentLanguage = useCurrentLanguage()
   const items: LanguageItem[] = [
     { label: "English", language: "en" },
     { label: "French", language: "fr" },
@@ -32,8 +33,8 @@ const LanguageSelect: FC = observer(() => {
     <Label>
       <Localized name="language" />
       <Select
-        value={settingStore.language ?? language}
-        onChange={(e) => (settingStore.language = e.target.value as Language)}
+        value={language ?? currentLanguage}
+        onChange={(e) => setLanguage(e.target.value as Language)}
         style={{ marginTop: "0.5rem" }}
       >
         {items.map((item) => (
