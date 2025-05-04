@@ -6,10 +6,13 @@ import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
+import { useTickScroll } from "./useTickScroll"
 
 export function useTempoEditor() {
   const { tempoEditorStore } = useStores()
   const { rulerStore, tickScrollStore } = tempoEditorStore
+  const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
+
   const controlPoints = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.controlPoints,
   )
@@ -100,9 +103,7 @@ export function useTempoEditor() {
     setSelectedEventIds: useCallback((ids: number[]) => {
       tempoEditorStore.selectedEventIds = ids
     }, []),
-    setScrollLeftInPixels: useCallback((scrollLeft: number) => {
-      tickScrollStore.setScrollLeftInPixels(scrollLeft)
-    }, []),
+    setScrollLeftInPixels,
     setAutoScroll: useCallback((autoScroll: boolean) => {
       tempoEditorStore.autoScroll = autoScroll
     }, []),

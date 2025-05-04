@@ -3,9 +3,13 @@ import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
+import { useTickScroll } from "./useTickScroll"
 
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
+  const { tickScrollStore } = arrangeViewStore
+  const { setScrollLeftInPixels, scaleAroundPointX } =
+    useTickScroll(tickScrollStore)
 
   return {
     get autoScroll() {
@@ -52,7 +56,9 @@ export function useArrangeView() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.transform)
     },
     get scrollLeft() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollLeft)
+      return useMobxStore(
+        ({ arrangeViewStore }) => arrangeViewStore.tickScrollStore.scrollLeft,
+      )
     },
     get scrollTop() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollTop)
@@ -118,15 +124,12 @@ export function useArrangeView() {
     setScaleY: useCallback((scaleY: number) => {
       arrangeViewStore.setScaleY(scaleY)
     }, []),
-    scaleAroundPointX: useCallback((scale: number, x: number) => {
-      arrangeViewStore.scaleAroundPointX(scale, x)
-    }, []),
+    scaleAroundPointX,
     scrollBy: useCallback((x: number, y: number) => {
-      arrangeViewStore.scrollBy(x, y)
+      setScrollLeftInPixels(tickScrollStore.scrollLeft - x)
+      arrangeViewStore.setScrollTop(arrangeViewStore.scrollTop - y)
     }, []),
-    setScrollLeftInPixels: useCallback((x: number) => {
-      arrangeViewStore.setScrollLeftInPixels(x)
-    }, []),
+    setScrollLeftInPixels,
     setScrollTop: useCallback((value: number) => {
       arrangeViewStore.setScrollTop(value)
     }, []),

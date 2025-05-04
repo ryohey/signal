@@ -9,6 +9,7 @@ import { PianoNoteItem, PianoRollMouseMode } from "../stores/PianoRollStore"
 import { TrackId } from "../track"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
+import { useTickScroll } from "./useTickScroll"
 
 const SCALE_Y_MIN = 0.5
 const SCALE_Y_MAX = 4
@@ -16,6 +17,8 @@ const SCALE_Y_MAX = 4
 export function usePianoRoll() {
   const { pianoRollStore, songStore } = useStores()
   const { tickScrollStore } = pianoRollStore
+  const { setScrollLeftInTicks, setScrollLeftInPixels, scaleAroundPointX } =
+    useTickScroll(tickScrollStore)
 
   const setScrollTopInPixels = useCallback(
     (y: number) => {
@@ -208,10 +211,10 @@ export function usePianoRoll() {
     }, [pianoRollStore]),
     scrollBy: useCallback(
       (dx: number, dy: number) => {
-        tickScrollStore.setScrollLeftInPixels(pianoRollStore.scrollLeft - dx)
+        setScrollLeftInPixels(pianoRollStore.scrollLeft - dx)
         setScrollTopInPixels(pianoRollStore.scrollTop - dy)
       },
-      [pianoRollStore, tickScrollStore],
+      [setScrollLeftInPixels, setScrollTopInPixels, pianoRollStore],
     ),
     setAutoScroll: useCallback(
       (autoScroll: boolean) => (pianoRollStore.autoScroll = autoScroll),
@@ -253,14 +256,8 @@ export function usePianoRoll() {
       (show: boolean) => (pianoRollStore.showEventList = show),
       [pianoRollStore],
     ),
-    setScrollLeftInTicks: useCallback(
-      (scrollLeft: number) => tickScrollStore.setScrollLeftInTicks(scrollLeft),
-      [tickScrollStore],
-    ),
-    setScrollLeftInPixels: useCallback(
-      (scrollLeft: number) => tickScrollStore.setScrollLeftInPixels(scrollLeft),
-      [tickScrollStore],
-    ),
+    setScrollLeftInTicks,
+    setScrollLeftInPixels,
     setSelectedTrackId: useCallback(
       (id: TrackId) => (pianoRollStore.selectedTrackId = id),
       [pianoRollStore],
@@ -274,11 +271,7 @@ export function usePianoRoll() {
       (ids: number[]) => (pianoRollStore.selectedNoteIds = ids),
       [pianoRollStore],
     ),
-    scaleAroundPointX: useCallback(
-      (scaleXDelta: number, pixelX: number) =>
-        tickScrollStore.scaleAroundPointX(scaleXDelta, pixelX),
-      [tickScrollStore],
-    ),
+    scaleAroundPointX,
     scaleAroundPointY: useCallback(
       (scaleYDelta: number, pixelY: number) => {
         const { transform, scrollTop, scaleY, scrollTopKeys } = pianoRollStore

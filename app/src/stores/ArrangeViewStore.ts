@@ -22,7 +22,7 @@ export type SerializedArrangeViewStore = Pick<
 
 export default class ArrangeViewStore {
   readonly rulerStore: RulerStore
-  private readonly tickScrollStore: TickScrollStore
+  readonly tickScrollStore: TickScrollStore
 
   scaleX = 1
   scaleY = 1
@@ -78,7 +78,6 @@ export default class ArrangeViewStore {
       contentHeight: computed,
       quantizer: computed,
       selectedTrackId: computed,
-      setScrollLeftInPixels: action,
       setScrollTop: action,
     })
   }
@@ -103,23 +102,10 @@ export default class ArrangeViewStore {
     return this.tickScrollStore.scrollLeft
   }
 
-  setScrollLeftInPixels(x: number) {
-    this.tickScrollStore.setScrollLeftInPixels(x)
-  }
-
   setScrollTop(value: number) {
     const maxOffset =
       this.contentHeight + Layout.rulerHeight + BAR_WIDTH - this.canvasHeight
     this.scrollTop = clamp(value, 0, maxOffset)
-  }
-
-  scrollBy(x: number, y: number) {
-    this.setScrollLeftInPixels(this.scrollLeft - x)
-    this.setScrollTop(this.scrollTop - y)
-  }
-
-  scaleAroundPointX(scaleXDelta: number, pixelX: number) {
-    this.tickScrollStore.scaleAroundPointX(scaleXDelta, pixelX)
   }
 
   setScaleY(scaleY: number) {
@@ -158,7 +144,8 @@ export default class ArrangeViewStore {
   }
 
   get notes(): Rect[] {
-    const { transform, trackTransform, scrollLeft, canvasWidth, scaleY } = this
+    const { transform, trackTransform, canvasWidth, scaleY } = this
+    const { scrollLeft } = this.tickScrollStore
 
     return this.songStore.song.tracks
       .map((t, i) =>
