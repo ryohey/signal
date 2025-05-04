@@ -1,3 +1,4 @@
+import { Player } from "@signal-app/player"
 import { computed, makeObservable, observable } from "mobx"
 import { Layout } from "../Constants"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
@@ -6,8 +7,8 @@ import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import Quantizer from "../quantizer"
 import { PianoRollMouseMode } from "./PianoRollStore"
-import RootStore from "./RootStore"
 import { RulerStore } from "./RulerStore"
+import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
 
 export default class TempoEditorStore {
@@ -25,9 +26,18 @@ export default class TempoEditorStore {
   selection: TempoSelection | null = null
   selectedEventIds: number[] = []
 
-  constructor(readonly rootStore: RootStore) {
-    this.rulerStore = new RulerStore(this, rootStore.songStore)
-    this.tickScrollStore = new TickScrollStore(this, 0.15, 15)
+  constructor(
+    private readonly songStore: SongStore,
+    private readonly player: Player,
+  ) {
+    this.rulerStore = new RulerStore(this, this.songStore)
+    this.tickScrollStore = new TickScrollStore(
+      this,
+      this.songStore,
+      this.player,
+      0.15,
+      15,
+    )
 
     makeObservable(this, {
       scrollLeftTicks: observable,
@@ -63,12 +73,12 @@ export default class TempoEditorStore {
 
   get items() {
     const { transform, canvasWidth, scrollLeft } = this
-    const events = this.rootStore.song.conductorTrack?.events ?? []
+    const events = this.songStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
   }
 
   get quantizer(): Quantizer {
-    return new Quantizer(this.rootStore, this.quantize, this.isQuantizeEnabled)
+    return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
   }
 
   // draggable hit areas for each tempo changes

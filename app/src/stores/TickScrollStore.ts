@@ -2,10 +2,9 @@ import { Player } from "@signal-app/player"
 import { clamp } from "lodash"
 import { autorun, computed, makeObservable } from "mobx"
 import { TickTransform } from "../entities/transform/TickTransform"
-import Song from "../song"
+import { SongStore } from "./SongStore"
 
 interface TickScrollProvider {
-  readonly rootStore: { song: Song; player: Player }
   readonly transform: TickTransform
   readonly canvasWidth: number
   readonly autoScroll: boolean
@@ -17,6 +16,8 @@ interface TickScrollProvider {
 export class TickScrollStore {
   constructor(
     private readonly parent: TickScrollProvider,
+    private readonly songStore: SongStore,
+    private readonly player: Player,
     private readonly minScaleX: number,
     private readonly maxScaleX: number,
   ) {
@@ -33,11 +34,8 @@ export class TickScrollStore {
 
   setUpAutoScroll() {
     autorun(() => {
-      const {
-        autoScroll,
-        rootStore: { player },
-      } = this.parent
-      const { isPlaying, position } = player
+      const { autoScroll } = this.parent
+      const { isPlaying, position } = this.player
       const { playheadInScrollZone } = this
       if (autoScroll && isPlaying && playheadInScrollZone) {
         this.parent.scrollLeftTicks = position
@@ -60,7 +58,7 @@ export class TickScrollStore {
 
   get contentWidth(): number {
     const { transform, canvasWidth } = this.parent
-    const trackEndTick = this.parent.rootStore.song.endOfSong
+    const trackEndTick = this.songStore.song.endOfSong
     const startTick = transform.getTick(this.scrollLeft)
     const widthTick = transform.getTick(canvasWidth)
     const endTick = startTick + widthTick
@@ -85,12 +83,8 @@ export class TickScrollStore {
   }
 
   get playheadPosition(): number {
-    const {
-      transform,
-      scrollLeftTicks,
-      rootStore: { player },
-    } = this.parent
-    return transform.getX(player.position - scrollLeftTicks)
+    const { transform, scrollLeftTicks } = this.parent
+    return transform.getX(this.player.position - scrollLeftTicks)
   }
 
   // Returns true if the user needs to scroll to comfortably view the playhead.

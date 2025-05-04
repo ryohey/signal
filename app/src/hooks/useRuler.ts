@@ -4,8 +4,9 @@ import { useUpdateTimeSignature } from "../actions"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
+import { useSong } from "./useSong"
 
 const TIME_SIGNATURE_HIT_WIDTH = 20
 
@@ -26,7 +27,8 @@ export function useRuler(rulerStore: RulerStore) {
   const { parent } = rulerStore
 
   const transform = useMobxSelector(() => parent.transform, [parent])
-  const timeSignatures = useMobxStore(({ song }) => song.timeSignatures)
+  const song = useSong()
+  const timeSignatures = useMobxSelector(() => song.timeSignatures, [song])
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
   const quantizer = useMobxSelector(() => parent.quantizer, [parent])
   const canvasWidth = useMobxSelector(() => parent.canvasWidth, [parent])

@@ -1,3 +1,4 @@
+import { Player } from "@signal-app/player"
 import { clamp, cloneDeep, max, min } from "lodash"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
 import { Layout, MaxNoteNumber } from "../Constants"
@@ -20,8 +21,8 @@ import Track, {
   UNASSIGNED_TRACK_ID,
   isNoteEvent,
 } from "../track"
-import RootStore from "./RootStore"
 import { RulerStore } from "./RulerStore"
+import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
 
 export type PianoRollMouseMode = "pencil" | "selection"
@@ -88,9 +89,18 @@ export default class PianoRollStore {
   keySignature: KeySignature | null = null
   previewingNoteNumbers: ReadonlySet<number> = new Set()
 
-  constructor(readonly rootStore: RootStore) {
-    this.rulerStore = new RulerStore(this, rootStore.songStore)
-    this.tickScrollStore = new TickScrollStore(this, 0.15, 15)
+  constructor(
+    private readonly songStore: SongStore,
+    private readonly player: Player,
+  ) {
+    this.rulerStore = new RulerStore(this, this.songStore)
+    this.tickScrollStore = new TickScrollStore(
+      this,
+      this.songStore,
+      this.player,
+      0.15,
+      15,
+    )
 
     makeObservable(this, {
       scrollLeftTicks: observable,
@@ -249,17 +259,17 @@ export default class PianoRollStore {
   }
 
   get selectedTrackIndex(): number {
-    return this.rootStore.song.tracks.findIndex(
+    return this.songStore.song.tracks.findIndex(
       (t) => t.id === this.selectedTrackId,
     )
   }
 
   set selectedTrackIndex(index: number) {
-    this.selectedTrackId = this.rootStore.song.tracks[index]?.id
+    this.selectedTrackId = this.songStore.song.tracks[index]?.id
   }
 
   get selectedTrack(): Track | undefined {
-    return this.rootStore.song.getTrack(this.selectedTrackId)
+    return this.songStore.song.getTrack(this.selectedTrackId)
   }
 
   get transform(): NoteCoordTransform {
@@ -325,7 +335,7 @@ export default class PianoRollStore {
   }
 
   get ghostTrackIds(): TrackId[] {
-    const song = this.rootStore.song
+    const song = this.songStore.song
     const { notGhostTrackIds, selectedTrackId } = this
     return song.tracks
       .filter(
@@ -356,37 +366,35 @@ export default class PianoRollStore {
   }
 
   get currentVolume(): number | undefined {
-    return this.selectedTrack?.getVolume(this.rootStore.player.position)
+    return this.selectedTrack?.getVolume(this.player.position)
   }
 
   get currentPan(): number | undefined {
-    return this.selectedTrack?.getPan(this.rootStore.player.position)
+    return this.selectedTrack?.getPan(this.player.position)
   }
 
   get currentTempo(): number | undefined {
-    return this.rootStore.song.conductorTrack?.getTempo(
-      this.rootStore.player.position,
-    )
+    return this.songStore.song.conductorTrack?.getTempo(this.player.position)
   }
 
   get currentMBTTime(): string {
     return Measure.getMBTString(
-      this.rootStore.song.measures,
-      this.rootStore.player.position,
-      this.rootStore.song.timebase,
+      this.songStore.song.measures,
+      this.player.position,
+      this.songStore.song.timebase,
     )
   }
 
   get cursorX(): number {
-    return this.transform.getX(this.rootStore.player.position)
+    return this.transform.getX(this.player.position)
   }
 
   get quantizer(): Quantizer {
-    return new Quantizer(this.rootStore, this.quantize, this.isQuantizeEnabled)
+    return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
   }
 
   get enabledQuantizer(): Quantizer {
-    return new Quantizer(this.rootStore, this.quantize, true)
+    return new Quantizer(this.songStore, this.quantize, true)
   }
 
   get controlCursor(): string {

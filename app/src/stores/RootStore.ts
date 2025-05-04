@@ -5,7 +5,6 @@ import {
   createUserRepository,
 } from "@signal-app/api"
 import { Player, SoundFontSynth } from "@signal-app/player"
-import { makeObservable, observable } from "mobx"
 import { deserialize, serialize } from "serializr"
 import { auth, firestore, functions } from ".././firebase/firebase"
 import { isRunningInElectron } from "../helpers/platform"
@@ -13,7 +12,7 @@ import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
-import Song, { emptySong } from "../song"
+import Song from "../song"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
@@ -46,8 +45,6 @@ export interface SerializedRootStore {
 }
 
 export default class RootStore {
-  song: Song = emptySong()
-
   readonly cloudSongRepository = createCloudSongRepository(firestore, auth)
   readonly cloudSongDataRepository = createCloudSongDataRepository(
     firestore,
@@ -57,18 +54,19 @@ export default class RootStore {
   readonly userRepository = createUserRepository(firestore, auth)
 
   readonly router = new Router()
+  readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
   readonly historyStore = new HistoryStore(this)
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
   readonly controlStore: ControlStore
-  readonly arrangeViewStore = new ArrangeViewStore(this)
-  readonly tempoEditorStore = new TempoEditorStore(this)
+  readonly arrangeViewStore: ArrangeViewStore
+  readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly exportStore = new ExportStore()
   readonly authStore = new AuthStore(this.userRepository)
   readonly cloudFileStore = new CloudFileStore(
-    this,
+    this.songStore,
     this.cloudSongRepository,
     this.cloudSongDataRepository,
   )
@@ -83,23 +81,26 @@ export default class RootStore {
   readonly themeStore = new ThemeStore()
 
   constructor() {
-    makeObservable(this, {
-      song: observable.ref,
-    })
-
     const context = new (window.AudioContext || window.webkitAudioContext)()
     this.synth = new SoundFontSynth(context)
     this.metronomeSynth = new SoundFontSynth(context)
     this.synthGroup = new GroupOutput(this.trackMuteStore, this.metronomeSynth)
     this.synthGroup.outputs.push({ synth: this.synth, isEnabled: true })
 
-    const eventSource = new EventSource(this)
+    const eventSource = new EventSource(this.songStore)
     this.player = new Player(this.synthGroup, eventSource)
-    this.midiRecorder = new MIDIRecorder(this.player, this)
 
-    this.pianoRollStore = new PianoRollStore(this)
+    this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
+    this.arrangeViewStore = new ArrangeViewStore(this.songStore, this.player)
+    this.tempoEditorStore = new TempoEditorStore(this.songStore, this.player)
     this.controlStore = new ControlStore()
     this.soundFontStore = new SoundFontStore(this.synth)
+
+    this.midiRecorder = new MIDIRecorder(
+      this.songStore,
+      this.player,
+      this.pianoRollStore,
+    )
 
     const preview = previewMidiInput(this)
 
@@ -117,7 +118,7 @@ export default class RootStore {
 
   serialize(): SerializedRootStore {
     return {
-      song: serialize(this.song),
+      song: serialize(this.songStore.song),
       pianoRollStore: this.pianoRollStore.serialize(),
       controlStore: this.controlStore.serialize(),
       arrangeViewStore: this.arrangeViewStore.serialize(),
@@ -126,7 +127,7 @@ export default class RootStore {
 
   restore(serializedState: SerializedRootStore) {
     const song = deserialize(Song, serializedState.song)
-    this.song = song
+    this.songStore.song = song
     this.pianoRollStore.restore(serializedState.pianoRollStore)
     this.controlStore.restore(serializedState.controlStore)
     this.arrangeViewStore.restore(serializedState.arrangeViewStore)
@@ -135,7 +136,7 @@ export default class RootStore {
   async init() {
     // Select the first track that is not a conductor track
     this.pianoRollStore.selectedTrackId =
-      this.song.tracks.find((t) => !t.isConductorTrack)?.id ??
+      this.songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
       UNASSIGNED_TRACK_ID
 
     await this.synth.setup()
@@ -146,10 +147,6 @@ export default class RootStore {
   private async setupMetronomeSynth() {
     const data = await loadMetronomeSoundFontData()
     await this.metronomeSynth.loadSoundFont(data)
-  }
-
-  get songStore(): SongStore {
-    return this
   }
 }
 

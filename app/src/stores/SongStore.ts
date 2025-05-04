@@ -1,5 +1,17 @@
-import Song from "../song"
+import { makeObservable, observable } from "mobx"
+import { serialize } from "serializr"
+import Song, { emptySong } from "../song"
 
-export interface SongStore {
-  song: Song
+export class SongStore {
+  song: Song = emptySong()
+
+  constructor() {
+    makeObservable(this, {
+      song: observable.ref,
+    })
+  }
+
+  serialize() {
+    return serialize(this.song)
+  }
 }
