@@ -1,3 +1,4 @@
+import { Player } from "@signal-app/player"
 import { clamp, cloneDeep } from "lodash"
 import { action, computed, makeObservable, observable } from "mobx"
 import { Layout } from "../Constants"
@@ -10,8 +11,8 @@ import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import Quantizer from "../quantizer"
 import { isNoteEvent, TrackId } from "../track"
-import RootStore from "./RootStore"
 import { RulerStore } from "./RulerStore"
+import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
 
 export type SerializedArrangeViewStore = Pick<
@@ -39,10 +40,18 @@ export default class ArrangeViewStore {
   openTransposeDialog = false
   openVelocityDialog = false
 
-  constructor(readonly rootStore: RootStore) {
-    this.rootStore = rootStore
-    this.rulerStore = new RulerStore(this, rootStore.songStore)
-    this.tickScrollStore = new TickScrollStore(this, 0.15, 15)
+  constructor(
+    private readonly songStore: SongStore,
+    private readonly player: Player,
+  ) {
+    this.rulerStore = new RulerStore(this, this.songStore)
+    this.tickScrollStore = new TickScrollStore(
+      this,
+      this.songStore,
+      this.player,
+      0.15,
+      15,
+    )
 
     makeObservable(this, {
       scaleX: observable,
@@ -123,7 +132,7 @@ export default class ArrangeViewStore {
   }
 
   get contentHeight(): number {
-    return this.trackTransform.getY(this.rootStore.song.tracks.length)
+    return this.trackTransform.getY(this.songStore.song.tracks.length)
   }
 
   get transform(): NoteCoordTransform {
@@ -151,7 +160,7 @@ export default class ArrangeViewStore {
   get notes(): Rect[] {
     const { transform, trackTransform, scrollLeft, canvasWidth, scaleY } = this
 
-    return this.rootStore.song.tracks
+    return this.songStore.song.tracks
       .map((t, i) =>
         t.events
           .filter(
@@ -176,7 +185,7 @@ export default class ArrangeViewStore {
   }
 
   get cursorX(): number {
-    return this.transform.getX(this.rootStore.player.position)
+    return this.transform.getX(this.player.position)
   }
 
   get selectionRect(): Rect | null {
@@ -197,10 +206,10 @@ export default class ArrangeViewStore {
   }
 
   get quantizer(): Quantizer {
-    return new Quantizer(this.rootStore, this.quantize, true)
+    return new Quantizer(this.songStore, this.quantize, true)
   }
 
   get selectedTrackId(): TrackId | undefined {
-    return this.rootStore.song.tracks[this.selectedTrackIndex]?.id
+    return this.songStore.song.tracks[this.selectedTrackIndex]?.id
   }
 }

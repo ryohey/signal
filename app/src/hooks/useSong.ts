@@ -1,6 +1,6 @@
 import { useMobxStore } from "./useMobxSelector"
 
 export const useSong = () => {
-  const song = useMobxStore(({ song }) => song)
+  const song = useMobxStore(({ songStore }) => songStore.song)
   return song
 }

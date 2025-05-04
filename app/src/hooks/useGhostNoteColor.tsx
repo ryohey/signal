@@ -4,7 +4,8 @@ import { vec4 } from "gl-matrix"
 import { colorToVec4 } from "../gl/color"
 import { TrackId } from "../track"
 import { trackColorToVec4 } from "../track/TrackColor"
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
+import { useSong } from "./useSong"
 
 interface NoteStyle {
   inactiveColor: vec4
@@ -15,7 +16,8 @@ interface NoteStyle {
 
 export const useGhostNoteColor = (trackId: TrackId): NoteStyle => {
   const theme = useTheme()
-  const track = useMobxStore(({ song }) => song.getTrack(trackId))
+  const song = useSong()
+  const track = useMobxSelector(() => song.getTrack(trackId), [song, trackId])
   const color = useMobxSelector(() => track?.color, [track])
 
   if (track === undefined) {
