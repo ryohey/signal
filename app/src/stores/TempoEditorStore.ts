@@ -15,10 +15,6 @@ export default class TempoEditorStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
 
-  scrollLeftTicks: number = 0
-  scaleX: number = 1
-  autoScroll: boolean = true
-  canvasWidth: number = 0
   canvasHeight: number = 0
   quantize = 4
   isQuantizeEnabled = true
@@ -30,7 +26,6 @@ export default class TempoEditorStore {
     private readonly songStore: SongStore,
     private readonly player: Player,
   ) {
-    this.rulerStore = new RulerStore(this, this.songStore)
     this.tickScrollStore = new TickScrollStore(
       this,
       this.songStore,
@@ -38,12 +33,9 @@ export default class TempoEditorStore {
       0.15,
       15,
     )
+    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      scrollLeftTicks: observable,
-      scaleX: observable,
-      autoScroll: observable,
-      canvasWidth: observable,
       canvasHeight: observable,
       quantize: observable,
       isQuantizeEnabled: observable,
@@ -67,12 +59,13 @@ export default class TempoEditorStore {
   }
 
   get transform() {
-    const pixelsPerTick = Layout.pixelsPerTick * this.scaleX
+    const pixelsPerTick = Layout.pixelsPerTick * this.tickScrollStore.scaleX
     return new TempoCoordTransform(pixelsPerTick, this.canvasHeight)
   }
 
   get items() {
-    const { transform, canvasWidth, scrollLeft } = this
+    const { transform, scrollLeft } = this
+    const { canvasWidth } = this.tickScrollStore
     const events = this.songStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
   }

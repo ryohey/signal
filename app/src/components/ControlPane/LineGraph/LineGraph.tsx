@@ -10,6 +10,7 @@ import { ControlCoordTransform } from "../../../entities/transform/ControlCoordT
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useControlPane } from "../../../hooks/useControlPane"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { pointToCircleRect } from "../../../stores/TempoEditorStore"
 import { TrackEventOf } from "../../../track"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
@@ -47,7 +48,8 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   axis,
   axisLabelFormatter = (v) => v.toString(),
 }: LineGraphProps<T>) => {
-  const { scrollLeft, transform, cursor, mouseMode } = useControlPane()
+  const { transform, cursor, mouseMode } = useControlPane()
+  const { scrollLeft } = useTickScroll()
   const theme = useTheme()
   const createOrUpdateControlEventsValue = useCreateOrUpdateControlEventsValue()
   const handlePencilMouseDown = usePencilGesture()

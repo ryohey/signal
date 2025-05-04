@@ -7,6 +7,7 @@ import { RulerStore } from "../stores/RulerStore"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
+import { useTickScroll } from "./useTickScroll"
 
 const TIME_SIGNATURE_HIT_WIDTH = 20
 
@@ -24,15 +25,13 @@ export interface RulerTimeSignature {
 
 export function useRuler(rulerStore: RulerStore) {
   const updateTimeSignature = useUpdateTimeSignature()
+  const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { parent } = rulerStore
 
-  const transform = useMobxSelector(() => parent.transform, [parent])
   const song = useSong()
   const timeSignatures = useMobxSelector(() => song.timeSignatures, [song])
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
   const quantizer = useMobxSelector(() => parent.quantizer, [parent])
-  const canvasWidth = useMobxSelector(() => parent.canvasWidth, [parent])
-  const scrollLeft = useMobxSelector(() => parent.scrollLeft, [parent])
   const selectedTimeSignatureEventIds = useMobxSelector(
     () => rulerStore.selectedTimeSignatureEventIds,
     [rulerStore],
@@ -112,12 +111,9 @@ export function useRuler(rulerStore: RulerStore) {
   )
 
   return {
-    canvasWidth,
-    scrollLeft,
     beats: rulerBeats,
     loop,
     timeSignatures: rulerTimeSignatures,
-    transform,
     timeSignatureHitTest,
     setLoopBegin,
     setLoopEnd,
@@ -139,7 +135,6 @@ export function useRuler(rulerStore: RulerStore) {
       },
       [rulerStore, updateTimeSignature],
     ),
-    getTick,
     getQuantizedTick,
   }
 }

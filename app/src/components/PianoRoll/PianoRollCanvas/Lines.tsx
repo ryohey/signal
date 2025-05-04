@@ -6,6 +6,7 @@ import { Layout } from "../../../Constants"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../gl/color"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { HorizontalGrid } from "./HorizontalGrid"
 import { LegacyLines } from "./lagacy/LegacyLines"
 
@@ -24,8 +25,8 @@ export const Lines: FC<LinesProps> = (props) => {
 
 const _Lines: FC<{ zIndex: number }> = ({ zIndex }) => {
   const theme = useTheme()
-  const { scrollTop, canvasWidth, canvasHeight, scaleY, keySignature } =
-    usePianoRoll()
+  const { scrollTop, canvasHeight, scaleY, keySignature } = usePianoRoll()
+  const { canvasWidth } = useTickScroll()
 
   const laneColors = useMemo(() => {
     const whiteLaneColor = colorToVec4(

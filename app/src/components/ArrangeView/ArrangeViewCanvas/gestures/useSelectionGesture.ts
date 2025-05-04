@@ -4,11 +4,13 @@ import { Rect } from "../../../../entities/geometry/Rect"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
+import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { useCreateSelectionGesture } from "./useCreateSelectionGesture"
 import { useMoveSelectionGesture } from "./useMoveSelectionGesture"
 
 export const useSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const { scrollLeft, scrollTop, selectionRect } = useArrangeView()
+  const { scrollTop, selectionRect } = useArrangeView()
+  const { scrollLeft } = useTickScroll()
   const moveSelectionGesture = useMoveSelectionGesture()
   const createSelectionGesture = useCreateSelectionGesture()
 

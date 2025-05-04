@@ -10,9 +10,11 @@ import {
 import { useControlPane } from "./useControlPane"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
+import { useTickScroll } from "./useTickScroll"
 
 export function useControlValueEvents() {
-  const { controlMode, scrollLeft, transform } = useControlPane()
+  const { controlMode, transform } = useControlPane()
+  const { scrollLeft } = useTickScroll()
   const { windowedEvents, selectedTrack } = usePianoRoll()
   const selectedTrackEvents = useMobxSelector(
     () => selectedTrack?.events ?? [],

@@ -55,11 +55,9 @@ export default class PianoRollStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
 
-  scrollLeftTicks = 0
   scrollTopKeys = 70 // 中央くらいの音程にスクロールしておく
   notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
-  scaleX = 1
   scaleY = 1
   autoScroll = true
   quantize = 8
@@ -74,7 +72,6 @@ export default class PianoRollStore {
     programNumber: 0,
   }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
-  canvasWidth: number = 0
   canvasHeight: number = 0
   showTrackList = false
   showEventList = false
@@ -88,7 +85,6 @@ export default class PianoRollStore {
     private readonly songStore: SongStore,
     private readonly player: Player,
   ) {
-    this.rulerStore = new RulerStore(this, this.songStore)
     this.tickScrollStore = new TickScrollStore(
       this,
       this.songStore,
@@ -96,15 +92,13 @@ export default class PianoRollStore {
       0.15,
       15,
     )
+    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      scrollLeftTicks: observable,
       scrollTopKeys: observable,
       notesCursor: observable,
       mouseMode: observable,
-      scaleX: observable,
       scaleY: observable,
-      autoScroll: observable,
       quantize: observable,
       isQuantizeEnabled: observable,
       selectedTrackId: observable,
@@ -114,7 +108,6 @@ export default class PianoRollStore {
       openInstrumentBrowser: observable,
       instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
-      canvasWidth: observable,
       canvasHeight: observable,
       showTrackList: observable,
       showEventList: observable,
@@ -124,7 +117,6 @@ export default class PianoRollStore {
       keySignature: observable,
       previewingNoteNumbers: observable.ref,
       contentHeight: computed,
-      scrollLeft: computed,
       scrollTop: computed,
       transform: computed,
       windowedEvents: computed,
@@ -180,10 +172,6 @@ export default class PianoRollStore {
     return transform.getMaxY()
   }
 
-  get scrollLeft(): number {
-    return this.tickScrollStore.scrollLeft
-  }
-
   get scrollTop(): number {
     return Math.round(this.transform.getY(this.scrollTopKeys))
   }
@@ -200,14 +188,16 @@ export default class PianoRollStore {
 
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
-      Layout.pixelsPerTick * this.scaleX,
+      Layout.pixelsPerTick * this.tickScrollStore.scaleX,
       Layout.keyHeight * this.scaleY,
       127,
     )
   }
 
   get windowedEvents(): TrackEvent[] {
-    const { transform, scrollLeft, canvasWidth, selectedTrack: track } = this
+    const { transform, selectedTrack: track } = this
+    const { canvasWidth, scrollLeft } = this.tickScrollStore
+
     if (track === undefined) {
       return []
     }
@@ -242,7 +232,8 @@ export default class PianoRollStore {
   }
 
   get notes(): PianoNoteItem[] {
-    const { scrollLeft, canvasWidth, allNoteBounds, selectedNoteIds } = this
+    const { allNoteBounds, selectedNoteIds } = this
+    const { canvasWidth, scrollLeft } = this.tickScrollStore
 
     const range = Range.fromLength(scrollLeft, canvasWidth)
     return allNoteBounds

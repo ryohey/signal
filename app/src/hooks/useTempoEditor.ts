@@ -6,12 +6,10 @@ import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
-import { useTickScroll } from "./useTickScroll"
 
 export function useTempoEditor() {
   const { tempoEditorStore } = useStores()
   const { rulerStore } = tempoEditorStore
-  const { setScrollLeftInPixels } = useTickScroll()
 
   const controlPoints = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.controlPoints,
@@ -57,14 +55,8 @@ export function useTempoEditor() {
     cursor,
     cursorX,
     rulerStore,
-    get autoScroll() {
-      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.autoScroll)
-    },
     get items() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)
-    },
-    get scrollLeft() {
-      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.scrollLeft)
     },
     get quantizer() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.quantizer)
@@ -103,15 +95,8 @@ export function useTempoEditor() {
     setSelectedEventIds: useCallback((ids: number[]) => {
       tempoEditorStore.selectedEventIds = ids
     }, []),
-    setScrollLeftInPixels,
-    setAutoScroll: useCallback((autoScroll: boolean) => {
-      tempoEditorStore.autoScroll = autoScroll
-    }, []),
     setMouseMode: useCallback((mode: PianoRollMouseMode) => {
       tempoEditorStore.mouseMode = mode
-    }, []),
-    setCanvasWidth: useCallback((width: number) => {
-      tempoEditorStore.canvasWidth = width
     }, []),
     setCanvasHeight: useCallback((height: number) => {
       tempoEditorStore.canvasHeight = height

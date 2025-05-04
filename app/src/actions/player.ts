@@ -19,11 +19,16 @@ export const useStop = () => {
 }
 
 export const useRewindOneBar = () => {
-  const { scrollLeftTicks, setScrollLeftInTicks } = usePianoRoll()
+  const { setScrollLeftInTicks } = usePianoRoll()
   const song = useSong()
+  const {
+    pianoRollStore: { tickScrollStore },
+  } = useStores()
   const { position, setPosition } = usePlayer()
 
   return () => {
+    const { scrollLeftTicks } = tickScrollStore
+
     const tick = Measure.getPreviousMeasureTick(
       song.measures,
       position,
@@ -39,12 +44,16 @@ export const useRewindOneBar = () => {
 }
 
 export const useFastForwardOneBar = () => {
-  const { canvasWidth, transform, scrollLeft, setScrollLeftInPixels } =
-    usePianoRoll()
+  const { transform, setScrollLeftInPixels } = usePianoRoll()
+  const {
+    pianoRollStore: { tickScrollStore },
+  } = useStores()
   const song = useSong()
   const { position, setPosition } = usePlayer()
 
   return () => {
+    const { scrollLeft, canvasWidth } = tickScrollStore
+
     const tick = Measure.getNextMeasureTick(
       song.measures,
       position,

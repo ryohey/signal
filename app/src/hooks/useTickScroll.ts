@@ -11,11 +11,11 @@ export function useTickScroll() {
 
   const setScrollLeftInPixels = useCallback(
     (x: number) => {
-      const { contentWidth } = tickScrollStore
-      const { transform, canvasWidth } = tickScrollStore.parent
+      const { canvasWidth, contentWidth } = tickScrollStore
+      const { transform } = tickScrollStore.parent
       const maxX = contentWidth - canvasWidth
       const scrollLeft = clamp(x, 0, maxX)
-      tickScrollStore.parent.scrollLeftTicks = transform.getTick(scrollLeft)
+      tickScrollStore.scrollLeftTicks = transform.getTick(scrollLeft)
     },
     [tickScrollStore],
   )
@@ -28,15 +28,33 @@ export function useTickScroll() {
   )
 
   return {
+    get autoScroll() {
+      return useMobxSelector(
+        () => tickScrollStore.autoScroll,
+        [tickScrollStore],
+      )
+    },
     get scrollLeft() {
       return useMobxSelector(
         () => tickScrollStore.scrollLeft,
         [tickScrollStore],
       )
     },
-    get scaleX() {
+    get scrollLeftTicks() {
       return useMobxSelector(
-        () => tickScrollStore.parent.scaleX,
+        () => tickScrollStore.scrollLeftTicks,
+        [tickScrollStore],
+      )
+    },
+    get scaleX() {
+      return useMobxSelector(() => tickScrollStore.scaleX, [tickScrollStore])
+    },
+    get transform() {
+      return useMobxSelector(() => tickScrollStore.transform, [tickScrollStore])
+    },
+    get canvasWidth() {
+      return useMobxSelector(
+        () => tickScrollStore.canvasWidth,
         [tickScrollStore],
       )
     },
@@ -46,16 +64,37 @@ export function useTickScroll() {
         [tickScrollStore],
       )
     },
+    getTick: useCallback(
+      (offsetX: number) =>
+        tickScrollStore.transform.getTick(offsetX + tickScrollStore.scrollLeft),
+      [tickScrollStore],
+    ),
+    setCanvasWidth: useCallback(
+      (width: number) => {
+        tickScrollStore.canvasWidth = width
+      },
+      [tickScrollStore],
+    ),
     setScrollLeftInPixels,
     // Unlike scrollLeft = tick, this method keeps the scroll position within the content area
     setScrollLeftInTicks,
+    setScaleX: useCallback(
+      (scaleX: number) => {
+        tickScrollStore.scaleX = clamp(
+          scaleX,
+          tickScrollStore.minScaleX,
+          tickScrollStore.maxScaleX,
+        )
+      },
+      [tickScrollStore],
+    ),
     scaleAroundPointX: (scaleXDelta: number, pixelX: number) => {
       const { maxScaleX, minScaleX } = tickScrollStore
       const pixelXInTicks0 = tickScrollStore.parent.transform.getTick(
         tickScrollStore.scrollLeft + pixelX,
       )
-      tickScrollStore.parent.scaleX = clamp(
-        tickScrollStore.parent.scaleX * (1 + scaleXDelta),
+      tickScrollStore.scaleX = clamp(
+        tickScrollStore.scaleX * (1 + scaleXDelta),
         minScaleX,
         maxScaleX,
       )
@@ -63,9 +102,13 @@ export function useTickScroll() {
         tickScrollStore.scrollLeft + pixelX,
       )
       const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
-      setScrollLeftInTicks(
-        tickScrollStore.parent.scrollLeftTicks - scrollInTicks,
-      )
+      setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
     },
+    setAutoScroll: useCallback(
+      (autoScroll: boolean) => {
+        tickScrollStore.autoScroll = autoScroll
+      },
+      [tickScrollStore],
+    ),
   }
 }

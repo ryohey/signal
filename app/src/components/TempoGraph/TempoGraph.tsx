@@ -4,6 +4,7 @@ import useComponentSize from "@rehooks/component-size"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout } from "../../Constants"
 import { useTempoEditor } from "../../hooks/useTempoEditor"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { BAR_WIDTH, HorizontalScrollBar } from "../inputs/ScrollBar"
 import { TempoGraphAxis } from "./TempoGraphAxis"
@@ -17,16 +18,14 @@ const Wrapper = styled.div`
 `
 
 export const TempoGraph: FC = () => {
+  const { transform, contentWidth, rulerStore, setCanvasHeight } =
+    useTempoEditor()
   const {
-    transform,
     scrollLeft: _scrollLeft,
-    contentWidth,
-    rulerStore,
+    setCanvasWidth,
     setScrollLeftInPixels,
     setAutoScroll,
-    setCanvasWidth,
-    setCanvasHeight,
-  } = useTempoEditor()
+  } = useTickScroll()
 
   const ref = useRef(null)
   const size = useComponentSize(ref)

@@ -24,17 +24,13 @@ export default class ArrangeViewStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
 
-  scaleX = 1
   scaleY = 1
   SCALE_Y_MIN = 0.5
   SCALE_Y_MAX = 4
   selection: ArrangeSelection | null = null
   selectedEventIds: { [key: number]: number[] } = {} // { trackIndex: [eventId] }
-  autoScroll = true
   quantize = 1
-  scrollLeftTicks = 0
   scrollTop = 0
-  canvasWidth = 0
   canvasHeight = 0
   selectedTrackIndex = 0
   openTransposeDialog = false
@@ -44,7 +40,6 @@ export default class ArrangeViewStore {
     private readonly songStore: SongStore,
     private readonly player: Player,
   ) {
-    this.rulerStore = new RulerStore(this, this.songStore)
     this.tickScrollStore = new TickScrollStore(
       this,
       this.songStore,
@@ -52,17 +47,14 @@ export default class ArrangeViewStore {
       0.15,
       15,
     )
+    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      scaleX: observable,
       scaleY: observable,
       selection: observable.shallow,
       selectedEventIds: observable,
-      autoScroll: observable,
       quantize: observable,
-      scrollLeftTicks: observable,
       scrollTop: observable,
-      canvasWidth: observable,
       canvasHeight: observable,
       selectedTrackIndex: observable,
       openTransposeDialog: observable,
@@ -123,7 +115,7 @@ export default class ArrangeViewStore {
 
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
-      Layout.pixelsPerTick * this.scaleX,
+      Layout.pixelsPerTick * this.tickScrollStore.scaleX,
       0.5 * this.scaleY,
       127,
     )
@@ -144,8 +136,8 @@ export default class ArrangeViewStore {
   }
 
   get notes(): Rect[] {
-    const { transform, trackTransform, canvasWidth, scaleY } = this
-    const { scrollLeft } = this.tickScrollStore
+    const { transform, trackTransform, scaleY } = this
+    const { canvasWidth, scrollLeft } = this.tickScrollStore
 
     return this.songStore.song.tracks
       .map((t, i) =>

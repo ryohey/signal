@@ -6,6 +6,7 @@ import { Layout } from "../../Constants"
 import { TickTransform } from "../../entities/transform/TickTransform"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { RulerBeat, RulerTimeSignature, useRuler } from "../../hooks/useRuler"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import { RulerStore } from "../../stores/RulerStore"
 import { Theme } from "../../theme/Theme"
 import { TrackEventOf } from "../../track"
@@ -158,9 +159,6 @@ const PianoRuler: FC<PianoRulerProps> = ({
   const height = Layout.rulerHeight
 
   const {
-    canvasWidth: width,
-    scrollLeft,
-    transform,
     beats,
     loop,
     timeSignatures,
@@ -172,8 +170,8 @@ const PianoRuler: FC<PianoRulerProps> = ({
     clearSelectedTimeSignature,
     updateTimeSignature,
     getQuantizedTick,
-    getTick,
   } = useRuler(rulerStore)
+  const { canvasWidth: width, scrollLeft, transform, getTick } = useTickScroll()
 
   const onClickTimeSignature = (
     timeSignature: TrackEventOf<TimeSignatureEvent>,

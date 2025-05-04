@@ -5,9 +5,11 @@ import { isNoteEvent, NoteEvent, TrackId } from "../track"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { useSong } from "./useSong"
+import { useTickScroll } from "./useTickScroll"
 
 export function useGhostNotes(trackId: TrackId) {
-  const { transform, scrollLeft, canvasWidth } = usePianoRoll()
+  const { transform } = usePianoRoll()
+  const { canvasWidth, scrollLeft } = useTickScroll()
   const song = useSong()
   const track = useMobxSelector(() => song.getTrack(trackId), [song, trackId])
   const events = useMobxSelector(() => track?.events ?? [], [track])
