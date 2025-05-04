@@ -32,9 +32,6 @@ export function useTransportPanel() {
     get isRecording() {
       return useMobxStore(({ midiRecorder }) => midiRecorder.isRecording)
     },
-    get isSynthLoading() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.isLoading)
-    },
     get isMetronomeEnabled() {
       return useMobxStore(({ synthGroup }) => synthGroup.isMetronomeEnabled)
     },

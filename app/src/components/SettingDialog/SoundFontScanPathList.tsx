@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import RemoveIcon from "mdi-react/RemoveIcon"
 import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
 import { Button } from "../ui/Button"
 
@@ -13,22 +13,14 @@ const Actions = styled.div`
 `
 
 export const SoundFontScanPathList: FC = observer(() => {
-  const { soundFontStore } = useStores()
-  const { scanPaths } = soundFontStore
-
-  const removeScanPath = async (path: string) => {
-    await soundFontStore.removeScanPath(path)
-  }
+  const { scanPaths, addScanPath, removeScanPath, scanSoundFonts } =
+    useSoundFont()
 
   const onClickAddButton = async () => {
     const path = await window.electronAPI.showOpenDirectoryDialog()
     if (path) {
-      soundFontStore.addScanPath(path)
+      addScanPath(path)
     }
-  }
-
-  const onClickScanButton = () => {
-    soundFontStore.scanSoundFonts()
   }
 
   return (
@@ -49,7 +41,7 @@ export const SoundFontScanPathList: FC = observer(() => {
         <Button onClick={onClickAddButton}>
           <Localized name="add" />
         </Button>
-        <Button onClick={onClickScanButton}>
+        <Button onClick={scanSoundFonts}>
           <Localized name="scan" />
         </Button>
       </Actions>

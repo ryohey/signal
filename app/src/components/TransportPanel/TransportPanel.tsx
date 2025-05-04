@@ -7,6 +7,7 @@ import MetronomeIcon from "mdi-react/MetronomeIcon"
 import Stop from "mdi-react/StopIcon"
 import { FC } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useSoundFont } from "../../hooks/useSoundFont"
 import { useTransportPanel } from "../../hooks/useTransportPanel"
 import { Localized } from "../../localize/useLocalization"
 import { CircularProgress } from "../ui/CircularProgress"
@@ -80,12 +81,12 @@ export const TransportPanel: FC = () => {
     toggleRecording,
     toggleEnableLoop,
     toggleMetronome,
-    isSynthLoading,
     isLoopEnabled,
     isLoopActive,
     isMetronomeEnabled,
     canRecording,
   } = useTransportPanel()
+  const { isLoading: isSynthLoading } = useSoundFont()
 
   return (
     <Toolbar>
