@@ -8,6 +8,7 @@ import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { Localized, useLocalization } from "../../localize/useLocalization"
+import { cloudSongRepository } from "../../services/repositories"
 import {
   Dialog,
   DialogActions,
@@ -21,7 +22,7 @@ import { LinkShare } from "../ui/LinkShare"
 type PublishState = "publishable" | "published" | "notPublishable"
 
 export const PublishDialog: FC = () => {
-  const { songStore, cloudSongRepository, userRepository } = useStores()
+  const { songStore } = useStores()
   const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
   const song = useSong()
   const publishSong = usePublishSong()
@@ -58,11 +59,7 @@ export const PublishDialog: FC = () => {
   const onClickPublish = async () => {
     try {
       setIsLoading(true)
-      const user = await userRepository.getCurrentUser()
-      if (user === null) {
-        throw new Error("Failed to get current user, please re-sign in")
-      }
-      await publishSong(song, user)
+      await publishSong(song)
       setPublishState("published")
       toast.success(localized["song-published"])
     } catch (e) {
