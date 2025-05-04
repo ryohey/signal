@@ -4,42 +4,23 @@ import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
+import { useTrackScroll } from "./useTrackScroll"
 
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
-  const { tickScrollStore } = arrangeViewStore
+  const { tickScrollStore, trackScrollStore } = arrangeViewStore
   const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
+  const { setScrollTop } = useTrackScroll(trackScrollStore)
 
   return {
-    get canvasHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.canvasHeight,
-      )
-    },
     get cursorX() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.cursorX)
-    },
-    get scaleY() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleY)
-    },
-    get trackHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.trackHeight,
-      )
-    },
-    get contentHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.contentHeight,
-      )
     },
     get notes() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
     },
     get transform() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.transform)
-    },
-    get scrollTop() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollTop)
     },
     get selectedTrackIndex() {
       return useMobxStore(
@@ -90,19 +71,13 @@ export function useArrangeView() {
       )
     },
     rulerStore: arrangeViewStore.rulerStore,
-    setCanvasHeight: useCallback((height: number) => {
-      arrangeViewStore.canvasHeight = height
-    }, []),
-    setScaleY: useCallback((scaleY: number) => {
-      arrangeViewStore.setScaleY(scaleY)
-    }, []),
-    scrollBy: useCallback((x: number, y: number) => {
-      setScrollLeftInPixels(tickScrollStore.scrollLeft - x)
-      arrangeViewStore.setScrollTop(arrangeViewStore.scrollTop - y)
-    }, []),
-    setScrollTop: useCallback((value: number) => {
-      arrangeViewStore.setScrollTop(value)
-    }, []),
+    scrollBy: useCallback(
+      (x: number, y: number) => {
+        setScrollLeftInPixels(tickScrollStore.scrollLeft - x)
+        setScrollTop(trackScrollStore.scrollTop - y)
+      },
+      [setScrollLeftInPixels, setScrollTop, tickScrollStore, trackScrollStore],
+    ),
     setSelectedTrackIndex: useCallback((index: number) => {
       arrangeViewStore.selectedTrackIndex = index
     }, []),

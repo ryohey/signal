@@ -10,6 +10,7 @@ import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useRouter } from "../../hooks/useRouter"
 import { useTickScroll } from "../../hooks/useTickScroll"
+import { useTrackScroll } from "../../hooks/useTrackScroll"
 import { TrackId } from "../../track"
 import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { TrackName } from "../TrackList/TrackName"
@@ -76,19 +77,21 @@ const HeaderList = styled.div`
 export const ArrangeView: FC = () => {
   const {
     tracks,
-    trackHeight,
-    contentHeight,
     transform,
-    scaleY,
-    scrollTop,
     scrollBy,
     rulerStore,
-    setCanvasHeight,
     selectedTrackIndex,
-    setScrollTop,
-    setScaleY,
     setSelectedTrackIndex,
   } = useArrangeView()
+  const {
+    trackHeight,
+    contentHeight,
+    scaleY,
+    scrollTop,
+    setCanvasHeight,
+    setScrollTop,
+    setScaleY,
+  } = useTrackScroll()
   const {
     setCanvasWidth,
     setScrollLeftInPixels,

@@ -5,11 +5,13 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
+import { useTrackScroll } from "../../../../hooks/useTrackScroll"
 import { useCreateSelectionGesture } from "./useCreateSelectionGesture"
 import { useMoveSelectionGesture } from "./useMoveSelectionGesture"
 
 export const useSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const { scrollTop, selectionRect } = useArrangeView()
+  const { selectionRect } = useArrangeView()
+  const { scrollTop } = useTrackScroll()
   const { scrollLeft } = useTickScroll()
   const moveSelectionGesture = useMoveSelectionGesture()
   const createSelectionGesture = useCreateSelectionGesture()

@@ -5,6 +5,7 @@ import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useArrangeView } from "../../../hooks/useArrangeView"
 import { AbstractMouseEvent } from "../../../hooks/useContextMenu"
 import { useTickScroll } from "../../../hooks/useTickScroll"
+import { useTrackScroll } from "../../../hooks/useTrackScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
@@ -23,12 +24,11 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
   onContextMenu,
 }) => {
   const {
-    scrollTop,
-    contentHeight: height,
     rulerStore: { beats },
     cursorX,
     selectionRect,
   } = useArrangeView()
+  const { scrollTop, contentHeight: height } = useTrackScroll()
   const { scrollLeft } = useTickScroll()
   const theme = useTheme()
 
