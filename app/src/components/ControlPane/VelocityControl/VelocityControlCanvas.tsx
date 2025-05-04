@@ -10,6 +10,7 @@ import { Rect } from "../../../entities/geometry/Rect"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { observeDrag, observeDrag2 } from "../../../helpers/observeDrag"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { isNoteEvent } from "../../../track"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -27,12 +28,12 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
 }) => {
   const {
     transform,
-    scrollLeft,
     windowedEvents,
     rulerStore: { beats },
     selectedNoteIds,
     cursorX,
   } = usePianoRoll()
+  const { scrollLeft } = useTickScroll()
   const updateVelocitiesInRange = useUpdateVelocitiesInRange()
   const changeNotesVelocity = useChangeNotesVelocity()
   const theme = useTheme()

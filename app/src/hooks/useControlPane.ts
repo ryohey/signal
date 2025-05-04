@@ -28,9 +28,6 @@ export function useControlPane() {
     get selectedEventIds() {
       return useMobxStore(({ controlStore }) => controlStore.selectedEventIds)
     },
-    get scrollLeft() {
-      return usePianoRoll().scrollLeft
-    },
     get cursorX() {
       return usePianoRoll().cursorX
     },

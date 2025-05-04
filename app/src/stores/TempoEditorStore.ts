@@ -1,6 +1,5 @@
 import { Player } from "@signal-app/player"
 import { computed, makeObservable, observable } from "mobx"
-import { Layout } from "../Constants"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
@@ -15,10 +14,6 @@ export default class TempoEditorStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
 
-  scrollLeftTicks: number = 0
-  scaleX: number = 1
-  autoScroll: boolean = true
-  canvasWidth: number = 0
   canvasHeight: number = 0
   quantize = 4
   isQuantizeEnabled = true
@@ -30,27 +25,21 @@ export default class TempoEditorStore {
     private readonly songStore: SongStore,
     private readonly player: Player,
   ) {
-    this.rulerStore = new RulerStore(this, this.songStore)
     this.tickScrollStore = new TickScrollStore(
-      this,
       this.songStore,
       this.player,
       0.15,
       15,
     )
+    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      scrollLeftTicks: observable,
-      scaleX: observable,
-      autoScroll: observable,
-      canvasWidth: observable,
       canvasHeight: observable,
       quantize: observable,
       isQuantizeEnabled: observable,
       mouseMode: observable,
       selection: observable,
       selectedEventIds: observable,
-      scrollLeft: computed,
       transform: computed,
       items: computed,
       controlPoints: computed,
@@ -62,17 +51,16 @@ export default class TempoEditorStore {
     this.tickScrollStore.setUpAutoScroll()
   }
 
-  get scrollLeft(): number {
-    return this.tickScrollStore.scrollLeft
-  }
-
   get transform() {
-    const pixelsPerTick = Layout.pixelsPerTick * this.scaleX
-    return new TempoCoordTransform(pixelsPerTick, this.canvasHeight)
+    return new TempoCoordTransform(
+      this.tickScrollStore.transform,
+      this.canvasHeight,
+    )
   }
 
   get items() {
-    const { transform, canvasWidth, scrollLeft } = this
+    const { transform } = this
+    const { canvasWidth, scrollLeft } = this.tickScrollStore
     const events = this.songStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
   }
@@ -89,12 +77,6 @@ export default class TempoEditorStore {
       ...pointToCircleRect(p.bounds, circleRadius),
       id: p.id,
     }))
-  }
-
-  get cursor(): string {
-    return this.mouseMode === "pencil"
-      ? `url("./cursor-pencil.svg") 0 20, pointer`
-      : "auto"
   }
 }
 

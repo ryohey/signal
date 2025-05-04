@@ -1,9 +1,9 @@
 import { FC, useCallback } from "react"
-import { useArrangeView } from "../../hooks/useArrangeView"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 
 export const ArrangeAutoScrollButton: FC = () => {
-  const { autoScroll, setAutoScroll } = useArrangeView()
+  const { autoScroll, setAutoScroll } = useTickScroll()
 
   const onClickAutoScroll = useCallback(
     () => setAutoScroll(!autoScroll),

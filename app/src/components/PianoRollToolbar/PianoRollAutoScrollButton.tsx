@@ -1,9 +1,9 @@
 import { FC, useCallback } from "react"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 
 export const PianoRollAutoScrollButton: FC = () => {
-  const { autoScroll, setAutoScroll } = usePianoRoll()
+  const { autoScroll, setAutoScroll } = useTickScroll()
 
   const onClickAutoScroll = useCallback(
     () => setAutoScroll(!autoScroll),

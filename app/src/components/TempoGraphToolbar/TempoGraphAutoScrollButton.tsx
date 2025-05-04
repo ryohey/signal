@@ -1,9 +1,9 @@
 import { FC } from "react"
-import { useTempoEditor } from "../../hooks/useTempoEditor"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 
 export const TempoGraphAutoScrollButton: FC = () => {
-  const { setAutoScroll, autoScroll } = useTempoEditor()
+  const { setAutoScroll, autoScroll } = useTickScroll()
 
   return (
     <AutoScrollButton

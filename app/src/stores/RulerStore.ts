@@ -1,21 +1,19 @@
 import { computed, makeObservable, observable } from "mobx"
 import { BeatWithX } from "../entities/beat/BeatWithX"
-import { TickTransform } from "../entities/transform/TickTransform"
 import Quantizer from "../quantizer"
 import { SongStore } from "./SongStore"
+import { TickScrollStore } from "./TickScrollStore"
 
-interface RulerProvider {
-  transform: TickTransform
-  scrollLeft: number
-  canvasWidth: number
-  quantizer: Quantizer
+interface RulerStoreParent {
+  readonly quantizer: Quantizer
 }
 
 export class RulerStore {
   selectedTimeSignatureEventIds: number[] = []
 
   constructor(
-    readonly parent: RulerProvider,
+    readonly parent: RulerStoreParent,
+    private readonly tickScrollStore: TickScrollStore,
     private readonly songStore: SongStore,
   ) {
     makeObservable(this, {
@@ -25,7 +23,7 @@ export class RulerStore {
   }
 
   get beats(): BeatWithX[] {
-    const { scrollLeft, transform, canvasWidth } = this.parent
+    const { scrollLeft, transform, canvasWidth } = this.tickScrollStore
     const {
       song: { measures, timebase },
     } = this.songStore

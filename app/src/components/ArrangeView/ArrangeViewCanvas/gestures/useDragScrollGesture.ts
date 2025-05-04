@@ -2,16 +2,12 @@ import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
-import { useArrangeView } from "../../../../hooks/useArrangeView"
+import { useTickScroll } from "../../../../hooks/useTickScroll"
+import { useTrackScroll } from "../../../../hooks/useTrackScroll"
 
 export const useDragScrollGesture = (): MouseGesture<[], React.MouseEvent> => {
-  const {
-    scrollLeft,
-    scrollTop,
-    setScrollLeftInPixels,
-    setScrollTop,
-    setAutoScroll,
-  } = useArrangeView()
+  const { scrollTop, setScrollTop } = useTrackScroll()
+  const { scrollLeft, setScrollLeftInPixels, setAutoScroll } = useTickScroll()
 
   const setScrollLeft = useCallback(
     (v: number) => {

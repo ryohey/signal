@@ -1,95 +1,69 @@
 import { Player } from "@signal-app/player"
-import { clamp } from "lodash"
-import { autorun, computed, makeObservable } from "mobx"
+import { autorun, computed, makeObservable, observable } from "mobx"
+import { Layout } from "../Constants"
 import { TickTransform } from "../entities/transform/TickTransform"
 import { SongStore } from "./SongStore"
 
-interface TickScrollProvider {
-  readonly transform: TickTransform
-  readonly canvasWidth: number
-  readonly autoScroll: boolean
-  scrollLeftTicks: number
-  scaleX: number
-}
-
 // Store for scrolling according to the playback time
 export class TickScrollStore {
+  scrollLeftTicks = 0
+  scaleX = 1
+  autoScroll = true
+  canvasWidth = 0
+
   constructor(
-    private readonly parent: TickScrollProvider,
     private readonly songStore: SongStore,
     private readonly player: Player,
-    private readonly minScaleX: number,
-    private readonly maxScaleX: number,
+    readonly minScaleX: number,
+    readonly maxScaleX: number,
   ) {
     makeObservable(this, {
+      autoScroll: observable,
+      canvasWidth: observable,
+      scaleX: observable,
+      scrollLeftTicks: observable,
+      transform: computed,
       scrollLeft: computed,
       playheadPosition: computed,
       playheadInScrollZone: computed,
     })
   }
 
+  get transform(): TickTransform {
+    return new TickTransform(Layout.pixelsPerTick * this.scaleX)
+  }
+
   get scrollLeft(): number {
-    return Math.round(this.parent.transform.getX(this.parent.scrollLeftTicks))
+    return Math.round(this.transform.getX(this.scrollLeftTicks))
   }
 
   setUpAutoScroll() {
     autorun(() => {
-      const { autoScroll } = this.parent
       const { isPlaying, position } = this.player
-      const { playheadInScrollZone } = this
+      const { autoScroll, playheadInScrollZone } = this
       if (autoScroll && isPlaying && playheadInScrollZone) {
-        this.parent.scrollLeftTicks = position
+        this.scrollLeftTicks = position
       }
     })
   }
 
-  setScrollLeftInPixels(x: number) {
-    const { contentWidth } = this
-    const { transform, canvasWidth } = this.parent
-    const maxX = contentWidth - canvasWidth
-    const scrollLeft = clamp(x, 0, maxX)
-    this.parent.scrollLeftTicks = transform.getTick(scrollLeft)
-  }
-
-  // Unlike scrollLeft = tick, this method keeps the scroll position within the content area
-  setScrollLeftInTicks(tick: number) {
-    this.setScrollLeftInPixels(this.parent.transform.getX(tick))
-  }
-
   get contentWidth(): number {
-    const { transform, canvasWidth } = this.parent
+    const { transform, canvasWidth, scrollLeft } = this
     const trackEndTick = this.songStore.song.endOfSong
-    const startTick = transform.getTick(this.scrollLeft)
+    const startTick = transform.getTick(scrollLeft)
     const widthTick = transform.getTick(canvasWidth)
     const endTick = startTick + widthTick
     return transform.getX(Math.max(trackEndTick, endTick))
   }
 
-  scaleAroundPointX(scaleXDelta: number, pixelX: number) {
-    const { maxScaleX, minScaleX } = this
-    const pixelXInTicks0 = this.parent.transform.getTick(
-      this.scrollLeft + pixelX,
-    )
-    this.parent.scaleX = clamp(
-      this.parent.scaleX * (1 + scaleXDelta),
-      minScaleX,
-      maxScaleX,
-    )
-    const pixelXInTicks1 = this.parent.transform.getTick(
-      this.scrollLeft + pixelX,
-    )
-    const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
-    this.setScrollLeftInTicks(this.parent.scrollLeftTicks - scrollInTicks)
-  }
-
   get playheadPosition(): number {
-    const { transform, scrollLeftTicks } = this.parent
+    const { transform, scrollLeftTicks } = this
     return transform.getX(this.player.position - scrollLeftTicks)
   }
 
   // Returns true if the user needs to scroll to comfortably view the playhead.
   get playheadInScrollZone(): boolean {
-    const { canvasWidth } = this.parent
+    const { canvasWidth } = this
     return (
       this.playheadPosition < 0 || this.playheadPosition > canvasWidth * 0.7
     )

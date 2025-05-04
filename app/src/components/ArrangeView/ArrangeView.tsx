@@ -9,6 +9,8 @@ import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useRouter } from "../../hooks/useRouter"
+import { useTickScroll } from "../../hooks/useTickScroll"
+import { useTrackScroll } from "../../hooks/useTrackScroll"
 import { TrackId } from "../../track"
 import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { TrackName } from "../TrackList/TrackName"
@@ -75,26 +77,28 @@ const HeaderList = styled.div`
 export const ArrangeView: FC = () => {
   const {
     tracks,
-    trackHeight,
-    contentWidth,
-    contentHeight,
     transform,
-    scrollLeft,
-    scaleY,
-    scrollTop,
     scrollBy,
-    rulerStore,
-    setCanvasWidth,
-    setCanvasHeight,
     selectedTrackIndex,
-    setScrollLeftInPixels,
-    setAutoScroll,
-    setScrollTop,
-    setScaleX,
-    setScaleY,
-    scaleAroundPointX,
     setSelectedTrackIndex,
   } = useArrangeView()
+  const {
+    trackHeight,
+    contentHeight,
+    scaleY,
+    scrollTop,
+    setCanvasHeight,
+    setScrollTop,
+    setScaleY,
+  } = useTrackScroll()
+  const {
+    setCanvasWidth,
+    setScrollLeftInPixels,
+    setScaleX,
+    scaleAroundPointX,
+  } = useTickScroll()
+
+  const { contentWidth, scrollLeft, setAutoScroll } = useTickScroll()
   const { setPath } = useRouter()
   const selectTrack = useSelectTrack()
   const rulerSelectionGesture = useRulerSelectionGesture()
@@ -226,7 +230,6 @@ export const ArrangeView: FC = () => {
           }}
         >
           <CanvasPianoRuler
-            rulerStore={rulerStore}
             {...rulerSelectionGesture}
             style={{
               background: theme.backgroundColor,
@@ -266,7 +269,7 @@ export const ArrangeView: FC = () => {
       >
         <VerticalScaleScrollBar
           scrollOffset={scrollTop}
-          contentLength={contentHeight + Layout.rulerHeight}
+          contentLength={contentHeight - BAR_WIDTH}
           onScroll={setScrollTop}
           onClickScaleUp={onClickScaleUpVertical}
           onClickScaleDown={onClickScaleDownVertical}

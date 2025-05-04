@@ -5,6 +5,7 @@ import { Point } from "../../../entities/geometry/Point"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
@@ -30,12 +31,12 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     hitTest,
     items,
     transform,
-    scrollLeft: _scrollLeft,
     mouseMode,
     beats,
     cursor,
     cursorX,
   } = useTempoEditor()
+  const { scrollLeft: _scrollLeft } = useTickScroll()
   const changeTempo = useChangeTempo()
   const pencilGesture = usePencilGesture()
   const createSelectionGesture = useCreateSelectionGesture()

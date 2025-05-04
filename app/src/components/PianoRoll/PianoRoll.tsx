@@ -4,7 +4,9 @@ import { clamp } from "lodash"
 import { FC, useCallback, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
+import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import ControlPane from "../ControlPane/ControlPane"
 import {
   HorizontalScaleScrollBar,
@@ -36,23 +38,24 @@ const Beta = styled.div`
 `
 
 const PianoRollWrapper: FC = () => {
+  const { transform, scrollBy } = usePianoRoll()
+  const {
+    contentHeight,
+    scaleY,
+    scrollTop,
+    scaleAroundPointY,
+    setScrollTopInPixels,
+    setScaleY,
+  } = useKeyScroll()
   const {
     scaleX,
-    scaleY,
     scrollLeft,
-    scrollTop,
-    transform,
     contentWidth,
-    contentHeight,
     scaleAroundPointX,
-    scaleAroundPointY,
     setAutoScroll,
-    setScrollTopInPixels,
     setScrollLeftInPixels,
-    scrollBy,
     setScaleX,
-    setScaleY,
-  } = usePianoRoll()
+  } = useTickScroll()
 
   const ref = useRef(null)
   const size = useComponentSize(ref)

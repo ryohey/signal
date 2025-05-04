@@ -3,59 +3,24 @@ import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { useMobxSelector, useMobxStore } from "./useMobxSelector"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
+import { useTickScroll } from "./useTickScroll"
+import { useTrackScroll } from "./useTrackScroll"
 
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
+  const { tickScrollStore, trackScrollStore } = arrangeViewStore
+  const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
+  const { setScrollTop } = useTrackScroll(trackScrollStore)
 
   return {
-    get autoScroll() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.autoScroll)
-    },
-    get canvasWidth() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.canvasWidth,
-      )
-    },
-    get canvasHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.canvasHeight,
-      )
-    },
     get cursorX() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.cursorX)
-    },
-    get scaleX() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleX)
-    },
-    get scaleY() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scaleY)
-    },
-    get trackHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.trackHeight,
-      )
-    },
-    get contentWidth() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.contentWidth,
-      )
-    },
-    get contentHeight() {
-      return useMobxStore(
-        ({ arrangeViewStore }) => arrangeViewStore.contentHeight,
-      )
     },
     get notes() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
     },
     get transform() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.transform)
-    },
-    get scrollLeft() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollLeft)
-    },
-    get scrollTop() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.scrollTop)
     },
     get selectedTrackIndex() {
       return useMobxStore(
@@ -106,30 +71,13 @@ export function useArrangeView() {
       )
     },
     rulerStore: arrangeViewStore.rulerStore,
-    setCanvasWidth: useCallback((width: number) => {
-      arrangeViewStore.canvasWidth = width
-    }, []),
-    setCanvasHeight: useCallback((height: number) => {
-      arrangeViewStore.canvasHeight = height
-    }, []),
-    setScaleX: useCallback((scaleX: number) => {
-      arrangeViewStore.scaleX = scaleX
-    }, []),
-    setScaleY: useCallback((scaleY: number) => {
-      arrangeViewStore.setScaleY(scaleY)
-    }, []),
-    scaleAroundPointX: useCallback((scale: number, x: number) => {
-      arrangeViewStore.scaleAroundPointX(scale, x)
-    }, []),
-    scrollBy: useCallback((x: number, y: number) => {
-      arrangeViewStore.scrollBy(x, y)
-    }, []),
-    setScrollLeftInPixels: useCallback((x: number) => {
-      arrangeViewStore.setScrollLeftInPixels(x)
-    }, []),
-    setScrollTop: useCallback((value: number) => {
-      arrangeViewStore.setScrollTop(value)
-    }, []),
+    scrollBy: useCallback(
+      (x: number, y: number) => {
+        setScrollLeftInPixels(tickScrollStore.scrollLeft - x)
+        setScrollTop(trackScrollStore.scrollTop - y)
+      },
+      [setScrollLeftInPixels, setScrollTop, tickScrollStore, trackScrollStore],
+    ),
     setSelectedTrackIndex: useCallback((index: number) => {
       arrangeViewStore.selectedTrackIndex = index
     }, []),
@@ -142,9 +90,6 @@ export function useArrangeView() {
       },
       [],
     ),
-    setAutoScroll: useCallback((value: boolean) => {
-      arrangeViewStore.autoScroll = value
-    }, []),
     setQuantize: useCallback((value: number) => {
       arrangeViewStore.quantize = value
     }, []),

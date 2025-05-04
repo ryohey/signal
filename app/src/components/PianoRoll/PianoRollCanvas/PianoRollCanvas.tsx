@@ -3,7 +3,9 @@ import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { FC, MouseEventHandler, useCallback, useEffect, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useContextMenu } from "../../../hooks/useContextMenu"
+import { useKeyScroll } from "../../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
@@ -17,16 +19,14 @@ import { Notes } from "./Notes"
 export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
   const {
     notesCursor,
-    scrollLeft,
-    scrollTop,
     rulerStore: { beats },
     cursorX,
     selectionBounds,
     ghostTrackIds,
     mouseMode,
-    setCanvasWidth,
-    setCanvasHeight,
   } = usePianoRoll()
+  const { setCanvasWidth, scrollLeft } = useTickScroll()
+  const { scrollTop, setCanvasHeight } = useKeyScroll()
 
   const mouseHandler = useNoteMouseGesture()
 

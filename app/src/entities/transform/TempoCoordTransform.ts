@@ -1,16 +1,16 @@
 import { Point } from "../geometry/Point"
 import { TickTransform } from "./TickTransform"
 
-export class TempoCoordTransform implements TickTransform {
+export class TempoCoordTransform {
   constructor(
-    private readonly pixelsPerTick: number,
+    private readonly tickTransform: TickTransform,
     // The height of the drawing area of the graph
     readonly height: number,
     readonly maxBPM = 320,
   ) {}
 
   getX(tick: number) {
-    return tick * this.pixelsPerTick
+    return this.tickTransform.getX(tick)
   }
 
   getY(bpm: number) {
@@ -22,7 +22,7 @@ export class TempoCoordTransform implements TickTransform {
   }
 
   getTick(pixels: number) {
-    return pixels / this.pixelsPerTick
+    return this.tickTransform.getTick(pixels)
   }
 
   getBPM(pixels: number) {
@@ -31,14 +31,6 @@ export class TempoCoordTransform implements TickTransform {
 
   getDeltaBPM(pixels: number) {
     return (-pixels / this.height) * this.maxBPM
-  }
-
-  equals(t: TempoCoordTransform) {
-    return (
-      this.pixelsPerTick === t.pixelsPerTick &&
-      this.height === t.height &&
-      this.maxBPM === t.maxBPM
-    )
   }
 
   fromPosition(position: Point) {

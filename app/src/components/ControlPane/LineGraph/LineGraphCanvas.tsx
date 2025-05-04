@@ -5,6 +5,7 @@ import { Rect } from "../../../entities/geometry/Rect"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useControlPane } from "../../../hooks/useControlPane"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
@@ -37,12 +38,12 @@ export const LineGraphCanvas: FC<LineGraphCanvasProps> = ({
   onMouseDown,
   onContextMenu,
 }) => {
-  const { selection, scrollLeft, selectedEventIds, cursorX, transform, beats } =
-    useControlPane()
+  const { selection, selectedEventIds, cursorX, beats } = useControlPane()
+  const { transform: tickTransform, scrollLeft } = useTickScroll()
 
   const controlTransform = useMemo(
-    () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
-    [transform.horizontalId, maxValue, height],
+    () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),
+    [tickTransform.id, maxValue, height],
   )
 
   const selectionRect =

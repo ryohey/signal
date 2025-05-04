@@ -3,12 +3,14 @@ import Color from "color"
 import { FC, useMemo } from "react"
 import { Layout } from "../../../../Constants"
 import { colorToVec4 } from "../../../../gl/color"
-import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useKeyScroll } from "../../../../hooks/useKeyScroll"
+import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { LegacyHorizontalGrid } from "./LegacyHorizontalGrid"
 
 export const LegacyLines: FC<{ zIndex: number }> = ({ zIndex }) => {
   const theme = useTheme()
-  const { scrollTop, canvasWidth, canvasHeight, scaleY } = usePianoRoll()
+  const { scrollTop, canvasHeight, scaleY } = useKeyScroll()
+  const { canvasWidth } = useTickScroll()
 
   const color = useMemo(
     () => colorToVec4(Color(theme.pianoLaneEdgeColor)),

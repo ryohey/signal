@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { LineGraphItems } from "../../ControlPane/LineGraph/LineGraphItems"
 
 export interface TempoItemsProps {
@@ -8,8 +9,8 @@ export interface TempoItemsProps {
 }
 
 export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
-  const { items, selectedEventIds, controlPoints, scrollLeft } =
-    useTempoEditor()
+  const { items, selectedEventIds, controlPoints } = useTempoEditor()
+  const { scrollLeft } = useTickScroll()
 
   return (
     <LineGraphItems

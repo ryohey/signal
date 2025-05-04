@@ -5,17 +5,18 @@ import { ArrangeSelection } from "../../entities/selection/ArrangeSelection"
 import { MouseGesture } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
+import { useTickScroll } from "../../hooks/useTickScroll"
 
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
   const {
     tracks,
-    scrollLeft,
     trackTransform,
     resetSelection,
     quantizer,
     setSelection,
     setSelectedEventIds,
   } = useArrangeView()
+  const { transform, scrollLeft } = useTickScroll()
 
   const selectionFromTickRange = useCallback(
     (range: Range) =>
@@ -44,7 +45,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
 
       const startPosX = e.nativeEvent.offsetX + scrollLeft
       const startClientX = e.nativeEvent.clientX
-      const startTick = trackTransform.getTick(startPosX)
+      const startTick = transform.getTick(startPosX)
 
       resetSelection()
 
@@ -52,7 +53,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
         onMouseMove: (e) => {
           const deltaPx = e.clientX - startClientX
           const selectionToPx = startPosX + deltaPx
-          const endTick = trackTransform.getTick(selectionToPx)
+          const endTick = transform.getTick(selectionToPx)
           selection = selectionFromTickRange([startTick, endTick])
           setSelection(selection)
         },
@@ -65,6 +66,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
     },
     [
       scrollLeft,
+      transform,
       trackTransform,
       selectionFromTickRange,
       tracks,

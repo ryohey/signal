@@ -5,9 +5,11 @@ import { isNoteEvent, NoteEvent, TrackId } from "../track"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { useSong } from "./useSong"
+import { useTickScroll } from "./useTickScroll"
 
 export function useGhostNotes(trackId: TrackId) {
-  const { transform, scrollLeft, canvasWidth } = usePianoRoll()
+  const { transform } = usePianoRoll()
+  const { canvasWidth, scrollLeft, transform: tickTransform } = useTickScroll()
   const song = useSong()
   const track = useMobxSelector(() => song.getTrack(trackId), [song, trackId])
   const events = useMobxSelector(() => track?.events ?? [], [track])
@@ -23,12 +25,12 @@ export function useGhostNotes(trackId: TrackId) {
       noteEvents.filter(
         isEventOverlapRange(
           Range.fromLength(
-            transform.getTick(scrollLeft),
-            transform.getTick(canvasWidth),
+            tickTransform.getTick(scrollLeft),
+            tickTransform.getTick(canvasWidth),
           ),
         ),
       ),
-    [scrollLeft, canvasWidth, transform.horizontalId, noteEvents],
+    [scrollLeft, canvasWidth, tickTransform.id, noteEvents],
   )
 
   const getRect = useCallback(
