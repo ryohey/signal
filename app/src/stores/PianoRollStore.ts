@@ -1,9 +1,8 @@
 import { Player } from "@signal-app/player"
-import { clamp, cloneDeep } from "lodash"
-import { action, computed, makeObservable, observable, reaction } from "mobx"
+import { cloneDeep } from "lodash"
+import { computed, makeObservable, observable, reaction } from "mobx"
 import { Layout } from "../Constants"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
-import { Point } from "../entities/geometry/Point"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { Measure } from "../entities/measure/Measure"
@@ -54,12 +53,10 @@ export type SerializedPianoRollStore = Pick<
 
 export default class PianoRollStore {
   readonly rulerStore: RulerStore
-  private readonly tickScrollStore: TickScrollStore
+  readonly tickScrollStore: TickScrollStore
 
   scrollLeftTicks = 0
   scrollTopKeys = 70 // 中央くらいの音程にスクロールしておく
-  SCALE_Y_MIN = 0.5
-  SCALE_Y_MAX = 4
   notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
   scaleX = 1
@@ -126,7 +123,6 @@ export default class PianoRollStore {
       newNoteVelocity: observable,
       keySignature: observable,
       previewingNoteNumbers: observable.ref,
-      contentWidth: computed,
       contentHeight: computed,
       scrollLeft: computed,
       scrollTop: computed,
@@ -146,12 +142,6 @@ export default class PianoRollStore {
       enabledQuantizer: computed,
       controlCursor: computed,
       selectedTrack: computed,
-      setScrollLeftInPixels: action,
-      setScrollTopInPixels: action,
-      setScrollLeftInTicks: action,
-      scaleAroundPointX: action,
-      scaleAroundPointY: action,
-      scrollBy: action,
     })
   }
 
@@ -185,10 +175,6 @@ export default class PianoRollStore {
     this.selectedTrackId = serialized.selectedTrackId
   }
 
-  get contentWidth(): number {
-    return this.tickScrollStore.contentWidth
-  }
-
   get contentHeight(): number {
     const { transform } = this
     return transform.getMaxY()
@@ -202,59 +188,10 @@ export default class PianoRollStore {
     return Math.round(this.transform.getY(this.scrollTopKeys))
   }
 
-  setScrollLeftInPixels(x: number) {
-    this.tickScrollStore.setScrollLeftInPixels(x)
-  }
-
-  setScrollTopInPixels(y: number) {
-    const { transform, canvasHeight } = this
-    const maxY = transform.getMaxY() - canvasHeight
-    const scrollTop = clamp(y, 0, maxY)
-    this.scrollTopKeys = this.transform.getNoteNumberFractional(scrollTop)
-  }
-
-  setScrollLeftInTicks(tick: number) {
-    this.tickScrollStore.setScrollLeftInTicks(tick)
-  }
-
-  setScrollTopInKeys(keys: number) {
-    this.setScrollTopInPixels(this.transform.getY(keys))
-  }
-
-  scrollBy(x: number, y: number) {
-    this.setScrollLeftInPixels(this.scrollLeft - x)
-    this.setScrollTopInPixels(this.scrollTop - y)
-  }
-
-  scaleAroundPointX(scaleXDelta: number, pixelX: number) {
-    this.tickScrollStore.scaleAroundPointX(scaleXDelta, pixelX)
-  }
-
-  scaleAroundPointY(scaleYDelta: number, pixelY: number) {
-    const pixelYInKeys0 = this.transform.getNoteNumberFractional(
-      this.scrollTop + pixelY,
-    )
-    this.scaleY = clamp(
-      this.scaleY * (1 + scaleYDelta),
-      this.SCALE_Y_MIN,
-      this.SCALE_Y_MAX,
-    )
-
-    const pixelYInKeys1 = this.transform.getNoteNumberFractional(
-      this.scrollTop + pixelY,
-    )
-    const scrollInKeys = pixelYInKeys1 - pixelYInKeys0
-    this.setScrollTopInKeys(this.scrollTopKeys - scrollInKeys)
-  }
-
   get selectedTrackIndex(): number {
     return this.songStore.song.tracks.findIndex(
       (t) => t.id === this.selectedTrackId,
     )
-  }
-
-  set selectedTrackIndex(index: number) {
-    this.selectedTrackId = this.songStore.song.tracks[index]?.id
   }
 
   get selectedTrack(): Track | undefined {
@@ -332,19 +269,6 @@ export default class PianoRollStore {
           track.id !== selectedTrackId && !notGhostTrackIds.has(track.id),
       )
       .map((track) => track.id)
-  }
-
-  // hit test notes in canvas coordinates
-  getNotes(local: Point): PianoNoteItem[] {
-    return this.notes.filter((n) => Rect.containsPoint(n, local))
-  }
-
-  // convert mouse position to the local coordinate on the canvas
-  getLocal(e: { offsetX: number; offsetY: number }): Point {
-    return {
-      x: e.offsetX + this.scrollLeft,
-      y: e.offsetY + this.scrollTop,
-    }
   }
 
   get selectionBounds(): Rect | null {
