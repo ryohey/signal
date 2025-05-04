@@ -3,6 +3,7 @@ import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
 import { KeyScrollProvider } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { RulerProvider } from "../../hooks/useRuler"
 import { useStores } from "../../hooks/useStores"
 import { TickScrollProvider } from "../../hooks/useTickScroll"
 import EventList from "../EventEditor/EventList"
@@ -67,19 +68,21 @@ const PianoRollPanes: FC = () => {
 
 export const PianoRollEditor: FC = () => {
   const {
-    pianoRollStore: { tickScrollStore, keyScrollStore },
+    pianoRollStore: { tickScrollStore, keyScrollStore, rulerStore },
   } = useStores()
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <KeyScrollProvider value={keyScrollStore}>
-        <ColumnContainer>
-          <PianoRollKeyboardShortcut />
-          <PianoRollToolbar />
-          <PianoRollPanes />
-        </ColumnContainer>
-        <PianoRollTransposeDialog />
-        <PianoRollVelocityDialog />
+        <RulerProvider value={rulerStore}>
+          <ColumnContainer>
+            <PianoRollKeyboardShortcut />
+            <PianoRollToolbar />
+            <PianoRollPanes />
+          </ColumnContainer>
+          <PianoRollTransposeDialog />
+          <PianoRollVelocityDialog />
+        </RulerProvider>
       </KeyScrollProvider>
     </TickScrollProvider>
   )

@@ -7,7 +7,6 @@ import { TickTransform } from "../../entities/transform/TickTransform"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { RulerBeat, RulerTimeSignature, useRuler } from "../../hooks/useRuler"
 import { useTickScroll } from "../../hooks/useTickScroll"
-import { RulerStore } from "../../stores/RulerStore"
 import { Theme } from "../../theme/Theme"
 import { TrackEventOf } from "../../track"
 import DrawCanvas from "../DrawCanvas"
@@ -135,7 +134,6 @@ function drawTimeSignatures(
 }
 
 export interface PianoRulerProps {
-  rulerStore: RulerStore
   onMouseDown?: React.MouseEventHandler<HTMLCanvasElement>
   style?: React.CSSProperties
 }
@@ -147,7 +145,6 @@ interface TimeSignatureDialogState {
 }
 
 const PianoRuler: FC<PianoRulerProps> = ({
-  rulerStore,
   onMouseDown: _onMouseDown,
   style,
 }) => {
@@ -170,7 +167,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
     clearSelectedTimeSignature,
     updateTimeSignature,
     getQuantizedTick,
-  } = useRuler(rulerStore)
+  } = useRuler()
   const { canvasWidth: width, scrollLeft, transform, getTick } = useTickScroll()
 
   const onClickTimeSignature = (
@@ -270,11 +267,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
         onContextMenu={(e) => e.preventDefault()}
         style={style}
       />
-      <RulerContextMenu
-        {...menuProps}
-        rulerStore={rulerStore}
-        tick={rightClickTick}
-      />
+      <RulerContextMenu {...menuProps} tick={rightClickTick} />
       <TimeSignatureDialog
         open={timeSignatureDialogState != null}
         initialNumerator={timeSignatureDialogState?.numerator}

@@ -1,5 +1,5 @@
 import { findLast } from "lodash"
-import { useCallback, useMemo } from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { useUpdateTimeSignature } from "../actions"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
@@ -23,7 +23,10 @@ export interface RulerTimeSignature {
   isSelected: boolean
 }
 
-export function useRuler(rulerStore: RulerStore) {
+const RulerContext = createContext<RulerStore>(null!)
+export const RulerProvider = RulerContext.Provider
+
+export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { parent } = rulerStore
@@ -114,6 +117,12 @@ export function useRuler(rulerStore: RulerStore) {
     beats: rulerBeats,
     loop,
     timeSignatures: rulerTimeSignatures,
+    get selectedTimeSignatureEventIds() {
+      return useMobxSelector(
+        () => rulerStore.selectedTimeSignatureEventIds,
+        [rulerStore],
+      )
+    },
     timeSignatureHitTest,
     setLoopBegin,
     setLoopEnd,

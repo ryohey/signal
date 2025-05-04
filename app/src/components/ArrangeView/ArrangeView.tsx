@@ -79,7 +79,6 @@ export const ArrangeView: FC = () => {
     tracks,
     transform,
     scrollBy,
-    rulerStore,
     selectedTrackIndex,
     setSelectedTrackIndex,
   } = useArrangeView()
@@ -231,7 +230,6 @@ export const ArrangeView: FC = () => {
           }}
         >
           <CanvasPianoRuler
-            rulerStore={rulerStore}
             {...rulerSelectionGesture}
             style={{
               background: theme.backgroundColor,

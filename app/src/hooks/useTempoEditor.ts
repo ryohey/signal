@@ -54,7 +54,6 @@ export function useTempoEditor() {
     beats,
     cursor,
     cursorX,
-    rulerStore,
     get items() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)
     },

@@ -18,8 +18,7 @@ const Wrapper = styled.div`
 `
 
 export const TempoGraph: FC = () => {
-  const { transform, contentWidth, rulerStore, setCanvasHeight } =
-    useTempoEditor()
+  const { transform, contentWidth, setCanvasHeight } = useTempoEditor()
   const {
     scrollLeft: _scrollLeft,
     setCanvasWidth,
@@ -54,7 +53,6 @@ export const TempoGraph: FC = () => {
   return (
     <Wrapper ref={ref}>
       <CanvasPianoRuler
-        rulerStore={rulerStore}
         style={{
           background: theme.backgroundColor,
           borderBottom: `1px solid ${theme.dividerColor}`,
