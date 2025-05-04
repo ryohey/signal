@@ -1,3 +1,4 @@
+import { CloudSong } from "@signal-app/api"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { ChangeEvent, useCallback } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
@@ -224,6 +225,9 @@ export const useCloudFile = () => {
     },
     async publishSong() {
       setOpenPublishDialog(true)
+    },
+    async deleteSong(song: CloudSong) {
+      await cloudFileStore.deleteSong(song)
     },
   }
 }
