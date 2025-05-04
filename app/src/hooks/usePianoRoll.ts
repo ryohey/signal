@@ -2,11 +2,7 @@ import { useCallback } from "react"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
-import { NotePoint } from "../entities/transform/NotePoint"
-import {
-  PianoRollDraggable,
-  PianoRollMouseMode,
-} from "../stores/PianoRollStore"
+import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { TrackId } from "../track"
 import { useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
@@ -177,10 +173,10 @@ export function usePianoRoll() {
         ({ pianoRollStore }) => pianoRollStore.openInstrumentBrowser,
       )
     },
-    resetSelection: useCallback(
-      () => pianoRollStore.resetSelection(),
-      [pianoRollStore],
-    ),
+    resetSelection: useCallback(() => {
+      pianoRollStore.selection = null
+      pianoRollStore.selectedNoteIds = []
+    }, [pianoRollStore]),
     scrollBy: useCallback(
       (dx: number, dy: number) => pianoRollStore.scrollBy(dx, dy),
       [pianoRollStore],
@@ -292,7 +288,9 @@ export function usePianoRoll() {
       [pianoRollStore],
     ),
     toggleTool: useCallback(
-      () => pianoRollStore.toggleTool(),
+      () =>
+        (pianoRollStore.mouseMode =
+          pianoRollStore.mouseMode === "pencil" ? "selection" : "pencil"),
       [pianoRollStore],
     ),
     setNewNoteVelocity: useCallback(
@@ -314,21 +312,6 @@ export function usePianoRoll() {
     ),
     setOpenInstrumentBrowser: useCallback(
       (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
-      [pianoRollStore],
-    ),
-    getDraggablePosition: useCallback(
-      (draggable: PianoRollDraggable) =>
-        pianoRollStore.getDraggablePosition(draggable),
-      [pianoRollStore],
-    ),
-    getDraggableArea: useCallback(
-      (draggable: PianoRollDraggable, minLength: number) =>
-        pianoRollStore.getDraggableArea(draggable, minLength),
-      [pianoRollStore],
-    ),
-    updateDraggable: useCallback(
-      (draggable: PianoRollDraggable, position: Partial<NotePoint>) =>
-        pianoRollStore.updateDraggable(draggable, position),
       [pianoRollStore],
     ),
   }
