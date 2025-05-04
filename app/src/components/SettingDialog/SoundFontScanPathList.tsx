@@ -1,6 +1,5 @@
 import styled from "@emotion/styled"
 import RemoveIcon from "mdi-react/RemoveIcon"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
@@ -12,7 +11,7 @@ const Actions = styled.div`
   margin-top: 1rem;
 `
 
-export const SoundFontScanPathList: FC = observer(() => {
+export const SoundFontScanPathList: FC = () => {
   const { scanPaths, addScanPath, removeScanPath, scanSoundFonts } =
     useSoundFont()
 
@@ -47,7 +46,7 @@ export const SoundFontScanPathList: FC = observer(() => {
       </Actions>
     </>
   )
-})
+}
 
 const ScanPathLabel = styled.span`
   font-size: 0.8rem;

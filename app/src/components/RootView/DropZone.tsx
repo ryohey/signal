@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC, PropsWithChildren, useCallback } from "react"
 import { useSetSong } from "../../actions"
 import { songFromFile } from "../../actions/file"
@@ -14,7 +13,7 @@ const Container = styled.div`
   overflow: hidden;
 `
 
-export const DropZone: FC<PropsWithChildren> = observer(({ children }) => {
+export const DropZone: FC<PropsWithChildren> = ({ children }) => {
   const song = useSong()
   const localized = useLocalization()
   const setSong = useSetSong()
@@ -43,4 +42,4 @@ export const DropZone: FC<PropsWithChildren> = observer(({ children }) => {
       {children}
     </Container>
   )
-})
+}
