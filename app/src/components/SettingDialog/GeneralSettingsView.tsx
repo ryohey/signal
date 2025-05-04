@@ -1,8 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { useSettings } from "../../hooks/useSettings"
-import { useStores } from "../../hooks/useStores"
 import {
   Language,
   Localized,
@@ -19,7 +17,7 @@ interface LanguageItem {
   language: Language
 }
 
-const LanguageSelect: FC = observer(() => {
+const LanguageSelect: FC = () => {
   const { language, setLanguage } = useSettings()
   const currentLanguage = useCurrentLanguage()
   const items: LanguageItem[] = [
@@ -45,17 +43,16 @@ const LanguageSelect: FC = observer(() => {
       </Select>
     </Label>
   )
-})
+}
 
-const ThemeSelect: FC = observer(() => {
-  const { themeStore } = useStores()
-  const { themeType } = themeStore
+const ThemeSelect: FC = () => {
+  const { themeType, setThemeType } = useSettings()
   return (
     <Label>
       <Localized name="theme" />
       <Select
         value={themeType}
-        onChange={(e) => (themeStore.themeType = e.target.value as ThemeType)}
+        onChange={(e) => setThemeType(e.target.value as ThemeType)}
         style={{ marginTop: "0.5rem" }}
       >
         {Object.keys(themes).map((themeType) => (
@@ -66,7 +63,7 @@ const ThemeSelect: FC = observer(() => {
       </Select>
     </Label>
   )
-})
+}
 
 const Column = styled.div`
   display: flex;
@@ -74,7 +71,7 @@ const Column = styled.div`
   gap: 1rem;
 `
 
-export const GeneralSettingsView: FC = observer(() => {
+export const GeneralSettingsView: FC = () => {
   return (
     <>
       <DialogTitle>
@@ -88,4 +85,4 @@ export const GeneralSettingsView: FC = observer(() => {
       </DialogContent>
     </>
   )
-})
+}

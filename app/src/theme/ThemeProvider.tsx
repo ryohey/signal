@@ -1,16 +1,13 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react"
-import { observer } from "mobx-react-lite"
-import { useStores } from "../hooks/useStores"
+import { useSettings } from "../hooks/useSettings"
 import { themes } from "./Theme"
 
-export const ThemeProvider = observer(
-  ({ children }: { children: React.ReactNode }) => {
-    const { themeStore } = useStores()
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const { themeType } = useSettings()
 
-    return (
-      <EmotionThemeProvider theme={themes[themeStore.themeType]}>
-        {children}
-      </EmotionThemeProvider>
-    )
-  },
-)
+  return (
+    <EmotionThemeProvider theme={themes[themeType]}>
+      {children}
+    </EmotionThemeProvider>
+  )
+}
