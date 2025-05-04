@@ -7,6 +7,7 @@ import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransform"
+import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import Quantizer from "../quantizer"
@@ -115,8 +116,7 @@ export default class ArrangeViewStore {
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
       this.tickScrollStore.transform,
-      0.5 * this.scaleY,
-      127,
+      new KeyTransform(0.5 * this.scaleY, 127),
     )
   }
 

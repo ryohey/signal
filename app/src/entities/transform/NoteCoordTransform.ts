@@ -1,13 +1,13 @@
 import { Point } from "../../entities/geometry/Point"
 import { NoteEvent } from "../../track"
+import { KeyTransform } from "./KeyTransform"
 import { NotePoint } from "./NotePoint"
 import { TickTransform } from "./TickTransform"
 
 export class NoteCoordTransform {
   constructor(
     private readonly tickTransform: TickTransform,
-    readonly pixelsPerKey: number,
-    private readonly maxNoteNumber: number,
+    private readonly keyTransform: KeyTransform,
   ) {}
 
   // pixels
@@ -17,7 +17,7 @@ export class NoteCoordTransform {
   }
 
   getY(noteNumber: number) {
-    return (this.maxNoteNumber - noteNumber) * this.pixelsPerKey
+    return this.keyTransform.getY(noteNumber)
   }
 
   // ticks
@@ -27,25 +27,29 @@ export class NoteCoordTransform {
   }
 
   getNoteNumber(pixels: number) {
-    return Math.ceil(this.getNoteNumberFractional(pixels))
+    return this.keyTransform.getNoteNumber(pixels)
   }
 
   getNoteNumberFractional(pixels: number) {
-    return this.maxNoteNumber - pixels / this.pixelsPerKey
+    return this.keyTransform.getNoteNumberFractional(pixels)
   }
 
   getDeltaNoteNumber(deltaPixels: number) {
-    return -deltaPixels / this.pixelsPerKey
+    return this.keyTransform.getDeltaNoteNumber(deltaPixels)
   }
 
   get numberOfKeys() {
-    return this.maxNoteNumber + 1
+    return this.keyTransform.numberOfKeys
+  }
+
+  get pixelsPerKey() {
+    return this.keyTransform.pixelsPerKey
   }
 
   //
 
   getMaxY() {
-    return this.numberOfKeys * this.pixelsPerKey
+    return this.keyTransform.getMaxY()
   }
 
   getRect(note: NoteEvent) {
@@ -53,16 +57,16 @@ export class NoteCoordTransform {
       x: this.getX(note.tick),
       y: this.getY(note.noteNumber),
       width: this.getX(note.duration),
-      height: this.pixelsPerKey,
+      height: this.keyTransform.pixelsPerKey,
     }
   }
 
   getDrumRect(note: NoteEvent) {
     return {
-      x: this.getX(note.tick) - this.pixelsPerKey / 2,
+      x: this.getX(note.tick) - this.keyTransform.pixelsPerKey / 2,
       y: this.getY(note.noteNumber),
-      width: this.pixelsPerKey,
-      height: this.pixelsPerKey,
+      width: this.keyTransform.pixelsPerKey,
+      height: this.keyTransform.pixelsPerKey,
     }
   }
 

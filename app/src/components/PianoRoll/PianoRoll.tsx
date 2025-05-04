@@ -4,6 +4,7 @@ import { clamp } from "lodash"
 import { FC, useCallback, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
+import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import ControlPane from "../ControlPane/ControlPane"
@@ -37,16 +38,15 @@ const Beta = styled.div`
 `
 
 const PianoRollWrapper: FC = () => {
+  const { transform, scrollBy } = usePianoRoll()
   const {
+    contentHeight,
     scaleY,
     scrollTop,
-    transform,
-    contentHeight,
     scaleAroundPointY,
     setScrollTopInPixels,
-    scrollBy,
     setScaleY,
-  } = usePianoRoll()
+  } = useKeyScroll()
   const {
     scaleX,
     scrollLeft,

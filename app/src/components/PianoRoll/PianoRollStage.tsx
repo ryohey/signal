@@ -2,6 +2,7 @@ import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { FC } from "react"
 import { Layout } from "../../Constants"
+import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import CanvasPianoRuler from "./CanvasPianoRuler"
 import { PianoKeys } from "./PianoKeys"
@@ -34,7 +35,8 @@ const PianoKeyPosition = styled.div`
 `
 
 export const PianoRollStage: FC<PianoRollStageProps> = ({ width, height }) => {
-  const { scrollTop, rulerStore } = usePianoRoll()
+  const { rulerStore } = usePianoRoll()
+  const { scrollTop } = useKeyScroll()
   const theme = useTheme()
 
   return (

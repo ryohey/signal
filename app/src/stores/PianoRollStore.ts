@@ -1,7 +1,6 @@
 import { Player } from "@signal-app/player"
 import { cloneDeep } from "lodash"
 import { computed, makeObservable, observable, reaction } from "mobx"
-import { Layout } from "../Constants"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
@@ -18,6 +17,7 @@ import Track, {
   UNASSIGNED_TRACK_ID,
   isNoteEvent,
 } from "../track"
+import { KeyScrollStore } from "./KeyScrollStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
@@ -54,11 +54,10 @@ export type SerializedPianoRollStore = Pick<
 export default class PianoRollStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
+  readonly keyScrollStore: KeyScrollStore
 
-  scrollTopKeys = 70 // 中央くらいの音程にスクロールしておく
   notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
-  scaleY = 1
   quantize = 8
   isQuantizeEnabled = true
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
@@ -71,7 +70,6 @@ export default class PianoRollStore {
     programNumber: 0,
   }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
-  canvasHeight: number = 0
   showTrackList = false
   showEventList = false
   openTransposeDialog = false
@@ -90,13 +88,12 @@ export default class PianoRollStore {
       0.15,
       15,
     )
+    this.keyScrollStore = new KeyScrollStore()
     this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      scrollTopKeys: observable,
       notesCursor: observable,
       mouseMode: observable,
-      scaleY: observable,
       quantize: observable,
       isQuantizeEnabled: observable,
       selectedTrackId: observable,
@@ -106,7 +103,6 @@ export default class PianoRollStore {
       openInstrumentBrowser: observable,
       instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
-      canvasHeight: observable,
       showTrackList: observable,
       showEventList: observable,
       openTransposeDialog: observable,
@@ -114,8 +110,6 @@ export default class PianoRollStore {
       newNoteVelocity: observable,
       keySignature: observable,
       previewingNoteNumbers: observable.ref,
-      contentHeight: computed,
-      scrollTop: computed,
       transform: computed,
       windowedEvents: computed,
       allNoteBounds: computed,
@@ -165,15 +159,6 @@ export default class PianoRollStore {
     this.selectedTrackId = serialized.selectedTrackId
   }
 
-  get contentHeight(): number {
-    const { transform } = this
-    return transform.getMaxY()
-  }
-
-  get scrollTop(): number {
-    return Math.round(this.transform.getY(this.scrollTopKeys))
-  }
-
   get selectedTrackIndex(): number {
     return this.songStore.song.tracks.findIndex(
       (t) => t.id === this.selectedTrackId,
@@ -187,8 +172,7 @@ export default class PianoRollStore {
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
       this.tickScrollStore.transform,
-      Layout.keyHeight * this.scaleY,
-      127,
+      this.keyScrollStore.transform,
     )
   }
 

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
+import { KeyScrollProvider } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useStores } from "../../hooks/useStores"
 import { TickScrollProvider } from "../../hooks/useTickScroll"
@@ -66,18 +67,20 @@ const PianoRollPanes: FC = () => {
 
 export const PianoRollEditor: FC = () => {
   const {
-    pianoRollStore: { tickScrollStore },
+    pianoRollStore: { tickScrollStore, keyScrollStore },
   } = useStores()
 
   return (
     <TickScrollProvider value={tickScrollStore}>
-      <ColumnContainer>
-        <PianoRollKeyboardShortcut />
-        <PianoRollToolbar />
-        <PianoRollPanes />
-      </ColumnContainer>
-      <PianoRollTransposeDialog />
-      <PianoRollVelocityDialog />
+      <KeyScrollProvider value={keyScrollStore}>
+        <ColumnContainer>
+          <PianoRollKeyboardShortcut />
+          <PianoRollToolbar />
+          <PianoRollPanes />
+        </ColumnContainer>
+        <PianoRollTransposeDialog />
+        <PianoRollVelocityDialog />
+      </KeyScrollProvider>
     </TickScrollProvider>
   )
 }

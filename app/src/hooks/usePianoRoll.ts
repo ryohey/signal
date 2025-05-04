@@ -1,4 +1,3 @@
-import { clamp } from "lodash"
 import { useCallback } from "react"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Point } from "../entities/geometry/Point"
@@ -7,41 +6,19 @@ import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { PianoNoteItem, PianoRollMouseMode } from "../stores/PianoRollStore"
 import { TrackId } from "../track"
+import { useKeyScroll } from "./useKeyScroll"
 import { useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
 
-const SCALE_Y_MIN = 0.5
-const SCALE_Y_MAX = 4
-
 export function usePianoRoll() {
   const { pianoRollStore, songStore } = useStores()
-  const { tickScrollStore } = pianoRollStore
-  const { setScrollLeftInTicks, setScrollLeftInPixels } = useTickScroll()
-
-  const setScrollTopInPixels = useCallback(
-    (y: number) => {
-      const { transform, canvasHeight } = pianoRollStore
-      const maxY = transform.getMaxY() - canvasHeight
-      const scrollTop = clamp(y, 0, maxY)
-      pianoRollStore.scrollTopKeys =
-        transform.getNoteNumberFractional(scrollTop)
-    },
-    [pianoRollStore],
-  )
-
-  const setScrollTopInKeys = useCallback(
-    (keys: number) => {
-      const { transform } = pianoRollStore
-      setScrollTopInPixels(transform.getY(keys))
-    },
-    [pianoRollStore, setScrollTopInPixels],
-  )
+  const { tickScrollStore, keyScrollStore } = pianoRollStore
+  const { setScrollLeftInTicks, setScrollLeftInPixels } =
+    useTickScroll(tickScrollStore)
+  const { setScrollTopInPixels } = useKeyScroll(keyScrollStore)
 
   return {
-    get canvasHeight() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.canvasHeight)
-    },
     get cursorX() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.cursorX)
     },
@@ -108,15 +85,6 @@ export function usePianoRoll() {
     },
     get quantize() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.quantize)
-    },
-    get scaleY() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.scaleY)
-    },
-    get scrollTop() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.scrollTop)
-    },
-    get contentHeight() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.contentHeight)
     },
     get notesCursor() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.notesCursor)
@@ -188,12 +156,12 @@ export function usePianoRoll() {
     scrollBy: useCallback(
       (dx: number, dy: number) => {
         setScrollLeftInPixels(tickScrollStore.scrollLeft - dx)
-        setScrollTopInPixels(pianoRollStore.scrollTop - dy)
+        setScrollTopInPixels(keyScrollStore.scrollTop - dy)
       },
       [
         setScrollLeftInPixels,
         setScrollTopInPixels,
-        pianoRollStore,
+        keyScrollStore,
         tickScrollStore,
       ],
     ),
@@ -248,36 +216,6 @@ export function usePianoRoll() {
       (ids: number[]) => (pianoRollStore.selectedNoteIds = ids),
       [pianoRollStore],
     ),
-    scaleAroundPointY: useCallback(
-      (scaleYDelta: number, pixelY: number) => {
-        const { transform, scrollTop, scaleY, scrollTopKeys } = pianoRollStore
-        const pixelYInKeys0 = transform.getNoteNumberFractional(
-          scrollTop + pixelY,
-        )
-        pianoRollStore.scaleY = clamp(
-          scaleY * (1 + scaleYDelta),
-          SCALE_Y_MIN,
-          SCALE_Y_MAX,
-        )
-        const updatedTransform = pianoRollStore.transform
-        const updatedScrollTop = pianoRollStore.scrollTop
-        const pixelYInKeys1 = updatedTransform.getNoteNumberFractional(
-          updatedScrollTop + pixelY,
-        )
-        const scrollInKeys = pixelYInKeys1 - pixelYInKeys0
-        setScrollTopInKeys(scrollTopKeys - scrollInKeys)
-      },
-      [pianoRollStore, setScrollTopInKeys],
-    ),
-    setScaleY: useCallback(
-      (scale: number) => (pianoRollStore.scaleY = scale),
-      [pianoRollStore],
-    ),
-    setScrollTopInPixels,
-    setCanvasHeight: useCallback(
-      (height: number) => (pianoRollStore.canvasHeight = height),
-      [pianoRollStore],
-    ),
     setNotesCursor: useCallback(
       (cursor: string) => (pianoRollStore.notesCursor = cursor),
       [pianoRollStore],
@@ -286,9 +224,9 @@ export function usePianoRoll() {
     getLocal: useCallback(
       (e: { offsetX: number; offsetY: number }): Point => ({
         x: e.offsetX + tickScrollStore.scrollLeft,
-        y: e.offsetY + pianoRollStore.scrollTop,
+        y: e.offsetY + keyScrollStore.scrollTop,
       }),
-      [pianoRollStore, tickScrollStore],
+      [keyScrollStore, tickScrollStore],
     ),
     getNotes: useCallback(
       (local: Point): PianoNoteItem[] =>

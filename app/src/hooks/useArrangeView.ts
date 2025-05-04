@@ -8,7 +8,7 @@ import { useTickScroll } from "./useTickScroll"
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
   const { tickScrollStore } = arrangeViewStore
-  const { setScrollLeftInPixels } = useTickScroll()
+  const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
 
   return {
     get canvasHeight() {
