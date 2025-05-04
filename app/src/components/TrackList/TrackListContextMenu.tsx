@@ -1,21 +1,23 @@
 import Color from "color"
 import { FC, useCallback, useState } from "react"
 import { useAddTrack, useRemoveTrack } from "../../actions"
+import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import Track from "../../track/Track"
+import { TrackId } from "../../track/Track"
 import { ColorPicker } from "../ColorPicker/ColorPicker"
 import { ContextMenu, ContextMenuProps } from "../ContextMenu/ContextMenu"
 import { MenuItem } from "../ui/Menu"
 import { TrackDialog } from "./TrackDialog"
 
 export interface TrackListContextMenuProps extends ContextMenuProps {
-  track: Track
+  trackId: TrackId
 }
 
 export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
-  track,
+  trackId,
   ...props
 }) => {
+  const { setColor } = useTrack(trackId)
   const addTrack = useAddTrack()
   const removeTrack = useRemoveTrack()
 
@@ -25,19 +27,19 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
 
   const onClickAdd = addTrack
   const onClickDelete = useCallback(
-    () => removeTrack(track.id),
-    [track.id, removeTrack],
+    () => removeTrack(trackId),
+    [trackId, removeTrack],
   )
   const onClickProperty = () => setDialogOpened(true)
   const onClickChangeTrackColor = () => setColorPickerOpened(true)
 
   const onPickColor = (color: string | null) => {
     if (color === null) {
-      track.setColor(null)
+      setColor(null)
       return
     }
     const obj = Color(color)
-    track.setColor({
+    setColor({
       red: Math.floor(obj.red()),
       green: Math.floor(obj.green()),
       blue: Math.floor(obj.blue()),
@@ -86,7 +88,7 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
         </MenuItem>
       </ContextMenu>
       <TrackDialog
-        track={track}
+        trackId={trackId}
         open={isDialogOpened}
         onClose={() => setDialogOpened(false)}
       />

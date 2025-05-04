@@ -1,14 +1,16 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
+import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import Track from "../../track/Track"
+import { TrackId } from "../../track/Track"
 
 // Display the track number if there is no name track name for display
-export const TrackName: FC<{ track: Track }> = observer(({ track }) => {
-  if (track.name && track.name.length > 0) {
-    return <>{track.name}</>
+export const TrackName: FC<{ trackId: TrackId }> = ({ trackId }) => {
+  const { name, channel } = useTrack(trackId)
+
+  if (name && name.length > 0) {
+    return <>{name}</>
   }
-  if (track.channel === undefined) {
+  if (channel === undefined) {
     return (
       <>
         <Localized name="conductor-track" />
@@ -17,7 +19,7 @@ export const TrackName: FC<{ track: Track }> = observer(({ track }) => {
   }
   return (
     <>
-      <Localized name="track" /> {track.channel + 1}
+      <Localized name="track" /> {channel + 1}
     </>
   )
-})
+}

@@ -3,19 +3,18 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useTrack } from "../../../../hooks/useTrack"
 
 export const useRemoveNoteGesture = (): MouseGesture => {
-  const { setSelectedNoteIds, selectedTrack, getLocal, getNotes } =
+  const { setSelectedNoteIds, selectedTrackId, getLocal, getNotes } =
     usePianoRoll()
   let { selectedNoteIds } = usePianoRoll()
+  const { removeEvent: removeTrackEvent } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
   const removeEvent = (eventId: number) => {
-    if (selectedTrack === undefined) {
-      return
-    }
     pushHistory()
-    selectedTrack.removeEvent(eventId)
+    removeTrackEvent(eventId)
     selectedNoteIds = selectedNoteIds.filter((id) => id !== eventId)
     setSelectedNoteIds(selectedNoteIds)
   }

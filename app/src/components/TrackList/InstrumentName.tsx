@@ -1,7 +1,7 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
+import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import Track from "../../track/Track"
+import { TrackId } from "../../track/Track"
 
 export const InstrumentName: FC<{ programNumber: number | undefined }> = ({
   programNumber,
@@ -267,11 +267,10 @@ export const InstrumentName: FC<{ programNumber: number | undefined }> = ({
   return <></>
 }
 
-export const TrackInstrumentName: FC<{ track: Track }> = observer(
-  ({ track }) => {
-    if (track.isRhythmTrack) {
-      return <>Standard Drum Kit</>
-    }
-    return <InstrumentName programNumber={track.programNumber} />
-  },
-)
+export const TrackInstrumentName: FC<{ trackId: TrackId }> = ({ trackId }) => {
+  const { isRhythmTrack, programNumber } = useTrack(trackId)
+  if (isRhythmTrack) {
+    return <>Standard Drum Kit</>
+  }
+  return <InstrumentName programNumber={programNumber} />
+}

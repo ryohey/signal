@@ -9,18 +9,19 @@ import { useControlPane } from "../../../../hooks/useControlPane"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
-export const usePencilGesture = (): MouseGesture<
-  [Point, ControlCoordTransform, ValueEventType]
-> => {
+export const usePencilGesture = (
+  type: ValueEventType,
+): MouseGesture<[Point, ControlCoordTransform]> => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { setSelectedEventIds, setSelection } = useControlPane()
   const createTrackEvent = useCreateEvent()
-  const updateValueEvents = useUpdateValueEvents()
   const { pushHistory } = useHistory()
+  const updateValueEvents = useUpdateValueEvents(type)
+  const eventFactory = ValueEventType.getEventFactory(type)
 
   return {
-    onMouseDown(e, startPoint, transform, type) {
+    onMouseDown(e, startPoint, transform) {
       pushHistory()
 
       setSelectedEventIds([])
@@ -31,7 +32,7 @@ export const usePencilGesture = (): MouseGesture<
       const startClientPos = getClientPos(e)
       const pos = transform.fromPosition(startPoint)
 
-      const event = ValueEventType.getEventFactory(type)(pos.value)
+      const event = eventFactory(pos.value)
       createTrackEvent(event, pos.tick)
 
       let lastTick = pos.tick
@@ -48,7 +49,7 @@ export const usePencilGesture = (): MouseGesture<
           )
           const tick = transform.getTick(local.x)
 
-          updateValueEvents(type)(lastValue, value, lastTick, tick)
+          updateValueEvents(lastValue, value, lastTick, tick)
 
           lastTick = tick
           lastValue = value

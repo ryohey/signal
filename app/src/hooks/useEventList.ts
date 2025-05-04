@@ -1,13 +1,10 @@
 import { useMemo } from "react"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
+import { useTrack } from "./useTrack"
 
 export function useEventList() {
-  const { selectedTrack, selectedNoteIds } = usePianoRoll()
-  const trackEvents = useMobxSelector(
-    () => selectedTrack?.events ?? [],
-    [selectedTrack],
-  )
+  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
+  const { events: trackEvents } = useTrack(selectedTrackId)
   const events = useMemo(() => {
     if (selectedNoteIds.length > 0) {
       return trackEvents.filter(

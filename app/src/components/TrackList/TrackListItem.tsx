@@ -3,7 +3,6 @@ import Headset from "mdi-react/HeadphonesIcon"
 import Layers from "mdi-react/LayersIcon"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import VolumeOff from "mdi-react/VolumeOffIcon"
-import { observer } from "mobx-react-lite"
 import { FC, MouseEventHandler, useCallback, useState } from "react"
 import {
   useSelectTrack,
@@ -14,9 +13,10 @@ import { useContextMenu } from "../../hooks/useContextMenu"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRouter } from "../../hooks/useRouter"
+import { useTrack } from "../../hooks/useTrack"
 import { useTrackMute } from "../../hooks/useTrackMute"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
-import Track from "../../track/Track"
+import { TrackId } from "../../track/Track"
 import { trackColorToCSSColor } from "../../track/TrackColor"
 import { TrackMute } from "../../trackMute/TrackMute"
 import { TrackInstrumentName } from "./InstrumentName"
@@ -25,7 +25,7 @@ import { TrackListContextMenu } from "./TrackListContextMenu"
 import { TrackName } from "./TrackName"
 
 export type TrackListItemProps = {
-  track: Track
+  trackId: TrackId
 }
 
 const Container = styled.div`
@@ -151,8 +151,15 @@ const ControlButton = styled.div`
   }
 `
 
-export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
+export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
   const { selectedTrackId, notGhostTrackIds } = usePianoRoll()
+  const {
+    channel,
+    isConductorTrack,
+    programNumber,
+    isRhythmTrack,
+    color: trackColor,
+  } = useTrack(trackId)
   const { trackMute } = useTrackMute()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
@@ -162,65 +169,67 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
   const toggleAllGhostTracks = useToggleAllGhostTracks()
   const selectTrack = useSelectTrack()
 
-  const selected = track.id === selectedTrackId
-  const mute = TrackMute.isMuted(trackMute, track.id)
-  const solo = TrackMute.isSolo(trackMute, track.id)
-  const ghostTrack = !notGhostTrackIds.has(track.id)
-  const channel = track.channel
+  const selected = trackId === selectedTrackId
+  const mute = TrackMute.isMuted(trackMute, trackId)
+  const solo = TrackMute.isSolo(trackMute, trackId)
+  const ghostTrack = !notGhostTrackIds.has(trackId)
   const { onContextMenu, menuProps } = useContextMenu()
   const [isDialogOpened, setDialogOpened] = useState(false)
 
   const onDoubleClickIcon = useCallback(() => {
-    if (track.isConductorTrack) {
+    if (isConductorTrack) {
       return
     }
     setOpen(true)
     setSetting({
-      programNumber: track.programNumber ?? 0,
-      isRhythmTrack: track.isRhythmTrack,
+      programNumber,
+      isRhythmTrack,
     })
-  }, [setSetting, track])
+  }, [setSetting, programNumber, isRhythmTrack, setOpen, isConductorTrack])
+
   const onClickMute: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation()
-      toggleMuteTrack(track.id)
+      toggleMuteTrack(trackId)
     },
-    [track.id, toggleMuteTrack],
+    [trackId, toggleMuteTrack],
   )
+
   const onClickSolo: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation()
-      toggleSoloTrack(track.id)
+      toggleSoloTrack(trackId)
     },
-    [track.id, toggleSoloTrack],
+    [trackId, toggleSoloTrack],
   )
+
   const onClickGhostTrack: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation()
       if (e.nativeEvent.altKey) {
         toggleAllGhostTracks()
       } else {
-        toggleGhostTrack(track.id)
+        toggleGhostTrack(trackId)
       }
     },
-    [track.id, toggleAllGhostTracks, toggleGhostTrack],
+    [trackId, toggleAllGhostTracks, toggleGhostTrack],
   )
+
   const onSelectTrack = useCallback(() => {
     setPath("/track")
-    selectTrack(track.id)
-  }, [track.id, selectTrack, setPath])
+    selectTrack(trackId)
+  }, [trackId, selectTrack, setPath])
+
   const onClickChannel = useCallback(() => {
     setDialogOpened(true)
   }, [])
 
-  const emoji = track.isRhythmTrack
+  const emoji = isRhythmTrack
     ? "🥁"
-    : categoryEmojis[getCategoryIndex(track.programNumber ?? 0)]
+    : categoryEmojis[getCategoryIndex(programNumber ?? 0)]
 
   const color =
-    track.color !== undefined
-      ? trackColorToCSSColor(track.color)
-      : "transparent"
+    trackColor !== undefined ? trackColorToCSSColor(trackColor) : "transparent"
 
   return (
     <>
@@ -242,10 +251,10 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
         <div>
           <Label>
             <Name data-selected={selected}>
-              <TrackName track={track} />
+              <TrackName trackId={trackId} />
             </Name>
             <Instrument>
-              <TrackInstrumentName track={track} />
+              <TrackInstrumentName trackId={trackId} />
             </Instrument>
           </Label>
           <Controls>
@@ -278,12 +287,12 @@ export const TrackListItem: FC<TrackListItemProps> = observer(({ track }) => {
           </Controls>
         </div>
       </Container>
-      <TrackListContextMenu {...menuProps} track={track} />
+      <TrackListContextMenu {...menuProps} trackId={trackId} />
       <TrackDialog
-        track={track}
+        trackId={trackId}
         open={isDialogOpened}
         onClose={() => setDialogOpened(false)}
       />
     </>
   )
-})
+}

@@ -32,7 +32,7 @@ export const TrackList: FC = observer(() => {
           const toIndex = song.tracks.indexOf(overTrack)
           song.moveTrack(fromIndex, toIndex)
         }}
-        render={(track) => <TrackListItem key={track.id} track={track} />}
+        render={(track) => <TrackListItem key={track.id} trackId={track.id} />}
       ></DraggableList>
       <AddTrackButton />
     </List>

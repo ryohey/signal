@@ -1,7 +1,8 @@
 import { range } from "lodash"
 import { FC, useEffect, useState } from "react"
+import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import Track from "../../track"
+import { TrackId } from "../../track"
 import {
   Dialog,
   DialogActions,
@@ -15,24 +16,29 @@ import { TextField } from "../ui/TextField"
 import { TrackName } from "./TrackName"
 
 export interface TrackDialogProps {
-  track: Track
+  trackId: TrackId
   open: boolean
   onClose: () => void
 }
 
-export const TrackDialog: FC<TrackDialogProps> = ({ track, open, onClose }) => {
-  const [name, setName] = useState(track.name)
-  const [channel, setChannel] = useState(track.channel)
+export const TrackDialog: FC<TrackDialogProps> = ({
+  trackId,
+  open,
+  onClose,
+}) => {
+  const { name, channel, setName, setChannel } = useTrack(trackId)
+  const [_name, _setName] = useState(name)
+  const [_channel, _setChannel] = useState(channel)
 
   useEffect(() => {
-    setName(track.name)
-    setChannel(track.channel)
-  }, [track])
+    _setName(name)
+    _setChannel(channel)
+  }, [trackId])
 
   return (
     <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
       <DialogTitle>
-        <Localized name="track" />: <TrackName track={track} />
+        <Localized name="track" />: <TrackName trackId={trackId} />
       </DialogTitle>
       <DialogContent>
         <Label>
@@ -40,16 +46,16 @@ export const TrackDialog: FC<TrackDialogProps> = ({ track, open, onClose }) => {
         </Label>
         <TextField
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value as string)}
+          value={_name}
+          onChange={(e) => _setName(e.target.value as string)}
           style={{ width: "100%", marginBottom: "1rem" }}
         />
         <Label>
           <Localized name="channel" />
         </Label>
         <Select
-          value={channel}
-          onChange={(e) => setChannel(parseInt(e.target.value as string))}
+          value={_channel}
+          onChange={(e) => _setChannel(parseInt(e.target.value as string))}
         >
           {range(0, 16).map((v) => (
             <option key={v} value={v.toString()}>
@@ -72,8 +78,8 @@ export const TrackDialog: FC<TrackDialogProps> = ({ track, open, onClose }) => {
         </Button>
         <PrimaryButton
           onClick={() => {
-            track.channel = channel
-            track.setName(name ?? "")
+            setName(_name ?? "")
+            setChannel(_channel)
             onClose()
           }}
         >

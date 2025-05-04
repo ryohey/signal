@@ -1,5 +1,6 @@
 import { maxBy, min, minBy } from "lodash"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import { transaction } from "mobx"
 import {
   ControlEventsClipboardData,
   isControlEventsClipboardData,
@@ -9,31 +10,28 @@ import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
+import { useTrack } from "../hooks/useTrack"
 import clipboard from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { getEventById, updateEvent, createOrUpdate } =
+    useTrack(selectedTrackId)
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
 
   return <T extends ControllerEvent | PitchBendEvent>(event: T) => {
-    if (selectedTrack === undefined) {
-      return
-    }
-
     pushHistory()
 
     const controllerEvents = selectedEventIds
-      .map((id) => selectedTrack.getEventById(id))
+      .map((id) => getEventById(id))
       .filter(isNotUndefined)
 
     if (controllerEvents.length > 0) {
-      controllerEvents.forEach((e) =>
-        selectedTrack.updateEvent(e.id, { value: event.value }),
-      )
+      controllerEvents.forEach((e) => updateEvent(e.id, { value: event.value }))
     } else {
-      selectedTrack.createOrUpdate({
+      createOrUpdate({
         ...event,
         tick: position,
       })
@@ -42,35 +40,37 @@ export const useCreateOrUpdateControlEventsValue = () => {
 }
 
 export const useDeleteControlSelection = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { removeEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()
 
   return () => {
-    if (selectedTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
     pushHistory()
 
     // Remove selected notes and selected notes
-    selectedTrack.removeEvents(selectedEventIds)
+    removeEvents(selectedEventIds)
     setSelection(null)
   }
 }
 
 export const useCopyControlSelection = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { getEventById } = useTrack(selectedTrackId)
   const { selectedEventIds } = useControlPane()
 
   return () => {
-    if (selectedTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
     // Copy selected events
     const events = selectedEventIds
-      .map((id) => selectedTrack.getEventById(id))
+      .map((id) => getEventById(id))
       .filter(isNotUndefined)
 
     const minTick = min(events.map((e) => e.tick))
@@ -94,15 +94,12 @@ export const useCopyControlSelection = () => {
 }
 
 export const usePasteControlSelection = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { createOrUpdate } = useTrack(selectedTrackId)
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
   return () => {
-    if (selectedTrack === undefined) {
-      return
-    }
-
     const text = clipboard.readText()
     if (!text || text.length === 0) {
       return
@@ -119,26 +116,25 @@ export const usePasteControlSelection = () => {
       ...e,
       tick: e.tick + position,
     }))
-    selectedTrack.transaction((it) =>
-      events.forEach((e) => it.createOrUpdate(e)),
-    )
+    transaction(() => events.forEach(createOrUpdate))
   }
 }
 
 export const useDuplicateControlSelection = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { getEventById, createOrUpdate } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
 
   return () => {
-    if (selectedTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
     pushHistory()
 
     const selectedEvents = selectedEventIds
-      .map((id) => selectedTrack.getEventById(id))
+      .map((id) => getEventById(id))
       .filter(isNotUndefined)
 
     // move to the end of selection
@@ -152,8 +148,8 @@ export const useDuplicateControlSelection = () => {
     }))
 
     // select the created events
-    const addedEvents = selectedTrack.transaction((it) =>
-      notes.map((e) => it.createOrUpdate(e)),
+    const addedEvents = transaction(() => notes.map(createOrUpdate)).filter(
+      isNotUndefined,
     )
     setSelectedEventIds(addedEvents.map((e) => e.id))
   }

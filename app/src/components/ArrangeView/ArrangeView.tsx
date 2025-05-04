@@ -201,7 +201,7 @@ export const ArrangeView: FC = () => {
                 onTrackContextMenu(e)
               }}
             >
-              <TrackName track={t} />
+              <TrackName trackId={t.id} />
             </TrackHeader>
           ))}
         </div>

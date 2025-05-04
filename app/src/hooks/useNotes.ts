@@ -1,12 +1,10 @@
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { useMobxStore } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
+import { useTrack } from "./useTrack"
 
 export function useNotes() {
-  const { selectedTrack } = usePianoRoll()
-  const isRhythmTrack = useMobxSelector(
-    () => selectedTrack?.isRhythmTrack ?? false,
-    [selectedTrack],
-  )
+  const { selectedTrackId } = usePianoRoll()
+  const { isRhythmTrack } = useTrack(selectedTrackId)
 
   return {
     get notes() {
