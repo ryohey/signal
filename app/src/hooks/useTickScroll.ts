@@ -1,9 +1,14 @@
 import { clamp } from "lodash"
-import { useCallback } from "react"
+import { createContext, useCallback, useContext } from "react"
 import { TickScrollStore } from "../stores/TickScrollStore"
 import { useMobxSelector } from "./useMobxSelector"
 
-export function useTickScroll(tickScrollStore: TickScrollStore) {
+const TickScrollContext = createContext<TickScrollStore>(null!)
+export const TickScrollProvider = TickScrollContext.Provider
+
+export function useTickScroll() {
+  const tickScrollStore = useContext(TickScrollContext)
+
   const setScrollLeftInPixels = useCallback(
     (x: number) => {
       const { contentWidth } = tickScrollStore

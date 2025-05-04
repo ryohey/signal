@@ -8,8 +8,7 @@ import { useTickScroll } from "./useTickScroll"
 export function useArrangeView() {
   const { arrangeViewStore } = useStores()
   const { tickScrollStore } = arrangeViewStore
-  const { setScrollLeftInPixels, scaleAroundPointX } =
-    useTickScroll(tickScrollStore)
+  const { setScrollLeftInPixels, scaleAroundPointX } = useTickScroll()
 
   return {
     get autoScroll() {

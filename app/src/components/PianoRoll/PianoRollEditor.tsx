@@ -2,6 +2,8 @@ import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useStores } from "../../hooks/useStores"
+import { TickScrollProvider } from "../../hooks/useTickScroll"
 import EventList from "../EventEditor/EventList"
 import { PianoRollKeyboardShortcut } from "../KeyboardShortcut/PianoRollKeyboardShortcut"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
@@ -34,38 +36,48 @@ const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
   return <>{children}</>
 }
 
-export const PianoRollEditor: FC = () => {
+const PianoRollPanes: FC = () => {
   const { showTrackList, showEventList } = usePianoRoll()
 
   return (
-    <>
+    <div style={{ display: "flex", flexGrow: 1, position: "relative" }}>
+      <PaneLayout
+        split="vertical"
+        minSize={280}
+        pane1Style={{ display: "flex" }}
+        pane2Style={{ display: "flex" }}
+        isShow={showTrackList}
+        pane={<TrackList />}
+      >
+        <PaneLayout
+          split="vertical"
+          minSize={240}
+          pane1Style={{ display: "flex" }}
+          pane2Style={{ display: "flex" }}
+          isShow={showEventList}
+          pane={<EventList />}
+        >
+          <PianoRoll />
+        </PaneLayout>
+      </PaneLayout>
+    </div>
+  )
+}
+
+export const PianoRollEditor: FC = () => {
+  const {
+    pianoRollStore: { tickScrollStore },
+  } = useStores()
+
+  return (
+    <TickScrollProvider value={tickScrollStore}>
       <ColumnContainer>
         <PianoRollKeyboardShortcut />
         <PianoRollToolbar />
-        <div style={{ display: "flex", flexGrow: 1, position: "relative" }}>
-          <PaneLayout
-            split="vertical"
-            minSize={280}
-            pane1Style={{ display: "flex" }}
-            pane2Style={{ display: "flex" }}
-            isShow={showTrackList}
-            pane={<TrackList />}
-          >
-            <PaneLayout
-              split="vertical"
-              minSize={240}
-              pane1Style={{ display: "flex" }}
-              pane2Style={{ display: "flex" }}
-              isShow={showEventList}
-              pane={<EventList />}
-            >
-              <PianoRoll />
-            </PaneLayout>
-          </PaneLayout>
-        </div>
+        <PianoRollPanes />
       </ColumnContainer>
       <PianoRollTransposeDialog />
       <PianoRollVelocityDialog />
-    </>
+    </TickScrollProvider>
   )
 }

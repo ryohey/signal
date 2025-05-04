@@ -18,7 +18,7 @@ export function usePianoRoll() {
   const { pianoRollStore, songStore } = useStores()
   const { tickScrollStore } = pianoRollStore
   const { setScrollLeftInTicks, setScrollLeftInPixels, scaleAroundPointX } =
-    useTickScroll(tickScrollStore)
+    useTickScroll()
 
   const setScrollTopInPixels = useCallback(
     (y: number) => {

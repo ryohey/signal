@@ -1,5 +1,7 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
+import { useStores } from "../../hooks/useStores"
+import { TickScrollProvider } from "../../hooks/useTickScroll"
 import { ArrangeToolbar } from "../ArrangeToolbar/ArrangeToolbar"
 import { ArrangeViewKeyboardShortcut } from "../KeyboardShortcut/ArrangeViewKeyboardShortcut"
 import { ArrangeTransposeDialog } from "../TransposeDialog/ArrangeTransposeDialog"
@@ -15,8 +17,12 @@ const Container = styled.div`
 `
 
 export const ArrangeEditor: FC = () => {
+  const {
+    arrangeViewStore: { tickScrollStore },
+  } = useStores()
+
   return (
-    <>
+    <TickScrollProvider value={tickScrollStore}>
       <Container>
         <ArrangeViewKeyboardShortcut />
         <ArrangeToolbar />
@@ -24,6 +30,6 @@ export const ArrangeEditor: FC = () => {
       </Container>
       <ArrangeTransposeDialog />
       <ArrangeVelocityDialog />
-    </>
+    </TickScrollProvider>
   )
 }

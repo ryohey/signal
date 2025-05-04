@@ -10,8 +10,8 @@ import { useTickScroll } from "./useTickScroll"
 
 export function useTempoEditor() {
   const { tempoEditorStore } = useStores()
-  const { rulerStore, tickScrollStore } = tempoEditorStore
-  const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
+  const { rulerStore } = tempoEditorStore
+  const { setScrollLeftInPixels } = useTickScroll()
 
   const controlPoints = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.controlPoints,
