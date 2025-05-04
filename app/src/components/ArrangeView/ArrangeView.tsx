@@ -271,7 +271,7 @@ export const ArrangeView: FC = () => {
       >
         <VerticalScaleScrollBar
           scrollOffset={scrollTop}
-          contentLength={contentHeight + Layout.rulerHeight}
+          contentLength={contentHeight - BAR_WIDTH}
           onScroll={setScrollTop}
           onClickScaleUp={onClickScaleUpVertical}
           onClickScaleDown={onClickScaleDownVertical}
