@@ -20,6 +20,9 @@ export function useTempoEditor() {
   const transform = useMobxStore(
     ({ tempoEditorStore }) => tempoEditorStore.transform,
   )
+  const mouseMode = useMobxStore(
+    ({ tempoEditorStore }) => tempoEditorStore.mouseMode,
+  )
 
   const { position: playerPosition } = usePlayer()
 
@@ -34,19 +37,25 @@ export function useTempoEditor() {
     [transform, playerPosition],
   )
 
+  const cursor = useMemo(
+    () =>
+      mouseMode === "pencil"
+        ? `url("./cursor-pencil.svg") 0 20, pointer`
+        : "auto",
+    [mouseMode],
+  )
+
   return {
     controlPoints,
     selection,
     transform,
     selectionRect,
     beats,
+    cursor,
     cursorX,
     rulerStore,
     get autoScroll() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.autoScroll)
-    },
-    get cursor() {
-      return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.cursor)
     },
     get items() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.items)

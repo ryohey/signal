@@ -90,12 +90,6 @@ export default class TempoEditorStore {
       id: p.id,
     }))
   }
-
-  get cursor(): string {
-    return this.mouseMode === "pencil"
-      ? `url("./cursor-pencil.svg") 0 20, pointer`
-      : "auto"
-  }
 }
 
 export const pointToCircleRect = (p: Point, radius: number) => ({
