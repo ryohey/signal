@@ -40,7 +40,6 @@ export default class TempoEditorStore {
       mouseMode: observable,
       selection: observable,
       selectedEventIds: observable,
-      scrollLeft: computed,
       transform: computed,
       items: computed,
       controlPoints: computed,
@@ -52,10 +51,6 @@ export default class TempoEditorStore {
     this.tickScrollStore.setUpAutoScroll()
   }
 
-  get scrollLeft(): number {
-    return this.tickScrollStore.scrollLeft
-  }
-
   get transform() {
     return new TempoCoordTransform(
       this.tickScrollStore.transform,
@@ -64,8 +59,8 @@ export default class TempoEditorStore {
   }
 
   get items() {
-    const { transform, scrollLeft } = this
-    const { canvasWidth } = this.tickScrollStore
+    const { transform } = this
+    const { canvasWidth, scrollLeft } = this.tickScrollStore
     const events = this.songStore.song.conductorTrack?.events ?? []
     return transformEvents(events, transform, canvasWidth + scrollLeft)
   }
