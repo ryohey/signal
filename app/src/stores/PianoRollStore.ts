@@ -59,7 +59,6 @@ export default class PianoRollStore {
   notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
   scaleY = 1
-  autoScroll = true
   quantize = 8
   isQuantizeEnabled = true
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
@@ -86,7 +85,6 @@ export default class PianoRollStore {
     private readonly player: Player,
   ) {
     this.tickScrollStore = new TickScrollStore(
-      this,
       this.songStore,
       this.player,
       0.15,
@@ -188,7 +186,7 @@ export default class PianoRollStore {
 
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
-      Layout.pixelsPerTick * this.tickScrollStore.scaleX,
+      this.tickScrollStore.transform,
       Layout.keyHeight * this.scaleY,
       127,
     )
@@ -290,7 +288,7 @@ export default class PianoRollStore {
   }
 
   get cursorX(): number {
-    return this.transform.getX(this.player.position)
+    return this.tickScrollStore.transform.getX(this.player.position)
   }
 
   get quantizer(): Quantizer {

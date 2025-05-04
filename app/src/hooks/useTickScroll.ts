@@ -6,13 +6,12 @@ import { useMobxSelector } from "./useMobxSelector"
 const TickScrollContext = createContext<TickScrollStore>(null!)
 export const TickScrollProvider = TickScrollContext.Provider
 
-export function useTickScroll() {
-  const tickScrollStore = useContext(TickScrollContext)
-
+export function useTickScroll(
+  tickScrollStore: TickScrollStore = useContext(TickScrollContext),
+) {
   const setScrollLeftInPixels = useCallback(
     (x: number) => {
-      const { canvasWidth, contentWidth } = tickScrollStore
-      const { transform } = tickScrollStore.parent
+      const { transform, canvasWidth, contentWidth } = tickScrollStore
       const maxX = contentWidth - canvasWidth
       const scrollLeft = clamp(x, 0, maxX)
       tickScrollStore.scrollLeftTicks = transform.getTick(scrollLeft)
@@ -22,7 +21,7 @@ export function useTickScroll() {
 
   const setScrollLeftInTicks = useCallback(
     (tick: number) => {
-      setScrollLeftInPixels(tickScrollStore.parent.transform.getX(tick))
+      setScrollLeftInPixels(tickScrollStore.transform.getX(tick))
     },
     [tickScrollStore],
   )
@@ -90,7 +89,7 @@ export function useTickScroll() {
     ),
     scaleAroundPointX: (scaleXDelta: number, pixelX: number) => {
       const { maxScaleX, minScaleX } = tickScrollStore
-      const pixelXInTicks0 = tickScrollStore.parent.transform.getTick(
+      const pixelXInTicks0 = tickScrollStore.transform.getTick(
         tickScrollStore.scrollLeft + pixelX,
       )
       tickScrollStore.scaleX = clamp(
@@ -98,7 +97,7 @@ export function useTickScroll() {
         minScaleX,
         maxScaleX,
       )
-      const pixelXInTicks1 = tickScrollStore.parent.transform.getTick(
+      const pixelXInTicks1 = tickScrollStore.transform.getTick(
         tickScrollStore.scrollLeft + pixelX,
       )
       const scrollInTicks = pixelXInTicks1 - pixelXInTicks0

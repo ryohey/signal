@@ -43,7 +43,6 @@ const PianoRollWrapper: FC = () => {
     transform,
     contentHeight,
     scaleAroundPointY,
-    setAutoScroll,
     setScrollTopInPixels,
     scrollBy,
     setScaleY,
@@ -53,6 +52,7 @@ const PianoRollWrapper: FC = () => {
     scrollLeft,
     contentWidth,
     scaleAroundPointX,
+    setAutoScroll,
     setScrollLeftInPixels,
     setScaleX,
   } = useTickScroll()

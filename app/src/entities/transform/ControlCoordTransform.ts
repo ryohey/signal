@@ -4,7 +4,7 @@ import { Rect } from "../geometry/Rect"
 import { ControlSelection } from "../selection/ControlSelection"
 import { TickTransform } from "./TickTransform"
 
-export class ControlCoordTransform implements TickTransform {
+export class ControlCoordTransform {
   constructor(
     private readonly transform: TickTransform,
     readonly maxValue: number,

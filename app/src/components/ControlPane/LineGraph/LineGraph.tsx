@@ -48,8 +48,8 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   axis,
   axisLabelFormatter = (v) => v.toString(),
 }: LineGraphProps<T>) => {
-  const { transform, cursor, mouseMode } = useControlPane()
-  const { scrollLeft } = useTickScroll()
+  const { cursor, mouseMode } = useControlPane()
+  const { transform, scrollLeft } = useTickScroll()
   const theme = useTheme()
   const createOrUpdateControlEventsValue = useCreateOrUpdateControlEventsValue()
   const handlePencilMouseDown = usePencilGesture()
@@ -58,7 +58,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
-    [transform.horizontalId, maxValue, height, lineWidth],
+    [transform.id, maxValue, height, lineWidth],
   )
 
   const items = events.map((e) => ({

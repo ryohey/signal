@@ -9,7 +9,7 @@ import { useTickScroll } from "./useTickScroll"
 
 export function useGhostNotes(trackId: TrackId) {
   const { transform } = usePianoRoll()
-  const { canvasWidth, scrollLeft } = useTickScroll()
+  const { canvasWidth, scrollLeft, transform: tickTransform } = useTickScroll()
   const song = useSong()
   const track = useMobxSelector(() => song.getTrack(trackId), [song, trackId])
   const events = useMobxSelector(() => track?.events ?? [], [track])
@@ -25,12 +25,12 @@ export function useGhostNotes(trackId: TrackId) {
       noteEvents.filter(
         isEventOverlapRange(
           Range.fromLength(
-            transform.getTick(scrollLeft),
-            transform.getTick(canvasWidth),
+            tickTransform.getTick(scrollLeft),
+            tickTransform.getTick(canvasWidth),
           ),
         ),
       ),
-    [scrollLeft, canvasWidth, transform.horizontalId, noteEvents],
+    [scrollLeft, canvasWidth, tickTransform.id, noteEvents],
   )
 
   const getRect = useCallback(

@@ -41,7 +41,6 @@ export default class ArrangeViewStore {
     private readonly player: Player,
   ) {
     this.tickScrollStore = new TickScrollStore(
-      this,
       this.songStore,
       this.player,
       0.15,
@@ -115,14 +114,15 @@ export default class ArrangeViewStore {
 
   get transform(): NoteCoordTransform {
     return new NoteCoordTransform(
-      Layout.pixelsPerTick * this.tickScrollStore.scaleX,
+      this.tickScrollStore.transform,
       0.5 * this.scaleY,
       127,
     )
   }
 
   get trackTransform(): ArrangeCoordTransform {
-    const { transform, trackHeight } = this
+    const { trackHeight } = this
+    const { transform } = this.tickScrollStore
     return new ArrangeCoordTransform(transform, trackHeight)
   }
 
@@ -164,16 +164,17 @@ export default class ArrangeViewStore {
   }
 
   get cursorX(): number {
-    return this.transform.getX(this.player.position)
+    return this.tickScrollStore.transform.getX(this.player.position)
   }
 
   get selectionRect(): Rect | null {
     const { selection, trackTransform } = this
+    const { transform } = this.tickScrollStore
     if (selection === null) {
       return null
     }
-    const x = trackTransform.getX(selection.fromTick)
-    const right = trackTransform.getX(selection.toTick)
+    const x = transform.getX(selection.fromTick)
+    const right = transform.getX(selection.toTick)
     const y = trackTransform.getY(selection.fromTrackIndex)
     const bottom = trackTransform.getY(selection.toTrackIndex)
     return {

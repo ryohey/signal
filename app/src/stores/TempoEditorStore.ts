@@ -1,6 +1,5 @@
 import { Player } from "@signal-app/player"
 import { computed, makeObservable, observable } from "mobx"
-import { Layout } from "../Constants"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
@@ -27,7 +26,6 @@ export default class TempoEditorStore {
     private readonly player: Player,
   ) {
     this.tickScrollStore = new TickScrollStore(
-      this,
       this.songStore,
       this.player,
       0.15,
@@ -59,8 +57,10 @@ export default class TempoEditorStore {
   }
 
   get transform() {
-    const pixelsPerTick = Layout.pixelsPerTick * this.tickScrollStore.scaleX
-    return new TempoCoordTransform(pixelsPerTick, this.canvasHeight)
+    return new TempoCoordTransform(
+      this.tickScrollStore.transform,
+      this.canvasHeight,
+    )
   }
 
   get items() {

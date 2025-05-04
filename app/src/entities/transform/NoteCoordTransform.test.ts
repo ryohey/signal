@@ -1,7 +1,8 @@
 import { NoteCoordTransform } from "./NoteCoordTransform"
+import { TickTransform } from "./TickTransform"
 
 describe("NoteCoordTransform", () => {
-  const t = new NoteCoordTransform(100, 30, 127)
+  const t = new NoteCoordTransform(new TickTransform(100), 30, 127)
 
   it("constructor", () => {
     expect(t).not.toBeNull()

@@ -38,13 +38,12 @@ export const LineGraphCanvas: FC<LineGraphCanvasProps> = ({
   onMouseDown,
   onContextMenu,
 }) => {
-  const { selection, selectedEventIds, cursorX, transform, beats } =
-    useControlPane()
-  const { scrollLeft } = useTickScroll()
+  const { selection, selectedEventIds, cursorX, beats } = useControlPane()
+  const { transform: tickTransform, scrollLeft } = useTickScroll()
 
   const controlTransform = useMemo(
-    () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
-    [transform.horizontalId, maxValue, height],
+    () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),
+    [tickTransform.id, maxValue, height],
   )
 
   const selectionRect =

@@ -1,11 +1,8 @@
 import { Player } from "@signal-app/player"
 import { autorun, computed, makeObservable, observable } from "mobx"
+import { Layout } from "../Constants"
 import { TickTransform } from "../entities/transform/TickTransform"
 import { SongStore } from "./SongStore"
-
-interface TickScrollProvider {
-  readonly transform: TickTransform
-}
 
 // Store for scrolling according to the playback time
 export class TickScrollStore {
@@ -15,7 +12,6 @@ export class TickScrollStore {
   canvasWidth = 0
 
   constructor(
-    readonly parent: TickScrollProvider,
     private readonly songStore: SongStore,
     private readonly player: Player,
     readonly minScaleX: number,
@@ -34,11 +30,11 @@ export class TickScrollStore {
   }
 
   get transform(): TickTransform {
-    return this.parent.transform
+    return new TickTransform(Layout.pixelsPerTick * this.scaleX)
   }
 
   get scrollLeft(): number {
-    return Math.round(this.parent.transform.getX(this.scrollLeftTicks))
+    return Math.round(this.transform.getX(this.scrollLeftTicks))
   }
 
   setUpAutoScroll() {
@@ -52,8 +48,7 @@ export class TickScrollStore {
   }
 
   get contentWidth(): number {
-    const { transform } = this.parent
-    const { canvasWidth, scrollLeft } = this
+    const { transform, canvasWidth, scrollLeft } = this
     const trackEndTick = this.songStore.song.endOfSong
     const startTick = transform.getTick(scrollLeft)
     const widthTick = transform.getTick(canvasWidth)
@@ -62,8 +57,7 @@ export class TickScrollStore {
   }
 
   get playheadPosition(): number {
-    const { transform } = this.parent
-    const { scrollLeftTicks } = this
+    const { transform, scrollLeftTicks } = this
     return transform.getX(this.player.position - scrollLeftTicks)
   }
 

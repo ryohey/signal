@@ -165,9 +165,6 @@ export function usePianoRoll() {
         ({ pianoRollStore }) => pianoRollStore.isQuantizeEnabled,
       )
     },
-    get autoScroll() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.autoScroll)
-    },
     get currentMBTTime() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentMBTTime)
     },
@@ -199,10 +196,6 @@ export function usePianoRoll() {
         pianoRollStore,
         tickScrollStore,
       ],
-    ),
-    setAutoScroll: useCallback(
-      (autoScroll: boolean) => (pianoRollStore.autoScroll = autoScroll),
-      [pianoRollStore],
     ),
     setNotGhostTrackIds: useCallback(
       (ids: Set<TrackId>) => (pianoRollStore.notGhostTrackIds = ids),

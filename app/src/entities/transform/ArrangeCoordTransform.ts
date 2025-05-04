@@ -1,22 +1,14 @@
 import { Point } from "../geometry/Point"
 import { TickTransform } from "./TickTransform"
 
-export class ArrangeCoordTransform implements TickTransform {
+export class ArrangeCoordTransform {
   constructor(
     private readonly transform: TickTransform,
     private readonly pixelsPerTrack: number,
   ) {}
 
-  getX(tick: number): number {
-    return this.transform.getX(tick)
-  }
-
   getY(trackIndex: number): number {
     return trackIndex * this.pixelsPerTrack
-  }
-
-  getTick(x: number): number {
-    return this.transform.getTick(x)
   }
 
   getTrackIndex(y: number): number {
@@ -25,7 +17,7 @@ export class ArrangeCoordTransform implements TickTransform {
 
   getArrangePoint(point: Point) {
     return {
-      tick: this.getTick(point.x),
+      tick: this.transform.getTick(point.x),
       trackIndex: this.getTrackIndex(point.y),
     }
   }

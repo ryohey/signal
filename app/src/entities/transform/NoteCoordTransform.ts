@@ -3,9 +3,9 @@ import { NoteEvent } from "../../track"
 import { NotePoint } from "./NotePoint"
 import { TickTransform } from "./TickTransform"
 
-export class NoteCoordTransform implements TickTransform {
+export class NoteCoordTransform {
   constructor(
-    private readonly pixelsPerTick: number,
+    private readonly tickTransform: TickTransform,
     readonly pixelsPerKey: number,
     private readonly maxNoteNumber: number,
   ) {}
@@ -13,7 +13,7 @@ export class NoteCoordTransform implements TickTransform {
   // pixels
 
   getX(tick: number) {
-    return tick * this.pixelsPerTick
+    return this.tickTransform.getX(tick)
   }
 
   getY(noteNumber: number) {
@@ -23,7 +23,7 @@ export class NoteCoordTransform implements TickTransform {
   // ticks
 
   getTick(pixels: number) {
-    return pixels / this.pixelsPerTick
+    return this.tickTransform.getTick(pixels)
   }
 
   getNoteNumber(pixels: number) {
@@ -78,18 +78,5 @@ export class NoteCoordTransform implements TickTransform {
       tick: this.getTick(pos.x),
       noteNumber: this.getNoteNumberFractional(pos.y),
     }
-  }
-
-  equals(t: NoteCoordTransform) {
-    return (
-      this.pixelsPerKey === t.pixelsPerKey &&
-      this.pixelsPerTick === t.pixelsPerTick &&
-      this.maxNoteNumber === t.maxNoteNumber
-    )
-  }
-
-  // Unique integer representing the horizontal transformation
-  get horizontalId(): number {
-    return this.pixelsPerTick
   }
 }
