@@ -5,17 +5,14 @@ import {
   useStop,
   useToggleRecording,
 } from "../actions"
+import { useMIDIDevice } from "./useMIDIDevice"
 import { useMobxStore } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
 
 export function useTransportPanel() {
   const { synthGroup } = useStores()
-
-  const enabledInputs = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.enabledInputs,
-  )
-
+  const { enabledInputs } = useMIDIDevice()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
   return {
