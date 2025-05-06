@@ -1,5 +1,6 @@
 import { IEqualsComparer, reaction } from "mobx"
-import { useCallback, useSyncExternalStore } from "react"
+import { useCallback } from "react"
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 import RootStore from "../stores/RootStore"
 import { useStores } from "./useStores"
 
@@ -8,9 +9,9 @@ type Selector<T> = () => T
 export function useMobxSelector<T>(
   selector: Selector<T>,
   deps: any[],
-  equals?: IEqualsComparer<T>,
+  equals: IEqualsComparer<T> = Object.is,
 ): T {
-  return useSyncExternalStore(
+  return useSyncExternalStoreWithSelector(
     useCallback(
       (onStoreChange) =>
         reaction(selector, onStoreChange, {
@@ -20,6 +21,9 @@ export function useMobxSelector<T>(
       deps,
     ),
     selector,
+    undefined,
+    useCallback((x) => x, []),
+    equals,
   )
 }
 
