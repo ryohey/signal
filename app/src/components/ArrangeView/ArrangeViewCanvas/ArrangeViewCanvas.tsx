@@ -24,10 +24,10 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
   width,
   onContextMenu,
 }) => {
-  const { cursorX, selectionRect } = useArrangeView()
+  const { selectionRect } = useArrangeView()
   const { beats } = useRuler()
   const { scrollTop, contentHeight: height } = useTrackScroll()
-  const { scrollLeft } = useTickScroll()
+  const { cursorX, scrollLeft } = useTickScroll()
   const theme = useTheme()
 
   const selectionGesture = useSelectionGesture()

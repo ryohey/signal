@@ -120,7 +120,6 @@ export default class PianoRollStore {
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
-      cursorX: computed,
       quantizer: computed,
       enabledQuantizer: computed,
       controlCursor: computed,
@@ -264,10 +263,6 @@ export default class PianoRollStore {
       this.player.position,
       this.songStore.song.timebase,
     )
-  }
-
-  get cursorX(): number {
-    return this.tickScrollStore.transform.getX(this.player.position)
   }
 
   get quantizer(): Quantizer {

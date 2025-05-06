@@ -28,11 +28,10 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   height,
   style,
 }) => {
-  const { selectionRect, transform, mouseMode, cursor, cursorX } =
-    useTempoEditor()
+  const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
   const { beats } = useRuler()
   const { hitTest, items } = useTempoItems()
-  const { scrollLeft: _scrollLeft } = useTickScroll()
+  const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const changeTempo = useChangeTempo()
   const pencilGesture = usePencilGesture()
   const createSelectionGesture = useCreateSelectionGesture()

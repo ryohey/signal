@@ -19,9 +19,6 @@ export function usePianoRoll() {
   const { setScrollTopInPixels } = useKeyScroll(keyScrollStore)
 
   return {
-    get cursorX() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.cursorX)
-    },
     get currentPan() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentPan)
     },

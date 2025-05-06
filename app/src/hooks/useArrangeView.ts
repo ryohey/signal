@@ -12,9 +12,6 @@ export function useArrangeView() {
   const { setScrollTop } = useTrackScroll(trackScrollStore)
 
   return {
-    get cursorX() {
-      return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.cursorX)
-    },
     get notes() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.notes)
     },

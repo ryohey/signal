@@ -33,6 +33,9 @@ export function useTickScroll(
         [tickScrollStore],
       )
     },
+    get cursorX() {
+      return useMobxSelector(() => tickScrollStore.cursorX, [tickScrollStore])
+    },
     get scrollLeft() {
       return useMobxSelector(
         () => tickScrollStore.scrollLeft,

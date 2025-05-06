@@ -18,10 +18,10 @@ import { Lines } from "./Lines"
 import { Notes } from "./Notes"
 
 export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
-  const { notesCursor, cursorX, selectionBounds, ghostTrackIds, mouseMode } =
+  const { notesCursor, selectionBounds, ghostTrackIds, mouseMode } =
     usePianoRoll()
   const { beats } = useRuler()
-  const { setCanvasWidth, scrollLeft } = useTickScroll()
+  const { cursorX, setCanvasWidth, scrollLeft } = useTickScroll()
   const { scrollTop, setCanvasHeight } = useKeyScroll()
 
   const mouseHandler = useNoteMouseGesture()

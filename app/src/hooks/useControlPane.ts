@@ -27,9 +27,6 @@ export function useControlPane() {
     get selectedEventIds() {
       return useMobxStore(({ controlStore }) => controlStore.selectedEventIds)
     },
-    get cursorX() {
-      return usePianoRoll().cursorX
-    },
     get transform() {
       return usePianoRoll().transform
     },

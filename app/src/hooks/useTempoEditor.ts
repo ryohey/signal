@@ -2,7 +2,6 @@ import { useCallback, useMemo } from "react"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { useMobxStore } from "./useMobxSelector"
-import { usePlayer } from "./usePlayer"
 import { useRuler } from "./useRuler"
 import { useStores } from "./useStores"
 
@@ -20,17 +19,10 @@ export function useTempoEditor() {
     ({ tempoEditorStore }) => tempoEditorStore.mouseMode,
   )
 
-  const { position: playerPosition } = usePlayer()
-
   const selectionRect = useMemo(
     () =>
       selection != null ? TempoSelection.getBounds(selection, transform) : null,
     [selection, transform],
-  )
-
-  const cursorX = useMemo(
-    () => transform.getX(playerPosition),
-    [transform, playerPosition],
   )
 
   const cursor = useMemo(
@@ -47,7 +39,6 @@ export function useTempoEditor() {
     selectionRect,
     beats,
     cursor,
-    cursorX,
     get quantizer() {
       return useMobxStore(({ tempoEditorStore }) => tempoEditorStore.quantizer)
     },
