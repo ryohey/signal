@@ -234,64 +234,49 @@ export const useSetTrackName = () => {
   }
 }
 
-export const useSetTrackVolume = () => {
+export const useSetTrackVolume = (trackId: TrackId) => {
   const { position, sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { channel, setVolume } = useTrack(trackId)
 
-  return (trackId: TrackId, volume: number) => {
+  return (volume: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
+    setVolume(volume, position)
 
-    track.setVolume(volume, position)
-
-    if (track.channel !== undefined) {
-      sendEvent(volumeMidiEvent(0, track.channel, volume))
+    if (channel !== undefined) {
+      sendEvent(volumeMidiEvent(0, channel, volume))
     }
   }
 }
 
-export const useSetTrackPan = () => {
+export const useSetTrackPan = (trackId: TrackId) => {
   const { position, sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { setPan, channel } = useTrack(trackId)
 
-  return (trackId: TrackId, pan: number) => {
+  return (pan: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
+    setPan(pan, position)
 
-    track.setPan(pan, position)
-
-    if (track.channel !== undefined) {
-      sendEvent(panMidiEvent(0, track.channel, pan))
+    if (channel !== undefined) {
+      sendEvent(panMidiEvent(0, channel, pan))
     }
   }
 }
 
-export const useSetTrackInstrument = () => {
+export const useSetTrackInstrument = (trackId: TrackId) => {
   const { sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { channel, setProgramNumber } = useTrack(trackId)
 
-  return (trackId: TrackId, programNumber: number) => {
+  return (programNumber: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
-
-    track.setProgramNumber(programNumber)
+    setProgramNumber(programNumber)
 
     // 即座に反映する
     // Reflect immediately
-    if (track.channel !== undefined) {
-      sendEvent(programChangeMidiEvent(0, track.channel, programNumber))
+    if (channel !== undefined) {
+      sendEvent(programChangeMidiEvent(0, channel, programNumber))
     }
   }
 }
@@ -312,21 +297,21 @@ export const useToggleGhostTrack = () => {
 
 export const useToggleAllGhostTracks = () => {
   const { notGhostTrackIds, setNotGhostTrackIds } = usePianoRoll()
-  const song = useSong()
+  const { tracks } = useSong()
   const { pushHistory } = useHistory()
 
   return () => {
     pushHistory()
-    if (notGhostTrackIds.size > Math.floor(song.tracks.length / 2)) {
+    if (notGhostTrackIds.size > Math.floor(tracks.length / 2)) {
       setNotGhostTrackIds(new Set())
     } else {
-      setNotGhostTrackIds(new Set(song.tracks.map((t) => t.id)))
+      setNotGhostTrackIds(new Set(tracks.map((t) => t.id)))
     }
   }
 }
 
 export const useAddTimeSignature = () => {
-  const song = useSong()
+  const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const { measures, timeSignatures, addEvent } = useConductorTrack()
 
@@ -334,7 +319,7 @@ export const useAddTimeSignature = () => {
     const measureStartTick = Measure.getMeasureStart(
       measures,
       tick,
-      song.timebase,
+      timebase,
     ).tick
 
     // prevent duplication

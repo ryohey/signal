@@ -19,14 +19,14 @@ export function useInstrumentBrowser() {
   } = usePianoRoll()
   const { isRhythmTrack, channel, setChannel } = useTrack(selectedTrackId)
   const { isPlaying, sendEvent } = usePlayer()
-  const setTrackInstrumentAction = useSetTrackInstrument()
+  const setTrackInstrumentAction = useSetTrackInstrument(selectedTrackId)
   const song = useSong()
   const { previewNoteOn } = usePreviewNote()
 
   const onClickOK = useCallback(() => {
     if (setting.isRhythmTrack) {
       setChannel(9)
-      setTrackInstrumentAction(selectedTrackId, 0)
+      setTrackInstrumentAction(0)
     } else {
       if (isRhythmTrack) {
         // 適当なチャンネルに変える
@@ -40,7 +40,7 @@ export function useInstrumentBrowser() {
           ) || 0
         setChannel(availableChannel)
       }
-      setTrackInstrumentAction(selectedTrackId, setting.programNumber)
+      setTrackInstrumentAction(setting.programNumber)
     }
 
     setOpen(false)

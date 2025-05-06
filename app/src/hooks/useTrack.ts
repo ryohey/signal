@@ -54,6 +54,24 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
+    setPan: useCallback(
+      (pan: number, tick: number) => {
+        track?.setPan(pan, tick)
+      },
+      [track],
+    ),
+    setVolume: useCallback(
+      (volume: number, tick: number) => {
+        track?.setVolume(volume, tick)
+      },
+      [track],
+    ),
+    setProgramNumber: useCallback(
+      (programNumber: number) => {
+        track?.setProgramNumber(programNumber)
+      },
+      [track],
+    ),
     ...useTrackEvents(track),
   }
 }
