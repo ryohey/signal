@@ -7,7 +7,7 @@ import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
-  const song = useSong()
+  const { fileHandle } = useSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
 
@@ -50,7 +50,7 @@ export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
         <HotKey>{envString.cmdOrCtrl}+O</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickSave} disabled={song.fileHandle === null}>
+      <MenuItem onClick={onClickSave} disabled={fileHandle === null}>
         <Localized name="save-song" />
         <HotKey>{envString.cmdOrCtrl}+S</HotKey>
       </MenuItem>

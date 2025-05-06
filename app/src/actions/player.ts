@@ -20,7 +20,7 @@ export const useStop = () => {
 }
 
 export const useRewindOneBar = () => {
-  const song = useSong()
+  const { measures, timebase } = useSong()
   const {
     pianoRollStore: { tickScrollStore },
   } = useStores()
@@ -29,11 +29,7 @@ export const useRewindOneBar = () => {
   const { position, setPosition } = usePlayer()
 
   return () => {
-    const tick = Measure.getPreviousMeasureTick(
-      song.measures,
-      position,
-      song.timebase,
-    )
+    const tick = Measure.getPreviousMeasureTick(measures, position, timebase)
     setPosition(tick)
 
     // make sure player doesn't move out of sight to the left
@@ -49,15 +45,11 @@ export const useFastForwardOneBar = () => {
   } = useStores()
   const { transform, scrollLeft, canvasWidth, setScrollLeftInPixels } =
     useTickScroll(tickScrollStore)
-  const song = useSong()
+  const { measures, timebase } = useSong()
   const { position, setPosition } = usePlayer()
 
   return () => {
-    const tick = Measure.getNextMeasureTick(
-      song.measures,
-      position,
-      song.timebase,
-    )
+    const tick = Measure.getNextMeasureTick(measures, position, timebase)
     setPosition(tick)
 
     // make sure player doesn't move out of sight to the right
@@ -71,12 +63,10 @@ export const useFastForwardOneBar = () => {
 
 export const useNextTrack = () => {
   const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
-  const song = useSong()
+  const { tracks } = useSong()
 
   return () => {
-    setSelectedTrackIndex(
-      Math.min(selectedTrackIndex + 1, song.tracks.length - 1),
-    )
+    setSelectedTrackIndex(Math.min(selectedTrackIndex + 1, tracks.length - 1))
   }
 }
 

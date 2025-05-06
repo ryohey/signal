@@ -11,7 +11,7 @@ export function useTrackMute() {
   const trackMute = useMobxStore(
     ({ trackMuteStore }) => trackMuteStore.trackMute,
   )
-  const song = useSong()
+  const { getChannelForTrack } = useSong()
   const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
   const setTrackMute = useCallback(
     (trackMute: TrackMute) => {
@@ -50,7 +50,7 @@ export function useTrackMute() {
     }, [setTrackMute]),
     toggleMute: useCallback(
       (trackId: TrackId) => {
-        const channel = song.getTrack(trackId)?.channel
+        const channel = getChannelForTrack(trackId)
         if (channel === undefined) {
           return
         }
@@ -62,11 +62,11 @@ export function useTrackMute() {
           allSoundsOffChannel(channel)
         }
       },
-      [trackMute, song, allSoundsOffChannel, mute, unmute],
+      [trackMute, getChannelForTrack, allSoundsOffChannel, mute, unmute],
     ),
     toggleSolo: useCallback(
       (trackId: TrackId) => {
-        const channel = song.getTrack(trackId)?.channel
+        const channel = getChannelForTrack(trackId)
         if (channel === undefined) {
           return
         }
@@ -79,7 +79,14 @@ export function useTrackMute() {
           allSoundsOffExclude(channel)
         }
       },
-      [trackMute, song, allSoundsOffChannel, allSoundsOffExclude, solo, unsolo],
+      [
+        trackMute,
+        getChannelForTrack,
+        allSoundsOffChannel,
+        allSoundsOffExclude,
+        solo,
+        unsolo,
+      ],
     ),
   }
 }

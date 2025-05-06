@@ -7,15 +7,15 @@ import { isNotUndefined } from "../../../helpers/array"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
-import { useSong } from "../../../hooks/useSong"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
 export const useDragSelectionGesture = (): MouseGesture<
   [number, Point, TempoCoordTransform]
 > => {
-  const song = useSong()
+  const { getEventById, updateEvents } = useConductorTrack()
   const { pushHistory } = useHistory()
   const { setSelectedEventIds, quantizer } = useTempoEditor()
   let { selectedEventIds } = useTempoEditor()
@@ -27,12 +27,6 @@ export const useDragSelectionGesture = (): MouseGesture<
       startPoint: Point,
       transform: TempoCoordTransform,
     ) {
-      const { conductorTrack } = song
-
-      if (conductorTrack === undefined) {
-        return
-      }
-
       pushHistory()
 
       if (!selectedEventIds.includes(hitEventId)) {
@@ -41,12 +35,7 @@ export const useDragSelectionGesture = (): MouseGesture<
       }
 
       const events = selectedEventIds
-        .map(
-          (id) =>
-            conductorTrack.getEventById(
-              id,
-            ) as unknown as TrackEventOf<SetTempoEvent>,
-        )
+        .map((id) => getEventById(id) as unknown as TrackEventOf<SetTempoEvent>)
         .filter(isNotUndefined)
         .map((e) => ({ ...e })) // copy
 
@@ -73,7 +62,7 @@ export const useDragSelectionGesture = (): MouseGesture<
 
           const deltaValue = pos.bpm - start.bpm
 
-          conductorTrack.updateEvents(
+          updateEvents(
             events.map((ev) => ({
               id: ev.id,
               tick: Math.max(0, Math.floor(ev.tick + quantizedDeltaTick)),

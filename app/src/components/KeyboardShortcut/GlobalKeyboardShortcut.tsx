@@ -27,7 +27,7 @@ export const GlobalKeyboardShortcut: FC = () => {
   const { setOpenHelpDialog } = useRootView()
   const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
-  const song = useSong()
+  const { isSaved } = useSong()
   const rewindOneBar = useRewindOneBar()
   const fastForwardOneBar = useFastForwardOneBar()
   const stop = useStop()
@@ -46,7 +46,7 @@ export const GlobalKeyboardShortcut: FC = () => {
   const toast = useToast()
 
   const openLegacy = async () => {
-    if (song.isSaved || confirm(localized["confirm-open"])) {
+    if (isSaved || confirm(localized["confirm-open"])) {
       document.getElementById(LegacyOpenId)?.click()
     }
   }

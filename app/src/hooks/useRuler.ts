@@ -30,9 +30,7 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { parent } = rulerStore
-
-  const song = useSong()
-  const timeSignatures = useMobxSelector(() => song.timeSignatures, [song])
+  const { timeSignatures } = useSong()
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
   const quantizer = useMobxSelector(() => parent.quantizer, [parent])
   const selectedTimeSignatureEventIds = useMobxSelector(

@@ -8,11 +8,10 @@ import { useSong } from "./useSong"
 import { useTrackEvents } from "./useTrack"
 
 export function useConductorTrack() {
-  const song = useSong()
-  const { timebase } = song
+  const { tracks, timebase } = useSong()
   const conductorTrack = useMobxSelector(
-    () => song.tracks.find((t) => t.isConductorTrack),
-    [song],
+    () => tracks.find((t) => t.isConductorTrack),
+    [tracks],
   )
   const events = useMobxSelector(
     () => conductorTrack?.events ?? [],

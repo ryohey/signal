@@ -166,13 +166,13 @@ export function getEventsInSelection(
 }
 
 export const useArrangeTransposeSelection = () => {
-  const song = useSong()
+  const { transposeNotes } = useSong()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (deltaPitch: number) => {
     pushHistory()
-    song.transposeNotes(deltaPitch, selectedEventIds)
+    transposeNotes(deltaPitch, selectedEventIds)
   }
 }
 

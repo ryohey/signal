@@ -13,24 +13,24 @@ const List = styled.div`
   flex-grow: 1;
 `
 
-// we still need to use observer to track song.tracks changes
+// we still need to use observer to track tracks changes
 export const TrackList: FC = observer(() => {
-  const song = useSong()
+  const { moveTrack, getTrack, tracks } = useSong()
 
   return (
     <List>
       <DraggableList
-        items={song.tracks.filter((t) => !t.isConductorTrack)}
+        items={tracks.filter((t) => !t.isConductorTrack)}
         getItemId={(track) => track.id}
         onItemMoved={(id, overId) => {
-          const track = song.getTrack(id)
-          const overTrack = song.getTrack(overId)
+          const track = getTrack(id)
+          const overTrack = getTrack(overId)
           if (track === undefined || overTrack === undefined) {
             return
           }
-          const fromIndex = song.tracks.indexOf(track)
-          const toIndex = song.tracks.indexOf(overTrack)
-          song.moveTrack(fromIndex, toIndex)
+          const fromIndex = tracks.indexOf(track)
+          const toIndex = tracks.indexOf(overTrack)
+          moveTrack(fromIndex, toIndex)
         }}
         render={(track) => <TrackListItem key={track.id} trackId={track.id} />}
       ></DraggableList>

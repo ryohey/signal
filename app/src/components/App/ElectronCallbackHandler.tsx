@@ -37,7 +37,7 @@ import { songToMidi } from "../../midi/midiConversion"
 import { ElectronCallback } from "./ElectronCallback"
 
 export const ElectronCallbackHandler: FC = () => {
-  const song = useSong()
+  const { isSaved, filepath, getSong, setSaved, setFilepath } = useSong()
   const { isLoggedIn } = useAuth()
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
@@ -66,9 +66,9 @@ export const ElectronCallbackHandler: FC = () => {
         return // canceled
       }
       const { path } = res
-      const data = songToMidi(song).buffer
-      song.filepath = path
-      song.isSaved = true
+      const data = songToMidi(getSong()).buffer
+      setFilepath(path)
+      setSaved(true)
       await window.electronAPI.saveFile(path, data)
       window.electronAPI.addRecentDocument(path)
     } catch (e) {
@@ -90,7 +90,7 @@ export const ElectronCallbackHandler: FC = () => {
           await cloudSongFile.openSong()
         } else {
           try {
-            if (song.isSaved || confirm(localized["confirm-open"])) {
+            if (isSaved || confirm(localized["confirm-open"])) {
               const res = await window.electronAPI.showOpenDialog()
               if (res === null) {
                 return // canceled
@@ -107,7 +107,7 @@ export const ElectronCallbackHandler: FC = () => {
       }}
       onOpenFile={async ({ filePath }) => {
         try {
-          if (song.isSaved || confirm(localized["confirm-open"])) {
+          if (isSaved || confirm(localized["confirm-open"])) {
             const data = await window.electronAPI.readFile(filePath)
             const song = songFromArrayBuffer(data, filePath)
             setSong(song)
@@ -122,10 +122,10 @@ export const ElectronCallbackHandler: FC = () => {
           await cloudSongFile.saveSong()
         } else {
           try {
-            if (song.filepath) {
-              const data = songToMidi(song).buffer
-              await window.electronAPI.saveFile(song.filepath, data)
-              song.isSaved = true
+            if (filepath) {
+              const data = songToMidi(getSong()).buffer
+              await window.electronAPI.saveFile(filepath, data)
+              setSaved(true)
             } else {
               await saveFileAs()
             }

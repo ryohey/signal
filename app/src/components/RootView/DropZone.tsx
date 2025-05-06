@@ -14,7 +14,7 @@ const Container = styled.div`
 `
 
 export const DropZone: FC<PropsWithChildren> = ({ children }) => {
-  const song = useSong()
+  const { isSaved } = useSong()
   const localized = useLocalization()
   const setSong = useSetSong()
 
@@ -29,12 +29,12 @@ export const DropZone: FC<PropsWithChildren> = ({ children }) => {
       if (file.type !== "audio/midi" && file.type !== "audio/mid") {
         return
       }
-      if (song.isSaved || confirm(localized["confirm-open"])) {
+      if (isSaved || confirm(localized["confirm-open"])) {
         const newSong = await songFromFile(file)
         setSong(newSong)
       }
     },
-    [song, setSong],
+    [isSaved, setSong],
   )
 
   return (

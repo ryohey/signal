@@ -20,7 +20,7 @@ export function useInstrumentBrowser() {
   const { isRhythmTrack, channel, setChannel } = useTrack(selectedTrackId)
   const { isPlaying, sendEvent } = usePlayer()
   const setTrackInstrumentAction = useSetTrackInstrument(selectedTrackId)
-  const song = useSong()
+  const { tracks } = useSong()
   const { previewNoteOn } = usePreviewNote()
 
   const onClickOK = useCallback(() => {
@@ -31,7 +31,7 @@ export function useInstrumentBrowser() {
       if (isRhythmTrack) {
         // 適当なチャンネルに変える
         const channels = range(16)
-        const usedChannels = song.tracks
+        const usedChannels = tracks
           .filter((t) => t.id !== selectedTrackId)
           .map((t) => t.channel)
         const availableChannel =
@@ -50,7 +50,7 @@ export function useInstrumentBrowser() {
     selectedTrackId,
     setChannel,
     isRhythmTrack,
-    song,
+    tracks,
     setOpen,
     setTrackInstrumentAction,
   ])

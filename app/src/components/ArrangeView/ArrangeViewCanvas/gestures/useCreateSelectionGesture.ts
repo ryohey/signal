@@ -8,6 +8,7 @@ import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { usePlayer } from "../../../../hooks/usePlayer"
+import { useSong } from "../../../../hooks/useSong"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, Point],
@@ -22,7 +23,7 @@ export const useCreateSelectionGesture = (): MouseGesture<
     setSelection,
     setSelectedEventIds,
   } = useArrangeView()
-  const { tracks } = useArrangeView()
+  const { tracks } = useSong()
   let selection: ArrangeSelection | null = null
 
   const selectionFromPoints = useCallback(

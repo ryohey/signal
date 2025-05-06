@@ -42,7 +42,7 @@ export function eventsInSelection(
 }
 
 export const useTransposeSelection = () => {
-  const song = useSong()
+  const { transposeNotes } = useSong()
   const { selectedTrackIndex, selection, selectedNoteIds, setSelection } =
     usePianoRoll()
   const { pushHistory } = useHistory()
@@ -55,7 +55,7 @@ export const useTransposeSelection = () => {
       setSelection(s)
     }
 
-    song.transposeNotes(deltaPitch, {
+    transposeNotes(deltaPitch, {
       [selectedTrackIndex]: selectedNoteIds,
     })
   }
@@ -236,7 +236,7 @@ const sortedNotes = (notes: NoteEvent[]): NoteEvent[] =>
 const useSelectNeighborNote = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
   const { events, channel } = useTrack(selectedTrackId)
-  const song = useSong()
+  const { timebase } = useSong()
   const selectNote = useSelectNote()
   const startNote = useStartNote()
   const stopNote = useStopNote()
@@ -271,7 +271,7 @@ const useSelectNeighborNote = () => {
     startNote({ ...nextNote, channel })
     stopNote(
       { ...nextNote, channel },
-      tickToMillisec(nextNote.duration, 120, song.timebase) / 1000,
+      tickToMillisec(nextNote.duration, 120, timebase) / 1000,
     )
   }
 }

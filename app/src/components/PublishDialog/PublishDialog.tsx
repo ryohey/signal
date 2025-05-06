@@ -24,7 +24,7 @@ type PublishState = "publishable" | "published" | "notPublishable"
 export const PublishDialog: FC = () => {
   const { songStore } = useStores()
   const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
-  const song = useSong()
+  const { cloudSongId, getSong } = useSong()
   const publishSong = usePublishSong()
   const unpublishSong = useUnpublishSong()
   const [publishState, setPublishState] =
@@ -38,7 +38,6 @@ export const PublishDialog: FC = () => {
     ;(async () => {
       if (open) {
         setIsLoading(true)
-        const cloudSongId = songStore.song.cloudSongId
         if (cloudSongId === null) {
           setPublishState("notPublishable")
           setIsLoading(false)
@@ -59,7 +58,7 @@ export const PublishDialog: FC = () => {
   const onClickPublish = async () => {
     try {
       setIsLoading(true)
-      await publishSong(song)
+      await publishSong(getSong())
       setPublishState("published")
       toast.success(localized["song-published"])
     } catch (e) {
@@ -72,7 +71,7 @@ export const PublishDialog: FC = () => {
   const onClickUnpublish = async () => {
     try {
       setIsLoading(true)
-      await unpublishSong(song)
+      await unpublishSong(getSong())
       setPublishState("publishable")
       toast.success(localized["song-unpublished"])
     } catch (e) {
@@ -98,14 +97,14 @@ export const PublishDialog: FC = () => {
             </Alert>
           </>
         )}
-        {publishState === "published" && song.cloudSongId !== null && (
+        {publishState === "published" && cloudSongId !== null && (
           <>
-            <SongLink href={getCloudSongUrl(song.cloudSongId)} target="_blank">
+            <SongLink href={getCloudSongUrl(cloudSongId)} target="_blank">
               <Localized name="published-notice" />
               <OpenInNewIcon color={theme.secondaryTextColor} size="1rem" />
             </SongLink>
             <LinkShare
-              url={getCloudSongUrl(song.cloudSongId)}
+              url={getCloudSongUrl(cloudSongId)}
               text={localized["share-my-song-text"]}
             />
             <Divider />

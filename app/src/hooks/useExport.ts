@@ -41,14 +41,14 @@ const waitForAnimationFrame = () =>
 
 const useExportSong = () => {
   const { synth, exportStore } = useStores()
-  const song = useSong()
+  const { updateEndOfSong, getSong, timebase } = useSong()
   const localized = useLocalization()
   const dialog = useDialog()
 
   return async (format: "WAV" | "MP3") => {
-    song.updateEndOfSong()
+    updateEndOfSong()
 
-    if (!canExport(song)) {
+    if (!canExport(getSong())) {
       await dialog.show({
         title: localized["export"],
         message: localized["export-error-too-short"],
@@ -71,8 +71,8 @@ const useExportSong = () => {
     try {
       const audioBuffer = await renderAudio(
         soundFontData,
-        song.allEvents,
-        song.timebase,
+        getSong().allEvents,
+        timebase,
         sampleRate,
         {
           bufferSize: 128,

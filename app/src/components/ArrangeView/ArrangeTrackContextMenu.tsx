@@ -5,13 +5,15 @@ import {
   useRemoveTrack,
 } from "../../actions"
 import { useArrangeView } from "../../hooks/useArrangeView"
+import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
 import { ContextMenu, ContextMenuProps } from "../ContextMenu/ContextMenu"
 import { MenuItem } from "../ui/Menu"
 
 export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props
-  const { selectedTrackIndex, selectedTrackId, tracks } = useArrangeView()
+  const { selectedTrackIndex, selectedTrackId } = useArrangeView()
+  const { tracks } = useSong()
   const insertTrack = useInsertTrack()
   const removeTrack = useRemoveTrack()
   const duplicateTrack = useDuplicateTrack()

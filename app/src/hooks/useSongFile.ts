@@ -6,7 +6,7 @@ import { useLocalization } from "../localize/useLocalization"
 import { useSong } from "./useSong"
 
 export const useSongFile = () => {
-  const song = useSong()
+  const { isSaved, getSong } = useSong()
   const toast = useToast()
   const localized = useLocalization()
   const createSong = useCreateSong()
@@ -16,13 +16,13 @@ export const useSongFile = () => {
 
   return {
     async createNewSong() {
-      if (song.isSaved || confirm(localized["confirm-new"])) {
+      if (isSaved || confirm(localized["confirm-new"])) {
         createSong()
       }
     },
     async openSong() {
       try {
-        if (song.isSaved || confirm(localized["confirm-open"])) {
+        if (isSaved || confirm(localized["confirm-open"])) {
           await openFile()
         }
       } catch (e) {
@@ -31,7 +31,7 @@ export const useSongFile = () => {
     },
     async openSongLegacy(e: ChangeEvent<HTMLInputElement>) {
       try {
-        if (song.isSaved || confirm(localized["confirm-new"])) {
+        if (isSaved || confirm(localized["confirm-new"])) {
           await openSong(e.currentTarget)
         }
       } catch (e) {
@@ -39,10 +39,10 @@ export const useSongFile = () => {
       }
     },
     async saveSong() {
-      await saveFile(song)
+      await saveFile(getSong())
     },
     async saveAsSong() {
-      await saveFileAs(song)
+      await saveFileAs(getSong())
     },
     async downloadSong() {
       saveSong()
