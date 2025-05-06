@@ -9,13 +9,13 @@ import { VelocityDialog } from "./VelocityDialog"
 
 export const ArrangeVelocityDialog = () => {
   const { newNoteVelocity } = usePianoRoll()
-  const { openVelocityDialog, setOpenTransposeDialog } = useArrangeView()
+  const { openVelocityDialog, setOpenVelocityDialog } = useArrangeView()
   const arrangeBatchUpdateSelectedNotesVelocity =
     useArrangeBatchUpdateSelectedNotesVelocity()
 
   const onClose = useCallback(
-    () => setOpenTransposeDialog(false),
-    [setOpenTransposeDialog],
+    () => setOpenVelocityDialog(false),
+    [setOpenVelocityDialog],
   )
 
   const onClickOK = useCallback(
@@ -24,9 +24,9 @@ export const ArrangeVelocityDialog = () => {
         type: operationType,
         value,
       })
-      setOpenTransposeDialog(false)
+      setOpenVelocityDialog(false)
     },
-    [setOpenTransposeDialog, arrangeBatchUpdateSelectedNotesVelocity],
+    [setOpenVelocityDialog, arrangeBatchUpdateSelectedNotesVelocity],
   )
 
   return (
