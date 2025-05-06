@@ -4,7 +4,9 @@ import { useSong } from "./useSong"
 
 export function useTrackList() {
   const { tracks, getTrack, moveTrack } = useSong()
-  const trackIds = tracks.map((track) => track.id)
+  const trackIds = tracks
+    .filter((track) => !track.isConductorTrack)
+    .map((track) => track.id)
 
   return {
     trackIds,
