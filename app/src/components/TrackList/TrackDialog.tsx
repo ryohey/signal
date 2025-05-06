@@ -31,9 +31,12 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   const [_channel, _setChannel] = useState(channel)
 
   useEffect(() => {
+    if (!open) {
+      return
+    }
     _setName(name)
     _setChannel(channel)
-  }, [trackId])
+  }, [trackId, open])
 
   return (
     <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
