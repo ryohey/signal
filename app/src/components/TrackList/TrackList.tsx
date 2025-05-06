@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useSong } from "../../hooks/useSong"
+import { useTrackList } from "../../hooks/useTrackList"
 import { DraggableList } from "../ControlSettingDialog/DraggableList"
 import { AddTrackButton } from "./AddTrackButton"
 import { TrackListItem } from "./TrackListItem"
@@ -13,28 +12,18 @@ const List = styled.div`
   flex-grow: 1;
 `
 
-// we still need to use observer to track tracks changes
-export const TrackList: FC = observer(() => {
-  const { moveTrack, getTrack, tracks } = useSong()
+export const TrackList: FC = () => {
+  const { moveTrack, trackIds } = useTrackList()
 
   return (
     <List>
       <DraggableList
-        items={tracks.filter((t) => !t.isConductorTrack)}
-        getItemId={(track) => track.id}
-        onItemMoved={(id, overId) => {
-          const track = getTrack(id)
-          const overTrack = getTrack(overId)
-          if (track === undefined || overTrack === undefined) {
-            return
-          }
-          const fromIndex = tracks.indexOf(track)
-          const toIndex = tracks.indexOf(overTrack)
-          moveTrack(fromIndex, toIndex)
-        }}
-        render={(track) => <TrackListItem key={track.id} trackId={track.id} />}
+        items={trackIds}
+        getItemId={(trackId) => trackId}
+        onItemMoved={moveTrack}
+        render={(trackId) => <TrackListItem key={trackId} trackId={trackId} />}
       ></DraggableList>
       <AddTrackButton />
     </List>
   )
-})
+}
