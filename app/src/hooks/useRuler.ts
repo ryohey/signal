@@ -114,7 +114,8 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   )
 
   return {
-    beats: rulerBeats,
+    beats,
+    rulerBeats,
     loop,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {

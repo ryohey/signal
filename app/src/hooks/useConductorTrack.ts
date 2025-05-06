@@ -1,3 +1,4 @@
+import { toJS } from "mobx"
 import { useCallback, useMemo } from "react"
 import { Measure } from "../entities/measure/Measure"
 import { isTimeSignatureEvent, UNASSIGNED_TRACK_ID } from "../track"
@@ -40,9 +41,15 @@ export function useConductorTrack() {
         [conductorTrack, position],
       )
     },
-    events,
+    get events() {
+      return toJS(events)
+    },
     timeSignatures,
     measures,
+    getEvents: useCallback(
+      () => conductorTrack?.events ?? [],
+      [conductorTrack],
+    ),
     setTempo: useCallback(
       (bpm: number, tick: number) => {
         if (conductorTrack) {

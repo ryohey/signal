@@ -5,6 +5,7 @@ import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useKeyScroll } from "../../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -17,14 +18,9 @@ import { Lines } from "./Lines"
 import { Notes } from "./Notes"
 
 export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
-  const {
-    notesCursor,
-    rulerStore: { beats },
-    cursorX,
-    selectionBounds,
-    ghostTrackIds,
-    mouseMode,
-  } = usePianoRoll()
+  const { notesCursor, cursorX, selectionBounds, ghostTrackIds, mouseMode } =
+    usePianoRoll()
+  const { beats } = useRuler()
   const { setCanvasWidth, scrollLeft } = useTickScroll()
   const { scrollTop, setCanvasHeight } = useKeyScroll()
 

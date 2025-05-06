@@ -1,13 +1,12 @@
 import { useCallback } from "react"
 import { ControlSelection } from "../entities/selection/ControlSelection"
 import { ControlMode } from "../stores/ControlStore"
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
+import { useMobxStore } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { useStores } from "./useStores"
 
 export function useControlPane() {
   const { controlStore } = useStores()
-  const { rulerStore } = usePianoRoll()
 
   return {
     get cursor() {
@@ -33,9 +32,6 @@ export function useControlPane() {
     },
     get transform() {
       return usePianoRoll().transform
-    },
-    get beats() {
-      return useMobxSelector(() => rulerStore.beats, [rulerStore])
     },
     get quantizer() {
       return usePianoRoll().quantizer

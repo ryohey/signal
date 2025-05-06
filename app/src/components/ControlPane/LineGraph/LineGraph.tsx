@@ -11,7 +11,6 @@ import { isEventInRange } from "../../../helpers/filterEvents"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useControlPane } from "../../../hooks/useControlPane"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import { pointToCircleRect } from "../../../stores/TempoEditorStore"
 import { TrackEventOf } from "../../../track"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
 import { useCreateSelectionGesture } from "../Graph/MouseHandler/useCreateSelectionGesture"
@@ -67,7 +66,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   }))
 
   const controlPoints = items.map((p) => ({
-    ...pointToCircleRect(p, circleRadius),
+    ...Rect.fromPointWithSize(p, circleRadius * 2),
     id: p.id,
   }))
 

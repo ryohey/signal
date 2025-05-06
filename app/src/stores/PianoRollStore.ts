@@ -119,7 +119,6 @@ export default class PianoRollStore {
       selectionBounds: computed,
       currentVolume: computed,
       currentPan: computed,
-      currentTempo: computed,
       currentMBTTime: computed,
       cursorX: computed,
       quantizer: computed,
@@ -257,10 +256,6 @@ export default class PianoRollStore {
 
   get currentPan(): number | undefined {
     return this.selectedTrack?.getPan(this.player.position)
-  }
-
-  get currentTempo(): number | undefined {
-    return this.songStore.song.conductorTrack?.getTempo(this.player.position)
   }
 
   get currentMBTTime(): string {

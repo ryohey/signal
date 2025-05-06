@@ -59,6 +59,15 @@ export namespace Rect {
     }
   }
 
+  export function fromPointWithSize(point: Point, size: number): Rect {
+    return {
+      x: point.x - size / 2,
+      y: point.y - size / 2,
+      width: size,
+      height: size,
+    }
+  }
+
   export function scale(rect: Rect, scaleX: number, scaleY: number): Rect {
     return {
       x: rect.x * scaleX,
