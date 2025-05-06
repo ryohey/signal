@@ -6,8 +6,8 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
 import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
-import { useStores } from "../../hooks/useStores"
 import { Localized, useLocalization } from "../../localize/useLocalization"
+import { cloudSongRepository } from "../../services/repositories"
 import {
   Dialog,
   DialogActions,
@@ -21,9 +21,8 @@ import { LinkShare } from "../ui/LinkShare"
 type PublishState = "publishable" | "published" | "notPublishable"
 
 export const PublishDialog: FC = () => {
-  const { songStore, cloudSongRepository, userRepository } = useStores()
   const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
-  const song = useSong()
+  const { cloudSongId, getSong } = useSong()
   const publishSong = usePublishSong()
   const unpublishSong = useUnpublishSong()
   const [publishState, setPublishState] =
@@ -37,7 +36,6 @@ export const PublishDialog: FC = () => {
     ;(async () => {
       if (open) {
         setIsLoading(true)
-        const cloudSongId = songStore.song.cloudSongId
         if (cloudSongId === null) {
           setPublishState("notPublishable")
           setIsLoading(false)
@@ -58,11 +56,7 @@ export const PublishDialog: FC = () => {
   const onClickPublish = async () => {
     try {
       setIsLoading(true)
-      const user = await userRepository.getCurrentUser()
-      if (user === null) {
-        throw new Error("Failed to get current user, please re-sign in")
-      }
-      await publishSong(song, user)
+      await publishSong(getSong())
       setPublishState("published")
       toast.success(localized["song-published"])
     } catch (e) {
@@ -75,7 +69,7 @@ export const PublishDialog: FC = () => {
   const onClickUnpublish = async () => {
     try {
       setIsLoading(true)
-      await unpublishSong(song)
+      await unpublishSong(getSong())
       setPublishState("publishable")
       toast.success(localized["song-unpublished"])
     } catch (e) {
@@ -101,14 +95,14 @@ export const PublishDialog: FC = () => {
             </Alert>
           </>
         )}
-        {publishState === "published" && song.cloudSongId !== null && (
+        {publishState === "published" && cloudSongId !== null && (
           <>
-            <SongLink href={getCloudSongUrl(song.cloudSongId)} target="_blank">
+            <SongLink href={getCloudSongUrl(cloudSongId)} target="_blank">
               <Localized name="published-notice" />
               <OpenInNewIcon color={theme.secondaryTextColor} size="1rem" />
             </SongLink>
             <LinkShare
-              url={getCloudSongUrl(song.cloudSongId)}
+              url={getCloudSongUrl(cloudSongId)}
               text={localized["share-my-song-text"]}
             />
             <Divider />

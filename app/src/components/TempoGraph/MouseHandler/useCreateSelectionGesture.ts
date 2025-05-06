@@ -6,24 +6,19 @@ import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useSong } from "../../../hooks/useSong"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { isSetTempoEvent } from "../../../track"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const song = useSong()
   const { setSelectedEventIds, setSelection } = useTempoEditor()
+  const { getEvents } = useConductorTrack()
   let selection: TempoSelection | null = null
 
   return {
     onMouseDown(e, startPoint, transform) {
-      const { conductorTrack } = song
-      if (conductorTrack === undefined) {
-        return
-      }
-
       const start = transform.fromPosition(startPoint)
       const startClientPos = getClientPos(e)
 
@@ -53,7 +48,7 @@ export const useCreateSelectionGesture = (): MouseGesture<
           }
 
           setSelectedEventIds(
-            conductorTrack.events
+            getEvents()
               .filter(isSetTempoEvent)
               .filter(
                 isEventInRange(

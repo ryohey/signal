@@ -4,7 +4,7 @@ import { CloudSong } from "@signal-app/api"
 import { useToast } from "dialog-hooks"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import { FC } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useCloudFile } from "../../hooks/useCloudFile"
 import { Localized, useLocalization } from "../../localize/useLocalization"
 import { IconButton } from "../ui/IconButton"
 import { Menu, MenuItem } from "../ui/Menu"
@@ -62,7 +62,7 @@ export const CloudFileRow: FC<CloudFileRowProps> = ({
   const theme = useTheme()
   const toast = useToast()
   const localized = useLocalization()
-  const { cloudFileStore } = useStores()
+  const { deleteSong } = useCloudFile()
   const date: Date = (() => {
     switch (dateType) {
       case "created":
@@ -95,7 +95,7 @@ export const CloudFileRow: FC<CloudFileRowProps> = ({
             onClick={async (e) => {
               e.stopPropagation()
               try {
-                await cloudFileStore.deleteSong(song)
+                await deleteSong(song)
                 toast.info(localized["song-deleted"])
               } catch (e) {
                 console.error(e)

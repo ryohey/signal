@@ -1,14 +1,13 @@
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { FC } from "react"
 import { useRootView } from "../../hooks/useRootView"
-import { useStores } from "../../hooks/useStores"
 import { Localized } from "../../localize/useLocalization"
+import { userRepository } from "../../services/repositories"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { Button, PrimaryButton } from "../ui/Button"
 
 export const DeleteAccountDialog: FC = () => {
   const { openDeleteAccountDialog, setOpenDeleteAccountDialog } = useRootView()
-  const { userRepository } = useStores()
 
   const onClickCancel = () => {
     setOpenDeleteAccountDialog(false)

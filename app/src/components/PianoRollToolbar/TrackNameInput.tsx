@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC, useState } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useTrack } from "../../hooks/useTrack"
 import { TrackName } from "../TrackList/TrackName"
 
 const TrackNameWrapper = styled.span`
@@ -29,25 +29,21 @@ const Input = styled.input`
   outline: none;
 `
 
-// we still need to use observer to track selectedTrack changes
-export const TrackNameInput: FC = observer(() => {
-  const { selectedTrack } = usePianoRoll()
+export const TrackNameInput: FC = () => {
+  const { selectedTrackId } = usePianoRoll()
+  const { name, setName } = useTrack(selectedTrackId)
   const [isEditing, setEditing] = useState(false)
-
-  if (selectedTrack === undefined) {
-    return <></>
-  }
 
   return (
     <>
       {isEditing ? (
         <Input
-          defaultValue={selectedTrack.name ?? ""}
+          defaultValue={name}
           ref={(c) => c?.focus()}
           // to support IME we use onKeyPress instead of onKeyDown for capture Enter
           onKeyPress={(e) => {
             if (e.key === "Enter") {
-              selectedTrack.setName(e.currentTarget.value)
+              setName(e.currentTarget.value)
               setEditing(false)
             }
           }}
@@ -60,9 +56,9 @@ export const TrackNameInput: FC = observer(() => {
         />
       ) : (
         <TrackNameWrapper onDoubleClick={() => setEditing(true)}>
-          <TrackName track={selectedTrack} />
+          <TrackName trackId={selectedTrackId} />
         </TrackNameWrapper>
       )}
     </>
   )
-})
+}

@@ -1,24 +1,24 @@
 import { maxBy, min, minBy } from "lodash"
+import { transaction } from "mobx"
 import {
   TempoEventsClipboardData,
   isTempoEventsClipboardData,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
+import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
-import { useSong } from "../hooks/useSong"
 import { useTempoEditor } from "../hooks/useTempoEditor"
 import clipboard from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
-  const song = useSong()
+  const { removeEvents } = useConductorTrack()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useTempoEditor()
 
   return () => {
-    const { conductorTrack } = song
-    if (conductorTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
@@ -26,7 +26,7 @@ export const useDeleteTempoSelection = () => {
 
     // 選択範囲と選択されたノートを削除
     // Remove selected notes and selected notes
-    conductorTrack.removeEvents(selectedEventIds)
+    removeEvents(selectedEventIds)
     setSelection(null)
   }
 }
@@ -41,18 +41,17 @@ export const useResetTempoSelection = () => {
 }
 
 export const useCopyTempoSelection = () => {
-  const song = useSong()
   const { selectedEventIds } = useTempoEditor()
+  const { getEventById } = useConductorTrack()
 
   return () => {
-    const { conductorTrack } = song
-    if (conductorTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
     // Copy selected events
     const events = selectedEventIds
-      .map((id) => conductorTrack.getEventById(id))
+      .map(getEventById)
       .filter(isNotUndefined)
       .filter(isSetTempoEvent)
 
@@ -78,14 +77,10 @@ export const useCopyTempoSelection = () => {
 
 export const usePasteTempoSelection = () => {
   const { position } = usePlayer()
-  const { conductorTrack } = useSong()
+  const { createOrUpdate } = useConductorTrack()
   const { pushHistory } = useHistory()
 
   return () => {
-    if (conductorTrack === undefined) {
-      return
-    }
-
     const text = clipboard.readText()
     if (!text || text.length === 0) {
       return
@@ -102,27 +97,26 @@ export const usePasteTempoSelection = () => {
       ...e,
       tick: e.tick + position,
     }))
-    conductorTrack.transaction((it) => {
-      events.forEach((e) => it.createOrUpdate(e))
+    transaction(() => {
+      events.forEach(createOrUpdate)
     })
   }
 }
 
 export const useDuplicateTempoSelection = () => {
-  const song = useSong()
+  const { getEventById, createOrUpdate } = useConductorTrack()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
 
   return () => {
-    const { conductorTrack } = song
-    if (conductorTrack === undefined || selectedEventIds.length === 0) {
+    if (selectedEventIds.length === 0) {
       return
     }
 
     pushHistory()
 
     const selectedEvents = selectedEventIds
-      .map((id) => conductorTrack.getEventById(id))
+      .map((id) => getEventById(id))
       .filter(isNotUndefined)
 
     // move to the end of selection
@@ -135,8 +129,8 @@ export const useDuplicateTempoSelection = () => {
       tick: note.tick + deltaTick,
     }))
 
-    const addedEvents = conductorTrack.transaction((it) =>
-      events.map((e) => it.createOrUpdate(e)),
+    const addedEvents = transaction(() => events.map(createOrUpdate)).filter(
+      isNotUndefined,
     )
 
     // select the created events

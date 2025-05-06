@@ -25,9 +25,6 @@ export function usePianoRoll() {
     get currentPan() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentPan)
     },
-    get currentTempo() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentTempo)
-    },
     get currentVolume() {
       return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentVolume)
     },

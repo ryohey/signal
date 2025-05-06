@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import VolumeUp from "mdi-react/VolumeHighIcon"
-import { FC, useCallback } from "react"
+import { FC } from "react"
 import { useSetTrackVolume } from "../../actions"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Slider } from "../ui/Slider"
@@ -24,18 +24,14 @@ const VolumeIcon = styled(VolumeUp)`
 
 export const VolumeSlider: FC = () => {
   const { currentVolume, selectedTrackId: trackId } = usePianoRoll()
-  const setTrackVolume = useSetTrackVolume()
+  const setTrackVolume = useSetTrackVolume(trackId)
   const volume = currentVolume ?? 100
-  const onChange = useCallback(
-    (value: number) => setTrackVolume(trackId, value),
-    [setTrackVolume, trackId],
-  )
   return (
     <Container>
       <VolumeIcon />
       <Slider
         value={volume}
-        onChange={(value) => onChange(value)}
+        onChange={(value) => setTrackVolume(value)}
         max={127}
         minStepsBetweenThumbs={1}
       />

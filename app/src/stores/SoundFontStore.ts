@@ -21,14 +21,14 @@ interface FileSoundFont {
   path: string
 }
 
-interface Metadata {
+export interface Metadata {
   name: string
   scanPath?: string // FileSoundFont scan path
 }
 
 export type SoundFontFile = Metadata & { id: number }
 
-type SoundFontItem = LocalSoundFont | RemoteSoundFont | FileSoundFont
+export type SoundFontItem = LocalSoundFont | RemoteSoundFont | FileSoundFont
 
 const defaultSoundFonts: (SoundFontItem & Metadata & { id: number })[] =
   isRunningInElectron()
@@ -51,16 +51,16 @@ const defaultSoundFonts: (SoundFontItem & Metadata & { id: number })[] =
 
 export class SoundFontStore {
   private readonly storage: IndexedDBStorage<SoundFontItem, Metadata>
-  files: SoundFontFile[] = []
+  files: readonly SoundFontFile[] = []
   selectedSoundFontId: number | null = null
-  scanPaths: string[] = []
+  scanPaths: readonly string[] = []
   isLoading = false
 
   constructor(private readonly synth: SoundFontSynth) {
     makeObservable(this, {
-      files: observable,
+      files: observable.shallow,
       selectedSoundFontId: observable,
-      scanPaths: observable,
+      scanPaths: observable.shallow,
       isLoading: observable,
     })
 
@@ -180,7 +180,7 @@ export class SoundFontStore {
     if (this.scanPaths.includes(path)) {
       return
     }
-    this.scanPaths.push(path)
+    this.scanPaths = [...this.scanPaths, path]
     await this.scanSoundFonts()
   }
 }

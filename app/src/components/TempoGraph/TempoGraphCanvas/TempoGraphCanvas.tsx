@@ -4,7 +4,9 @@ import { useChangeTempo } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { matrixFromTranslation } from "../../../helpers/matrix"
+import { useRuler } from "../../../hooks/useRuler"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTempoItems } from "../../../hooks/useTempoItems"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -26,16 +28,10 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   height,
   style,
 }) => {
-  const {
-    selectionRect,
-    hitTest,
-    items,
-    transform,
-    mouseMode,
-    beats,
-    cursor,
-    cursorX,
-  } = useTempoEditor()
+  const { selectionRect, transform, mouseMode, cursor, cursorX } =
+    useTempoEditor()
+  const { beats } = useRuler()
+  const { hitTest, items } = useTempoItems()
   const { scrollLeft: _scrollLeft } = useTickScroll()
   const changeTempo = useChangeTempo()
   const pencilGesture = usePencilGesture()

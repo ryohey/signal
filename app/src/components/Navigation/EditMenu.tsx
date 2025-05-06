@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import {
   useCopySelection,
@@ -17,7 +16,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
-export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
+export const EditMenu: FC<{ close: () => void }> = ({ close }) => {
   const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
     usePianoRoll()
   const { hasUndo, hasRedo, undo, redo } = useHistory()
@@ -202,4 +201,4 @@ export const EditMenu: FC<{ close: () => void }> = observer(({ close }) => {
       </MenuItem>
     </>
   )
-})
+}

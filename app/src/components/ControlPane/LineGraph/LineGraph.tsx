@@ -11,7 +11,6 @@ import { isEventInRange } from "../../../helpers/filterEvents"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useControlPane } from "../../../hooks/useControlPane"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import { pointToCircleRect } from "../../../stores/TempoEditorStore"
 import { TrackEventOf } from "../../../track"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
 import { useCreateSelectionGesture } from "../Graph/MouseHandler/useCreateSelectionGesture"
@@ -52,7 +51,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   const { transform, scrollLeft } = useTickScroll()
   const theme = useTheme()
   const createOrUpdateControlEventsValue = useCreateOrUpdateControlEventsValue()
-  const handlePencilMouseDown = usePencilGesture()
+  const handlePencilMouseDown = usePencilGesture(eventType)
   const dragSelectionGesture = useDragSelectionGesture()
   const createSelectionGesture = useCreateSelectionGesture()
 
@@ -67,7 +66,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   }))
 
   const controlPoints = items.map((p) => ({
-    ...pointToCircleRect(p, circleRadius),
+    ...Rect.fromPointWithSize(p, circleRadius * 2),
     id: p.id,
   }))
 
@@ -86,14 +85,9 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
     (ev) => {
       const local = getLocal(ev.nativeEvent)
 
-      handlePencilMouseDown.onMouseDown(
-        ev.nativeEvent,
-        local,
-        controlTransform,
-        eventType,
-      )
+      handlePencilMouseDown.onMouseDown(ev.nativeEvent, local, controlTransform)
     },
-    [scrollLeft, controlTransform, eventType, handlePencilMouseDown],
+    [scrollLeft, controlTransform, handlePencilMouseDown],
   )
 
   const selectionMouseDown: MouseEventHandler = useCallback(

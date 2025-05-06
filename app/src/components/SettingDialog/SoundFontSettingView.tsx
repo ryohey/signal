@@ -1,8 +1,7 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { ChangeEvent, FC } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
-import { useStores } from "../../hooks/useStores"
+import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../Dialog/Dialog"
 import { FileInput } from "../Navigation/LegacyFileMenu"
@@ -21,8 +20,8 @@ const SectionTitle = styled.div`
   margin: 1rem 0;
 `
 
-export const SoundFontSettingsView: FC = observer(() => {
-  const { soundFontStore } = useStores()
+export const SoundFontSettingsView: FC = () => {
+  const { addSoundFont } = useSoundFont()
 
   // TODO: add open local file dialog and put it to SoundFontStore
   const onOpenSoundFont = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -30,10 +29,7 @@ export const SoundFontSettingsView: FC = observer(() => {
     const file = e.currentTarget.files?.item(0)
     if (file) {
       const arrayBuffer = await file.arrayBuffer()
-      soundFontStore.addSoundFont(
-        { type: "local", data: arrayBuffer },
-        { name: file.name },
-      )
+      addSoundFont({ type: "local", data: arrayBuffer }, { name: file.name })
     }
   }
 
@@ -67,4 +63,4 @@ export const SoundFontSettingsView: FC = observer(() => {
       </DialogContent>
     </>
   )
-})
+}

@@ -1,17 +1,15 @@
-import {
-  createCloudMidiRepository,
-  createCloudSongDataRepository,
-  createCloudSongRepository,
-  createUserRepository,
-} from "@signal-app/api"
 import { Player, SoundFontSynth } from "@signal-app/player"
 import { deserialize, serialize } from "serializr"
-import { auth, firestore, functions } from ".././firebase/firebase"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
+import {
+  cloudSongDataRepository,
+  cloudSongRepository,
+  userRepository,
+} from "../services/repositories"
 import Song from "../song"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
@@ -45,14 +43,6 @@ export interface SerializedRootStore {
 }
 
 export default class RootStore {
-  readonly cloudSongRepository = createCloudSongRepository(firestore, auth)
-  readonly cloudSongDataRepository = createCloudSongDataRepository(
-    firestore,
-    auth,
-  )
-  readonly cloudMidiRepository = createCloudMidiRepository(firestore, functions)
-  readonly userRepository = createUserRepository(firestore, auth)
-
   readonly router = new Router()
   readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
@@ -64,11 +54,11 @@ export default class RootStore {
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly exportStore = new ExportStore()
-  readonly authStore = new AuthStore(this.userRepository)
+  readonly authStore = new AuthStore(userRepository)
   readonly cloudFileStore = new CloudFileStore(
     this.songStore,
-    this.cloudSongRepository,
-    this.cloudSongDataRepository,
+    cloudSongRepository,
+    cloudSongDataRepository,
   )
   readonly settingStore = new SettingStore()
   readonly player: Player

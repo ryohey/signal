@@ -18,7 +18,7 @@ import { batchUpdateNotesVelocity, BatchUpdateOperation } from "./track"
 
 // returns moved event ids
 export const moveEventsBetweenTracks = (
-  tracks: Track[],
+  tracks: readonly Track[],
   eventIdForTrackIndex: { [trackIndex: number]: number[] },
   delta: ArrangePoint,
 ) => {
@@ -147,7 +147,7 @@ export const useArrangeDeleteSelection = () => {
 
 // returns { trackIndex: [eventId] }
 export function getEventsInSelection(
-  tracks: Track[],
+  tracks: readonly Track[],
   selection: ArrangeSelection,
 ) {
   const ids: { [key: number]: number[] } = {}
@@ -166,13 +166,13 @@ export function getEventsInSelection(
 }
 
 export const useArrangeTransposeSelection = () => {
-  const song = useSong()
+  const { transposeNotes } = useSong()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useArrangeView()
 
   return (deltaPitch: number) => {
     pushHistory()
-    song.transposeNotes(deltaPitch, selectedEventIds)
+    transposeNotes(deltaPitch, selectedEventIds)
   }
 }
 

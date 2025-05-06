@@ -9,6 +9,7 @@ import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useRouter } from "../../hooks/useRouter"
+import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { useTrackScroll } from "../../hooks/useTrackScroll"
 import { TrackId } from "../../track"
@@ -75,13 +76,9 @@ const HeaderList = styled.div`
 `
 
 export const ArrangeView: FC = () => {
-  const {
-    tracks,
-    transform,
-    scrollBy,
-    selectedTrackIndex,
-    setSelectedTrackIndex,
-  } = useArrangeView()
+  const { transform, scrollBy, selectedTrackIndex, setSelectedTrackIndex } =
+    useArrangeView()
+  const { tracks } = useSong()
   const {
     trackHeight,
     contentHeight,
@@ -201,7 +198,7 @@ export const ArrangeView: FC = () => {
                 onTrackContextMenu(e)
               }}
             >
-              <TrackName track={t} />
+              <TrackName trackId={t.id} />
             </TrackHeader>
           ))}
         </div>

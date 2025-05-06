@@ -5,12 +5,14 @@ import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
 import { useArrangeView } from "../../../hooks/useArrangeView"
+import { useSong } from "../../../hooks/useSong"
 
 export const Lines: FC<{ width: number; zIndex: number }> = ({
   width,
   zIndex,
 }) => {
-  const { tracks, trackTransform } = useArrangeView()
+  const { trackTransform } = useArrangeView()
+  const { tracks } = useSong()
   const theme = useTheme()
 
   const hline = (y: number): Rect => ({

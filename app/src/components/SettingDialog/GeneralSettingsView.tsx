@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../hooks/useStores"
+import { useSettings } from "../../hooks/useSettings"
 import {
   Language,
   Localized,
@@ -18,9 +17,9 @@ interface LanguageItem {
   language: Language
 }
 
-const LanguageSelect: FC = observer(() => {
-  const { settingStore } = useStores()
-  const language = useCurrentLanguage()
+const LanguageSelect: FC = () => {
+  const { language, setLanguage } = useSettings()
+  const currentLanguage = useCurrentLanguage()
   const items: LanguageItem[] = [
     { label: "English", language: "en" },
     { label: "French", language: "fr" },
@@ -32,8 +31,8 @@ const LanguageSelect: FC = observer(() => {
     <Label>
       <Localized name="language" />
       <Select
-        value={settingStore.language ?? language}
-        onChange={(e) => (settingStore.language = e.target.value as Language)}
+        value={language ?? currentLanguage}
+        onChange={(e) => setLanguage(e.target.value as Language)}
         style={{ marginTop: "0.5rem" }}
       >
         {items.map((item) => (
@@ -44,17 +43,16 @@ const LanguageSelect: FC = observer(() => {
       </Select>
     </Label>
   )
-})
+}
 
-const ThemeSelect: FC = observer(() => {
-  const { themeStore } = useStores()
-  const { themeType } = themeStore
+const ThemeSelect: FC = () => {
+  const { themeType, setThemeType } = useSettings()
   return (
     <Label>
       <Localized name="theme" />
       <Select
         value={themeType}
-        onChange={(e) => (themeStore.themeType = e.target.value as ThemeType)}
+        onChange={(e) => setThemeType(e.target.value as ThemeType)}
         style={{ marginTop: "0.5rem" }}
       >
         {Object.keys(themes).map((themeType) => (
@@ -65,7 +63,7 @@ const ThemeSelect: FC = observer(() => {
       </Select>
     </Label>
   )
-})
+}
 
 const Column = styled.div`
   display: flex;
@@ -73,7 +71,7 @@ const Column = styled.div`
   gap: 1rem;
 `
 
-export const GeneralSettingsView: FC = observer(() => {
+export const GeneralSettingsView: FC = () => {
   return (
     <>
       <DialogTitle>
@@ -87,4 +85,4 @@ export const GeneralSettingsView: FC = observer(() => {
       </DialogContent>
     </>
   )
-})
+}

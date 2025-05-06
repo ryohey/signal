@@ -1,6 +1,7 @@
 import isEqual from "lodash/isEqual"
 import React, { FC, useCallback } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useTrack } from "../../hooks/useTrack"
 import { TrackEvent } from "../../track"
 import { getEventController } from "./EventController"
 import { Cell, Row } from "./EventList"
@@ -22,25 +23,26 @@ const equalEventListItemProps = (
 
 export const EventListItem: FC<EventListItemProps> = React.memo(
   ({ item, style, onClick }) => {
-    const { selectedTrack } = usePianoRoll()
+    const { selectedTrackId } = usePianoRoll()
+    const { removeEvent, updateEvent } = useTrack(selectedTrackId)
 
     const controller = getEventController(item)
 
     const onDelete = useCallback(
       (e: TrackEvent) => {
-        selectedTrack?.removeEvent(e.id)
+        removeEvent(e.id)
       },
-      [selectedTrack],
+      [removeEvent],
     )
 
     const onChangeTick = useCallback(
       (input: string) => {
         const value = parseInt(input)
         if (!isNaN(value)) {
-          selectedTrack?.updateEvent(item.id, { tick: Math.max(0, value) })
+          updateEvent(item.id, { tick: Math.max(0, value) })
         }
       },
-      [selectedTrack, item],
+      [updateEvent, item],
     )
 
     const onChangeGate = useCallback(
@@ -50,10 +52,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.gate.update(value)
         if (obj !== null) {
-          selectedTrack?.updateEvent(item.id, obj)
+          updateEvent(item.id, obj)
         }
       },
-      [controller, selectedTrack, item],
+      [controller, updateEvent, item],
     )
 
     const onChangeValue = useCallback(
@@ -63,10 +65,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.value.update(value)
         if (obj !== null) {
-          selectedTrack?.updateEvent(item.id, obj)
+          updateEvent(item.id, obj)
         }
       },
-      [controller, selectedTrack, item],
+      [controller, updateEvent, item],
     )
 
     return (

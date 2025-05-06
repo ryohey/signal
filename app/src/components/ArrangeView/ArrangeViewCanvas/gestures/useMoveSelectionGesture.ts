@@ -9,19 +9,16 @@ import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { useHistory } from "../../../../hooks/useHistory"
+import { useSong } from "../../../../hooks/useSong"
 
 export const useMoveSelectionGesture = (): MouseGesture<
   [Point, Rect],
   MouseEvent
 > => {
   const { pushHistory } = useHistory()
-  const {
-    trackTransform,
-    quantizer,
-    tracks,
-    setSelection,
-    setSelectedEventIds,
-  } = useArrangeView()
+  const { trackTransform, quantizer, setSelection, setSelectedEventIds } =
+    useArrangeView()
+  const { tracks } = useSong()
   let { selection, selectedEventIds } = useArrangeView()
 
   return {

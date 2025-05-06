@@ -1,3 +1,4 @@
+import { CloudSong } from "@signal-app/api"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { ChangeEvent, useCallback } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
@@ -13,7 +14,7 @@ import { useStores } from "./useStores"
 export const useCloudFile = () => {
   const { setOpenCloudFileDialog, setOpenPublishDialog } = useRootView()
   const { cloudFileStore } = useStores()
-  const song = useSong()
+  const { cloudSongId, name, setName, isSaved, getSong } = useSong()
   const toast = useToast()
   const prompt = usePrompt()
   const dialog = useDialog()
@@ -27,18 +28,18 @@ export const useCloudFile = () => {
   const createSong = useCreateSong()
 
   const saveOrCreateSong = async () => {
-    if (song.cloudSongId !== null) {
-      if (song.name.length === 0) {
+    if (cloudSongId !== null) {
+      if (name.length === 0) {
         const text = await prompt.show({
           title: localized["save-as"],
         })
         if (text !== null && text.length > 0) {
-          song.name = text
+          setName(text)
         }
       }
       const closeProgress = showProgress(localized["song-saving"])
       try {
-        await updateSong(song)
+        await updateSong(getSong())
         toast.success(localized["song-saved"])
       } catch (e) {
         alert((e as Error).message)
@@ -46,17 +47,17 @@ export const useCloudFile = () => {
         closeProgress()
       }
     } else {
-      if (song.name.length === 0) {
+      if (name.length === 0) {
         const text = await prompt.show({
           title: localized["save-as"],
         })
         if (text !== null && text.length > 0) {
-          song.name = text
+          setName(text)
         }
       }
       const closeProgress = showProgress(localized["song-saving"])
       try {
-        await createSong(song)
+        await createSong(getSong())
         toast.success(localized["song-created"])
       } catch (e) {
         alert((e as Error).message)
@@ -69,7 +70,7 @@ export const useCloudFile = () => {
   // true: saved or not necessary
   // false: canceled
   const saveIfNeeded = async (): Promise<boolean> => {
-    if (song.isSaved) {
+    if (isSaved) {
       return true
     }
 
@@ -159,14 +160,14 @@ export const useCloudFile = () => {
       try {
         const text = await prompt.show({
           title: localized["save-as"],
-          initialText: song.name,
+          initialText: name,
         })
         if (text !== null && text.length > 0) {
-          song.name = text
+          setName(text)
         } else {
           return
         }
-        await createSong(song)
+        await createSong(getSong())
         toast.success(localized["song-saved"])
       } catch (e) {
         toast.error((e as Error).message)
@@ -178,14 +179,14 @@ export const useCloudFile = () => {
           title: localized["rename"],
         })
         if (text !== null && text.length > 0) {
-          song.name = text
+          setName(text)
         } else {
           return Promise.resolve(false)
         }
-        if (song.cloudSongId !== null) {
-          await updateSong(song)
+        if (cloudSongId !== null) {
+          await updateSong(getSong())
         } else {
-          await createSong(song)
+          await createSong(getSong())
         }
         toast.success(localized["song-saved"])
       } catch (e) {
@@ -214,7 +215,7 @@ export const useCloudFile = () => {
     async exportSong() {
       try {
         if (hasFSAccess) {
-          await saveFileAs(song)
+          await saveFileAs(getSong())
         } else {
           saveSong()
         }
@@ -224,6 +225,9 @@ export const useCloudFile = () => {
     },
     async publishSong() {
       setOpenPublishDialog(true)
+    },
+    async deleteSong(song: CloudSong) {
+      await cloudFileStore.deleteSong(song)
     },
   }
 }

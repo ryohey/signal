@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, useCallback } from "react"
+import { FC } from "react"
 import { useSetTrackPan } from "../../actions"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
@@ -25,11 +25,7 @@ const PAN_CENTER = 64
 
 export const PanSlider: FC = () => {
   const { currentPan, selectedTrackId: trackId } = usePianoRoll()
-  const setTrackPan = useSetTrackPan()
-  const onChange = useCallback(
-    (value: number) => setTrackPan(trackId, value),
-    [setTrackPan, trackId],
-  )
+  const setTrackPan = useSetTrackPan(trackId)
   const pan = currentPan ?? PAN_CENTER
 
   return (
@@ -39,8 +35,8 @@ export const PanSlider: FC = () => {
       </Label>
       <Slider
         value={pan}
-        onChange={(value) => onChange(value as number)}
-        onDoubleClick={() => onChange(PAN_CENTER)}
+        onChange={(value) => setTrackPan(value as number)}
+        onDoubleClick={() => setTrackPan(PAN_CENTER)}
         min={0}
         max={127}
         defaultValue={PAN_CENTER}

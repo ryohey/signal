@@ -1,15 +1,18 @@
 import { clamp } from "lodash"
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
+import { transaction } from "mobx"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { addedSet, deletedSet } from "../helpers/set"
+import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
+import { useTrack } from "../hooks/useTrack"
 import {
   panMidiEvent,
   programChangeMidiEvent,
@@ -27,15 +30,11 @@ import Track, {
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {
-  const song = useSong()
+  const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
   return (id: number, microsecondsPerBeat: number) => {
-    const track = song.conductorTrack
-    if (track === undefined) {
-      return
-    }
     pushHistory()
-    track.updateEvent<TrackEventOf<SetTempoEvent>>(id, {
+    updateEvent<TrackEventOf<SetTempoEvent>>(id, {
       microsecondsPerBeat: microsecondsPerBeat,
     })
   }
@@ -44,14 +43,13 @@ export const useChangeTempo = () => {
 /* events */
 
 export const useChangeNotesVelocity = () => {
-  const { selectedTrack, setNewNoteVelocity } = usePianoRoll()
+  const { selectedTrackId, setNewNoteVelocity } = usePianoRoll()
+  const { updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
+
   return (noteIds: number[], velocity: number) => {
-    if (selectedTrack === undefined) {
-      return
-    }
     pushHistory()
-    selectedTrack.updateEvents(
+    updateEvents(
       noteIds.map((id) => ({
         id,
         velocity: velocity,
@@ -62,19 +60,17 @@ export const useChangeNotesVelocity = () => {
 }
 
 export const useCreateEvent = () => {
-  const { quantizer, selectedTrack } = usePianoRoll()
+  const { quantizer, selectedTrackId } = usePianoRoll()
+  const { createOrUpdate } = useTrack(selectedTrackId)
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
 
   return (e: AnyChannelEvent, tick?: number) => {
-    if (selectedTrack === undefined) {
-      throw new Error("selected track is undefined")
-    }
     pushHistory()
-    const id = selectedTrack.createOrUpdate({
+    const id = createOrUpdate({
       ...e,
       tick: quantizer.round(tick ?? position),
-    }).id
+    })?.id
 
     // 即座に反映する
     // Reflect immediately
@@ -87,16 +83,19 @@ export const useCreateEvent = () => {
 }
 
 export const useUpdateVelocitiesInRange = () => {
-  const { selectedTrack, selectedNoteIds } = usePianoRoll()
+  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
+  const {
+    getEventById,
+    events: trackEvents,
+    updateEvents,
+  } = useTrack(selectedTrackId)
+
   return (
     startTick: number,
     startValue: number,
     endTick: number,
     endValue: number,
   ) => {
-    if (selectedTrack === undefined) {
-      return
-    }
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)
     const minValue = Math.min(startValue, endValue)
@@ -116,14 +115,13 @@ export const useUpdateVelocitiesInRange = () => {
 
     const notes =
       selectedNoteIds.length > 0
-        ? selectedNoteIds.map(
-            (id) => selectedTrack.getEventById(id) as NoteEvent,
-          )
-        : selectedTrack.events.filter(isNoteEvent)
+        ? selectedNoteIds.map((id) => getEventById(id) as NoteEvent)
+        : trackEvents.filter(isNoteEvent)
 
     const events = notes.filter(isEventInRange(Range.create(minTick, maxTick)))
-    selectedTrack.transaction((it) => {
-      it.updateEvents(
+
+    transaction(() => {
+      updateEvents(
         events.map((e) => ({
           id: e.id,
           velocity: getValue(e.tick),
@@ -134,23 +132,20 @@ export const useUpdateVelocitiesInRange = () => {
 }
 
 // Update controller events in the range with linear interpolation values
-export const updateEventsInRange =
-  (
-    track: Track | undefined,
-    quantizer: Quantizer,
-    filterEvent: (e: TrackEvent) => boolean,
-    createEvent: (value: number) => AnyEvent,
-  ) =>
-  (
+export const useUpdateEventsInRange = (
+  trackId: TrackId,
+  quantizer: Quantizer,
+  filterEvent: (e: TrackEvent) => boolean,
+  createEvent: (value: number) => AnyEvent,
+) => {
+  const { events: trackEvents, removeEvents, addEvents } = useTrack(trackId)
+
+  return (
     startValue: number,
     endValue: number,
     startTick: number,
     endTick: number,
   ) => {
-    if (track === undefined) {
-      throw new Error("track is undefined")
-    }
-
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)
     const _startTick = quantizer.floor(Math.max(0, minTick))
@@ -177,7 +172,7 @@ export const updateEventsInRange =
             )
 
     // Delete events in the dragged area
-    const events = track.events.filter(filterEvent).filter(
+    const events = trackEvents.filter(filterEvent).filter(
       (e) =>
         // to prevent remove the event created previously, do not remove the event placed at startTick
         e.tick !== startTick &&
@@ -185,8 +180,8 @@ export const updateEventsInRange =
         e.tick <= Math.max(maxTick, _endTick),
     )
 
-    track.transaction((it) => {
-      it.removeEvents(events.map((e) => e.id))
+    transaction(() => {
+      removeEvents(events.map((e) => e.id))
 
       const newEvents = closedRange(_startTick, _endTick, quantizer.unit).map(
         (tick) => ({
@@ -195,109 +190,93 @@ export const updateEventsInRange =
         }),
       )
 
-      it.addEvents(newEvents)
+      addEvents(newEvents)
     })
   }
+}
 
-export const useUpdateValueEvents = () => {
-  const { selectedTrack, quantizer } = usePianoRoll()
+export const useUpdateValueEvents = (type: ValueEventType) => {
+  const { selectedTrackId, quantizer } = usePianoRoll()
 
-  return (type: ValueEventType) =>
-    updateEventsInRange(
-      selectedTrack,
-      quantizer,
-      ValueEventType.getEventPredicate(type),
-      ValueEventType.getEventFactory(type),
-    )
+  return useUpdateEventsInRange(
+    selectedTrackId,
+    quantizer,
+    ValueEventType.getEventPredicate(type),
+    ValueEventType.getEventFactory(type),
+  )
 }
 
 /* note */
 
 export const useMuteNote = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { channel } = useTrack(selectedTrackId)
   const stopNote = useStopNote()
 
   return (noteNumber: number) => {
-    if (selectedTrack === undefined || selectedTrack.channel == undefined) {
+    if (channel == undefined) {
       return
     }
-    stopNote({ channel: selectedTrack.channel, noteNumber })
+    stopNote({ channel, noteNumber })
   }
 }
 
 /* track meta */
 
 export const useSetTrackName = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { setName } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
   return (name: string) => {
-    if (selectedTrack === undefined) {
-      return
-    }
     pushHistory()
-    selectedTrack.setName(name)
+    setName(name)
   }
 }
 
-export const useSetTrackVolume = () => {
+export const useSetTrackVolume = (trackId: TrackId) => {
   const { position, sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { channel, setVolume } = useTrack(trackId)
 
-  return (trackId: TrackId, volume: number) => {
+  return (volume: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
+    setVolume(volume, position)
 
-    track.setVolume(volume, position)
-
-    if (track.channel !== undefined) {
-      sendEvent(volumeMidiEvent(0, track.channel, volume))
+    if (channel !== undefined) {
+      sendEvent(volumeMidiEvent(0, channel, volume))
     }
   }
 }
 
-export const useSetTrackPan = () => {
+export const useSetTrackPan = (trackId: TrackId) => {
   const { position, sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { setPan, channel } = useTrack(trackId)
 
-  return (trackId: TrackId, pan: number) => {
+  return (pan: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
+    setPan(pan, position)
 
-    track.setPan(pan, position)
-
-    if (track.channel !== undefined) {
-      sendEvent(panMidiEvent(0, track.channel, pan))
+    if (channel !== undefined) {
+      sendEvent(panMidiEvent(0, channel, pan))
     }
   }
 }
 
-export const useSetTrackInstrument = () => {
+export const useSetTrackInstrument = (trackId: TrackId) => {
   const { sendEvent } = usePlayer()
-  const song = useSong()
   const { pushHistory } = useHistory()
+  const { channel, setProgramNumber } = useTrack(trackId)
 
-  return (trackId: TrackId, programNumber: number) => {
+  return (programNumber: number) => {
     pushHistory()
-    const track = song.getTrack(trackId)
-    if (track === undefined) {
-      return
-    }
-
-    track.setProgramNumber(programNumber)
+    setProgramNumber(programNumber)
 
     // 即座に反映する
     // Reflect immediately
-    if (track.channel !== undefined) {
-      sendEvent(programChangeMidiEvent(0, track.channel, programNumber))
+    if (channel !== undefined) {
+      sendEvent(programChangeMidiEvent(0, channel, programNumber))
     }
   }
 }
@@ -318,38 +297,39 @@ export const useToggleGhostTrack = () => {
 
 export const useToggleAllGhostTracks = () => {
   const { notGhostTrackIds, setNotGhostTrackIds } = usePianoRoll()
-  const song = useSong()
+  const { tracks } = useSong()
   const { pushHistory } = useHistory()
 
   return () => {
     pushHistory()
-    if (notGhostTrackIds.size > Math.floor(song.tracks.length / 2)) {
+    if (notGhostTrackIds.size > Math.floor(tracks.length / 2)) {
       setNotGhostTrackIds(new Set())
     } else {
-      setNotGhostTrackIds(new Set(song.tracks.map((t) => t.id)))
+      setNotGhostTrackIds(new Set(tracks.map((t) => t.id)))
     }
   }
 }
 
 export const useAddTimeSignature = () => {
-  const song = useSong()
+  const { timebase } = useSong()
   const { pushHistory } = useHistory()
+  const { measures, timeSignatures, addEvent } = useConductorTrack()
 
   return (tick: number, numerator: number, denominator: number) => {
     const measureStartTick = Measure.getMeasureStart(
-      song.measures,
+      measures,
       tick,
-      song.timebase,
+      timebase,
     ).tick
 
     // prevent duplication
-    if (song.timeSignatures?.some((e) => e.tick === measureStartTick)) {
+    if (timeSignatures.some((e) => e.tick === measureStartTick)) {
       return
     }
 
     pushHistory()
 
-    song.conductorTrack?.addEvent({
+    addEvent({
       ...timeSignatureMidiEvent(0, numerator, denominator),
       tick: measureStartTick,
     })
@@ -357,12 +337,12 @@ export const useAddTimeSignature = () => {
 }
 
 export const useUpdateTimeSignature = () => {
-  const song = useSong()
+  const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
 
   return (id: number, numerator: number, denominator: number) => {
     pushHistory()
-    song.conductorTrack?.updateEvent(id, {
+    updateEvent(id, {
       numerator,
       denominator,
     })

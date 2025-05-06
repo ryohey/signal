@@ -2,15 +2,12 @@ import { useTheme } from "@emotion/react"
 import Color from "color"
 import { colorToVec4, enhanceContrast } from "../gl/color"
 import { trackColorToCSSColor } from "../track/TrackColor"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
+import { useTrack } from "./useTrack"
 
 export function useNoteColor() {
-  const { selectedTrack } = usePianoRoll()
-  const trackColor = useMobxSelector(
-    () => selectedTrack?.color,
-    [selectedTrack],
-  )
+  const { selectedTrackId } = usePianoRoll()
+  const { color: trackColor } = useTrack(selectedTrackId)
   const theme = useTheme()
 
   const baseColor = Color(

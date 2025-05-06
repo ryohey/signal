@@ -156,7 +156,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
   const height = Layout.rulerHeight
 
   const {
-    beats,
+    rulerBeats,
     loop,
     timeSignatures,
     timeSignatureHitTest,
@@ -237,14 +237,14 @@ const PianoRuler: FC<PianoRulerProps> = ({
       ctx.clearRect(0, 0, width, height)
       ctx.save()
       ctx.translate(-scrollLeft + 0.5, 0)
-      drawRuler(ctx, height, beats, theme)
+      drawRuler(ctx, height, rulerBeats, theme)
       if (loop !== null) {
         drawLoopPoints(ctx, loop, height, transform, theme)
       }
       drawTimeSignatures(ctx, height, timeSignatures, theme)
       ctx.restore()
     },
-    [width, transform, scrollLeft, beats, timeSignatures, loop, theme],
+    [width, transform, scrollLeft, rulerBeats, timeSignatures, loop, theme],
   )
 
   const closeOpenTimeSignatureDialog = useCallback(() => {

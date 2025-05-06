@@ -6,6 +6,7 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
+import { useTrack } from "../../../../hooks/useTrack"
 
 export const useSelectNoteGesture = (): MouseGesture => {
   const {
@@ -13,10 +14,11 @@ export const useSelectNoteGesture = (): MouseGesture => {
     quantizer,
     getLocal,
     setSelection,
-    selectedTrack,
+    selectedTrackId,
     setSelectedNoteIds,
   } = usePianoRoll()
   let { selection } = usePianoRoll()
+  const { getEvents } = useTrack(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
@@ -43,14 +45,14 @@ export const useSelectNoteGesture = (): MouseGesture => {
         },
 
         onMouseUp: () => {
-          if (selection === null || selectedTrack === undefined) {
+          if (selection === null) {
             return
           }
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
           setSelectedNoteIds(
-            eventsInSelection(selectedTrack.events, selection).map((e) => e.id),
+            eventsInSelection(getEvents(), selection).map((e) => e.id),
           )
 
           setSelection(null)

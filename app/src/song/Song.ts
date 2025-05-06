@@ -18,7 +18,7 @@ const END_MARGIN = 480 * 30
 const DEFAULT_TIME_BASE = 480
 
 export default class Song {
-  tracks: Track[] = []
+  tracks: readonly Track[] = []
   filepath: string = ""
   timebase: number = DEFAULT_TIME_BASE
   name: string = ""
@@ -39,7 +39,7 @@ export default class Song {
       timeSignatures: computed,
       endOfSong: computed,
       allEvents: computed({ keepAlive: true }),
-      tracks: observable.shallow,
+      tracks: observable.ref,
       filepath: observable,
       timebase: observable,
       name: observable,
@@ -70,7 +70,9 @@ export default class Song {
       t.channel = t.channel || this.tracks.length - 1
     }
     t.id = this.generateTrackId()
-    this.tracks.splice(index, 0, t)
+    const tracks = [...this.tracks]
+    tracks.splice(index, 0, t)
+    this.tracks = tracks
   }
 
   addTrack(t: Track) {
@@ -82,8 +84,10 @@ export default class Song {
   }
 
   moveTrack(from: number, to: number) {
-    const [track] = this.tracks.splice(from, 1)
-    this.tracks.splice(to, 0, track)
+    const tracks = [...this.tracks]
+    const [track] = tracks.splice(from, 1)
+    tracks.splice(to, 0, track)
+    this.tracks = tracks
   }
 
   get conductorTrack(): Track | undefined {

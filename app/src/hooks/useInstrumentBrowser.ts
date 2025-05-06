@@ -8,45 +8,52 @@ import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { usePreviewNote } from "./usePreviewNote"
 import { useSong } from "./useSong"
+import { useTrack } from "./useTrack"
 
 export function useInstrumentBrowser() {
   const {
-    selectedTrack: track,
+    selectedTrackId,
     instrumentBrowserSetting: setting,
     setInstrumentBrowserSetting: setSetting,
     setOpenInstrumentBrowser: setOpen,
   } = usePianoRoll()
+  const { isRhythmTrack, channel, setChannel } = useTrack(selectedTrackId)
   const { isPlaying, sendEvent } = usePlayer()
-  const setTrackInstrumentAction = useSetTrackInstrument()
-  const song = useSong()
+  const setTrackInstrumentAction = useSetTrackInstrument(selectedTrackId)
+  const { tracks } = useSong()
   const { previewNoteOn } = usePreviewNote()
 
   const onClickOK = useCallback(() => {
-    if (track === undefined) {
-      return
-    }
-
     if (setting.isRhythmTrack) {
-      track.channel = 9
-      setTrackInstrumentAction(track.id, 0)
+      setChannel(9)
+      setTrackInstrumentAction(0)
     } else {
-      if (track.isRhythmTrack) {
+      if (isRhythmTrack) {
         // 適当なチャンネルに変える
         const channels = range(16)
-        const usedChannels = song.tracks
-          .filter((t) => t !== track)
+        const usedChannels = tracks
+          .filter((t) => t.id !== selectedTrackId)
           .map((t) => t.channel)
         const availableChannel =
           Math.min(
             ...difference(channels, usedChannels).filter(isNotUndefined),
           ) || 0
-        track.channel = availableChannel
+        setChannel(availableChannel)
       }
-      setTrackInstrumentAction(track.id, setting.programNumber)
+      setTrackInstrumentAction(setting.programNumber)
     }
 
     setOpen(false)
-  }, [setting, setSetting, track, song, setOpen, setTrackInstrumentAction])
+  }, [
+    setting,
+    setSetting,
+    selectedTrackId,
+    setChannel,
+    isRhythmTrack,
+    tracks,
+    setOpen,
+    setTrackInstrumentAction,
+  ])
 
   return {
     setting,
@@ -68,7 +75,6 @@ export function useInstrumentBrowser() {
     },
     onChangeInstrument: useCallback(
       (programNumber: number) => {
-        const channel = track?.channel
         if (channel === undefined) {
           return
         }
@@ -81,7 +87,7 @@ export function useInstrumentBrowser() {
           isRhythmTrack: setting.isRhythmTrack,
         })
       },
-      [setSetting, setting, track, previewNoteOn],
+      [setSetting, setting, channel, previewNoteOn],
     ),
     onClickOK,
   }

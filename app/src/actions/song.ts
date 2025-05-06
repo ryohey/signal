@@ -3,7 +3,6 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
@@ -20,7 +19,7 @@ const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {
 }
 
 export const useSetSong = () => {
-  const { songStore } = useStores()
+  const { setSong } = useSong()
   const { clear: clearHistory } = useHistory()
   const { reset: resetTrackMute } = useTrackMute()
   const { stop, reset, setPosition } = usePlayer()
@@ -39,7 +38,7 @@ export const useSetSong = () => {
   } = useArrangeView()
 
   return (newSong: Song) => {
-    songStore.song = newSong
+    setSong(newSong)
     resetTrackMute()
 
     setScrollLeftInPixels(0)
@@ -69,10 +68,12 @@ export const useCreateSong = () => {
 }
 
 export const useSaveSong = () => {
-  const song = useSong()
+  const { getSong } = useSong()
+  const { setSaved } = useSong()
+
   return () => {
-    song.isSaved = true
-    downloadSongAsMidi(song)
+    setSaved(true)
+    downloadSongAsMidi(getSong())
   }
 }
 
@@ -88,12 +89,12 @@ export const useOpenSong = () => {
 }
 
 export const useAddTrack = () => {
-  const song = useSong()
+  const { addTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
 
   return () => {
     pushHistory()
-    song.addTrack(emptyTrack(Math.min(song.tracks.length - 1, 0xf)))
+    addTrack(emptyTrack(Math.min(tracks.length - 1, 0xf)))
   }
 }
 
@@ -102,7 +103,7 @@ export const useRemoveTrack = () => {
     selectedTrackIndex: pianoRollSelectedTrackIndex,
     setSelectedTrackIndex,
   } = usePianoRoll()
-  const song = useSong()
+  const { tracks, removeTrack } = useSong()
   const { pushHistory } = useHistory()
   const {
     selectedTrackIndex: arrangeSelectedTrackIndex,
@@ -110,7 +111,7 @@ export const useRemoveTrack = () => {
   } = useArrangeView()
 
   return (trackId: TrackId) => {
-    if (song.tracks.filter((t) => !t.isConductorTrack).length <= 1) {
+    if (tracks.filter((t) => !t.isConductorTrack).length <= 1) {
       // conductor track を除き、最後のトラックの場合
       // トラックがなくなるとエラーが出るので削除できなくする
       // For the last track except for Conductor Track
@@ -118,12 +119,12 @@ export const useRemoveTrack = () => {
       return
     }
     pushHistory()
-    song.removeTrack(trackId)
+    removeTrack(trackId)
     setSelectedTrackIndex(
-      Math.min(pianoRollSelectedTrackIndex, song.tracks.length - 1),
+      Math.min(pianoRollSelectedTrackIndex, tracks.length - 1),
     )
     setArrangeSelectedTrackIndex(
-      Math.min(arrangeSelectedTrackIndex, song.tracks.length - 1),
+      Math.min(arrangeSelectedTrackIndex, tracks.length - 1),
     )
   }
 }
@@ -134,28 +135,28 @@ export const useSelectTrack = () => {
 }
 
 export const useInsertTrack = () => {
-  const song = useSong()
+  const { insertTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
 
   return (trackIndex: number) => {
     pushHistory()
-    song.insertTrack(emptyTrack(song.tracks.length - 1), trackIndex)
+    insertTrack(emptyTrack(tracks.length - 1), trackIndex)
   }
 }
 
 export const useDuplicateTrack = () => {
-  const song = useSong()
+  const { getTrack, tracks, insertTrack } = useSong()
   const { pushHistory } = useHistory()
 
   return (trackId: TrackId) => {
-    const track = song.getTrack(trackId)
+    const track = getTrack(trackId)
     if (track === undefined) {
       throw new Error("No track found")
     }
-    const trackIndex = song.tracks.findIndex((t) => t.id === trackId)
+    const trackIndex = tracks.findIndex((t) => t.id === trackId)
     const newTrack = track.clone()
     newTrack.channel = undefined
     pushHistory()
-    song.insertTrack(newTrack, trackIndex + 1)
+    insertTrack(newTrack, trackIndex + 1)
   }
 }

@@ -5,17 +5,14 @@ import {
   useStop,
   useToggleRecording,
 } from "../actions"
+import { useMIDIDevice } from "./useMIDIDevice"
 import { useMobxStore } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
 
 export function useTransportPanel() {
   const { synthGroup } = useStores()
-
-  const enabledInputs = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.enabledInputs,
-  )
-
+  const { enabledInputs } = useMIDIDevice()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
   return {
@@ -34,9 +31,6 @@ export function useTransportPanel() {
     canRecording: Object.values(enabledInputs).filter((e) => e).length > 0,
     get isRecording() {
       return useMobxStore(({ midiRecorder }) => midiRecorder.isRecording)
-    },
-    get isSynthLoading() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.isLoading)
     },
     get isMetronomeEnabled() {
       return useMobxStore(({ synthGroup }) => synthGroup.isMetronomeEnabled)

@@ -1,7 +1,6 @@
 import { useCallback } from "react"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-import { useMobxSelector, useMobxStore } from "./useMobxSelector"
-import { useSong } from "./useSong"
+import { useMobxStore } from "./useMobxSelector"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
 import { useTrackScroll } from "./useTrackScroll"
@@ -44,10 +43,6 @@ export function useArrangeView() {
       return useMobxStore(
         ({ arrangeViewStore }) => arrangeViewStore.selectedEventIds,
       )
-    },
-    get tracks() {
-      const song = useSong()
-      return useMobxSelector(() => song.tracks, [song])
     },
     get quantize() {
       return useMobxStore(({ arrangeViewStore }) => arrangeViewStore.quantize)

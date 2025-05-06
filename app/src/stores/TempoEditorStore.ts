@@ -1,7 +1,5 @@
 import { Player } from "@signal-app/player"
 import { computed, makeObservable, observable } from "mobx"
-import { transformEvents } from "../components/TempoGraph/transformEvents"
-import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import Quantizer from "../quantizer"
@@ -41,8 +39,6 @@ export default class TempoEditorStore {
       selection: observable,
       selectedEventIds: observable,
       transform: computed,
-      items: computed,
-      controlPoints: computed,
       quantizer: computed,
     })
   }
@@ -58,31 +54,7 @@ export default class TempoEditorStore {
     )
   }
 
-  get items() {
-    const { transform } = this
-    const { canvasWidth, scrollLeft } = this.tickScrollStore
-    const events = this.songStore.song.conductorTrack?.events ?? []
-    return transformEvents(events, transform, canvasWidth + scrollLeft)
-  }
-
   get quantizer(): Quantizer {
     return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
   }
-
-  // draggable hit areas for each tempo changes
-  get controlPoints() {
-    const { items } = this
-    const circleRadius = 4
-    return items.map((p) => ({
-      ...pointToCircleRect(p.bounds, circleRadius),
-      id: p.id,
-    }))
-  }
 }
-
-export const pointToCircleRect = (p: Point, radius: number) => ({
-  x: p.x - radius,
-  y: p.y - radius,
-  width: radius * 2,
-  height: radius * 2,
-})

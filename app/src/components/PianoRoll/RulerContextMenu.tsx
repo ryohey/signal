@@ -1,8 +1,8 @@
 import { FC, useCallback, useState } from "react"
 import { useAddTimeSignature } from "../../actions"
+import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { usePlayer } from "../../hooks/usePlayer"
 import { useRuler } from "../../hooks/useRuler"
-import { useSong } from "../../hooks/useSong"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -24,7 +24,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   const { handleClose } = props
   const { setLoopBegin, setLoopEnd } = usePlayer()
   const { selectedTimeSignatureEventIds } = useRuler()
-  const song = useSong()
+  const { removeEvents } = useConductorTrack()
   const addTimeSignature = useAddTimeSignature()
   const [isOpenTimeSignatureDialog, setOpenTimeSignatureDialog] =
     useState(false)
@@ -37,9 +37,9 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   }, [])
 
   const onClickRemoveTimeSignature = useCallback(() => {
-    song.conductorTrack?.removeEvents(selectedTimeSignatureEventIds)
+    removeEvents(selectedTimeSignatureEventIds)
     handleClose()
-  }, [song, selectedTimeSignatureEventIds])
+  }, [removeEvents, selectedTimeSignatureEventIds])
 
   const onClickSetLoopStart = useCallback(() => {
     setLoopBegin(tick)

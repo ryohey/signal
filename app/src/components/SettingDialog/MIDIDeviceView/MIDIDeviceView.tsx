@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
-import { useStores } from "../../../hooks/useStores"
+import { useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
 import { Alert } from "../../ui/Alert"
@@ -60,9 +59,7 @@ const SectionTitle = styled.div`
   margin: 1rem 0;
 `
 
-export const MIDIDeviceView: FC = observer(() => {
-  const { midiDeviceStore } = useStores()
-
+export const MIDIDeviceView: FC = () => {
   const {
     inputs,
     outputs,
@@ -71,7 +68,10 @@ export const MIDIDeviceView: FC = observer(() => {
     enabledInputs,
     enabledOutputs,
     isFactorySoundEnabled,
-  } = midiDeviceStore
+    setInputEnable,
+    setOutputEnable,
+    setFactorySoundEnable,
+  } = useMIDIDevice()
 
   const formatName = (device: WebMidi.MIDIPort) =>
     (device?.name ?? "") +
@@ -128,9 +128,7 @@ export const MIDIDeviceView: FC = observer(() => {
                   key={device.id}
                   device={device}
                   isSelected={isSelected}
-                  onCheck={(checked) =>
-                    midiDeviceStore.setInputEnable(device.id, checked)
-                  }
+                  onCheck={(checked) => setInputEnable(device.id, checked)}
                 />
               ))}
             </DeviceList>
@@ -144,18 +142,14 @@ export const MIDIDeviceView: FC = observer(() => {
                   <DeviceRow
                     device={factorySound}
                     isSelected={isFactorySoundEnabled}
-                    onCheck={(checked) =>
-                      (midiDeviceStore.isFactorySoundEnabled = checked)
-                    }
+                    onCheck={setFactorySoundEnable}
                   />
                   {outputDevices.map(({ device, isSelected }) => (
                     <DeviceRow
                       key={device.id}
                       device={device}
                       isSelected={isSelected}
-                      onCheck={(checked) =>
-                        midiDeviceStore.setOutputEnable(device.id, checked)
-                      }
+                      onCheck={(checked) => setOutputEnable(device.id, checked)}
                     />
                   ))}
                 </DeviceList>
@@ -166,4 +160,4 @@ export const MIDIDeviceView: FC = observer(() => {
       </DialogContent>
     </>
   )
-})
+}

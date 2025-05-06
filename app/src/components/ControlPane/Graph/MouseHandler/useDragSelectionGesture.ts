@@ -1,14 +1,18 @@
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import { transaction } from "mobx"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useTrack } from "../../../../hooks/useTrack"
 import { TrackEventOf } from "../../../../track"
 
 export const useDragSelectionGesture = () => {
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { events, updateEvents, removeRedundantEvents } =
+    useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const controlPane = useControlPane()
   const { quantizer, setSelectedEventIds } = controlPane
@@ -21,10 +25,6 @@ export const useDragSelectionGesture = () => {
       startPoint: Point,
       transform: ControlCoordTransform,
     ) {
-      if (selectedTrack === undefined) {
-        return
-      }
-
       pushHistory()
 
       if (!selectedEventIds.includes(hitEventId)) {
@@ -32,7 +32,7 @@ export const useDragSelectionGesture = () => {
         selectedEventIds = [hitEventId]
       }
 
-      const controllerEvents = selectedTrack.events
+      const controllerEvents = events
         .filter((e) => selectedEventIds.includes(e.id))
         .map((e) => ({ ...e }) as unknown as TrackEventOf<T>) // copy
 
@@ -55,7 +55,7 @@ export const useDragSelectionGesture = () => {
           const currentValue = transform.getValue(startPoint.y + delta.y)
           const deltaValue = currentValue - startValue
 
-          selectedTrack.updateEvents(
+          updateEvents(
             controllerEvents.map((ev) => ({
               id: ev.id,
               tick: Math.max(0, Math.floor(ev.tick + quantizedDeltaTick)),
@@ -69,12 +69,12 @@ export const useDragSelectionGesture = () => {
 
         onMouseUp: () => {
           // Find events with the same tick and remove it
-          const controllerEvents = selectedTrack.events.filter((e) =>
+          const controllerEvents = events.filter((e) =>
             selectedEventIds.includes(e.id),
           )
 
-          selectedTrack.transaction((it) =>
-            controllerEvents.forEach((e) => it.removeRedundantEvents(e)),
+          transaction(() =>
+            controllerEvents.forEach((e) => removeRedundantEvents(e)),
           )
         },
       })

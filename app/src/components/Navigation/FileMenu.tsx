@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
@@ -6,8 +5,8 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
-export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
-  const song = useSong()
+export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
+  const { fileHandle } = useSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
 
@@ -50,7 +49,7 @@ export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
         <HotKey>{envString.cmdOrCtrl}+O</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickSave} disabled={song.fileHandle === null}>
+      <MenuItem onClick={onClickSave} disabled={fileHandle === null}>
         <Localized name="save-song" />
         <HotKey>{envString.cmdOrCtrl}+S</HotKey>
       </MenuItem>
@@ -65,4 +64,4 @@ export const FileMenu: FC<{ close: () => void }> = observer(({ close }) => {
       </MenuItem>
     </>
   )
-})
+}

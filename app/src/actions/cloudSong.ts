@@ -1,11 +1,15 @@
-import { CloudSong, User } from "@signal-app/api"
+import { CloudSong } from "@signal-app/api"
 import { basename } from "../helpers/path"
-import { useStores } from "../hooks/useStores"
 import { songFromMidi, songToMidi } from "../midi/midiConversion"
+import {
+  cloudMidiRepository,
+  cloudSongDataRepository,
+  cloudSongRepository,
+  userRepository,
+} from "../services/repositories"
 import Song from "../song"
 
 export const useLoadSong = () => {
-  const { cloudSongDataRepository } = useStores()
   return async (cloudSong: CloudSong) => {
     const songData = await cloudSongDataRepository.get(cloudSong.songDataId)
     const song = songFromMidi(songData)
@@ -18,7 +22,6 @@ export const useLoadSong = () => {
 }
 
 export const useCreateSong = () => {
-  const { cloudSongRepository, cloudSongDataRepository } = useStores()
   return async (song: Song) => {
     const bytes = songToMidi(song)
     const songDataId = await cloudSongDataRepository.create({ data: bytes })
@@ -34,7 +37,6 @@ export const useCreateSong = () => {
 }
 
 export const useUpdateSong = () => {
-  const { cloudSongRepository, cloudSongDataRepository } = useStores()
   return async (song: Song) => {
     if (song.cloudSongId === null || song.cloudSongDataId === null) {
       throw new Error("This song is not loaded from the cloud")
@@ -55,7 +57,6 @@ export const useUpdateSong = () => {
 }
 
 export const useDeleteSong = () => {
-  const { cloudSongRepository, cloudSongDataRepository } = useStores()
   return async (song: CloudSong) => {
     await cloudSongDataRepository.delete(song.songDataId)
     await cloudSongRepository.delete(song.id)
@@ -63,7 +64,6 @@ export const useDeleteSong = () => {
 }
 
 export const useLoadSongFromExternalMidiFile = () => {
-  const { cloudMidiRepository } = useStores()
   return async (midiFileUrl: string) => {
     const id = await cloudMidiRepository.storeMidiFile(midiFileUrl)
     const data = await cloudMidiRepository.get(id)
@@ -75,8 +75,11 @@ export const useLoadSongFromExternalMidiFile = () => {
 }
 
 export const usePublishSong = () => {
-  const { cloudSongRepository, cloudSongDataRepository } = useStores()
-  return async (song: Song, user: User) => {
+  return async (song: Song) => {
+    const user = await userRepository.getCurrentUser()
+    if (user === null) {
+      throw new Error("Failed to get current user, please re-sign in")
+    }
     if (song.cloudSongId === null || song.cloudSongDataId === null) {
       throw new Error("This song is not saved in the cloud")
     }
@@ -86,7 +89,6 @@ export const usePublishSong = () => {
 }
 
 export const useUnpublishSong = () => {
-  const { cloudSongRepository, cloudSongDataRepository } = useStores()
   return async (song: Song) => {
     if (song.cloudSongId === null || song.cloudSongDataId === null) {
       throw new Error("This song is not loaded from the cloud")
