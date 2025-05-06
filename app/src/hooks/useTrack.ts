@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { TrackId } from "../track"
+import Track, { TrackId } from "../track"
 import { TrackColor } from "../track/TrackColor"
 import { TrackEvent } from "../track/TrackEvent"
 import { useMobxSelector } from "./useMobxSelector"
@@ -54,6 +54,12 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
+    ...useTrackEvents(track),
+  }
+}
+
+export function useTrackEvents(track: Track | undefined) {
+  return {
     addEvent: useCallback(
       <T extends TrackEvent>(
         event: Omit<T, "id"> & { subtype?: string },
@@ -108,9 +114,9 @@ export function useTrack(id: TrackId) {
       [track],
     ),
     updateEvent: useCallback(
-      (eventId: number, event: Partial<TrackEvent>) => {
+      <T extends TrackEvent>(id: number, obj: Partial<T>): T | null => {
         if (track) {
-          return track.updateEvent(eventId, event)
+          return track.updateEvent(id, obj)
         }
         return null
       },

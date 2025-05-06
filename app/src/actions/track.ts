@@ -7,6 +7,7 @@ import { Measure } from "../entities/measure/Measure"
 import { closedRange, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { addedSet, deletedSet } from "../helpers/set"
+import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -29,15 +30,11 @@ import Track, {
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {
-  const song = useSong()
+  const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
   return (id: number, microsecondsPerBeat: number) => {
-    const track = song.conductorTrack
-    if (track === undefined) {
-      return
-    }
     pushHistory()
-    track.updateEvent<TrackEventOf<SetTempoEvent>>(id, {
+    updateEvent<TrackEventOf<SetTempoEvent>>(id, {
       microsecondsPerBeat: microsecondsPerBeat,
     })
   }
@@ -331,22 +328,23 @@ export const useToggleAllGhostTracks = () => {
 export const useAddTimeSignature = () => {
   const song = useSong()
   const { pushHistory } = useHistory()
+  const { measures, timeSignatures, addEvent } = useConductorTrack()
 
   return (tick: number, numerator: number, denominator: number) => {
     const measureStartTick = Measure.getMeasureStart(
-      song.measures,
+      measures,
       tick,
       song.timebase,
     ).tick
 
     // prevent duplication
-    if (song.timeSignatures?.some((e) => e.tick === measureStartTick)) {
+    if (timeSignatures.some((e) => e.tick === measureStartTick)) {
       return
     }
 
     pushHistory()
 
-    song.conductorTrack?.addEvent({
+    addEvent({
       ...timeSignatureMidiEvent(0, numerator, denominator),
       tick: measureStartTick,
     })
@@ -354,12 +352,12 @@ export const useAddTimeSignature = () => {
 }
 
 export const useUpdateTimeSignature = () => {
-  const song = useSong()
+  const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
 
   return (id: number, numerator: number, denominator: number) => {
     pushHistory()
-    song.conductorTrack?.updateEvent(id, {
+    updateEvent(id, {
       numerator,
       denominator,
     })

@@ -5,20 +5,20 @@ import { MouseGesture } from "../../../gesture/MouseGesture"
 import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
-import { useSong } from "../../../hooks/useSong"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { setTempoMidiEvent } from "../../../midi/MidiEvent"
-import { isSetTempoEvent, UNASSIGNED_TRACK_ID } from "../../../track"
+import { isSetTempoEvent } from "../../../track"
 
 export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
-  const song = useSong()
   const { pushHistory } = useHistory()
   const { quantizer } = useTempoEditor()
+  const { id: conductorTrackId, createOrUpdate } = useConductorTrack()
   const updateEventsInRange = useUpdateEventsInRange(
-    song.conductorTrack?.id ?? UNASSIGNED_TRACK_ID,
+    conductorTrackId,
     quantizer,
     isSetTempoEvent,
     (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v)),
@@ -26,12 +26,6 @@ export const usePencilGesture = (): MouseGesture<
 
   return {
     onMouseDown(e, startPoint, transform) {
-      const { conductorTrack: track } = song
-
-      if (track === undefined) {
-        return
-      }
-
       pushHistory()
 
       const startClientPos = getClientPos(e)
@@ -42,7 +36,7 @@ export const usePencilGesture = (): MouseGesture<
         ...setTempoMidiEvent(0, Math.round(bpm)),
         tick: quantizer.round(pos.tick),
       }
-      track.createOrUpdate(event)
+      createOrUpdate(event)
 
       let lastTick = pos.tick
       let lastValue = pos.bpm
