@@ -1,7 +1,11 @@
-import { toJS } from "mobx"
+import { isEqual } from "lodash"
 import { useCallback, useMemo } from "react"
 import { Measure } from "../entities/measure/Measure"
-import { isTimeSignatureEvent, UNASSIGNED_TRACK_ID } from "../track"
+import {
+  isSetTempoEvent,
+  isTimeSignatureEvent,
+  UNASSIGNED_TRACK_ID,
+} from "../track"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
@@ -13,13 +17,10 @@ export function useConductorTrack() {
     () => tracks.find((t) => t.isConductorTrack),
     [tracks],
   )
-  const events = useMobxSelector(
-    () => conductorTrack?.events ?? [],
+  const timeSignatures = useMobxSelector(
+    () => (conductorTrack?.events ?? []).filter(isTimeSignatureEvent),
     [conductorTrack],
-  )
-  const timeSignatures = useMemo(
-    () => events.filter(isTimeSignatureEvent),
-    [events],
+    isEqual,
   )
   const measures = useMemo(
     () => Measure.fromTimeSignatures(timeSignatures, timebase),
@@ -40,8 +41,12 @@ export function useConductorTrack() {
         [conductorTrack, position],
       )
     },
-    get events() {
-      return toJS(events)
+    get tempoEvents() {
+      return useMobxSelector(
+        () => (conductorTrack?.events ?? []).filter(isSetTempoEvent),
+        [conductorTrack],
+        isEqual,
+      )
     },
     timeSignatures,
     measures,

@@ -14,11 +14,11 @@ export function useTempoItems() {
     tempoEditorStore: { tickScrollStore },
   } = useStores()
   const { transform } = useTempoEditor()
-  const { events } = useConductorTrack()
+  const { tempoEvents } = useConductorTrack()
   const { canvasWidth, scrollLeft } = useTickScroll(tickScrollStore)
   const items = useMemo(
-    () => transformEvents(events, transform, canvasWidth + scrollLeft),
-    [events, transform, canvasWidth, scrollLeft],
+    () => transformEvents(tempoEvents, transform, canvasWidth + scrollLeft),
+    [tempoEvents, transform, canvasWidth, scrollLeft],
   )
 
   // draggable hit areas for each tempo changes

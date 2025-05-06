@@ -1,16 +1,16 @@
+import { SetTempoEvent } from "midifile-ts"
 import { TempoCoordTransform } from "../../entities/transform/TempoCoordTransform"
-import { isSetTempoEvent, TrackEvent } from "../../track"
+import { TrackEventOf } from "../../track"
 import { TempoGraphItem } from "./TempoGraphItem"
 
 export const transformEvents = (
-  events: readonly TrackEvent[],
+  events: TrackEventOf<SetTempoEvent>[],
   transform: TempoCoordTransform,
   maxX: number,
 ): TempoGraphItem[] => {
   // まず位置だけ計算する
   // Calculate only position
   const items = events
-    .filter(isSetTempoEvent)
     .sort((a, b) => a.tick - b.tick)
     .map((e) => {
       const bpm = (60 * 1000000) / e.microsecondsPerBeat
