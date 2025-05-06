@@ -6,7 +6,6 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
 import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
-import { useStores } from "../../hooks/useStores"
 import { Localized, useLocalization } from "../../localize/useLocalization"
 import { cloudSongRepository } from "../../services/repositories"
 import {
@@ -22,7 +21,6 @@ import { LinkShare } from "../ui/LinkShare"
 type PublishState = "publishable" | "published" | "notPublishable"
 
 export const PublishDialog: FC = () => {
-  const { songStore } = useStores()
   const { openPublishDialog: open, setOpenPublishDialog } = useRootView()
   const { cloudSongId, getSong } = useSong()
   const publishSong = usePublishSong()
