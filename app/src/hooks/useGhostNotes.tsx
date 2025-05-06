@@ -2,21 +2,14 @@ import { useCallback, useMemo } from "react"
 import { Range } from "../entities/geometry/Range"
 import { isEventOverlapRange } from "../helpers/filterEvents"
 import { isNoteEvent, NoteEvent, TrackId } from "../track"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
-import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
+import { useTrack } from "./useTrack"
 
 export function useGhostNotes(trackId: TrackId) {
   const { transform } = usePianoRoll()
   const { canvasWidth, scrollLeft, transform: tickTransform } = useTickScroll()
-  const song = useSong()
-  const track = useMobxSelector(() => song.getTrack(trackId), [song, trackId])
-  const events = useMobxSelector(() => track?.events ?? [], [track])
-  const isRhythmTrack = useMobxSelector(
-    () => track?.isRhythmTrack ?? false,
-    [track],
-  )
+  const { events, isRhythmTrack } = useTrack(trackId)
 
   const noteEvents = useMemo(() => events.filter(isNoteEvent), [events])
 
