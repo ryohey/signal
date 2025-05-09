@@ -17,6 +17,7 @@ import { HistoryProvider } from "../../hooks/useHistory"
 import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
+import { TempoEditorProvider } from "../../hooks/useTempoEditor"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
 import { ProgressDialog } from "../Dialog/ProgressDialog"
@@ -48,14 +49,16 @@ export function App() {
                               <AuthProvider>
                                 <ControlPaneProvider>
                                   <ArrangeViewProvider>
-                                    <HistoryProvider>
-                                      <GlobalKeyboardShortcut />
-                                      <GlobalCSS />
-                                      {isRunningInElectron() && (
-                                        <ElectronCallbackHandler />
-                                      )}
-                                      <RootView />
-                                    </HistoryProvider>
+                                    <TempoEditorProvider>
+                                      <HistoryProvider>
+                                        <GlobalKeyboardShortcut />
+                                        <GlobalCSS />
+                                        {isRunningInElectron() && (
+                                          <ElectronCallbackHandler />
+                                        )}
+                                        <RootView />
+                                      </HistoryProvider>
+                                    </TempoEditorProvider>
                                   </ArrangeViewProvider>
                                 </ControlPaneProvider>
                               </AuthProvider>

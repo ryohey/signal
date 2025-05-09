@@ -13,7 +13,6 @@ import { registerReactions } from "./reactions"
 import RootViewStore from "./RootViewStore"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
-import TempoEditorStore from "./TempoEditorStore"
 import { TrackMuteStore } from "./TrackMuteStore"
 
 // we use any for now. related: https://github.com/Microsoft/TypeScript/issues/1897
@@ -31,7 +30,6 @@ export default class RootStore {
   readonly trackMuteStore = new TrackMuteStore()
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
-  readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly player: Player
   readonly synth: SoundFontSynth
@@ -52,7 +50,6 @@ export default class RootStore {
     this.player = new Player(this.synthGroup, eventSource)
 
     this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
-    this.tempoEditorStore = new TempoEditorStore(this.songStore, this.player)
     this.soundFontStore = new SoundFontStore(this.synth)
 
     this.midiRecorder = new MIDIRecorder(
@@ -69,7 +66,6 @@ export default class RootStore {
     }
 
     this.pianoRollStore.setUpAutorun()
-    this.tempoEditorStore.setUpAutorun()
 
     registerReactions(this)
   }

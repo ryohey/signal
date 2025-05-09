@@ -18,8 +18,9 @@ const Wrapper = styled.div`
 `
 
 export const TempoGraph: FC = () => {
-  const { transform, contentWidth, setCanvasHeight } = useTempoEditor()
+  const { transform, setCanvasHeight } = useTempoEditor()
   const {
+    contentWidth,
     scrollLeft: _scrollLeft,
     setCanvasWidth,
     setScrollLeftInPixels,
