@@ -90,7 +90,7 @@ export const GlobalKeyboardShortcut: FC = () => {
             toast.error((e as Error).message)
           }
         }}
-        accept="audio/midi"
+        accept=".mid,audio/midi"
       ></FileInput>
       <KeyboardShortcut
         actions={[
