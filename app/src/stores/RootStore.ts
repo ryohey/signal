@@ -16,7 +16,6 @@ import ArrangeViewStore, {
 import { AuthStore } from "./AuthStore"
 import { CloudFileStore } from "./CloudFileStore"
 import { ControlStore, SerializedControlStore } from "./ControlStore"
-import { ExportStore } from "./ExportStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
@@ -45,7 +44,6 @@ export default class RootStore {
   readonly arrangeViewStore: ArrangeViewStore
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
-  readonly exportStore = new ExportStore()
   readonly authStore = new AuthStore(userRepository)
   readonly cloudFileStore = new CloudFileStore(
     this.songStore,

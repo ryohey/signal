@@ -1,25 +1,50 @@
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
-import { useCallback } from "react"
+import { makeObservable, observable } from "mobx"
+import { createContext, useCallback, useContext } from "react"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
-import { useSong } from "../hooks/useSong"
 import { useLocalization } from "../localize/useLocalization"
 import Song from "../song"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
+import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
+class ExportStore {
+  openExportProgressDialog = false
+  progress = 0
+  isCanceled = false
+
+  constructor() {
+    makeObservable(this, {
+      openExportProgressDialog: observable,
+      progress: observable,
+    })
+  }
+}
+
+const ExportStoreContext = createContext<ExportStore>(null!)
+
+export function ExportProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ExportStoreContext.Provider value={new ExportStore()}>
+      {children}
+    </ExportStoreContext.Provider>
+  )
+}
+
 export function useExport() {
-  const { exportStore } = useStores()
+  const exportStore = useContext(ExportStoreContext)
 
   return {
     get openExportProgressDialog() {
-      return useMobxStore(
-        ({ exportStore }) => exportStore.openExportProgressDialog,
+      return useMobxSelector(
+        () => exportStore.openExportProgressDialog,
+        [exportStore],
       )
     },
     get progress() {
-      return useMobxStore(({ exportStore }) => exportStore.progress)
+      return useMobxSelector(() => exportStore.progress, [exportStore])
     },
     get exportSong() {
       return useExportSong()
@@ -40,7 +65,8 @@ const waitForAnimationFrame = () =>
   new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
 const useExportSong = () => {
-  const { synth, exportStore } = useStores()
+  const exportStore = useContext(ExportStoreContext)
+  const { synth } = useStores()
   const { updateEndOfSong, getSong, timebase } = useSong()
   const localized = useLocalization()
   const dialog = useDialog()

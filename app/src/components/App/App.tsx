@@ -8,6 +8,7 @@ import React from "react"
 import { HelmetProvider } from "react-helmet-async"
 import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
+import { ExportProvider } from "../../hooks/useExport"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
@@ -39,12 +40,14 @@ export function App() {
                       <LocalizationProvider>
                         <HistoryProvider>
                           <RouterProvider>
-                            <GlobalKeyboardShortcut />
-                            <GlobalCSS />
-                            {isRunningInElectron() && (
-                              <ElectronCallbackHandler />
-                            )}
-                            <RootView />
+                            <ExportProvider>
+                              <GlobalKeyboardShortcut />
+                              <GlobalCSS />
+                              {isRunningInElectron() && (
+                                <ElectronCallbackHandler />
+                              )}
+                              <RootView />
+                            </ExportProvider>
                           </RouterProvider>
                         </HistoryProvider>
                       </LocalizationProvider>
