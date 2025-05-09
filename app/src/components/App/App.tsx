@@ -8,6 +8,7 @@ import React from "react"
 import { HelmetProvider } from "react-helmet-async"
 import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
+import { AuthProvider } from "../../hooks/useAuth"
 import { CloudFileProvider } from "../../hooks/useCloudFile"
 import { ExportProvider } from "../../hooks/useExport"
 import { HistoryProvider } from "../../hooks/useHistory"
@@ -43,12 +44,14 @@ export function App() {
                           <RouterProvider>
                             <ExportProvider>
                               <CloudFileProvider>
-                                <GlobalKeyboardShortcut />
-                                <GlobalCSS />
-                                {isRunningInElectron() && (
-                                  <ElectronCallbackHandler />
-                                )}
-                                <RootView />
+                                <AuthProvider>
+                                  <GlobalKeyboardShortcut />
+                                  <GlobalCSS />
+                                  {isRunningInElectron() && (
+                                    <ElectronCallbackHandler />
+                                  )}
+                                  <RootView />
+                                </AuthProvider>
                               </CloudFileProvider>
                             </ExportProvider>
                           </RouterProvider>

@@ -4,12 +4,10 @@ import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
-import { userRepository } from "../services/repositories"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "./ArrangeViewStore"
-import { AuthStore } from "./AuthStore"
 import { ControlStore, SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
@@ -39,7 +37,6 @@ export default class RootStore {
   readonly arrangeViewStore: ArrangeViewStore
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
-  readonly authStore = new AuthStore(userRepository)
   readonly player: Player
   readonly synth: SoundFontSynth
   readonly metronomeSynth: SoundFontSynth
