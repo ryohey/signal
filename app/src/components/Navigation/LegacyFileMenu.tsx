@@ -50,7 +50,7 @@ export const LegacyFileMenu: FC<{ close: () => void }> = ({ close }) => {
 
       <MenuDivider />
 
-      <FileInput onChange={onClickOpen} accept="audio/midi">
+      <FileInput onChange={onClickOpen} accept=".mid,audio/midi">
         <MenuItem>
           <Localized name="open-song" />
         </MenuItem>
