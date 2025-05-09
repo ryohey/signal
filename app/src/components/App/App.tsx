@@ -10,6 +10,7 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { AuthProvider } from "../../hooks/useAuth"
 import { CloudFileProvider } from "../../hooks/useCloudFile"
+import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { ExportProvider } from "../../hooks/useExport"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { RouterProvider } from "../../hooks/useRouter"
@@ -45,12 +46,14 @@ export function App() {
                             <ExportProvider>
                               <CloudFileProvider>
                                 <AuthProvider>
-                                  <GlobalKeyboardShortcut />
-                                  <GlobalCSS />
-                                  {isRunningInElectron() && (
-                                    <ElectronCallbackHandler />
-                                  )}
-                                  <RootView />
+                                  <ControlPaneProvider>
+                                    <GlobalKeyboardShortcut />
+                                    <GlobalCSS />
+                                    {isRunningInElectron() && (
+                                      <ElectronCallbackHandler />
+                                    )}
+                                    <RootView />
+                                  </ControlPaneProvider>
                                 </AuthProvider>
                               </CloudFileProvider>
                             </ExportProvider>

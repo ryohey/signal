@@ -8,7 +8,7 @@ import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "./ArrangeViewStore"
-import { ControlStore, SerializedControlStore } from "./ControlStore"
+import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
@@ -33,7 +33,6 @@ export default class RootStore {
   readonly trackMuteStore = new TrackMuteStore()
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
-  readonly controlStore: ControlStore
   readonly arrangeViewStore: ArrangeViewStore
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
@@ -58,7 +57,6 @@ export default class RootStore {
     this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
     this.arrangeViewStore = new ArrangeViewStore(this.songStore, this.player)
     this.tempoEditorStore = new TempoEditorStore(this.songStore, this.player)
-    this.controlStore = new ControlStore()
     this.soundFontStore = new SoundFontStore(this.synth)
 
     this.midiRecorder = new MIDIRecorder(
