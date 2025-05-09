@@ -1,5 +1,4 @@
 import { Player, SoundFontSynth } from "@signal-app/player"
-import { deserialize, serialize } from "serializr"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
@@ -10,7 +9,6 @@ import {
   cloudSongRepository,
   userRepository,
 } from "../services/repositories"
-import Song from "../song"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
@@ -46,7 +44,7 @@ export default class RootStore {
   readonly router = new Router()
   readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
-  readonly historyStore = new HistoryStore(this)
+  readonly historyStore = new HistoryStore()
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
   readonly controlStore: ControlStore
@@ -104,23 +102,6 @@ export default class RootStore {
     this.tempoEditorStore.setUpAutorun()
 
     registerReactions(this)
-  }
-
-  serialize(): SerializedRootStore {
-    return {
-      song: serialize(this.songStore.song),
-      pianoRollStore: this.pianoRollStore.serialize(),
-      controlStore: this.controlStore.serialize(),
-      arrangeViewStore: this.arrangeViewStore.serialize(),
-    }
-  }
-
-  restore(serializedState: SerializedRootStore) {
-    const song = deserialize(Song, serializedState.song)
-    this.songStore.song = song
-    this.pianoRollStore.restore(serializedState.pianoRollStore)
-    this.controlStore.restore(serializedState.controlStore)
-    this.arrangeViewStore.restore(serializedState.arrangeViewStore)
   }
 
   async init() {
