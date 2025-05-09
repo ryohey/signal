@@ -11,7 +11,7 @@ import { TrackEventOf } from "../../../../track"
 
 export const useDragSelectionGesture = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { events, updateEvents, removeRedundantEvents } =
+  const { getEvents, updateEvents, removeRedundantEvents } =
     useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const controlPane = useControlPane()
@@ -32,7 +32,7 @@ export const useDragSelectionGesture = () => {
         selectedEventIds = [hitEventId]
       }
 
-      const controllerEvents = events
+      const controllerEvents = getEvents()
         .filter((e) => selectedEventIds.includes(e.id))
         .map((e) => ({ ...e }) as unknown as TrackEventOf<T>) // copy
 
@@ -69,7 +69,7 @@ export const useDragSelectionGesture = () => {
 
         onMouseUp: () => {
           // Find events with the same tick and remove it
-          const controllerEvents = events.filter((e) =>
+          const controllerEvents = getEvents().filter((e) =>
             selectedEventIds.includes(e.id),
           )
 

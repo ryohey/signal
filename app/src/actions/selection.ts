@@ -235,7 +235,7 @@ const sortedNotes = (notes: NoteEvent[]): NoteEvent[] =>
 
 const useSelectNeighborNote = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const { events, channel } = useTrack(selectedTrackId)
+  const { getEvents, channel } = useTrack(selectedTrackId)
   const { timebase } = useSong()
   const selectNote = useSelectNote()
   const startNote = useStartNote()
@@ -246,7 +246,7 @@ const useSelectNeighborNote = () => {
       return
     }
 
-    const allNotes = events.filter(isNoteEvent)
+    const allNotes = getEvents().filter(isNoteEvent)
     const selectedNotes = sortedNotes(
       selectedNoteIds
         .map((id) => allNotes.find((n) => n.id === id))
@@ -317,11 +317,15 @@ export const useQuantizeSelectedNotes = () => {
 
 export const useSelectAllNotes = () => {
   const { selectedTrackId, setSelectedNoteIds } = usePianoRoll()
-  const { events } = useTrack(selectedTrackId)
+  const { getEvents } = useTrack(selectedTrackId)
   const { setSelectedEventIds } = useControlPane()
 
   return useCallback(() => {
-    setSelectedNoteIds(events.filter(isNoteEvent).map((note) => note.id))
+    setSelectedNoteIds(
+      getEvents()
+        .filter(isNoteEvent)
+        .map((note) => note.id),
+    )
     setSelectedEventIds([])
-  }, [events, setSelectedNoteIds, setSelectedEventIds])
+  }, [getEvents, setSelectedNoteIds, setSelectedEventIds])
 }

@@ -84,11 +84,7 @@ export const useCreateEvent = () => {
 
 export const useUpdateVelocitiesInRange = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const {
-    getEventById,
-    events: trackEvents,
-    updateEvents,
-  } = useTrack(selectedTrackId)
+  const { getEventById, getEvents, updateEvents } = useTrack(selectedTrackId)
 
   return (
     startTick: number,
@@ -116,7 +112,7 @@ export const useUpdateVelocitiesInRange = () => {
     const notes =
       selectedNoteIds.length > 0
         ? selectedNoteIds.map((id) => getEventById(id) as NoteEvent)
-        : trackEvents.filter(isNoteEvent)
+        : getEvents().filter(isNoteEvent)
 
     const events = notes.filter(isEventInRange(Range.create(minTick, maxTick)))
 
@@ -138,7 +134,7 @@ export const useUpdateEventsInRange = (
   filterEvent: (e: TrackEvent) => boolean,
   createEvent: (value: number) => AnyEvent,
 ) => {
-  const { events: trackEvents, removeEvents, addEvents } = useTrack(trackId)
+  const { getEvents, removeEvents, addEvents } = useTrack(trackId)
 
   return (
     startValue: number,
@@ -172,13 +168,15 @@ export const useUpdateEventsInRange = (
             )
 
     // Delete events in the dragged area
-    const events = trackEvents.filter(filterEvent).filter(
-      (e) =>
-        // to prevent remove the event created previously, do not remove the event placed at startTick
-        e.tick !== startTick &&
-        e.tick >= Math.min(minTick, _startTick) &&
-        e.tick <= Math.max(maxTick, _endTick),
-    )
+    const events = getEvents()
+      .filter(filterEvent)
+      .filter(
+        (e) =>
+          // to prevent remove the event created previously, do not remove the event placed at startTick
+          e.tick !== startTick &&
+          e.tick >= Math.min(minTick, _startTick) &&
+          e.tick <= Math.max(maxTick, _endTick),
+      )
 
     transaction(() => {
       removeEvents(events.map((e) => e.id))
