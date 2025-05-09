@@ -8,6 +8,7 @@ import React from "react"
 import { HelmetProvider } from "react-helmet-async"
 import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
+import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
 import { CloudFileProvider } from "../../hooks/useCloudFile"
 import { ControlPaneProvider } from "../../hooks/useControlPane"
@@ -41,24 +42,26 @@ export function App() {
                   <DialogProvider component={ActionDialog}>
                     <ProgressProvider component={ProgressDialog}>
                       <LocalizationProvider>
-                        <HistoryProvider>
-                          <RouterProvider>
-                            <ExportProvider>
-                              <CloudFileProvider>
-                                <AuthProvider>
-                                  <ControlPaneProvider>
-                                    <GlobalKeyboardShortcut />
-                                    <GlobalCSS />
-                                    {isRunningInElectron() && (
-                                      <ElectronCallbackHandler />
-                                    )}
-                                    <RootView />
-                                  </ControlPaneProvider>
-                                </AuthProvider>
-                              </CloudFileProvider>
-                            </ExportProvider>
-                          </RouterProvider>
-                        </HistoryProvider>
+                        <RouterProvider>
+                          <ExportProvider>
+                            <CloudFileProvider>
+                              <AuthProvider>
+                                <ControlPaneProvider>
+                                  <ArrangeViewProvider>
+                                    <HistoryProvider>
+                                      <GlobalKeyboardShortcut />
+                                      <GlobalCSS />
+                                      {isRunningInElectron() && (
+                                        <ElectronCallbackHandler />
+                                      )}
+                                      <RootView />
+                                    </HistoryProvider>
+                                  </ArrangeViewProvider>
+                                </ControlPaneProvider>
+                              </AuthProvider>
+                            </CloudFileProvider>
+                          </ExportProvider>
+                        </RouterProvider>
                       </LocalizationProvider>
                     </ProgressProvider>
                   </DialogProvider>

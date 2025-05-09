@@ -3,6 +3,7 @@ import { createContext, useContext } from "react"
 import { deserialize } from "serializr"
 import Song from "../song"
 import { SerializedRootStore } from "../stores/RootStore"
+import { useArrangeView } from "./useArrangeView"
 import { useControlPane } from "./useControlPane"
 import { useMobxSelector } from "./useMobxSelector"
 import { useStores } from "./useStores"
@@ -53,28 +54,30 @@ export function useHistory() {
 }
 
 function useSerializeState() {
-  const { songStore, pianoRollStore, arrangeViewStore } = useStores()
+  const { songStore, pianoRollStore } = useStores()
   const { serializeState: serializeControlPane } = useControlPane()
+  const { serializeState: serializeArrangeView } = useArrangeView()
 
   return () =>
     ({
       song: songStore.serialize(),
       pianoRollStore: pianoRollStore.serialize(),
       controlStore: serializeControlPane(),
-      arrangeViewStore: arrangeViewStore.serialize(),
+      arrangeViewStore: serializeArrangeView(),
     }) as SerializedRootStore
 }
 
 function useRestoreState() {
-  const { songStore, pianoRollStore, arrangeViewStore } = useStores()
+  const { songStore, pianoRollStore } = useStores()
   const { restoreState: restoreControlPane } = useControlPane()
+  const { restoreState: restoreArrangeView } = useArrangeView()
 
   return (serializedState: SerializedRootStore) => {
     const song = deserialize(Song, serializedState.song)
     songStore.song = song
     pianoRollStore.restore(serializedState.pianoRollStore)
     restoreControlPane(serializedState.controlStore)
-    arrangeViewStore.restore(serializedState.arrangeViewStore)
+    restoreArrangeView(serializedState.arrangeViewStore)
   }
 }
 

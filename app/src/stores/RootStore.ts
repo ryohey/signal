@@ -5,9 +5,7 @@ import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
 import { UNASSIGNED_TRACK_ID } from "../track"
-import ArrangeViewStore, {
-  SerializedArrangeViewStore,
-} from "./ArrangeViewStore"
+import { SerializedArrangeViewStore } from "./ArrangeViewStore"
 import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
@@ -33,7 +31,6 @@ export default class RootStore {
   readonly trackMuteStore = new TrackMuteStore()
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
-  readonly arrangeViewStore: ArrangeViewStore
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly player: Player
@@ -55,7 +52,6 @@ export default class RootStore {
     this.player = new Player(this.synthGroup, eventSource)
 
     this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
-    this.arrangeViewStore = new ArrangeViewStore(this.songStore, this.player)
     this.tempoEditorStore = new TempoEditorStore(this.songStore, this.player)
     this.soundFontStore = new SoundFontStore(this.synth)
 
@@ -73,7 +69,6 @@ export default class RootStore {
     }
 
     this.pianoRollStore.setUpAutorun()
-    this.arrangeViewStore.setUpAutorun()
     this.tempoEditorStore.setUpAutorun()
 
     registerReactions(this)
