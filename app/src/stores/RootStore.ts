@@ -65,8 +65,6 @@ export default class RootStore {
       this.midiRecorder.onMessage(e)
     }
 
-    this.pianoRollStore.setUpAutorun()
-
     registerReactions(this)
   }
 

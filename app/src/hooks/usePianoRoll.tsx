@@ -1,18 +1,54 @@
-import { useCallback } from "react"
+import { createContext, useCallback, useContext, useEffect } from "react"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Point } from "../entities/geometry/Point"
 import { Rect } from "../entities/geometry/Rect"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
-import { PianoNoteItem, PianoRollMouseMode } from "../stores/PianoRollStore"
+import PianoRollStore, {
+  PianoNoteItem,
+  PianoRollMouseMode,
+  SerializedPianoRollStore,
+} from "../stores/PianoRollStore"
 import { TrackId } from "../track"
-import { useKeyScroll } from "./useKeyScroll"
-import { useMobxStore } from "./useMobxSelector"
+import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
+import { useMobxSelector } from "./useMobxSelector"
+import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
-import { useTickScroll } from "./useTickScroll"
+import { TickScrollProvider, useTickScroll } from "./useTickScroll"
+
+const PianoRollStoreContext = createContext<PianoRollStore>(null!)
+
+export function PianoRollProvider({ children }: { children: React.ReactNode }) {
+  const { pianoRollStore } = useStores()
+
+  useEffect(() => {
+    pianoRollStore.setUpAutorun()
+  }, [pianoRollStore])
+
+  return (
+    <PianoRollStoreContext.Provider value={pianoRollStore}>
+      {children}
+    </PianoRollStoreContext.Provider>
+  )
+}
+
+export function PianoRollScope({ children }: { children: React.ReactNode }) {
+  const { tickScrollStore, keyScrollStore, rulerStore } = useContext(
+    PianoRollStoreContext,
+  )
+
+  return (
+    <TickScrollProvider value={tickScrollStore}>
+      <KeyScrollProvider value={keyScrollStore}>
+        <RulerProvider value={rulerStore}>{children}</RulerProvider>
+      </KeyScrollProvider>
+    </TickScrollProvider>
+  )
+}
 
 export function usePianoRoll() {
-  const { pianoRollStore, songStore } = useStores()
+  const pianoRollStore = useContext(PianoRollStoreContext)
+  const { songStore } = useStores()
   const { tickScrollStore, keyScrollStore } = pianoRollStore
   const { setScrollLeftInTicks, setScrollLeftInPixels } =
     useTickScroll(tickScrollStore)
@@ -20,127 +56,168 @@ export function usePianoRoll() {
 
   return {
     get currentPan() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentPan)
+      return useMobxSelector(() => pianoRollStore.currentPan, [pianoRollStore])
     },
     get currentVolume() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentVolume)
+      return useMobxSelector(
+        () => pianoRollStore.currentVolume,
+        [pianoRollStore],
+      )
     },
     get enabledQuantizer() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.enabledQuantizer,
+      return useMobxSelector(
+        () => pianoRollStore.enabledQuantizer,
+        [pianoRollStore],
       )
     },
     get notes() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.notes)
+      return useMobxSelector(() => pianoRollStore.notes, [pianoRollStore])
     },
     get notGhostTrackIds() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.notGhostTrackIds,
+      return useMobxSelector(
+        () => pianoRollStore.notGhostTrackIds,
+        [pianoRollStore],
       )
     },
     get rulerStore() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.rulerStore)
+      return useMobxSelector(() => pianoRollStore.rulerStore, [pianoRollStore])
     },
     get mouseMode() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.mouseMode)
+      return useMobxSelector(() => pianoRollStore.mouseMode, [pianoRollStore])
     },
     get keySignature() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.keySignature)
+      return useMobxSelector(
+        () => pianoRollStore.keySignature,
+        [pianoRollStore],
+      )
     },
     get selection() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.selection)
+      return useMobxSelector(() => pianoRollStore.selection, [pianoRollStore])
     },
     get selectedTrack() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.selectedTrack)
+      return useMobxSelector(
+        () => pianoRollStore.selectedTrack,
+        [pianoRollStore],
+      )
     },
     get selectedTrackId() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.selectedTrackId,
+      return useMobxSelector(
+        () => pianoRollStore.selectedTrackId,
+        [pianoRollStore],
       )
     },
     get selectedTrackIndex() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.selectedTrackIndex,
+      return useMobxSelector(
+        () => pianoRollStore.selectedTrackIndex,
+        [pianoRollStore],
       )
     },
     get selectedNoteIds() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.selectedNoteIds,
+      return useMobxSelector(
+        () => pianoRollStore.selectedNoteIds,
+        [pianoRollStore],
       )
     },
     get transform() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.transform)
+      return useMobxSelector(() => pianoRollStore.transform, [pianoRollStore])
     },
     get windowedEvents() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.windowedEvents)
+      return useMobxSelector(
+        () => pianoRollStore.windowedEvents,
+        [pianoRollStore],
+      )
     },
     get quantizer() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.quantizer)
+      return useMobxSelector(() => pianoRollStore.quantizer, [pianoRollStore])
     },
     get quantize() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.quantize)
+      return useMobxSelector(() => pianoRollStore.quantize, [pianoRollStore])
     },
     get notesCursor() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.notesCursor)
+      return useMobxSelector(() => pianoRollStore.notesCursor, [pianoRollStore])
     },
     get selectionBounds() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.selectionBounds,
+      return useMobxSelector(
+        () => pianoRollStore.selectionBounds,
+        [pianoRollStore],
       )
     },
     get showTrackList() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.showTrackList)
+      return useMobxSelector(
+        () => pianoRollStore.showTrackList,
+        [pianoRollStore],
+      )
     },
     get showEventList() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.showEventList)
+      return useMobxSelector(
+        () => pianoRollStore.showEventList,
+        [pianoRollStore],
+      )
     },
     get ghostTrackIds() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.ghostTrackIds)
+      return useMobxSelector(
+        () => pianoRollStore.ghostTrackIds,
+        [pianoRollStore],
+      )
     },
     get previewingNoteNumbers() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.previewingNoteNumbers,
+      return useMobxSelector(
+        () => pianoRollStore.previewingNoteNumbers,
+        [pianoRollStore],
       )
     },
     get openTransposeDialog() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.openTransposeDialog,
+      return useMobxSelector(
+        () => pianoRollStore.openTransposeDialog,
+        [pianoRollStore],
       )
     },
     get openVelocityDialog() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.openVelocityDialog,
+      return useMobxSelector(
+        () => pianoRollStore.openVelocityDialog,
+        [pianoRollStore],
       )
     },
     get newNoteVelocity() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.newNoteVelocity,
+      return useMobxSelector(
+        () => pianoRollStore.newNoteVelocity,
+        [pianoRollStore],
       )
     },
     get lastNoteDuration() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.lastNoteDuration,
+      return useMobxSelector(
+        () => pianoRollStore.lastNoteDuration,
+        [pianoRollStore],
       )
     },
     get isQuantizeEnabled() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.isQuantizeEnabled,
+      return useMobxSelector(
+        () => pianoRollStore.isQuantizeEnabled,
+        [pianoRollStore],
       )
     },
     get currentMBTTime() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.currentMBTTime)
+      return useMobxSelector(
+        () => pianoRollStore.currentMBTTime,
+        [pianoRollStore],
+      )
     },
     get controlCursor() {
-      return useMobxStore(({ pianoRollStore }) => pianoRollStore.controlCursor)
+      return useMobxSelector(
+        () => pianoRollStore.controlCursor,
+        [pianoRollStore],
+      )
     },
     get instrumentBrowserSetting() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.instrumentBrowserSetting,
+      return useMobxSelector(
+        () => pianoRollStore.instrumentBrowserSetting,
+        [pianoRollStore],
       )
     },
     get openInstrumentBrowser() {
-      return useMobxStore(
-        ({ pianoRollStore }) => pianoRollStore.openInstrumentBrowser,
+      return useMobxSelector(
+        () => pianoRollStore.openInstrumentBrowser,
+        [pianoRollStore],
       )
     },
     resetSelection: useCallback(() => {
@@ -227,6 +304,15 @@ export function usePianoRoll() {
         pianoRollStore.notes.filter((n) => Rect.containsPoint(n, local)),
       [pianoRollStore],
     ),
+    getSelection: useCallback(() => pianoRollStore.selection, [pianoRollStore]),
+    getSelectedTrack: useCallback(
+      () => pianoRollStore.selectedTrack,
+      [pianoRollStore],
+    ),
+    getSelectedNoteIds: useCallback(
+      () => pianoRollStore.selectedNoteIds,
+      [pianoRollStore],
+    ),
     setLastNoteDuration: useCallback(
       (duration: number | null) => (pianoRollStore.lastNoteDuration = duration),
       [pianoRollStore],
@@ -256,6 +342,14 @@ export function usePianoRoll() {
     ),
     setOpenInstrumentBrowser: useCallback(
       (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
+      [pianoRollStore],
+    ),
+    serializeState: useCallback(
+      () => pianoRollStore.serialize(),
+      [pianoRollStore],
+    ),
+    restoreState: useCallback(
+      (state: SerializedPianoRollStore) => pianoRollStore.restore(state),
       [pianoRollStore],
     ),
   }

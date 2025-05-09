@@ -1,11 +1,7 @@
 import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
-import { KeyScrollProvider } from "../../hooks/useKeyScroll"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
-import { RulerProvider } from "../../hooks/useRuler"
-import { useStores } from "../../hooks/useStores"
-import { TickScrollProvider } from "../../hooks/useTickScroll"
+import { PianoRollScope, usePianoRoll } from "../../hooks/usePianoRoll"
 import EventList from "../EventEditor/EventList"
 import { PianoRollKeyboardShortcut } from "../KeyboardShortcut/PianoRollKeyboardShortcut"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
@@ -67,23 +63,15 @@ const PianoRollPanes: FC = () => {
 }
 
 export const PianoRollEditor: FC = () => {
-  const {
-    pianoRollStore: { tickScrollStore, keyScrollStore, rulerStore },
-  } = useStores()
-
   return (
-    <TickScrollProvider value={tickScrollStore}>
-      <KeyScrollProvider value={keyScrollStore}>
-        <RulerProvider value={rulerStore}>
-          <ColumnContainer>
-            <PianoRollKeyboardShortcut />
-            <PianoRollToolbar />
-            <PianoRollPanes />
-          </ColumnContainer>
-          <PianoRollTransposeDialog />
-          <PianoRollVelocityDialog />
-        </RulerProvider>
-      </KeyScrollProvider>
-    </TickScrollProvider>
+    <PianoRollScope>
+      <ColumnContainer>
+        <PianoRollKeyboardShortcut />
+        <PianoRollToolbar />
+        <PianoRollPanes />
+      </ColumnContainer>
+      <PianoRollTransposeDialog />
+      <PianoRollVelocityDialog />
+    </PianoRollScope>
   )
 }

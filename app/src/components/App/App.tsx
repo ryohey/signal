@@ -14,6 +14,7 @@ import { CloudFileProvider } from "../../hooks/useCloudFile"
 import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { ExportProvider } from "../../hooks/useExport"
 import { HistoryProvider } from "../../hooks/useHistory"
+import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
@@ -47,20 +48,22 @@ export function App() {
                           <ExportProvider>
                             <CloudFileProvider>
                               <AuthProvider>
-                                <ControlPaneProvider>
-                                  <ArrangeViewProvider>
-                                    <TempoEditorProvider>
-                                      <HistoryProvider>
-                                        <GlobalKeyboardShortcut />
-                                        <GlobalCSS />
-                                        {isRunningInElectron() && (
-                                          <ElectronCallbackHandler />
-                                        )}
-                                        <RootView />
-                                      </HistoryProvider>
-                                    </TempoEditorProvider>
-                                  </ArrangeViewProvider>
-                                </ControlPaneProvider>
+                                <PianoRollProvider>
+                                  <ControlPaneProvider>
+                                    <ArrangeViewProvider>
+                                      <TempoEditorProvider>
+                                        <HistoryProvider>
+                                          <GlobalKeyboardShortcut />
+                                          <GlobalCSS />
+                                          {isRunningInElectron() && (
+                                            <ElectronCallbackHandler />
+                                          )}
+                                          <RootView />
+                                        </HistoryProvider>
+                                      </TempoEditorProvider>
+                                    </ArrangeViewProvider>
+                                  </ControlPaneProvider>
+                                </PianoRollProvider>
                               </AuthProvider>
                             </CloudFileProvider>
                           </ExportProvider>

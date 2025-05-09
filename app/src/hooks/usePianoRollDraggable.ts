@@ -8,16 +8,16 @@ import { isNotUndefined } from "../helpers/array"
 import { DraggableArea, PianoRollDraggable } from "../stores/PianoRollStore"
 import { isNoteEvent } from "../track"
 import { usePianoRoll } from "./usePianoRoll"
-import { useStores } from "./useStores"
 
 export function usePianoRollDraggable() {
-  const { pianoRollStore } = useStores()
-  const { setSelection } = usePianoRoll()
+  const { getSelection, getSelectedTrack, getSelectedNoteIds, setSelection } =
+    usePianoRoll()
 
   return {
     getDraggablePosition: useCallback(
       (draggable: PianoRollDraggable): NotePoint | null => {
-        const { selectedTrack, selection } = pianoRollStore
+        const selection = getSelection()
+        const selectedTrack = getSelectedTrack()
 
         switch (draggable.type) {
           case "note": {
@@ -57,11 +57,12 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [pianoRollStore],
+      [getSelectedTrack, getSelection],
     ),
     updateDraggable: useCallback(
       (draggable: PianoRollDraggable, position: Partial<NotePoint>) => {
-        const { selectedTrack, selection } = pianoRollStore
+        const selection = getSelection()
+        const selectedTrack = getSelectedTrack()
 
         switch (draggable.type) {
           case "note": {
@@ -138,14 +139,16 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [pianoRollStore, setSelection],
+      [getSelection, getSelectedTrack, setSelection],
     ),
     getDraggableArea: useCallback(
       (
         draggable: PianoRollDraggable,
         minLength: number = 0,
       ): DraggableArea | null => {
-        const { selectedTrack, selectedNoteIds } = pianoRollStore
+        const selectedNoteIds = getSelectedNoteIds()
+        const selectedTrack = getSelectedTrack()
+
         if (selectedTrack === undefined) {
           return null
         }
@@ -193,7 +196,9 @@ export function usePianoRollDraggable() {
             break
           }
           case "selection": {
-            const { selection, selectedNoteIds } = pianoRollStore
+            const selection = getSelection()
+            const selectedNoteIds = getSelectedNoteIds()
+
             if (selection === null) {
               return null
             }
@@ -254,7 +259,7 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [pianoRollStore],
+      [getSelection, getSelectedNoteIds, getSelectedTrack],
     ),
   }
 }

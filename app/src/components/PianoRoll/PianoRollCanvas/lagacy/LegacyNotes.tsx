@@ -1,13 +1,15 @@
 import { FC } from "react"
 import { colorToVec4 } from "../../../../gl/color"
 import { useNoteColor } from "../../../../hooks/useNoteColor"
-import { useNotes } from "../../../../hooks/useNotes"
+import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useTrack } from "../../../../hooks/useTrack"
 import { PianoNoteItem } from "../../../../stores/PianoRollStore"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 
 export const LegacyNotes: FC<{ zIndex: number }> = ({ zIndex }) => {
-  const { notes, isRhythmTrack } = useNotes()
+  const { notes, selectedTrackId } = usePianoRoll()
+  const { isRhythmTrack } = useTrack(selectedTrackId)
   const { borderColor, selectedColor, baseColor, backgroundColor } =
     useNoteColor()
 
