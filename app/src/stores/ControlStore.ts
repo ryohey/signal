@@ -34,7 +34,10 @@ export const isEqualControlMode = (a: ControlMode, b: ControlMode) => {
   }
 }
 
-export type SerializedControlStore = Pick<ControlStore, "controlModes">
+export type SerializedControlStore = Pick<
+  ControlStore,
+  "controlModes" | "selection" | "selectedEventIds"
+>
 
 export const defaultControlModes: ControlMode[] = [
   {
@@ -88,12 +91,16 @@ export class ControlStore {
   }
 
   serialize(): SerializedControlStore {
-    return {
-      controlModes: cloneDeep(this.controlModes),
-    }
+    return cloneDeep({
+      controlModes: this.controlModes,
+      selection: this.selection,
+      selectedEventIds: this.selectedEventIds,
+    })
   }
 
   restore(serialized: SerializedControlStore) {
     this.controlModes = serialized.controlModes
+    this.selection = serialized.selection
+    this.selectedEventIds = serialized.selectedEventIds
   }
 }
