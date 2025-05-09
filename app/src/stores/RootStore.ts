@@ -21,7 +21,6 @@ import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
 import RootViewStore from "./RootViewStore"
-import Router from "./Router"
 import SettingStore from "./SettingStore"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
@@ -40,7 +39,6 @@ export interface SerializedRootStore {
 }
 
 export default class RootStore {
-  readonly router = new Router()
   readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
   readonly rootViewStore = new RootViewStore()

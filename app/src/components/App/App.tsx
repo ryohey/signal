@@ -9,6 +9,7 @@ import { HelmetProvider } from "react-helmet-async"
 import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { HistoryProvider } from "../../hooks/useHistory"
+import { RouterProvider } from "../../hooks/useRouter"
 import { StoreContext } from "../../hooks/useStores"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
@@ -35,10 +36,12 @@ export function App() {
                   <ProgressProvider component={ProgressDialog}>
                     <LocalizationProvider>
                       <HistoryProvider>
-                        <GlobalKeyboardShortcut />
-                        <GlobalCSS />
-                        {isRunningInElectron() && <ElectronCallbackHandler />}
-                        <RootView />
+                        <RouterProvider>
+                          <GlobalKeyboardShortcut />
+                          <GlobalCSS />
+                          {isRunningInElectron() && <ElectronCallbackHandler />}
+                          <RootView />
+                        </RouterProvider>
                       </HistoryProvider>
                     </LocalizationProvider>
                   </ProgressProvider>
