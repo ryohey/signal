@@ -17,7 +17,6 @@ import { AuthStore } from "./AuthStore"
 import { CloudFileStore } from "./CloudFileStore"
 import { ControlStore, SerializedControlStore } from "./ControlStore"
 import { ExportStore } from "./ExportStore"
-import HistoryStore from "./HistoryStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
@@ -44,7 +43,6 @@ export default class RootStore {
   readonly router = new Router()
   readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
-  readonly historyStore = new HistoryStore()
   readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
   readonly controlStore: ControlStore

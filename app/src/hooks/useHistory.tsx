@@ -1,11 +1,35 @@
+import { makeObservable, observable } from "mobx"
+import { createContext, useContext } from "react"
 import { deserialize } from "serializr"
 import Song from "../song"
 import { SerializedRootStore } from "../stores/RootStore"
 import { useMobxSelector } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
+class HistoryStore {
+  undoHistory: readonly SerializedRootStore[] = []
+  redoHistory: readonly SerializedRootStore[] = []
+
+  constructor() {
+    makeObservable(this, {
+      undoHistory: observable.ref,
+      redoHistory: observable.ref,
+    })
+  }
+}
+
+const HistoryStoreContext = createContext(new HistoryStore())
+
+export function HistoryProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <HistoryStoreContext.Provider value={new HistoryStore()}>
+      {children}
+    </HistoryStoreContext.Provider>
+  )
+}
+
 export function useHistory() {
-  const { historyStore } = useStores()
+  const historyStore = useContext(HistoryStoreContext)
 
   return {
     get hasUndo() {
@@ -54,7 +78,7 @@ function useRestoreState() {
 }
 
 function usePushHistory() {
-  const { historyStore } = useStores()
+  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
 
   return () => {
@@ -63,7 +87,7 @@ function usePushHistory() {
 }
 
 function useUndo() {
-  const { historyStore } = useStores()
+  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
@@ -79,7 +103,7 @@ function useUndo() {
 }
 
 function useRedo() {
-  const { historyStore } = useStores()
+  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
@@ -95,7 +119,7 @@ function useRedo() {
 }
 
 function useClearHistory() {
-  const { historyStore } = useStores()
+  const historyStore = useContext(HistoryStoreContext)
 
   return () => {
     historyStore.undoHistory = []

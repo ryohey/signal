@@ -8,6 +8,7 @@ import React from "react"
 import { HelmetProvider } from "react-helmet-async"
 import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
+import { HistoryProvider } from "../../hooks/useHistory"
 import { StoreContext } from "../../hooks/useStores"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
@@ -33,10 +34,12 @@ export function App() {
                 <DialogProvider component={ActionDialog}>
                   <ProgressProvider component={ProgressDialog}>
                     <LocalizationProvider>
-                      <GlobalKeyboardShortcut />
-                      <GlobalCSS />
-                      {isRunningInElectron() && <ElectronCallbackHandler />}
-                      <RootView />
+                      <HistoryProvider>
+                        <GlobalKeyboardShortcut />
+                        <GlobalCSS />
+                        {isRunningInElectron() && <ElectronCallbackHandler />}
+                        <RootView />
+                      </HistoryProvider>
                     </LocalizationProvider>
                   </ProgressProvider>
                 </DialogProvider>
