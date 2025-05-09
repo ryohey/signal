@@ -1,19 +1,117 @@
-import { CloudSong } from "@signal-app/api"
+import {
+  CloudSong,
+  ICloudSongDataRepository,
+  ICloudSongRepository,
+} from "@signal-app/api"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
-import { ChangeEvent, useCallback } from "react"
+import { orderBy } from "lodash"
+import { computed, makeObservable, observable } from "mobx"
+import {
+  ChangeEvent,
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+} from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
+import {
+  cloudSongDataRepository,
+  cloudSongRepository,
+} from "../services/repositories"
 import { emptySong } from "../song"
-import { useMobxStore } from "./useMobxSelector"
+import { SongStore } from "../stores/SongStore"
+import { useMobxSelector } from "./useMobxSelector"
 import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
+class CloudFileStore {
+  isLoading = false
+  selectedColumn: "name" | "date" = "date"
+  dateType: "created" | "updated" = "created"
+  sortAscending = false
+  _files: CloudSong[] = []
+
+  constructor(
+    private readonly songStore: SongStore,
+    private readonly cloudSongRepository: ICloudSongRepository,
+    private readonly cloudSongDataRepository: ICloudSongDataRepository,
+  ) {
+    makeObservable(this, {
+      isLoading: observable,
+      selectedColumn: observable,
+      dateType: observable,
+      sortAscending: observable,
+      _files: observable,
+      files: computed,
+    })
+  }
+
+  async load() {
+    this.isLoading = true
+    this._files = await this.cloudSongRepository.getMySongs()
+    this.isLoading = false
+  }
+
+  get files() {
+    return orderBy(
+      this._files,
+      (data) => {
+        switch (this.selectedColumn) {
+          case "name":
+            return data.name
+          case "date":
+            switch (this.dateType) {
+              case "created":
+                return data.createdAt.getTime()
+              case "updated":
+                return data.updatedAt.getTime()
+            }
+        }
+      },
+      this.sortAscending ? "asc" : "desc",
+    )
+  }
+
+  async deleteSong(song: CloudSong) {
+    await this.cloudSongDataRepository.delete(song.songDataId)
+    await this.cloudSongRepository.delete(song.id)
+
+    if (this.songStore.song.cloudSongId === song.id) {
+      this.songStore.song.cloudSongId = null
+      this.songStore.song.cloudSongDataId = null
+    }
+    await this.load()
+  }
+}
+
+const CloudFileStoreContext = createContext<CloudFileStore>(null!)
+
+export function CloudFileProvider({ children }: { children: React.ReactNode }) {
+  const { songStore } = useStores()
+  const cloudFileStore = useMemo(
+    () =>
+      new CloudFileStore(
+        songStore,
+        cloudSongRepository,
+        cloudSongDataRepository,
+      ),
+    [songStore],
+  )
+
+  return (
+    <CloudFileStoreContext.Provider value={cloudFileStore}>
+      {children}
+    </CloudFileStoreContext.Provider>
+  )
+}
+
 export const useCloudFile = () => {
   const { setOpenCloudFileDialog, setOpenPublishDialog } = useRootView()
-  const { cloudFileStore } = useStores()
+  const cloudFileStore = useContext(CloudFileStoreContext)
   const { cloudSongId, name, setName, isSaved, getSong } = useSong()
   const toast = useToast()
   const prompt = usePrompt()
@@ -95,19 +193,25 @@ export const useCloudFile = () => {
 
   return {
     get isLoading() {
-      return useMobxStore(({ cloudFileStore }) => cloudFileStore.isLoading)
+      return useMobxSelector(() => cloudFileStore.isLoading, [cloudFileStore])
     },
     get dateType() {
-      return useMobxStore(({ cloudFileStore }) => cloudFileStore.dateType)
+      return useMobxSelector(() => cloudFileStore.dateType, [cloudFileStore])
     },
     get files() {
-      return useMobxStore(({ cloudFileStore }) => cloudFileStore.files)
+      return useMobxSelector(() => cloudFileStore.files, [cloudFileStore])
     },
     get selectedColumn() {
-      return useMobxStore(({ cloudFileStore }) => cloudFileStore.selectedColumn)
+      return useMobxSelector(
+        () => cloudFileStore.selectedColumn,
+        [cloudFileStore],
+      )
     },
     get sortAscending() {
-      return useMobxStore(({ cloudFileStore }) => cloudFileStore.sortAscending)
+      return useMobxSelector(
+        () => cloudFileStore.sortAscending,
+        [cloudFileStore],
+      )
     },
     setDateType: useCallback(
       (type: "created" | "updated") => {

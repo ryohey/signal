@@ -4,17 +4,12 @@ import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
 import { MIDIRecorder } from "../services/MIDIRecorder"
-import {
-  cloudSongDataRepository,
-  cloudSongRepository,
-  userRepository,
-} from "../services/repositories"
+import { userRepository } from "../services/repositories"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "./ArrangeViewStore"
 import { AuthStore } from "./AuthStore"
-import { CloudFileStore } from "./CloudFileStore"
 import { ControlStore, SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
@@ -45,11 +40,6 @@ export default class RootStore {
   readonly tempoEditorStore: TempoEditorStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly authStore = new AuthStore(userRepository)
-  readonly cloudFileStore = new CloudFileStore(
-    this.songStore,
-    cloudSongRepository,
-    cloudSongDataRepository,
-  )
   readonly player: Player
   readonly synth: SoundFontSynth
   readonly metronomeSynth: SoundFontSynth
