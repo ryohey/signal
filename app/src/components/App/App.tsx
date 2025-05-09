@@ -10,6 +10,7 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { RouterProvider } from "../../hooks/useRouter"
+import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
@@ -28,28 +29,32 @@ export function App() {
   return (
     <React.StrictMode>
       <StoreContext.Provider value={rootStore}>
-        <ThemeProvider>
-          <HelmetProvider>
-            <ToastProvider component={Toast}>
-              <PromptProvider component={PromptDialog}>
-                <DialogProvider component={ActionDialog}>
-                  <ProgressProvider component={ProgressDialog}>
-                    <LocalizationProvider>
-                      <HistoryProvider>
-                        <RouterProvider>
-                          <GlobalKeyboardShortcut />
-                          <GlobalCSS />
-                          {isRunningInElectron() && <ElectronCallbackHandler />}
-                          <RootView />
-                        </RouterProvider>
-                      </HistoryProvider>
-                    </LocalizationProvider>
-                  </ProgressProvider>
-                </DialogProvider>
-              </PromptProvider>
-            </ToastProvider>
-          </HelmetProvider>
-        </ThemeProvider>
+        <SettingProvider>
+          <ThemeProvider>
+            <HelmetProvider>
+              <ToastProvider component={Toast}>
+                <PromptProvider component={PromptDialog}>
+                  <DialogProvider component={ActionDialog}>
+                    <ProgressProvider component={ProgressDialog}>
+                      <LocalizationProvider>
+                        <HistoryProvider>
+                          <RouterProvider>
+                            <GlobalKeyboardShortcut />
+                            <GlobalCSS />
+                            {isRunningInElectron() && (
+                              <ElectronCallbackHandler />
+                            )}
+                            <RootView />
+                          </RouterProvider>
+                        </HistoryProvider>
+                      </LocalizationProvider>
+                    </ProgressProvider>
+                  </DialogProvider>
+                </PromptProvider>
+              </ToastProvider>
+            </HelmetProvider>
+          </ThemeProvider>
+        </SettingProvider>
       </StoreContext.Provider>
     </React.StrictMode>
   )

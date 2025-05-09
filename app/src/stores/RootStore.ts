@@ -21,11 +21,9 @@ import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
 import RootViewStore from "./RootViewStore"
-import SettingStore from "./SettingStore"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
 import TempoEditorStore from "./TempoEditorStore"
-import { ThemeStore } from "./ThemeStore"
 import { TrackMuteStore } from "./TrackMuteStore"
 
 // we use any for now. related: https://github.com/Microsoft/TypeScript/issues/1897
@@ -54,7 +52,6 @@ export default class RootStore {
     cloudSongRepository,
     cloudSongDataRepository,
   )
-  readonly settingStore = new SettingStore()
   readonly player: Player
   readonly synth: SoundFontSynth
   readonly metronomeSynth: SoundFontSynth
@@ -62,7 +59,6 @@ export default class RootStore {
   readonly midiInput = new MIDIInput()
   readonly midiRecorder: MIDIRecorder
   readonly soundFontStore: SoundFontStore
-  readonly themeStore = new ThemeStore()
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()
