@@ -1,7 +1,7 @@
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
 import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext } from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
 import { useLocalization } from "../localize/useLocalization"
@@ -26,8 +26,10 @@ class ExportStore {
 const ExportStoreContext = createContext<ExportStore>(null!)
 
 export function ExportProvider({ children }: { children: React.ReactNode }) {
+  const exportStore = useMemo(() => new ExportStore(), [])
+
   return (
-    <ExportStoreContext.Provider value={new ExportStore()}>
+    <ExportStoreContext.Provider value={exportStore}>
       {children}
     </ExportStoreContext.Provider>
   )

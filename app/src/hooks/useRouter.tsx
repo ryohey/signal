@@ -1,5 +1,5 @@
 import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext } from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { useMobxSelector } from "./useMobxSelector"
 
 export type RoutePath = "/track" | "/arrange" | "/tempo"
@@ -17,10 +17,10 @@ class Router {
 const RouterContext = createContext(new Router())
 
 export function RouterProvider({ children }: { children: React.ReactNode }) {
+  const router = useMemo(() => new Router(), [])
+
   return (
-    <RouterContext.Provider value={new Router()}>
-      {children}
-    </RouterContext.Provider>
+    <RouterContext.Provider value={router}>{children}</RouterContext.Provider>
   )
 }
 
