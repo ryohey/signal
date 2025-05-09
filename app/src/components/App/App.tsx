@@ -15,6 +15,7 @@ import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { ExportProvider } from "../../hooks/useExport"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
+import { RootViewProvider } from "../../hooks/useRootView"
 import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
@@ -52,14 +53,16 @@ export function App() {
                                   <ControlPaneProvider>
                                     <ArrangeViewProvider>
                                       <TempoEditorProvider>
-                                        <HistoryProvider>
-                                          <GlobalKeyboardShortcut />
-                                          <GlobalCSS />
-                                          {isRunningInElectron() && (
-                                            <ElectronCallbackHandler />
-                                          )}
-                                          <RootView />
-                                        </HistoryProvider>
+                                        <RootViewProvider>
+                                          <HistoryProvider>
+                                            <GlobalKeyboardShortcut />
+                                            <GlobalCSS />
+                                            {isRunningInElectron() && (
+                                              <ElectronCallbackHandler />
+                                            )}
+                                            <RootView />
+                                          </HistoryProvider>
+                                        </RootViewProvider>
                                       </TempoEditorProvider>
                                     </ArrangeViewProvider>
                                   </ControlPaneProvider>

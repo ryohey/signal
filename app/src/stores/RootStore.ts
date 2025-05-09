@@ -10,7 +10,6 @@ import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
-import RootViewStore from "./RootViewStore"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
 import { TrackMuteStore } from "./TrackMuteStore"
@@ -28,7 +27,6 @@ export interface SerializedRootStore {
 export default class RootStore {
   readonly songStore = new SongStore()
   readonly trackMuteStore = new TrackMuteStore()
-  readonly rootViewStore = new RootViewStore()
   readonly pianoRollStore: PianoRollStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly player: Player
