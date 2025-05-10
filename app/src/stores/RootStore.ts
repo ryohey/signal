@@ -8,7 +8,7 @@ import { MIDIRecorder } from "../services/MIDIRecorder"
 import { SerializedArrangeViewStore } from "./ArrangeViewStore"
 import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
-import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
+import { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
@@ -25,7 +25,6 @@ export interface SerializedRootStore {
 
 export default class RootStore {
   readonly songStore = new SongStore()
-  readonly pianoRollStore: PianoRollStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly player: Player
   readonly synth: SoundFontSynth
@@ -46,7 +45,6 @@ export default class RootStore {
     const eventSource = new EventSource(this.songStore)
     this.player = new Player(this.synthGroup, eventSource)
 
-    this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
     this.soundFontStore = new SoundFontStore(this.synth)
 
     this.midiRecorder = new MIDIRecorder(this.songStore, this.player)

@@ -1,6 +1,12 @@
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { autorun } from "mobx"
-import { createContext, useCallback, useContext, useEffect } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Point } from "../entities/geometry/Point"
 import { Rect } from "../entities/geometry/Rect"
@@ -22,8 +28,13 @@ import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {
-  const { pianoRollStore, songStore, midiInput, midiMonitor, midiRecorder } =
+  const { songStore, player, midiInput, midiMonitor, midiRecorder } =
     useStores()
+
+  const pianoRollStore = useMemo(
+    () => new PianoRollStore(songStore, player),
+    [songStore, player],
+  )
 
   useEffect(() => {
     pianoRollStore.setUpAutorun()
