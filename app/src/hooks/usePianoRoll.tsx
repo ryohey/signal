@@ -1,9 +1,12 @@
+import { deserializeSingleEvent, Stream } from "midifile-ts"
+import { autorun } from "mobx"
 import { createContext, useCallback, useContext, useEffect } from "react"
 import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Point } from "../entities/geometry/Point"
 import { Rect } from "../entities/geometry/Rect"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
+import { addedSet, deletedSet } from "../helpers/set"
 import PianoRollStore, {
   PianoNoteItem,
   PianoRollMouseMode,
@@ -19,11 +22,47 @@ import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {
-  const { pianoRollStore } = useStores()
+  const { pianoRollStore, midiInput, midiMonitor } = useStores()
 
   useEffect(() => {
     pianoRollStore.setUpAutorun()
   }, [pianoRollStore])
+
+  // highlight notes when receiving MIDI input
+  useEffect(
+    () =>
+      midiInput.on("midiMessage", (e) => {
+        const stream = new Stream(e.data)
+        const event = deserializeSingleEvent(stream)
+
+        if (event.type !== "channel") {
+          return
+        }
+
+        if (event.subtype === "noteOn") {
+          pianoRollStore.previewingNoteNumbers = addedSet(
+            pianoRollStore.previewingNoteNumbers,
+            event.noteNumber,
+          )
+        } else if (event.subtype === "noteOff") {
+          pianoRollStore.previewingNoteNumbers = deletedSet(
+            pianoRollStore.previewingNoteNumbers,
+            event.noteNumber,
+          )
+        }
+      }),
+    [pianoRollStore],
+  )
+
+  // sync MIDIMonitor channel with selected track
+  useEffect(
+    () =>
+      autorun(() => {
+        const track = pianoRollStore.selectedTrack
+        midiMonitor.channel = track?.channel ?? 0
+      }),
+    [pianoRollStore, midiMonitor],
+  )
 
   return (
     <PianoRollStoreContext.Provider value={pianoRollStore}>

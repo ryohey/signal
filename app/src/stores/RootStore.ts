@@ -2,7 +2,8 @@ import { Player, SoundFontSynth } from "@signal-app/player"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { GroupOutput } from "../services/GroupOutput"
-import { MIDIInput, previewMidiInput } from "../services/MIDIInput"
+import { MIDIInput } from "../services/MIDIInput"
+import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
 import { UNASSIGNED_TRACK_ID } from "../track"
 import { SerializedArrangeViewStore } from "./ArrangeViewStore"
@@ -33,6 +34,7 @@ export default class RootStore {
   readonly synthGroup: GroupOutput
   readonly midiInput = new MIDIInput()
   readonly midiRecorder: MIDIRecorder
+  readonly midiMonitor: MIDIMonitor
   readonly soundFontStore: SoundFontStore
 
   constructor() {
@@ -53,11 +55,10 @@ export default class RootStore {
       this.player,
       this.pianoRollStore,
     )
-
-    const preview = previewMidiInput(this)
+    this.midiMonitor = new MIDIMonitor(this.player)
 
     this.midiInput.on("midiMessage", (e) => {
-      preview(e)
+      this.midiMonitor.onMessage(e)
       this.midiRecorder.onMessage(e)
     })
 
