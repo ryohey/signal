@@ -1,9 +1,8 @@
 import { Measure } from "../entities/measure/Measure"
-import { usePianoRoll } from "../hooks/usePianoRoll"
+import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
-import { useTickScroll } from "../hooks/useTickScroll"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 import { useToggleGhostTrack } from "./track"
@@ -21,11 +20,7 @@ export const useStop = () => {
 
 export const useRewindOneBar = () => {
   const { measures, timebase } = useSong()
-  const {
-    pianoRollStore: { tickScrollStore },
-  } = useStores()
-  const { scrollLeftTicks, setScrollLeftInTicks } =
-    useTickScroll(tickScrollStore)
+  const { scrollLeftTicks, setScrollLeftInTicks } = usePianoRollTickScroll()
   const { position, setPosition } = usePlayer()
 
   return () => {
@@ -40,11 +35,8 @@ export const useRewindOneBar = () => {
 }
 
 export const useFastForwardOneBar = () => {
-  const {
-    pianoRollStore: { tickScrollStore },
-  } = useStores()
   const { transform, scrollLeft, canvasWidth, setScrollLeftInPixels } =
-    useTickScroll(tickScrollStore)
+    usePianoRollTickScroll()
   const { measures, timebase } = useSong()
   const { position, setPosition } = usePlayer()
 

@@ -410,3 +410,8 @@ export function usePianoRoll() {
     ),
   }
 }
+
+export function usePianoRollTickScroll() {
+  const { tickScrollStore } = useContext(PianoRollStoreContext)
+  return useTickScroll(tickScrollStore)
+}
