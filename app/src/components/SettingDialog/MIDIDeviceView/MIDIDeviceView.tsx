@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
-import { useMIDIDevice } from "../../../hooks/useMIDIDevice"
+import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
 import { Alert } from "../../ui/Alert"
@@ -8,19 +8,12 @@ import { Checkbox } from "../../ui/Checkbox"
 import { CircularProgress } from "../../ui/CircularProgress"
 import { Label } from "../../ui/Label"
 
-interface Device {
-  id: string
-  name: string
-  isConnected: boolean
-}
-
 interface ListItem {
   device: Device
-  isSelected: boolean
   onCheck: (isChecked: boolean) => void
 }
 
-const DeviceRow: FC<ListItem> = ({ device, isSelected, onCheck }) => {
+const DeviceRow: FC<ListItem> = ({ device, onCheck }) => {
   return (
     <Label
       style={{
@@ -30,7 +23,7 @@ const DeviceRow: FC<ListItem> = ({ device, isSelected, onCheck }) => {
       }}
     >
       <Checkbox
-        checked={isSelected}
+        checked={device.isEnabled}
         onCheckedChange={(state) => onCheck(state === true)}
         style={{ marginRight: "0.5rem" }}
         label={
@@ -61,43 +54,13 @@ const SectionTitle = styled.div`
 
 export const MIDIDeviceView: FC = () => {
   const {
-    inputs,
-    outputs,
+    inputDevices,
+    outputDevices,
     isLoading,
     requestError,
-    enabledInputs,
-    enabledOutputs,
-    isFactorySoundEnabled,
     setInputEnable,
     setOutputEnable,
-    setFactorySoundEnable,
   } = useMIDIDevice()
-
-  const formatName = (device: WebMidi.MIDIPort) =>
-    (device?.name ?? "") +
-    ((device.manufacturer?.length ?? 0) > 0 ? `(${device.manufacturer})` : "")
-
-  const portToDevice = (device: WebMidi.MIDIPort): Device => ({
-    id: device.id,
-    name: formatName(device),
-    isConnected: device.state === "connected",
-  })
-
-  const inputDevices = inputs.map((device) => ({
-    device: portToDevice(device),
-    isSelected: enabledInputs[device.id],
-  }))
-
-  const outputDevices = outputs.map((device) => ({
-    device: portToDevice(device),
-    isSelected: enabledOutputs[device.id],
-  }))
-
-  const factorySound: Device = {
-    id: "signal-midi-app",
-    name: "Signal Factory Sound",
-    isConnected: true,
-  }
 
   return (
     <>
@@ -123,11 +86,10 @@ export const MIDIDeviceView: FC = () => {
                   <Localized name="no-inputs" />
                 </Notice>
               )}
-              {inputDevices.map(({ device, isSelected }) => (
+              {inputDevices.map((device) => (
                 <DeviceRow
                   key={device.id}
                   device={device}
-                  isSelected={isSelected}
                   onCheck={(checked) => setInputEnable(device.id, checked)}
                 />
               ))}
@@ -139,16 +101,10 @@ export const MIDIDeviceView: FC = () => {
                   <Localized name="outputs" />
                 </SectionTitle>
                 <DeviceList>
-                  <DeviceRow
-                    device={factorySound}
-                    isSelected={isFactorySoundEnabled}
-                    onCheck={setFactorySoundEnable}
-                  />
-                  {outputDevices.map(({ device, isSelected }) => (
+                  {outputDevices.map((device) => (
                     <DeviceRow
                       key={device.id}
                       device={device}
-                      isSelected={isSelected}
                       onCheck={(checked) => setOutputEnable(device.id, checked)}
                     />
                   ))}
