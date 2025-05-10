@@ -1,21 +1,52 @@
-import { useCallback } from "react"
+import { makeObservable, observable } from "mobx"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { TrackId } from "../track"
 import { TrackMute } from "../trackMute/TrackMute"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
+class TrackMuteStore {
+  trackMute: TrackMute = {
+    mutes: {},
+    solos: {},
+  }
+
+  constructor() {
+    makeObservable(this, {
+      trackMute: observable.ref,
+    })
+  }
+}
+
+const TrackMuteStoreContext = createContext<TrackMuteStore>(null!)
+
+export function TrackMuteProvider({ children }: { children: React.ReactNode }) {
+  const trackMuteStore = useMemo(() => new TrackMuteStore(), [])
+
+  return (
+    <TrackMuteStoreContext.Provider value={trackMuteStore}>
+      {children}
+    </TrackMuteStoreContext.Provider>
+  )
+}
+
 export function useTrackMute() {
-  const { trackMuteStore } = useStores()
-  const trackMute = useMobxStore(
-    ({ trackMuteStore }) => trackMuteStore.trackMute,
+  const trackMuteStore = useContext(TrackMuteStoreContext)
+  const { synthGroup } = useStores()
+  const trackMute = useMobxSelector(
+    () => trackMuteStore.trackMute,
+    [trackMuteStore],
   )
   const { getChannelForTrack } = useSong()
   const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
   const setTrackMute = useCallback(
     (trackMute: TrackMute) => {
       trackMuteStore.trackMute = trackMute
+
+      // sync with synth group
+      synthGroup.trackMute = trackMute
     },
     [trackMuteStore],
   )

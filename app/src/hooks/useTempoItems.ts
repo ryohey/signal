@@ -3,19 +3,15 @@ import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { Point } from "../entities/geometry/Point"
 import { Rect } from "../entities/geometry/Rect"
 import { useConductorTrack } from "./useConductorTrack"
-import { useStores } from "./useStores"
 import { useTempoEditor } from "./useTempoEditor"
 import { useTickScroll } from "./useTickScroll"
 
 const CIRCLE_RADIUS = 4
 
 export function useTempoItems() {
-  const {
-    tempoEditorStore: { tickScrollStore },
-  } = useStores()
   const { transform } = useTempoEditor()
   const { tempoEvents } = useConductorTrack()
-  const { canvasWidth, scrollLeft } = useTickScroll(tickScrollStore)
+  const { canvasWidth, scrollLeft } = useTickScroll()
   const items = useMemo(
     () => transformEvents(tempoEvents, transform, canvasWidth + scrollLeft),
     [tempoEvents, transform, canvasWidth, scrollLeft],

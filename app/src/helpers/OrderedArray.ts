@@ -9,20 +9,15 @@ export class OrderedArray<
   T extends { id: number },
   K extends number | string = number,
 > {
-  readonly array: T[]
-  private keyExtractor: (item: T) => K
-  private descending: boolean
   private readonly lookupMap: Map<number, T>
 
   constructor(
-    array: T[],
-    keyExtractor: (item: T) => K,
-    descending: boolean = false,
+    readonly array: T[],
+    private readonly keyExtractor: (item: T) => K,
+    private readonly descending: boolean = false,
+    private readonly generateId: () => number = () => Math.random() * 1000000,
   ) {
-    this.array = array
     this.lookupMap = new Map(array.map((item) => [item.id, item]))
-    this.keyExtractor = keyExtractor
-    this.descending = descending
     this.sort()
 
     makeObservable(this, {
@@ -91,6 +86,12 @@ export class OrderedArray<
     this.array.splice(insertionIndex, 0, element)
     this.lookupMap.set(element.id, element)
     return this.array
+  }
+
+  create(element: Omit<T, "id">): T {
+    const newElement = { ...element, id: this.generateId() } as T
+    this.add(newElement)
+    return newElement
   }
 
   remove(id: number): ReadonlyArray<T> {

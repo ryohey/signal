@@ -21,14 +21,9 @@ export default class TempoEditorStore {
 
   constructor(
     private readonly songStore: SongStore,
-    private readonly player: Player,
+    player: Player,
   ) {
-    this.tickScrollStore = new TickScrollStore(
-      this.songStore,
-      this.player,
-      0.15,
-      15,
-    )
+    this.tickScrollStore = new TickScrollStore(this.songStore, player, 0.15, 15)
     this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {

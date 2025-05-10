@@ -27,9 +27,9 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
   width,
   height,
 }) => {
-  const { transform, windowedEvents, selectedNoteIds, cursorX } = usePianoRoll()
+  const { transform, windowedEvents, selectedNoteIds } = usePianoRoll()
   const { beats } = useRuler()
-  const { scrollLeft } = useTickScroll()
+  const { cursorX, scrollLeft } = useTickScroll()
   const updateVelocitiesInRange = useUpdateVelocitiesInRange()
   const changeNotesVelocity = useChangeNotesVelocity()
   const theme = useTheme()

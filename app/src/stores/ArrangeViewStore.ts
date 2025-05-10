@@ -37,14 +37,9 @@ export default class ArrangeViewStore {
 
   constructor(
     private readonly songStore: SongStore,
-    private readonly player: Player,
+    player: Player,
   ) {
-    this.tickScrollStore = new TickScrollStore(
-      this.songStore,
-      this.player,
-      0.15,
-      15,
-    )
+    this.tickScrollStore = new TickScrollStore(this.songStore, player, 0.15, 15)
     this.trackScrollStore = new TrackScrollStore(this.songStore)
     this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
@@ -58,7 +53,6 @@ export default class ArrangeViewStore {
       transform: computed,
       trackTransform: computed,
       notes: computed,
-      cursorX: computed,
       selectionRect: computed,
       quantizer: computed,
       selectedTrackId: computed,
@@ -122,10 +116,6 @@ export default class ArrangeViewStore {
           }),
       )
       .flat()
-  }
-
-  get cursorX(): number {
-    return this.tickScrollStore.transform.getX(this.player.position)
   }
 
   get selectionRect(): Rect | null {

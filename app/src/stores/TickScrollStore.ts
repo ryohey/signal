@@ -26,6 +26,7 @@ export class TickScrollStore {
       scrollLeft: computed,
       playheadPosition: computed,
       playheadInScrollZone: computed,
+      cursorX: computed,
     })
   }
 
@@ -67,5 +68,9 @@ export class TickScrollStore {
     return (
       this.playheadPosition < 0 || this.playheadPosition > canvasWidth * 0.7
     )
+  }
+
+  get cursorX(): number {
+    return this.transform.getX(this.player.position)
   }
 }

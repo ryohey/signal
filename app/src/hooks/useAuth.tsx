@@ -1,8 +1,12 @@
 import { AuthUser, IUserRepository, User } from "@signal-app/api"
 import { makeObservable, observable } from "mobx"
+import { createContext, useCallback, useContext, useMemo } from "react"
+import { auth } from "../firebase/firebase"
 import { isRunningInElectron } from "../helpers/platform"
+import { userRepository } from "../services/repositories"
+import { useMobxSelector } from "./useMobxSelector"
 
-export class AuthStore {
+class AuthStore {
   authUser: AuthUser | null = null
   user: User | null = null
 
@@ -50,5 +54,36 @@ export class AuthStore {
 
   get isLoggedIn() {
     return this.authUser !== null
+  }
+}
+
+const AuthStoreContext = createContext<AuthStore>(null!)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const authStore = useMemo(() => new AuthStore(userRepository), [])
+
+  return (
+    <AuthStoreContext.Provider value={authStore}>
+      {children}
+    </AuthStoreContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const authStore = useContext(AuthStoreContext)
+
+  return {
+    get authUser() {
+      return useMobxSelector(() => authStore.authUser, [authStore])
+    },
+    get user() {
+      return useMobxSelector(() => authStore.user, [authStore])
+    },
+    get isLoggedIn() {
+      return useMobxSelector(() => authStore.isLoggedIn, [authStore])
+    },
+    signOut: useCallback(async () => {
+      await auth.signOut()
+    }, []),
   }
 }

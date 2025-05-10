@@ -1,7 +1,8 @@
 import { GLFallback } from "@ryohey/webgl-react"
 import { FC } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
-import { useNotes } from "../../../hooks/useNotes"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useTrack } from "../../../hooks/useTrack"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 import { LegacyNotes } from "./lagacy/LegacyNotes"
@@ -15,7 +16,8 @@ export const Notes: FC<NotesProps> = (props) => {
 }
 
 const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
-  const { notes, isRhythmTrack } = useNotes()
+  const { notes, selectedTrackId } = usePianoRoll()
+  const { isRhythmTrack } = useTrack(selectedTrackId)
   const { borderColor, inactiveColor, activeColor, selectedColor } =
     useNoteColor()
 
