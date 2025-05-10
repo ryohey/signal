@@ -56,10 +56,10 @@ export default class RootStore {
 
     const preview = previewMidiInput(this)
 
-    this.midiInput.onMidiMessage = (e) => {
+    this.midiInput.on("midiMessage", (e) => {
       preview(e)
       this.midiRecorder.onMessage(e)
-    }
+    })
 
     registerReactions(this)
   }
