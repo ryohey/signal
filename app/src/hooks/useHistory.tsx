@@ -48,10 +48,18 @@ export function useHistory() {
         [historyStore],
       )
     },
-    pushHistory: usePushHistory(),
-    undo: useUndo(),
-    redo: useRedo(),
-    clear: useClearHistory(),
+    get pushHistory() {
+      return usePushHistory()
+    },
+    get undo() {
+      return useUndo()
+    },
+    get redo() {
+      return useRedo()
+    },
+    get clear() {
+      return useClearHistory()
+    },
   }
 }
 
