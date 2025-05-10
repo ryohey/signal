@@ -12,7 +12,7 @@ import PianoRollStore, {
   PianoRollMouseMode,
   SerializedPianoRollStore,
 } from "../stores/PianoRollStore"
-import { TrackId } from "../track"
+import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
 import { RulerProvider } from "./useRuler"
@@ -22,10 +22,18 @@ import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {
-  const { pianoRollStore, midiInput, midiMonitor, midiRecorder } = useStores()
+  const { pianoRollStore, songStore, midiInput, midiMonitor, midiRecorder } =
+    useStores()
 
   useEffect(() => {
     pianoRollStore.setUpAutorun()
+  }, [pianoRollStore])
+
+  // Initially select the first track that is not a conductor track
+  useEffect(() => {
+    pianoRollStore.selectedTrackId =
+      songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
+      UNASSIGNED_TRACK_ID
   }, [pianoRollStore])
 
   // highlight notes when receiving MIDI input

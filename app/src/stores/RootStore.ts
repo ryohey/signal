@@ -5,7 +5,6 @@ import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput } from "../services/MIDIInput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
-import { UNASSIGNED_TRACK_ID } from "../track"
 import { SerializedArrangeViewStore } from "./ArrangeViewStore"
 import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
@@ -62,11 +61,6 @@ export default class RootStore {
   }
 
   async init() {
-    // Select the first track that is not a conductor track
-    this.pianoRollStore.selectedTrackId =
-      this.songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
-      UNASSIGNED_TRACK_ID
-
     await this.synth.setup()
     await this.soundFontStore.init()
     this.setupMetronomeSynth()
