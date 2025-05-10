@@ -10,7 +10,7 @@ export const useMoveSelectionGesture = (): MouseGesture => {
 
   return {
     onMouseDown(e) {
-      const isCopy = e.metaKey
+      const isCopy = e.metaKey || e.ctrlKey
 
       if (isCopy) {
         cloneSelection()
