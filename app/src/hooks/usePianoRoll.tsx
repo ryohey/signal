@@ -22,7 +22,7 @@ import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {
-  const { pianoRollStore, midiInput, midiMonitor } = useStores()
+  const { pianoRollStore, midiInput, midiMonitor, midiRecorder } = useStores()
 
   useEffect(() => {
     pianoRollStore.setUpAutorun()
@@ -62,6 +62,15 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
         midiMonitor.channel = track?.channel ?? 0
       }),
     [pianoRollStore, midiMonitor],
+  )
+
+  // sync MIDIRecorder channel with selected track
+  useEffect(
+    () =>
+      autorun(() => {
+        midiRecorder.trackId = pianoRollStore.selectedTrackId
+      }),
+    [pianoRollStore, midiRecorder],
   )
 
   return (

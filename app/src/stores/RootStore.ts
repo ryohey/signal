@@ -50,11 +50,7 @@ export default class RootStore {
     this.pianoRollStore = new PianoRollStore(this.songStore, this.player)
     this.soundFontStore = new SoundFontStore(this.synth)
 
-    this.midiRecorder = new MIDIRecorder(
-      this.songStore,
-      this.player,
-      this.pianoRollStore,
-    )
+    this.midiRecorder = new MIDIRecorder(this.songStore, this.player)
     this.midiMonitor = new MIDIMonitor(this.player)
 
     this.midiInput.on("midiMessage", (e) => {

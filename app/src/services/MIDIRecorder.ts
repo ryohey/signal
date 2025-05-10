@@ -1,18 +1,17 @@
 import { Player } from "@signal-app/player"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { makeObservable, observable, observe } from "mobx"
-import PianoRollStore from "../stores/PianoRollStore"
 import { SongStore } from "../stores/SongStore"
-import { NoteEvent, TrackEvent } from "../track"
+import { NoteEvent, TrackEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
 
 export class MIDIRecorder {
   private recordedNotes: NoteEvent[] = []
+  trackId: TrackId = UNASSIGNED_TRACK_ID
   isRecording: boolean = false
 
   constructor(
-    songStore: SongStore,
+    private readonly songStore: SongStore,
     private readonly player: Player,
-    private readonly pianoRollStore: PianoRollStore,
   ) {
     makeObservable(this, {
       isRecording: observable,
@@ -24,7 +23,7 @@ export class MIDIRecorder {
         return
       }
 
-      const track = pianoRollStore.selectedTrack
+      const track = this.songStore.song.getTrack(this.trackId)
       if (track === undefined) {
         return
       }
@@ -43,7 +42,7 @@ export class MIDIRecorder {
 
       if (!change.newValue) {
         // stop recording
-        songStore.song.tracks.forEach((track) => {
+        this.songStore.song.tracks.forEach((track) => {
           const events = track.events
             .filter((e) => e.isRecording === true)
             .map<Partial<TrackEvent>>((e) => ({ ...e, isRecording: false }))
@@ -58,7 +57,7 @@ export class MIDIRecorder {
       return
     }
 
-    const track = this.pianoRollStore.selectedTrack
+    const track = this.songStore.song.getTrack(this.trackId)
     if (track === undefined) {
       return
     }
