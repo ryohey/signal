@@ -30,7 +30,7 @@ export const useSelectionGesture = (): MouseGesture & CursorProvider => {
           const type = positionType(selectionBounds, local)
           switch (type) {
             case "center":
-              return moveSelectionAction.onMouseDown(e, selectedNoteIds)
+              return moveSelectionAction.onMouseDown(e)
             case "right":
               return dragSelectionRightEdgeAction.onMouseDown(
                 e,

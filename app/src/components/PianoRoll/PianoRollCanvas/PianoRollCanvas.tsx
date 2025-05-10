@@ -32,6 +32,11 @@ export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
 
   const handleContextMenu: MouseEventHandler = useCallback(
     (e) => {
+      // Ctrl + Click is used to copy the selected notes
+      if (e.ctrlKey) {
+        return
+      }
+
       if (mouseMode === "selection") {
         e.stopPropagation()
         onContextMenu(e)

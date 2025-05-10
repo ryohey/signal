@@ -52,6 +52,11 @@ export const songFromFile = async (file: File) =>
     file.name,
   )
 
+// Use the file name without extension as the song title
+const getNameFromPathOrName = (pathOrName: string) => {
+  return basename(pathOrName)?.replace(/\.[^/.]+$/, "") ?? ""
+}
+
 export const songFromArrayBuffer = (
   content: ArrayBuffer,
   filePath?: string,
@@ -61,7 +66,7 @@ export const songFromArrayBuffer = (
   const pathOrName = filePath ?? name
   if (song.name.length === 0 && pathOrName) {
     // Use the file name without extension as the song title
-    song.name = basename(pathOrName)?.replace(/\.[^/.]+$/, "") ?? ""
+    song.name = getNameFromPathOrName(pathOrName)
   }
   if (filePath) {
     song.filepath = filePath
@@ -110,8 +115,9 @@ export const saveFileAs = async (song: Song) => {
   try {
     const data = songToMidi(song).buffer
     await writeFile(fileHandle, data)
-    song.isSaved = true
     song.fileHandle = fileHandle
+    song.name = getNameFromPathOrName(fileHandle.name)
+    song.isSaved = true
   } catch (ex) {
     const msg = "Unable to save file."
     console.error(msg, ex)
