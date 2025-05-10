@@ -20,6 +20,7 @@ import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
 import { TempoEditorProvider } from "../../hooks/useTempoEditor"
+import { TrackMuteProvider } from "../../hooks/useTrackMute"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
 import { ProgressDialog } from "../Dialog/ProgressDialog"
@@ -54,14 +55,16 @@ export function App() {
                                     <ArrangeViewProvider>
                                       <TempoEditorProvider>
                                         <RootViewProvider>
-                                          <HistoryProvider>
-                                            <GlobalKeyboardShortcut />
-                                            <GlobalCSS />
-                                            {isRunningInElectron() && (
-                                              <ElectronCallbackHandler />
-                                            )}
-                                            <RootView />
-                                          </HistoryProvider>
+                                          <TrackMuteProvider>
+                                            <HistoryProvider>
+                                              <GlobalKeyboardShortcut />
+                                              <GlobalCSS />
+                                              {isRunningInElectron() && (
+                                                <ElectronCallbackHandler />
+                                              )}
+                                              <RootView />
+                                            </HistoryProvider>
+                                          </TrackMuteProvider>
                                         </RootViewProvider>
                                       </TempoEditorProvider>
                                     </ArrangeViewProvider>

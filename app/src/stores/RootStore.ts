@@ -12,7 +12,6 @@ import PianoRollStore, { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
-import { TrackMuteStore } from "./TrackMuteStore"
 
 // we use any for now. related: https://github.com/Microsoft/TypeScript/issues/1897
 type Json = any
@@ -26,7 +25,6 @@ export interface SerializedRootStore {
 
 export default class RootStore {
   readonly songStore = new SongStore()
-  readonly trackMuteStore = new TrackMuteStore()
   readonly pianoRollStore: PianoRollStore
   readonly midiDeviceStore = new MIDIDeviceStore()
   readonly player: Player
@@ -41,7 +39,7 @@ export default class RootStore {
     const context = new (window.AudioContext || window.webkitAudioContext)()
     this.synth = new SoundFontSynth(context)
     this.metronomeSynth = new SoundFontSynth(context)
-    this.synthGroup = new GroupOutput(this.trackMuteStore, this.metronomeSynth)
+    this.synthGroup = new GroupOutput(this.metronomeSynth)
     this.synthGroup.outputs.push({ synth: this.synth, isEnabled: true })
 
     const eventSource = new EventSource(this.songStore)

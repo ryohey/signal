@@ -26,6 +26,11 @@ export interface TrackMute {
 }
 
 export namespace TrackMute {
+  export const empty: TrackMute = {
+    mutes: {},
+    solos: {},
+  }
+
   function setMute(
     trackMute: TrackMute,
     trackId: TrackId,
