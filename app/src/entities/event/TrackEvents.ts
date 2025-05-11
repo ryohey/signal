@@ -143,7 +143,7 @@ export namespace TrackEvents {
       if (e !== undefined) {
         updateEvent<TrackEventOf<ControllerEvent>>(e.id, {
           value,
-        })
+        })(events)
       } else {
         // If there are no controller events, we insert new event at the head of the track
         addEvent<TrackEventOf<ControllerEvent>>({
