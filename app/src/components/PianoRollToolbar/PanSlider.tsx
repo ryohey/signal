@@ -21,7 +21,8 @@ const Label = styled.div`
 `
 
 export const PanSlider: FC = () => {
-  const { value, setValue, defaultValue } = usePanSlider()
+  const { value, setValue, defaultValue, onPointerDown, onPointerUp } =
+    usePanSlider()
 
   return (
     <Container>
@@ -32,6 +33,8 @@ export const PanSlider: FC = () => {
         value={value}
         onChange={setValue}
         onDoubleClick={() => setValue(defaultValue)}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
         min={0}
         max={127}
         defaultValue={defaultValue}

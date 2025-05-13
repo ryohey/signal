@@ -22,7 +22,7 @@ const VolumeIcon = styled(VolumeUp)`
 `
 
 export const VolumeSlider: FC = () => {
-  const { value, setValue } = useVolumeSlider()
+  const { value, setValue, onPointerDown, onPointerUp } = useVolumeSlider()
 
   return (
     <Container>
@@ -30,6 +30,8 @@ export const VolumeSlider: FC = () => {
       <Slider
         value={value}
         onChange={setValue}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
         max={127}
         minStepsBetweenThumbs={1}
       />

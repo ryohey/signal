@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { panMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
 import { usePianoRoll } from "./usePianoRoll"
@@ -12,10 +12,15 @@ export function useVolumeSlider() {
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { setVolume, channel } = useTrack(trackId)
+  const [isDragging, setIsDragging] = useState(false)
 
   const setTrackVolume = useCallback(
     (pan: number) => {
-      pushHistory()
+      if (!isDragging) {
+        // record history for the keyboard event (no dragging)
+        pushHistory()
+      }
+
       setVolume(pan, position)
 
       if (channel !== undefined) {
@@ -28,5 +33,13 @@ export function useVolumeSlider() {
   return {
     value: currentVolume ?? DEFAULT_VOLUME,
     setValue: setTrackVolume,
+    onPointerDown: useCallback(() => {
+      // record history only when dragging starts
+      pushHistory()
+      setIsDragging(true)
+    }, [pushHistory]),
+    onPointerUp: useCallback(() => {
+      setIsDragging(false)
+    }, []),
   }
 }

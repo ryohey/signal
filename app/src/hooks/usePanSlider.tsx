@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { panMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
 import { usePianoRoll } from "./usePianoRoll"
@@ -12,10 +12,15 @@ export function usePanSlider() {
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { setPan, channel } = useTrack(trackId)
+  const [isDragging, setIsDragging] = useState(false)
 
   const setTrackPan = useCallback(
     (pan: number) => {
-      pushHistory()
+      if (!isDragging) {
+        // record history for the keyboard event (no dragging)
+        pushHistory()
+      }
+
       setPan(pan, position)
 
       if (channel !== undefined) {
@@ -29,5 +34,12 @@ export function usePanSlider() {
     value: currentPan ?? PAN_CENTER,
     setValue: setTrackPan,
     defaultValue: PAN_CENTER,
+    onPointerDown: useCallback(() => {
+      pushHistory()
+      setIsDragging(true)
+    }, [pushHistory]),
+    onPointerUp: useCallback(() => {
+      setIsDragging(false)
+    }, []),
   }
 }
