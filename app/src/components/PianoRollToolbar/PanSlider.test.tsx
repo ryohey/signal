@@ -8,16 +8,13 @@ import userEvent from "@testing-library/user-event"
 import { LocalizationContext } from "../../localize/useLocalization"
 import { PanSlider } from "./PanSlider"
 
-jest.mock("../../hooks/usePianoRoll", () => ({
-  usePianoRoll: jest.fn(() => ({
-    currentPan: 42,
-    selectedTrackId: 1,
-  })),
-}))
-
 const setTrackPanMock = jest.fn()
-jest.mock("../../actions", () => ({
-  useSetTrackPan: jest.fn(() => setTrackPanMock),
+jest.mock("../../hooks/usePanSlider", () => ({
+  usePanSlider: jest.fn(() => ({
+    value: 42,
+    setValue: setTrackPanMock,
+    defaultValue: 64,
+  })),
 }))
 
 describe("PanSlider", () => {
