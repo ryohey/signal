@@ -14,10 +14,8 @@ import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
 import {
-  panMidiEvent,
   programChangeMidiEvent,
   timeSignatureMidiEvent,
-  volumeMidiEvent,
 } from "../midi/MidiEvent"
 import Quantizer from "../quantizer"
 import Track, {
@@ -229,36 +227,6 @@ export const useSetTrackName = () => {
   return (name: string) => {
     pushHistory()
     setName(name)
-  }
-}
-
-export const useSetTrackVolume = (trackId: TrackId) => {
-  const { position, sendEvent } = usePlayer()
-  const { pushHistory } = useHistory()
-  const { channel, setVolume } = useTrack(trackId)
-
-  return (volume: number) => {
-    pushHistory()
-    setVolume(volume, position)
-
-    if (channel !== undefined) {
-      sendEvent(volumeMidiEvent(0, channel, volume))
-    }
-  }
-}
-
-export const useSetTrackPan = (trackId: TrackId) => {
-  const { position, sendEvent } = usePlayer()
-  const { pushHistory } = useHistory()
-  const { setPan, channel } = useTrack(trackId)
-
-  return (pan: number) => {
-    pushHistory()
-    setPan(pan, position)
-
-    if (channel !== undefined) {
-      sendEvent(panMidiEvent(0, channel, pan))
-    }
   }
 }
 

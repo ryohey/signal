@@ -30,7 +30,7 @@ export const PanSlider: FC = () => {
       </Label>
       <Slider
         value={value}
-        onChange={(value) => setValue(value as number)}
+        onChange={setValue}
         onDoubleClick={() => setValue(defaultValue)}
         min={0}
         max={127}
