@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
-import { useSetTrackPan } from "../../actions"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePanSlider } from "../../hooks/usePanSlider"
 import { Localized } from "../../localize/useLocalization"
 import { Slider } from "../ui/Slider"
 
@@ -21,12 +20,9 @@ const Label = styled.div`
   color: var(--color-text-secondary);
 `
 
-const PAN_CENTER = 64
-
 export const PanSlider: FC = () => {
-  const { currentPan, selectedTrackId: trackId } = usePianoRoll()
-  const setTrackPan = useSetTrackPan(trackId)
-  const pan = currentPan ?? PAN_CENTER
+  const { value, setValue, defaultValue, onPointerDown, onPointerUp } =
+    usePanSlider()
 
   return (
     <Container>
@@ -34,14 +30,16 @@ export const PanSlider: FC = () => {
         <Localized name="pan" />
       </Label>
       <Slider
-        value={pan}
-        onChange={(value) => setTrackPan(value as number)}
-        onDoubleClick={() => setTrackPan(PAN_CENTER)}
+        value={value}
+        onChange={setValue}
+        onDoubleClick={() => setValue(defaultValue)}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
         min={0}
         max={127}
-        defaultValue={PAN_CENTER}
+        defaultValue={defaultValue}
         minStepsBetweenThumbs={1}
-        marks={[PAN_CENTER]}
+        marks={[defaultValue]}
       ></Slider>
     </Container>
   )
