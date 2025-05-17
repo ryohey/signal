@@ -6,9 +6,9 @@ import {
   usePasteTempoSelection,
   useResetTempoSelection,
 } from "../../actions/tempo"
-import { isTempoEventsClipboardData } from "../../clipboard/clipboardTypes"
+import { TempoEventsClipboardDataSchema } from "../../clipboard/clipboardTypes"
 import { useTempoEditor } from "../../hooks/useTempoEditor"
-import clipboard from "../../services/Clipboard"
+import { readClipboardData } from "../../services/Clipboard"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 import { isFocusable } from "./isFocusable"
 
@@ -55,22 +55,19 @@ export const TempoEditorKeyboardShortcut: FC = () => {
           run: duplicateTempoSelection,
         },
       ]}
-      onPaste={(e) => {
+      onPaste={async (e) => {
         if (e.target !== null && isFocusable(e.target)) {
           return
         }
 
-        const text = clipboard.readText()
+        const obj = await readClipboardData()
+        const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
 
-        if (!text || text.length === 0) {
+        if (!data) {
           return
         }
 
-        const obj = JSON.parse(text)
-
-        if (isTempoEventsClipboardData(obj)) {
-          pasteTempoSelection()
-        }
+        pasteTempoSelection()
       }}
     />
   )

@@ -2,7 +2,7 @@ import mapValues from "lodash/mapValues"
 import { transaction } from "mobx"
 import {
   ArrangeNotesClipboardData,
-  isArrangeNotesClipboardData,
+  ArrangeNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { Range } from "../entities/geometry/Range"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
@@ -13,7 +13,7 @@ import { useArrangeView } from "../hooks/useArrangeView"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import clipboard from "../services/Clipboard"
+import { readClipboardData, writeClipboardData } from "../services/Clipboard"
 import Track from "../track"
 import { batchUpdateNotesVelocity, BatchUpdateOperation } from "./track"
 
@@ -89,7 +89,7 @@ export const useArrangeCopySelection = () => {
       notes,
       selectedTrackIndex: selection.fromTrackIndex,
     }
-    clipboard.writeText(JSON.stringify(data))
+    writeClipboardData(data)
   }
 }
 
@@ -99,20 +99,19 @@ export const useArrangePasteSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
 
-  return () => {
-    const text = clipboard.readText()
-    if (!text || text.length === 0) {
-      return
-    }
-    const obj = JSON.parse(text)
-    if (!isArrangeNotesClipboardData(obj)) {
+  return async () => {
+    const obj = await readClipboardData()
+    const { data, error } = ArrangeNotesClipboardDataSchema.safeParse(obj)
+
+    if (!data) {
+      console.error("Invalid clipboard data", error)
       return
     }
 
     pushHistory()
 
-    for (const trackIndex in obj.notes) {
-      const notes = obj.notes[trackIndex].map((note) => ({
+    for (const trackIndex in data.notes) {
+      const notes = data.notes[trackIndex].map((note) => ({
         ...note,
         tick: note.tick + position,
       }))
@@ -120,7 +119,7 @@ export const useArrangePasteSelection = () => {
       const isRulerSelected = selectedTrackIndex < 0
       const trackNumberOffset = isRulerSelected
         ? 0
-        : -obj.selectedTrackIndex + selectedTrackIndex
+        : -data.selectedTrackIndex + selectedTrackIndex
 
       const destTrackIndex = parseInt(trackIndex) + trackNumberOffset
 

@@ -23,7 +23,7 @@ export function useTrack(id: TrackId) {
       return useMobxSelector(() => track?.name ?? "", [track])
     },
     get channel() {
-      return useMobxSelector(() => track?.channel ?? 0, [track])
+      return useMobxSelector(() => track?.channel, [track])
     },
     get events() {
       return useMobxSelector(() => track?.events ?? [], [track])

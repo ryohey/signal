@@ -1,41 +1,41 @@
-import { SetTempoEvent } from "midifile-ts"
-import { NoteEvent, TrackEvent, TrackEventOf } from "../track"
+import { z } from "zod"
 
-export interface PianoNotesClipboardData {
-  readonly type: "piano_notes"
-  readonly notes: NoteEvent[]
-}
+export const PianoNotesClipboardDataSchema = z.object({
+  type: z.literal("piano_notes"),
+  notes: z.array(z.any()), // NoteEvent[]
+})
 
-export const isPianoNotesClipboardData = (
-  x: any,
-): x is PianoNotesClipboardData => x.type === "piano_notes" && "notes" in x
+export type PianoNotesClipboardData = z.infer<
+  typeof PianoNotesClipboardDataSchema
+>
 
-export interface ArrangeNotesClipboardData {
-  readonly type: "arrange_notes"
-  readonly notes: { [key: number]: TrackEvent[] }
-  readonly selectedTrackIndex: number
-}
+export const ArrangeNotesClipboardDataSchema = z.object({
+  type: z.literal("arrange_notes"),
+  notes: z.record(
+    z.union([z.number(), z.string()]).describe("trackIndex"),
+    z.array(z.any().describe("TrackEvent")),
+  ),
+  selectedTrackIndex: z.number(),
+})
 
-export const isArrangeNotesClipboardData = (
-  x: any,
-): x is ArrangeNotesClipboardData =>
-  x.type === "arrange_notes" && "notes" in x && "selectedTrackIndex" in x
+export type ArrangeNotesClipboardData = z.infer<
+  typeof ArrangeNotesClipboardDataSchema
+>
 
-export interface ControlEventsClipboardData {
-  readonly type: "control_events"
-  readonly events: readonly TrackEvent[]
-}
+export const ControlEventsClipboardDataSchema = z.object({
+  type: z.literal("control_events"),
+  events: z.array(z.any().describe("TrackEvent")),
+})
 
-export const isControlEventsClipboardData = (
-  x: any,
-): x is ControlEventsClipboardData =>
-  x.type === "control_events" && "events" in x
+export type ControlEventsClipboardData = z.infer<
+  typeof ControlEventsClipboardDataSchema
+>
 
-export interface TempoEventsClipboardData {
-  readonly type: "tempo_events"
-  readonly events: TrackEventOf<SetTempoEvent>[]
-}
+export const TempoEventsClipboardDataSchema = z.object({
+  type: z.literal("tempo_events"),
+  events: z.array(z.any().describe("TrackEventOf<SetTempoEvent>")),
+})
 
-export const isTempoEventsClipboardData = (
-  x: any,
-): x is ControlEventsClipboardData => x.type === "tempo_events" && "events" in x
+export type TempoEventsClipboardData = z.infer<
+  typeof TempoEventsClipboardDataSchema
+>
