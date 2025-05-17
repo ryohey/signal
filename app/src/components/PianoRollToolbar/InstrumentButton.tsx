@@ -19,7 +19,9 @@ export const InstrumentButton: FC = () => {
     setOpen(true)
   }, [isRhythmTrack, programNumber, setOpen, setSetting])
 
-  const emoji = categoryEmojis[getCategoryIndex(programNumber ?? 0)]
+  const emoji = isRhythmTrack
+    ? "🥁"
+    : categoryEmojis[getCategoryIndex(programNumber ?? 0)]
 
   return (
     <ToolbarButton

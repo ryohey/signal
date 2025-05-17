@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { CheckedState } from "@radix-ui/react-checkbox"
 import { FC } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { Localized } from "../../localize/useLocalization"
@@ -45,14 +44,10 @@ export const InstrumentBrowser: FC = () => {
     selectedCategoryIndex,
     categoryFirstProgramEvents,
     categoryInstruments,
-    setSetting,
     onChangeInstrument: onChange,
     onClickOK,
+    onChangeRhythmTrack,
   } = useInstrumentBrowser()
-
-  const onChangeRhythmTrack = (state: CheckedState) => {
-    setSetting({ programNumber, isRhythmTrack: state === true })
-  }
 
   const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
     value: i,
@@ -96,7 +91,7 @@ export const InstrumentBrowser: FC = () => {
         <Footer>
           <Checkbox
             checked={isRhythmTrack}
-            onCheckedChange={onChangeRhythmTrack}
+            onCheckedChange={(state) => onChangeRhythmTrack(state === true)}
             label={<Localized name="rhythm-track" />}
           />
         </Footer>

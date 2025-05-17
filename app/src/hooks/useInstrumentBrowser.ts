@@ -1,7 +1,6 @@
 import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { isNotUndefined } from "../helpers/array"
 import { getCategoryIndex } from "../midi/GM"
 import { programChangeMidiEvent } from "../midi/MidiEvent"
@@ -24,11 +23,13 @@ export function useInstrumentBrowser() {
   const { tracks } = useSong()
   const { previewNoteOn } = usePreviewNote()
 
-  const applySetting = useCallback(
-    (setting: InstrumentSetting) => {
-      if (setting.isRhythmTrack) {
+  const changeRhythmTrack = useCallback(
+    (newRhythmTrack: boolean) => {
+      if (newRhythmTrack === isRhythmTrack) {
+        return
+      }
+      if (newRhythmTrack) {
         setChannel(9)
-        setTrackInstrumentAction(setting.programNumber)
       } else {
         if (isRhythmTrack) {
           // 適当なチャンネルに変える
@@ -42,22 +43,20 @@ export function useInstrumentBrowser() {
             ) || 0
           setChannel(availableChannel)
         }
-        setTrackInstrumentAction(setting.programNumber)
       }
+      setSetting({
+        programNumber: 0, // reset program number when changing rhythm track
+        isRhythmTrack: newRhythmTrack,
+      })
+      setTrackInstrumentAction(0)
     },
-    [
-      setChannel,
-      setTrackInstrumentAction,
-      isRhythmTrack,
-      selectedTrackId,
-      tracks,
-    ],
+    [isRhythmTrack, selectedTrackId, setChannel, tracks, setSetting],
   )
 
   const onClickOK = useCallback(() => {
-    applySetting(setting)
+    setTrackInstrumentAction(setting.programNumber)
     setOpen(false)
-  }, [applySetting, setting, setOpen])
+  }, [changeRhythmTrack, setTrackInstrumentAction, setting, setOpen])
 
   const selectedCategoryIndex = isRhythmTrack
     ? 0
@@ -65,19 +64,7 @@ export function useInstrumentBrowser() {
 
   return {
     setting,
-    setSetting: (newSetting: InstrumentSetting) => {
-      if (newSetting.isRhythmTrack) {
-        setSetting({
-          programNumber: 0,
-          isRhythmTrack: true,
-        })
-      } else {
-        setSetting(newSetting)
-      }
-      if (setting.isRhythmTrack !== newSetting.isRhythmTrack) {
-        applySetting(newSetting)
-      }
-    },
+    setSetting,
     get isOpen() {
       return usePianoRoll().openInstrumentBrowser
     },
@@ -119,6 +106,12 @@ export function useInstrumentBrowser() {
         })
       },
       [setSetting, setting, channel, previewNoteOn],
+    ),
+    onChangeRhythmTrack: useCallback(
+      (state: boolean) => {
+        changeRhythmTrack(state)
+      },
+      [changeRhythmTrack],
     ),
     onClickOK,
   }
