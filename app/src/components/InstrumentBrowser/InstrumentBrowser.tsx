@@ -4,11 +4,11 @@ import { FC } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { FancyCategoryName } from "../TrackList/CategoryName"
 import { InstrumentName } from "../TrackList/InstrumentName"
 import { Button, PrimaryButton } from "../ui/Button"
 import { Checkbox } from "../ui/Checkbox"
 import { Label } from "../ui/Label"
+import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName"
 import { SelectBox } from "./SelectBox"
 
 export interface InstrumentSetting {
@@ -18,11 +18,6 @@ export interface InstrumentSetting {
 
 const Finder = styled.div`
   display: flex;
-
-  &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
 `
 
 const Left = styled.div`
@@ -61,18 +56,22 @@ export const InstrumentBrowser: FC = () => {
 
   const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
     value: i,
-    label: <FancyCategoryName programNumber={preset} />,
+    label: isRhythmTrack ? (
+      <DrumKitCategoryName />
+    ) : (
+      <FancyCategoryName programNumber={preset} />
+    ),
   }))
 
   const instrumentOptions = categoryInstruments.map((p) => ({
     value: p,
-    label: <InstrumentName programNumber={p} />,
+    label: <InstrumentName programNumber={p} isRhythmTrack={isRhythmTrack} />,
   }))
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="InstrumentBrowser">
-        <Finder className={isRhythmTrack ? "disabled" : ""}>
+        <Finder>
           <Left>
             <Label style={{ marginBottom: "0.5rem" }}>
               <Localized name="categories" />
