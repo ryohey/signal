@@ -20,8 +20,8 @@ import {
   DialogContent,
   DialogTitle,
 } from "../Dialog/Dialog"
+import { DraggableList } from "../DraggableList/DraggableList"
 import { Button } from "../ui/Button"
-import { DraggableList } from "./DraggableList"
 
 const nonControllerControlModes: ControlMode[] = [
   {

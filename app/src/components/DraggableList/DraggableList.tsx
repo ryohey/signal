@@ -1,6 +1,5 @@
 import {
   DndContext,
-  KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
@@ -9,7 +8,6 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import {
   SortableContext,
-  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
@@ -64,9 +62,6 @@ export const DraggableList = <T extends object, ID extends string | number>({
       activationConstraint: {
         distance: 5, // Enable item click
       },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     }),
   )
 
