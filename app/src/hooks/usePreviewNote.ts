@@ -10,7 +10,11 @@ export function usePreviewNote() {
   const [stopNoteTimeout, setStopNoteTimeout] = useState<NodeJS.Timeout | null>(
     null,
   )
-  const { selectedTrackId } = usePianoRoll()
+  const {
+    selectedTrackId,
+    addPreviewingNoteNumbers,
+    removePreviewingNoteNumbers,
+  } = usePianoRoll()
   const { channel } = useTrack(selectedTrackId)
 
   const previewNoteOff = useCallback(() => {
@@ -29,10 +33,11 @@ export function usePreviewNote() {
           noteNumber: prevNoteNumber,
           channel,
         })
+        removePreviewingNoteNumbers(prevNoteNumber)
       }
       return null
     })
-  }, [stopNote, channel])
+  }, [stopNote, channel, removePreviewingNoteNumbers])
 
   return {
     previewNoteOn: useCallback(
@@ -43,14 +48,7 @@ export function usePreviewNote() {
 
         // if note is already playing, stop it immediately and cancel the timeout
         if (stopNoteTimeout !== null) {
-          clearTimeout(stopNoteTimeout)
-        }
-
-        if (prevNoteNumber !== null) {
-          stopNote({
-            noteNumber: prevNoteNumber,
-            channel,
-          })
+          previewNoteOff()
         }
 
         startNote({
@@ -59,12 +57,20 @@ export function usePreviewNote() {
           channel,
         })
         setPrevNoteNumber(noteNumber)
+        addPreviewingNoteNumbers(noteNumber)
 
         if (duration !== undefined) {
           setStopNoteTimeout(setTimeout(() => previewNoteOff(), duration))
         }
       },
-      [stopNoteTimeout, channel, previewNoteOff, startNote, prevNoteNumber],
+      [
+        stopNoteTimeout,
+        channel,
+        previewNoteOff,
+        startNote,
+        prevNoteNumber,
+        addPreviewingNoteNumbers,
+      ],
     ),
     previewNoteOff,
   }

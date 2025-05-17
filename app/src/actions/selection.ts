@@ -7,16 +7,15 @@ import {
 import { Rect } from "../entities/geometry/Rect"
 import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
-import { tickToMillisec } from "../helpers/bpm"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
+import { usePreviewNote } from "../hooks/usePreviewNote"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
 import clipboard from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
-import { useStartNote, useStopNote } from "./player"
 
 export function eventsInSelection(
   events: readonly TrackEvent[],
@@ -235,11 +234,9 @@ const sortedNotes = (notes: NoteEvent[]): NoteEvent[] =>
 
 const useSelectNeighborNote = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const { getEvents, channel } = useTrack(selectedTrackId)
-  const { timebase } = useSong()
+  const { previewNoteOn } = usePreviewNote()
+  const { getEvents } = useTrack(selectedTrackId)
   const selectNote = useSelectNote()
-  const startNote = useStartNote()
-  const stopNote = useStopNote()
 
   return (deltaIndex: number) => {
     if (selectedNoteIds.length === 0) {
@@ -265,14 +262,7 @@ const useSelectNeighborNote = () => {
     }
 
     selectNote(nextNote.id)
-
-    // Stop playing the current note, then play the new note.
-    stopNote({ ...currentNote, channel })
-    startNote({ ...nextNote, channel })
-    stopNote(
-      { ...nextNote, channel },
-      tickToMillisec(nextNote.duration, 120, timebase) / 1000,
-    )
+    previewNoteOn(currentNote.noteNumber, currentNote.duration)
   }
 }
 
