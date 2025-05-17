@@ -2,7 +2,7 @@ import { max, min } from "lodash"
 import { useCallback } from "react"
 import {
   PianoNotesClipboardData,
-  isPianoNotesClipboardData,
+  PianoNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { Rect } from "../entities/geometry/Rect"
 import { Selection } from "../entities/selection/Selection"
@@ -14,7 +14,7 @@ import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
-import clipboard from "../services/Clipboard"
+import { readClipboardData, writeClipboardData } from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
 
 export function eventsInSelection(
@@ -87,7 +87,7 @@ export const useCopySelection = () => {
   const { selection, selectedNoteIds, selectedTrackId } = usePianoRoll()
   const { getEventById } = useTrack(selectedTrackId)
 
-  return () => {
+  return async () => {
     if (selectedNoteIds.length === 0) {
       return
     }
@@ -112,7 +112,7 @@ export const useCopySelection = () => {
       notes,
     }
 
-    clipboard.writeText(JSON.stringify(data))
+    await writeClipboardData(data)
   }
 }
 
@@ -142,26 +142,24 @@ export const useDeleteSelection = () => {
   }
 }
 
+// Paste notes copied to the current position
 export const usePasteSelection = () => {
   const { selectedTrackId } = usePianoRoll()
   const { addEvents } = useTrack(selectedTrackId)
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
-  return () => {
-    // Paste notes copied to the current position
-    const text = clipboard.readText()
-    if (!text || text.length === 0) {
-      return
-    }
-    const obj = JSON.parse(text)
-    if (!isPianoNotesClipboardData(obj)) {
+  return async (clipboardData?: any) => {
+    const obj = clipboardData ?? (await readClipboardData())
+    const { data } = PianoNotesClipboardDataSchema.safeParse(obj)
+
+    if (!data) {
       return
     }
 
     pushHistory()
 
-    const notes = obj.notes.map((note) => ({
+    const notes = data.notes.map((note) => ({
       ...note,
       tick: Math.max(0, note.tick + position),
     }))

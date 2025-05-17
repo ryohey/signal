@@ -3,7 +3,7 @@ import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import {
   ControlEventsClipboardData,
-  isControlEventsClipboardData,
+  ControlEventsClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "../hooks/useControlPane"
@@ -11,7 +11,7 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useTrack } from "../hooks/useTrack"
-import clipboard from "../services/Clipboard"
+import { readClipboardData, writeClipboardData } from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
   const { selectedTrackId } = usePianoRoll()
@@ -63,7 +63,7 @@ export const useCopyControlSelection = () => {
   const { getEventById } = useTrack(selectedTrackId)
   const { selectedEventIds } = useControlPane()
 
-  return () => {
+  return async () => {
     if (selectedEventIds.length === 0) {
       return
     }
@@ -89,7 +89,7 @@ export const useCopyControlSelection = () => {
       events: relativePositionedEvents,
     }
 
-    clipboard.writeText(JSON.stringify(data))
+    await writeClipboardData(data)
   }
 }
 
@@ -99,20 +99,17 @@ export const usePasteControlSelection = () => {
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
-  return () => {
-    const text = clipboard.readText()
-    if (!text || text.length === 0) {
-      return
-    }
+  return async (clipboardData?: any) => {
+    const obj = clipboardData ?? (await readClipboardData())
+    const { data } = ControlEventsClipboardDataSchema.safeParse(obj)
 
-    const obj = JSON.parse(text)
-    if (!isControlEventsClipboardData(obj)) {
+    if (!data) {
       return
     }
 
     pushHistory()
 
-    const events = obj.events.map((e) => ({
+    const events = data.events.map((e) => ({
       ...e,
       tick: e.tick + position,
     }))

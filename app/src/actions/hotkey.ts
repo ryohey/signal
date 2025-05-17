@@ -5,13 +5,13 @@ import {
   usePasteControlSelection,
 } from "../actions/control"
 import {
-  isControlEventsClipboardData,
-  isPianoNotesClipboardData,
+  ControlEventsClipboardDataSchema,
+  PianoNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { useControlPane } from "../hooks/useControlPane"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { useRouter } from "../hooks/useRouter"
-import Clipboard from "../services/Clipboard"
+import { readClipboardData } from "../services/Clipboard"
 import {
   useArrangeCopySelection,
   useArrangeDeleteSelection,
@@ -94,18 +94,17 @@ export const usePasteSelectionGlobal = () => {
   const pasteTempoSelection = usePasteTempoSelection()
   const pasteControlSelection = usePasteControlSelection()
 
-  return () => {
+  return async () => {
     switch (path) {
       case "/track": {
-        const text = Clipboard.readText()
-        if (!text || text.length === 0) {
+        const obj = await readClipboardData()
+        if (!obj) {
           return
         }
-        const obj = JSON.parse(text)
-        if (isPianoNotesClipboardData(obj)) {
-          pasteSelection()
-        } else if (isControlEventsClipboardData(obj)) {
-          pasteControlSelection()
+        if (PianoNotesClipboardDataSchema.safeParse(obj).success) {
+          pasteSelection(obj)
+        } else if (ControlEventsClipboardDataSchema.safeParse(obj).success) {
+          pasteControlSelection(obj)
         }
         break
       }

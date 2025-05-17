@@ -2,14 +2,14 @@ import { maxBy, min, minBy } from "lodash"
 import { transaction } from "mobx"
 import {
   TempoEventsClipboardData,
-  isTempoEventsClipboardData,
+  TempoEventsClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useTempoEditor } from "../hooks/useTempoEditor"
-import clipboard from "../services/Clipboard"
+import { readClipboardData, writeClipboardData } from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
@@ -44,7 +44,7 @@ export const useCopyTempoSelection = () => {
   const { selectedEventIds } = useTempoEditor()
   const { getEventById } = useConductorTrack()
 
-  return () => {
+  return async () => {
     if (selectedEventIds.length === 0) {
       return
     }
@@ -71,7 +71,7 @@ export const useCopyTempoSelection = () => {
       events: relativePositionedEvents,
     }
 
-    clipboard.writeText(JSON.stringify(data))
+    await writeClipboardData(data)
   }
 }
 
@@ -80,20 +80,17 @@ export const usePasteTempoSelection = () => {
   const { createOrUpdate } = useConductorTrack()
   const { pushHistory } = useHistory()
 
-  return () => {
-    const text = clipboard.readText()
-    if (!text || text.length === 0) {
-      return
-    }
+  return async (clipboardData?: any) => {
+    const obj = clipboardData ?? (await readClipboardData())
+    const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
 
-    const obj = JSON.parse(text)
-    if (!isTempoEventsClipboardData(obj)) {
+    if (!data) {
       return
     }
 
     pushHistory()
 
-    const events = obj.events.map((e) => ({
+    const events = data.events.map((e) => ({
       ...e,
       tick: e.tick + position,
     }))

@@ -2,12 +2,12 @@ import { FC } from "react"
 import { usePasteSelection, useSelectAllNotes } from "../../actions"
 import { usePasteControlSelection } from "../../actions/control"
 import {
-  isControlEventsClipboardData,
-  isPianoNotesClipboardData,
+  ControlEventsClipboardDataSchema,
+  PianoNotesClipboardDataSchema,
 } from "../../clipboard/clipboardTypes"
 import { useControlPane } from "../../hooks/useControlPane"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
-import clipboard from "../../services/Clipboard"
+import { readClipboardData } from "../../services/Clipboard"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 import { useControlPaneKeyboardShortcutActions } from "./controlPaneKeyboardShortcutActions"
 import { isFocusable } from "./isFocusable"
@@ -27,23 +27,17 @@ export const PianoRollKeyboardShortcut: FC = () => {
   const selectAllNotes = useSelectAllNotes()
 
   // Handle pasting here to allow pasting even when the element does not have focus, such as after clicking the ruler
-  const onPaste = (e: ClipboardEvent) => {
+  const onPaste = async (e: ClipboardEvent) => {
     if (e.target !== null && isFocusable(e.target)) {
       return
     }
 
-    const text = clipboard.readText()
+    const obj = await readClipboardData()
 
-    if (!text || text.length === 0) {
-      return
-    }
-
-    const obj = JSON.parse(text)
-
-    if (isPianoNotesClipboardData(obj)) {
-      pasteSelection()
-    } else if (isControlEventsClipboardData(obj)) {
-      pasteControlSelection()
+    if (PianoNotesClipboardDataSchema.safeParse(obj).success) {
+      pasteSelection(obj)
+    } else if (ControlEventsClipboardDataSchema.safeParse(obj).success) {
+      pasteControlSelection(obj)
     }
   }
 
