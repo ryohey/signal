@@ -3,7 +3,6 @@ import { CheckedState } from "@radix-ui/react-checkbox"
 import { FC } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { Localized } from "../../localize/useLocalization"
-import { getCategoryIndex } from "../../midi/GM"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { FancyCategoryName } from "../TrackList/CategoryName"
 import { InstrumentName } from "../TrackList/InstrumentName"
@@ -48,33 +47,26 @@ export const InstrumentBrowser: FC = () => {
     isOpen,
     setOpen,
     setting: { programNumber, isRhythmTrack },
+    selectedCategoryIndex,
+    categoryFirstProgramEvents,
+    categoryInstruments,
     setSetting,
     onChangeInstrument: onChange,
     onClickOK,
   } = useInstrumentBrowser()
 
-  const { presetCategories } = useInstrumentBrowser()
-  const selectedCategoryId = getCategoryIndex(programNumber)
-
   const onChangeRhythmTrack = (state: CheckedState) => {
     setSetting({ programNumber, isRhythmTrack: state === true })
   }
 
-  const instruments =
-    presetCategories.length > selectedCategoryId
-      ? presetCategories[selectedCategoryId].presets
-      : []
-
-  const categoryOptions = presetCategories.map((preset, i) => ({
+  const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
     value: i,
-    label: (
-      <FancyCategoryName programNumber={preset.presets[0].programNumber} />
-    ),
+    label: <FancyCategoryName programNumber={preset} />,
   }))
 
-  const instrumentOptions = instruments.map((p) => ({
-    value: p.programNumber,
-    label: <InstrumentName programNumber={p.programNumber} />,
+  const instrumentOptions = categoryInstruments.map((p) => ({
+    value: p,
+    label: <InstrumentName programNumber={p} />,
   }))
 
   return (
@@ -87,7 +79,7 @@ export const InstrumentBrowser: FC = () => {
             </Label>
             <SelectBox
               items={categoryOptions}
-              selectedValue={selectedCategoryId}
+              selectedValue={selectedCategoryIndex}
               onChange={(i) => onChange(i * 8)} // Choose the first instrument of the category
             />
           </Left>

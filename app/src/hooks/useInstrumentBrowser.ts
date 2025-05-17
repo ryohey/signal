@@ -1,4 +1,4 @@
-import { difference, groupBy, map, range } from "lodash"
+import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
 import { isNotUndefined } from "../helpers/array"
@@ -55,6 +55,8 @@ export function useInstrumentBrowser() {
     setTrackInstrumentAction,
   ])
 
+  const selectedCategoryIndex = getCategoryIndex(setting.programNumber)
+
   return {
     setting,
     setSetting,
@@ -62,16 +64,17 @@ export function useInstrumentBrowser() {
       return usePianoRoll().openInstrumentBrowser
     },
     setOpen,
-    get presetCategories() {
+    selectedCategoryIndex,
+    get categoryFirstProgramEvents() {
       return useMemo(() => {
-        const presets = range(0, 128).map((programNumber) => ({
-          programNumber,
-        }))
-        return map(
-          groupBy(presets, (p) => getCategoryIndex(p.programNumber)),
-          (presets) => ({ presets }),
-        )
+        return range(0, 127, 8)
       }, [])
+    },
+    get categoryInstruments() {
+      return useMemo(() => {
+        const offset = selectedCategoryIndex * 8
+        return range(offset, offset + 8)
+      }, [selectedCategoryIndex])
     },
     onChangeInstrument: useCallback(
       (programNumber: number) => {
