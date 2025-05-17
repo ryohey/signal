@@ -1,4 +1,4 @@
-import { difference, groupBy, map, range } from "lodash"
+import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
 import { isNotUndefined } from "../helpers/array"
@@ -23,37 +23,44 @@ export function useInstrumentBrowser() {
   const { tracks } = useSong()
   const { previewNoteOn } = usePreviewNote()
 
-  const onClickOK = useCallback(() => {
-    if (setting.isRhythmTrack) {
-      setChannel(9)
-      setTrackInstrumentAction(0)
-    } else {
-      if (isRhythmTrack) {
-        // 適当なチャンネルに変える
-        const channels = range(16)
-        const usedChannels = tracks
-          .filter((t) => t.id !== selectedTrackId)
-          .map((t) => t.channel)
-        const availableChannel =
-          Math.min(
-            ...difference(channels, usedChannels).filter(isNotUndefined),
-          ) || 0
-        setChannel(availableChannel)
+  const changeRhythmTrack = useCallback(
+    (newRhythmTrack: boolean) => {
+      if (newRhythmTrack === isRhythmTrack) {
+        return
       }
-      setTrackInstrumentAction(setting.programNumber)
-    }
+      if (newRhythmTrack) {
+        setChannel(9)
+      } else {
+        if (isRhythmTrack) {
+          // 適当なチャンネルに変える
+          const channels = range(16)
+          const usedChannels = tracks
+            .filter((t) => t.id !== selectedTrackId)
+            .map((t) => t.channel)
+          const availableChannel =
+            Math.min(
+              ...difference(channels, usedChannels).filter(isNotUndefined),
+            ) || 0
+          setChannel(availableChannel)
+        }
+      }
+      setSetting({
+        programNumber: 0, // reset program number when changing rhythm track
+        isRhythmTrack: newRhythmTrack,
+      })
+      setTrackInstrumentAction(0)
+    },
+    [isRhythmTrack, selectedTrackId, setChannel, tracks, setSetting],
+  )
 
+  const onClickOK = useCallback(() => {
+    setTrackInstrumentAction(setting.programNumber)
     setOpen(false)
-  }, [
-    setting,
-    setSetting,
-    selectedTrackId,
-    setChannel,
-    isRhythmTrack,
-    tracks,
-    setOpen,
-    setTrackInstrumentAction,
-  ])
+  }, [changeRhythmTrack, setTrackInstrumentAction, setting, setOpen])
+
+  const selectedCategoryIndex = isRhythmTrack
+    ? 0
+    : getCategoryIndex(setting.programNumber)
 
   return {
     setting,
@@ -62,16 +69,23 @@ export function useInstrumentBrowser() {
       return usePianoRoll().openInstrumentBrowser
     },
     setOpen,
-    get presetCategories() {
+    selectedCategoryIndex,
+    get categoryFirstProgramEvents() {
       return useMemo(() => {
-        const presets = range(0, 128).map((programNumber) => ({
-          programNumber,
-        }))
-        return map(
-          groupBy(presets, (p) => getCategoryIndex(p.programNumber)),
-          (presets) => ({ presets }),
-        )
-      }, [])
+        if (setting.isRhythmTrack) {
+          return [0]
+        }
+        return range(0, 127, 8)
+      }, [setting.isRhythmTrack])
+    },
+    get categoryInstruments() {
+      return useMemo(() => {
+        if (setting.isRhythmTrack) {
+          return [0, 8, 16, 24, 25, 32, 40, 48, 56]
+        }
+        const offset = selectedCategoryIndex * 8
+        return range(offset, offset + 8)
+      }, [selectedCategoryIndex, setting.isRhythmTrack])
     },
     onChangeInstrument: useCallback(
       (programNumber: number) => {
@@ -80,7 +94,11 @@ export function useInstrumentBrowser() {
         }
         sendEvent(programChangeMidiEvent(0, channel, programNumber))
         if (!isPlaying) {
-          previewNoteOn(64, 500)
+          if (setting.isRhythmTrack) {
+            previewNoteOn(38, 500)
+          } else {
+            previewNoteOn(64, 500)
+          }
         }
         setSetting({
           programNumber,
@@ -88,6 +106,12 @@ export function useInstrumentBrowser() {
         })
       },
       [setSetting, setting, channel, previewNoteOn],
+    ),
+    onChangeRhythmTrack: useCallback(
+      (state: boolean) => {
+        changeRhythmTrack(state)
+      },
+      [changeRhythmTrack],
     ),
     onClickOK,
   }

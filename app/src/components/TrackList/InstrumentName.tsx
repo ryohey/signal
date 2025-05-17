@@ -1,9 +1,7 @@
 import { FC } from "react"
-import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import { TrackId } from "../../track/Track"
 
-export const InstrumentName: FC<{ programNumber: number | undefined }> = ({
+const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({
   programNumber,
 }) => {
   switch (programNumber) {
@@ -267,10 +265,39 @@ export const InstrumentName: FC<{ programNumber: number | undefined }> = ({
   return <></>
 }
 
-export const TrackInstrumentName: FC<{ trackId: TrackId }> = ({ trackId }) => {
-  const { isRhythmTrack, programNumber } = useTrack(trackId)
-  if (isRhythmTrack) {
-    return <>Standard Drum Kit</>
+const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
+  programNumber,
+}) => {
+  switch (programNumber) {
+    case 0:
+      return <Localized name="Standard Drum Kit" />
+    case 8:
+      return <Localized name="Room Drum Kit" />
+    case 16:
+      return <Localized name="Power Drum Kit" />
+    case 24:
+      return <Localized name="Electronic Drum Kit" />
+    case 25:
+      return <Localized name="Analog Drum Kit" />
+    case 32:
+      return <Localized name="Jazz Drum Kit" />
+    case 40:
+      return <Localized name="Brush Drum Kit" />
+    case 48:
+      return <Localized name="Orchestra Drum Kit" />
+    case 56:
+      return <Localized name="SFX Drum Kit" />
+    default:
+      return <></>
   }
-  return <InstrumentName programNumber={programNumber} />
+}
+
+export const InstrumentName: FC<{
+  isRhythmTrack: boolean
+  programNumber: number
+}> = ({ isRhythmTrack, programNumber }) => {
+  if (isRhythmTrack) {
+    return <RhythmInstrumentName programNumber={programNumber} />
+  }
+  return <NormalInstrumentName programNumber={programNumber} />
 }

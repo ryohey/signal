@@ -19,7 +19,7 @@ import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { TrackId } from "../../track/Track"
 import { trackColorToCSSColor } from "../../track/TrackColor"
 import { TrackMute } from "../../trackMute/TrackMute"
-import { TrackInstrumentName } from "./InstrumentName"
+import { InstrumentName } from "./InstrumentName"
 import { TrackDialog } from "./TrackDialog"
 import { TrackListContextMenu } from "./TrackListContextMenu"
 import { TrackName } from "./TrackName"
@@ -254,7 +254,10 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
               <TrackName trackId={trackId} />
             </Name>
             <Instrument>
-              <TrackInstrumentName trackId={trackId} />
+              <InstrumentName
+                programNumber={programNumber}
+                isRhythmTrack={isRhythmTrack}
+              />
             </Instrument>
           </Label>
           <Controls>

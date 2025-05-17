@@ -1,4 +1,5 @@
-import { FC, useEffect, useState } from "react"
+import { FC } from "react"
+import { NumericFormat } from "react-number-format"
 
 export interface NumberInputProps {
   value: number
@@ -6,6 +7,7 @@ export interface NumberInputProps {
   max?: number
   step?: number
   id?: string
+  allowNegative?: boolean
   onChange: (value: number) => void
   onEnter?: () => void
   style?: React.CSSProperties
@@ -18,63 +20,33 @@ export const NumberInput: FC<NumberInputProps> = ({
   max,
   step,
   id,
+  allowNegative = false,
   onChange,
   onEnter,
   style,
   className,
 }) => {
-  const [rawValue, setRawValue] = useState(value)
-
-  const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      e.currentTarget.blur()
-      onEnter?.()
-    }
-  }
-
-  const updateRawValue = (newValue: number) => {
-    setRawValue(clamp(newValue))
-    if (newValue !== value && !isNaN(newValue)) {
-      onChange(newValue)
-    }
-  }
-
-  const clamp = (value: number) => {
-    return Math.max(
-      min ?? Number.NEGATIVE_INFINITY,
-      Math.min(max ?? Number.POSITIVE_INFINITY, value),
-    )
-  }
-
-  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateRawValue(clamp(parseFloat(e.target.value)))
-  }
-
-  const onBlur = () => {
-    if (isNaN(rawValue)) {
-      updateRawValue(min ?? 0)
-    }
-  }
-
-  useEffect(() => {
-    // Update the input value without triggering onChange
-    setRawValue(value)
-  }, [value])
-
   return (
-    <input
-      type="number"
-      id={id}
-      min={min}
-      max={max}
-      value={rawValue}
-      step={step}
-      onChange={onChangeInput}
-      onKeyPress={onKeyPress}
-      onBlur={onBlur}
+    <NumericFormat
+      value={value}
+      onValueChange={({ floatValue }) => {
+        if (floatValue !== undefined) {
+          onChange(floatValue)
+        }
+      }}
+      fixedDecimalScale
+      allowNegative={allowNegative}
       style={style}
       className={className}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          onEnter?.()
+        }
+      }}
+      min={min}
+      max={max}
+      step={step}
+      id={id}
     />
   )
 }

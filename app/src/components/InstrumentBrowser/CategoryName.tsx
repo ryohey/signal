@@ -2,9 +2,7 @@ import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 
-export const CategoryName: FC<{ programNumber: number }> = ({
-  programNumber,
-}) => {
+const CategoryName: FC<{ programNumber: number }> = ({ programNumber }) => {
   switch (getCategoryIndex(programNumber)) {
     case 0:
       return <Localized name="Piano" />
@@ -37,7 +35,7 @@ export const CategoryName: FC<{ programNumber: number }> = ({
     case 14:
       return <Localized name="Percussive" />
     case 15:
-      return <Localized name="Sound effects" />
+      return <Localized name="Sound Effects" />
   }
   return <></>
 }
@@ -49,6 +47,14 @@ export const FancyCategoryName: FC<{ programNumber: number }> = ({
   return (
     <>
       {emoji} <CategoryName programNumber={programNumber} />
+    </>
+  )
+}
+
+export const DrumKitCategoryName: FC = () => {
+  return (
+    <>
+      🥁 <Localized name="Drum Kits" />
     </>
   )
 }

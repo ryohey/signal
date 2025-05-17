@@ -66,6 +66,7 @@ export const VelocityDialog: FC<VelocityDialogProps> = ({
             onChange={setValue}
             style={{ flexGrow: 1 }}
             onEnter={_onClickOK}
+            allowNegative={operationType === "add"}
           />
           <Row>
             <RadioButton

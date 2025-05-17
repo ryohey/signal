@@ -253,14 +253,13 @@ const useSelectNeighborNote = () => {
     const firstNote = sortedNotes(selectedNotes)[0]
     const notes = sortedNotes(allNotes)
     const currentIndex = notes.findIndex((n) => n.id === firstNote.id)
-    const currentNote = notes[currentIndex]
     const nextNote = notes[currentIndex + deltaIndex]
     if (nextNote === undefined) {
       return
     }
 
     selectNote(nextNote.id)
-    previewNoteOn(currentNote.noteNumber, currentNote.duration)
+    previewNoteOn(nextNote.noteNumber, nextNote.duration)
   }
 }
 

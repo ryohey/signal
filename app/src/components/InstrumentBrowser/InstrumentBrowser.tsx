@@ -1,15 +1,13 @@
 import styled from "@emotion/styled"
-import { CheckedState } from "@radix-ui/react-checkbox"
 import { FC } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { Localized } from "../../localize/useLocalization"
-import { getCategoryIndex } from "../../midi/GM"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { FancyCategoryName } from "../TrackList/CategoryName"
 import { InstrumentName } from "../TrackList/InstrumentName"
 import { Button, PrimaryButton } from "../ui/Button"
 import { Checkbox } from "../ui/Checkbox"
 import { Label } from "../ui/Label"
+import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName"
 import { SelectBox } from "./SelectBox"
 
 export interface InstrumentSetting {
@@ -19,11 +17,6 @@ export interface InstrumentSetting {
 
 const Finder = styled.div`
   display: flex;
-
-  &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
 `
 
 const Left = styled.div`
@@ -48,46 +41,39 @@ export const InstrumentBrowser: FC = () => {
     isOpen,
     setOpen,
     setting: { programNumber, isRhythmTrack },
-    setSetting,
+    selectedCategoryIndex,
+    categoryFirstProgramEvents,
+    categoryInstruments,
     onChangeInstrument: onChange,
     onClickOK,
+    onChangeRhythmTrack,
   } = useInstrumentBrowser()
 
-  const { presetCategories } = useInstrumentBrowser()
-  const selectedCategoryId = getCategoryIndex(programNumber)
-
-  const onChangeRhythmTrack = (state: CheckedState) => {
-    setSetting({ programNumber, isRhythmTrack: state === true })
-  }
-
-  const instruments =
-    presetCategories.length > selectedCategoryId
-      ? presetCategories[selectedCategoryId].presets
-      : []
-
-  const categoryOptions = presetCategories.map((preset, i) => ({
+  const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
     value: i,
-    label: (
-      <FancyCategoryName programNumber={preset.presets[0].programNumber} />
+    label: isRhythmTrack ? (
+      <DrumKitCategoryName />
+    ) : (
+      <FancyCategoryName programNumber={preset} />
     ),
   }))
 
-  const instrumentOptions = instruments.map((p) => ({
-    value: p.programNumber,
-    label: <InstrumentName programNumber={p.programNumber} />,
+  const instrumentOptions = categoryInstruments.map((p) => ({
+    value: p,
+    label: <InstrumentName programNumber={p} isRhythmTrack={isRhythmTrack} />,
   }))
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="InstrumentBrowser">
-        <Finder className={isRhythmTrack ? "disabled" : ""}>
+        <Finder>
           <Left>
             <Label style={{ marginBottom: "0.5rem" }}>
               <Localized name="categories" />
             </Label>
             <SelectBox
               items={categoryOptions}
-              selectedValue={selectedCategoryId}
+              selectedValue={selectedCategoryIndex}
               onChange={(i) => onChange(i * 8)} // Choose the first instrument of the category
             />
           </Left>
@@ -105,7 +91,7 @@ export const InstrumentBrowser: FC = () => {
         <Footer>
           <Checkbox
             checked={isRhythmTrack}
-            onCheckedChange={onChangeRhythmTrack}
+            onCheckedChange={(state) => onChangeRhythmTrack(state === true)}
             label={<Localized name="rhythm-track" />}
           />
         </Footer>

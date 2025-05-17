@@ -4,7 +4,7 @@ import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTrack } from "../../hooks/useTrack"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
-import { TrackInstrumentName } from "../TrackList/InstrumentName"
+import { InstrumentName } from "../TrackList/InstrumentName"
 
 export const InstrumentButton: FC = () => {
   const { selectedTrackId } = usePianoRoll()
@@ -19,7 +19,9 @@ export const InstrumentButton: FC = () => {
     setOpen(true)
   }, [isRhythmTrack, programNumber, setOpen, setSetting])
 
-  const emoji = categoryEmojis[getCategoryIndex(programNumber ?? 0)]
+  const emoji = isRhythmTrack
+    ? "🥁"
+    : categoryEmojis[getCategoryIndex(programNumber ?? 0)]
 
   return (
     <ToolbarButton
@@ -30,7 +32,10 @@ export const InstrumentButton: FC = () => {
     >
       <span style={{ marginRight: "0.5rem" }}>{emoji}</span>
       <span>
-        <TrackInstrumentName trackId={selectedTrackId} />
+        <InstrumentName
+          programNumber={programNumber}
+          isRhythmTrack={isRhythmTrack}
+        />
       </span>
     </ToolbarButton>
   )
