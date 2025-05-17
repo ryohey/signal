@@ -59,7 +59,9 @@ export function useInstrumentBrowser() {
     setOpen(false)
   }, [applySetting, setting, setOpen])
 
-  const selectedCategoryIndex = getCategoryIndex(setting.programNumber)
+  const selectedCategoryIndex = isRhythmTrack
+    ? 0
+    : getCategoryIndex(setting.programNumber)
 
   return {
     setting,
