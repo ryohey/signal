@@ -1,5 +1,5 @@
 import { makeObservable, observable } from "mobx"
-import { createContext, useContext } from "react"
+import { createContext, useCallback, useContext } from "react"
 import { deserialize } from "serializr"
 import Song from "../song"
 import { SerializedRootStore } from "../stores/RootStore"
@@ -69,13 +69,16 @@ function useSerializeState() {
   const { serializeState: serializeControlPane } = useControlPane()
   const { serializeState: serializeArrangeView } = useArrangeView()
 
-  return () =>
-    ({
-      song: songStore.serialize(),
-      pianoRollStore: serializePianoRoll(),
-      controlStore: serializeControlPane(),
-      arrangeViewStore: serializeArrangeView(),
-    }) as SerializedRootStore
+  return useCallback(
+    () =>
+      ({
+        song: songStore.serialize(),
+        pianoRollStore: serializePianoRoll(),
+        controlStore: serializeControlPane(),
+        arrangeViewStore: serializeArrangeView(),
+      }) as SerializedRootStore,
+    [songStore, serializePianoRoll, serializeControlPane, serializeArrangeView],
+  )
 }
 
 function useRestoreState() {
@@ -84,22 +87,25 @@ function useRestoreState() {
   const { restoreState: restoreControlPane } = useControlPane()
   const { restoreState: restoreArrangeView } = useArrangeView()
 
-  return (serializedState: SerializedRootStore) => {
-    const song = deserialize(Song, serializedState.song)
-    setSong(song)
-    restorePianoRoll(serializedState.pianoRollStore)
-    restoreControlPane(serializedState.controlStore)
-    restoreArrangeView(serializedState.arrangeViewStore)
-  }
+  return useCallback(
+    (serializedState: SerializedRootStore) => {
+      const song = deserialize(Song, serializedState.song)
+      setSong(song)
+      restorePianoRoll(serializedState.pianoRollStore)
+      restoreControlPane(serializedState.controlStore)
+      restoreArrangeView(serializedState.arrangeViewStore)
+    },
+    [setSong, restorePianoRoll, restoreControlPane, restoreArrangeView],
+  )
 }
 
 function usePushHistory() {
   const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
 
-  return () => {
+  return useCallback(() => {
     historyStore.undoHistory = [...historyStore.undoHistory, serializeState()]
-  }
+  }, [historyStore, serializeState])
 }
 
 function useUndo() {
@@ -107,7 +113,7 @@ function useUndo() {
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
-  return () => {
+  return useCallback(() => {
     const undoHistory = [...historyStore.undoHistory]
     const state = undoHistory.pop()
     if (state) {
@@ -115,7 +121,7 @@ function useUndo() {
       historyStore.redoHistory = [...historyStore.redoHistory, serializeState()]
       restoreState(state)
     }
-  }
+  }, [historyStore, serializeState, restoreState])
 }
 
 function useRedo() {
@@ -123,7 +129,7 @@ function useRedo() {
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
-  return () => {
+  return useCallback(() => {
     const redoHistory = [...historyStore.redoHistory]
     const state = redoHistory.pop()
     if (state) {
@@ -131,14 +137,14 @@ function useRedo() {
       historyStore.undoHistory = [...historyStore.undoHistory, serializeState()]
       restoreState(state)
     }
-  }
+  }, [historyStore, serializeState, restoreState])
 }
 
 function useClearHistory() {
   const historyStore = useContext(HistoryStoreContext)
 
-  return () => {
+  return useCallback(() => {
     historyStore.undoHistory = []
     historyStore.redoHistory = []
-  }
+  }, [historyStore])
 }

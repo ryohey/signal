@@ -327,6 +327,23 @@ export function usePianoRoll() {
       },
       [pianoRollStore],
     ),
+    addPreviewingNoteNumbers: useCallback(
+      (noteNumber: number) =>
+        (pianoRollStore.previewingNoteNumbers = new Set([
+          ...pianoRollStore.previewingNoteNumbers,
+          noteNumber,
+        ])),
+      [pianoRollStore],
+    ),
+    removePreviewingNoteNumbers: useCallback(
+      (noteNumber: number) =>
+        (pianoRollStore.previewingNoteNumbers = new Set(
+          [...pianoRollStore.previewingNoteNumbers].filter(
+            (n) => n !== noteNumber,
+          ),
+        )),
+      [pianoRollStore],
+    ),
     setSelection: useCallback(
       (selection: Selection | null) => (pianoRollStore.selection = selection),
       [pianoRollStore],

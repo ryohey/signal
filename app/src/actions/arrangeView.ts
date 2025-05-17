@@ -1,4 +1,5 @@
 import mapValues from "lodash/mapValues"
+import { transaction } from "mobx"
 import {
   ArrangeNotesClipboardData,
   isArrangeNotesClipboardData,
@@ -21,46 +22,48 @@ export const moveEventsBetweenTracks = (
   tracks: readonly Track[],
   eventIdForTrackIndex: { [trackIndex: number]: number[] },
   delta: ArrangePoint,
-) => {
-  const updates = []
-  for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
-    eventIdForTrackIndex,
-  )) {
-    const trackIndex = parseInt(trackIndexStr, 10)
-    const track = tracks[trackIndex]
-    const events = selectedEventIdsValue
-      .map((id) => track.getEventById(id))
-      .filter(isNotUndefined)
+) =>
+  transaction(() => {
+    const updates = []
+    for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
+      eventIdForTrackIndex,
+    )) {
+      const trackIndex = parseInt(trackIndexStr, 10)
+      const track = tracks[trackIndex]
+      const events = selectedEventIdsValue
+        .map((id) => track.getEventById(id))
+        .filter(isNotUndefined)
 
-    if (delta.trackIndex === 0) {
-      track.updateEvents(
-        events.map((e) => ({
-          id: e.id,
-          tick: e.tick + delta.tick,
-        })),
-      )
-    } else {
-      updates.push({
-        sourceTrackIndex: trackIndex,
-        destinationTrackIndex: trackIndex + delta.trackIndex,
-        events: events.map((e) => ({
-          ...e,
-          tick: e.tick + delta.tick,
-        })),
-      })
+      if (delta.trackIndex === 0) {
+        track.updateEvents(
+          events.map((e) => ({
+            id: e.id,
+            tick: e.tick + delta.tick,
+          })),
+        )
+      } else {
+        updates.push({
+          sourceTrackIndex: trackIndex,
+          destinationTrackIndex: trackIndex + delta.trackIndex,
+          events: events.map((e) => ({
+            ...e,
+            tick: e.tick + delta.tick,
+          })),
+        })
+      }
     }
-  }
-  if (delta.trackIndex !== 0) {
-    const ids: { [trackIndex: number]: number[] } = {}
-    for (const u of updates) {
-      tracks[u.sourceTrackIndex].removeEvents(u.events.map((e) => e.id))
-      const events = tracks[u.destinationTrackIndex].addEvents(u.events)
-      ids[u.destinationTrackIndex] = events.map((e) => e.id)
+    if (delta.trackIndex !== 0) {
+      const ids: { [trackIndex: number]: number[] } = {}
+      for (const u of updates) {
+        tracks[u.sourceTrackIndex].removeEvents(u.events.map((e) => e.id))
+        const events = tracks[u.destinationTrackIndex].addEvents(u.events)
+        ids[u.destinationTrackIndex] = events.map((e) => e.id)
+      }
+      return ids
     }
-    return ids
-  }
-  return eventIdForTrackIndex
-}
+
+    return eventIdForTrackIndex
+  })
 
 export const useArrangeCopySelection = () => {
   const { tracks } = useSong()
