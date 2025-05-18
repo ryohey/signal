@@ -3,9 +3,10 @@ import { FC } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTrack } from "../../../hooks/useTrack"
-import { NoteCircles } from "./NoteCircles"
-import { NoteRectangles } from "./NoteRectangles"
 import { LegacyNotes } from "./lagacy/LegacyNotes"
+import { NoteCircles } from "./NoteCircles"
+import { NoteLabels } from "./NoteLabels"
+import { NoteRectangles } from "./NoteRectangles"
 
 export interface NotesProps {
   zIndex: number
@@ -34,14 +35,17 @@ const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
         />
       )}
       {!isRhythmTrack && (
-        <NoteRectangles
-          strokeColor={borderColor}
-          inactiveColor={inactiveColor}
-          activeColor={activeColor}
-          selectedColor={selectedColor}
-          rects={notes}
-          zIndex={zIndex + 0.1}
-        />
+        <>
+          <NoteRectangles
+            strokeColor={borderColor}
+            inactiveColor={inactiveColor}
+            activeColor={activeColor}
+            selectedColor={selectedColor}
+            rects={notes}
+            zIndex={zIndex + 0.1}
+          />
+          <NoteLabels rects={notes} zIndex={zIndex + 0.2} />
+        </>
       )}
     </>
   )

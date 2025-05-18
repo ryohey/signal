@@ -40,6 +40,7 @@ export function useGhostNotes(trackId: TrackId) {
           ...rect,
           id: e.id,
           velocity: 127, // draw opaque when ghost
+          noteNumber: e.noteNumber,
           isSelected: false,
         }
       }),
