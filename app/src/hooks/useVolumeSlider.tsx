@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import { panMidiEvent } from "../midi/MidiEvent"
+import { volumeMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
@@ -24,7 +24,7 @@ export function useVolumeSlider() {
       setVolume(pan, position)
 
       if (channel !== undefined) {
-        sendEvent(panMidiEvent(0, channel, pan))
+        sendEvent(volumeMidiEvent(0, channel, pan))
       }
     },
     [pushHistory, setVolume, position, sendEvent, channel],
