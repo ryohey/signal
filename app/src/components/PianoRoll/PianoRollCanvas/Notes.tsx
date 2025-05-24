@@ -2,10 +2,12 @@ import { GLFallback } from "@ryohey/webgl-react"
 import { FC } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useSettings } from "../../../hooks/useSettings"
 import { useTrack } from "../../../hooks/useTrack"
-import { NoteCircles } from "./NoteCircles"
-import { NoteRectangles } from "./NoteRectangles"
 import { LegacyNotes } from "./lagacy/LegacyNotes"
+import { NoteCircles } from "./NoteCircles"
+import { NoteLabels } from "./NoteLabels"
+import { NoteRectangles } from "./NoteRectangles"
 
 export interface NotesProps {
   zIndex: number
@@ -20,6 +22,7 @@ const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const { borderColor, inactiveColor, activeColor, selectedColor } =
     useNoteColor()
+  const { showNoteLabels } = useSettings()
 
   return (
     <>
@@ -34,14 +37,17 @@ const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
         />
       )}
       {!isRhythmTrack && (
-        <NoteRectangles
-          strokeColor={borderColor}
-          inactiveColor={inactiveColor}
-          activeColor={activeColor}
-          selectedColor={selectedColor}
-          rects={notes}
-          zIndex={zIndex + 0.1}
-        />
+        <>
+          <NoteRectangles
+            strokeColor={borderColor}
+            inactiveColor={inactiveColor}
+            activeColor={activeColor}
+            selectedColor={selectedColor}
+            rects={notes}
+            zIndex={zIndex + 0.1}
+          />
+          {showNoteLabels && <NoteLabels rects={notes} zIndex={zIndex + 0.2} />}
+        </>
       )}
     </>
   )
