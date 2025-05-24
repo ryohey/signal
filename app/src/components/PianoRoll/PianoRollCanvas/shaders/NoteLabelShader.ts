@@ -147,7 +147,7 @@ export const NoteLabelShader = (gl: WebGL2RenderingContext) =>
         // Sample font atlas
         vec4 tex = texture(u_font, v_uv);
         float alpha = tex.a;
-        alpha = smoothstep(0.40, 0.60, alpha);
+        alpha = smoothstep(0.3, 0.7, alpha);
         vec4 outCol = mix(color, selectedColor, v_state.y);
         outColor = vec4(outCol.rgb, alpha * outCol.a);
       }
