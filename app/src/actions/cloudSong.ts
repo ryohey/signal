@@ -1,4 +1,4 @@
-import { CloudSong, User } from "@signal-app/api"
+import { CloudSong, User } from "/imports/signal/packages/api/src"
 import { basename } from "../helpers/path"
 import { useStores } from "../hooks/useStores"
 import { songFromMidi, songToMidi } from "../midi/midiConversion"

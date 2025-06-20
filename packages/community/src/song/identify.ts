@@ -7,35 +7,35 @@ import {
   SetTempoEvent,
   TimeSignatureEvent,
 } from "midifile-ts"
-import { TrackEvent, TrackEventOf } from "./Song.js"
+import { TrackEvent, TrackEventOf } from "./Song"
 
 export const isProgramChangeEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<ProgramChangeEvent> =>
   "subtype" in e && e.subtype === "programChange"
 
 export const isPitchBendEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<PitchBendEvent> =>
   "subtype" in e && e.subtype === "pitchBend"
 
 export const isEndOfTrackEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<EndOfTrackEvent> =>
   "subtype" in e && e.subtype === "endOfTrack"
 
 export const isSetTempoEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<SetTempoEvent> =>
   "subtype" in e && e.subtype === "setTempo"
 
 export const isTimeSignatureEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<TimeSignatureEvent> =>
   "subtype" in e && e.subtype === "timeSignature"
 
 export const isControllerEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<ControllerEvent> =>
   "subtype" in e && e.subtype === "controller"
 
@@ -50,6 +50,6 @@ export const isModulationEvent = isControllerEventWithType(1)
 export const isExpressionEvent = isControllerEventWithType(0x0b)
 
 export const isSequencerSpecificEvent = (
-  e: TrackEvent,
+  e: TrackEvent
 ): e is TrackEventOf<SequencerSpecificEvent> =>
   "subtype" in e && e.subtype === "sequencerSpecific"

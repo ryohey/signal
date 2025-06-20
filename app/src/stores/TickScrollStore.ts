@@ -1,4 +1,4 @@
-import { Player } from "@signal-app/player"
+import { Player } from "/imports/signal/packages/player/src"
 import { clamp } from "lodash"
 import { autorun, computed, makeObservable } from "mobx"
 import { TickTransform } from "../entities/transform/TickTransform"
@@ -18,7 +18,7 @@ export class TickScrollStore {
   constructor(
     private readonly parent: TickScrollProvider,
     private readonly minScaleX: number,
-    private readonly maxScaleX: number,
+    private readonly maxScaleX: number
   ) {
     makeObservable(this, {
       scrollLeft: computed,
@@ -70,15 +70,15 @@ export class TickScrollStore {
   scaleAroundPointX(scaleXDelta: number, pixelX: number) {
     const { maxScaleX, minScaleX } = this
     const pixelXInTicks0 = this.parent.transform.getTick(
-      this.scrollLeft + pixelX,
+      this.scrollLeft + pixelX
     )
     this.parent.scaleX = clamp(
       this.parent.scaleX * (1 + scaleXDelta),
       minScaleX,
-      maxScaleX,
+      maxScaleX
     )
     const pixelXInTicks1 = this.parent.transform.getTick(
-      this.scrollLeft + pixelX,
+      this.scrollLeft + pixelX
     )
     const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
     this.setScrollLeftInTicks(this.parent.scrollLeftTicks - scrollInTicks)

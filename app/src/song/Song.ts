@@ -1,4 +1,4 @@
-import { PlayerEvent } from "@signal-app/player"
+import { PlayerEvent } from "/imports/signal/packages/player/src"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
 import { Measure } from "../entities/measure/Measure"
@@ -44,7 +44,7 @@ export default class Song {
         this.tracks.map((t) => ({ channel: t.channel, events: t.events })),
         this.name,
       ],
-      () => (this.isSaved = false),
+      () => (this.isSaved = false)
     )
   }
 
@@ -100,7 +100,7 @@ export default class Song {
 
   get endOfSong(): number {
     const eos = Math.max(
-      ...this.tracks.map((t) => t.endOfTrack).filter(isNotUndefined),
+      ...this.tracks.map((t) => t.endOfTrack).filter(isNotUndefined)
     )
     return (eos ?? 0) + END_MARGIN
   }
@@ -113,7 +113,7 @@ export default class Song {
     deltaPitch: number,
     selectedEventIds: {
       [key: number]: number[] // trackIndex: eventId
-    },
+    }
   ) {
     for (const trackIndexStr in selectedEventIds) {
       const trackIndex = parseInt(trackIndexStr)
@@ -134,7 +134,7 @@ export default class Song {
               noteNumber: NoteNumber.clamp(n.noteNumber + deltaPitch),
             }
           })
-          .filter(isNotNull),
+          .filter(isNotNull)
       )
     }
   }

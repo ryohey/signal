@@ -2,7 +2,7 @@ import {
   CloudSong,
   ICloudSongDataRepository,
   ICloudSongRepository,
-} from "@signal-app/api"
+} from "/imports/signal/packages/api/src"
 import { orderBy } from "lodash"
 import { computed, makeObservable, observable } from "mobx"
 import { SongStore } from "./SongStore"
@@ -17,7 +17,7 @@ export class CloudFileStore {
   constructor(
     private readonly songStore: SongStore,
     private readonly cloudSongRepository: ICloudSongRepository,
-    private readonly cloudSongDataRepository: ICloudSongDataRepository,
+    private readonly cloudSongDataRepository: ICloudSongDataRepository
   ) {
     makeObservable(this, {
       isLoading: observable,
@@ -51,7 +51,7 @@ export class CloudFileStore {
             }
         }
       },
-      this.sortAscending ? "asc" : "desc",
+      this.sortAscending ? "asc" : "desc"
     )
   }
 

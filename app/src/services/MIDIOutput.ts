@@ -1,4 +1,4 @@
-import { SendableEvent, SynthOutput } from "@signal-app/player"
+import { SendableEvent, SynthOutput } from "/imports/signal/packages/player/src"
 import { serialize } from "midifile-ts"
 
 export default class MIDIOutput implements SynthOutput {
@@ -15,7 +15,7 @@ export default class MIDIOutput implements SynthOutput {
   sendEvent(
     event: SendableEvent,
     delayTime: number,
-    timestampNow: number,
+    timestampNow: number
   ): void {
     const msg = serialize({ ...event, deltaTime: 0 }, false)
     const timestamp = delayTime * 1000 + timestampNow

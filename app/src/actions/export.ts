@@ -1,4 +1,4 @@
-import { renderAudio } from "@signal-app/player"
+import { renderAudio } from "/imports/signal/packages/player/src"
 import { useDialog } from "dialog-hooks"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
@@ -47,7 +47,7 @@ export const useExportSong = () => {
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>
             (exportStore.progress = numFrames / totalFrames),
-        },
+        }
       )
 
       exportStore.progress = 1

@@ -2,21 +2,21 @@ import {
   createCloudSongDataRepository,
   createCloudSongRepository,
   createUserRepository,
-} from "@signal-app/api"
-import { Player, SoundFontSynth } from "@signal-app/player"
-import { auth, firestore } from "../firebase/firebase.js"
-import { EventSource } from "../services/EventSource.js"
-import { AuthStore } from "./AuthStore.js"
-import { CommunitySongStore } from "./CommunitySongStore.js"
-import RootViewStore from "./RootViewStore.js"
-import { SongStore } from "./SongStore.js"
+} from "/imports/signal/packages/api/src"
+import { Player, SoundFontSynth } from "/imports/signal/packages/player/src"
+import { auth, firestore } from "../firebase/firebase"
+import { EventSource } from "../services/EventSource"
+import { AuthStore } from "./AuthStore"
+import { CommunitySongStore } from "./CommunitySongStore"
+import RootViewStore from "./RootViewStore"
+import { SongStore } from "./SongStore"
 
 export default class RootStore {
   readonly userRepository = createUserRepository(firestore, auth)
   readonly cloudSongRepository = createCloudSongRepository(firestore, auth)
   readonly cloudSongDataRepository = createCloudSongDataRepository(
     firestore,
-    auth,
+    auth
   )
   readonly songStore = new SongStore(this.cloudSongDataRepository)
   readonly authStore = new AuthStore(this.userRepository)

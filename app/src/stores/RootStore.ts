@@ -3,8 +3,8 @@ import {
   createCloudSongDataRepository,
   createCloudSongRepository,
   createUserRepository,
-} from "@signal-app/api"
-import { Player, SoundFontSynth } from "@signal-app/player"
+} from "/imports/signal/packages/api/src"
+import { Player, SoundFontSynth } from "/imports/signal/packages/player/src"
 import { makeObservable, observable } from "mobx"
 import { deserialize, serialize } from "serializr"
 import { auth, firestore, functions } from ".././firebase/firebase"
@@ -51,7 +51,7 @@ export default class RootStore {
   readonly cloudSongRepository = createCloudSongRepository(firestore, auth)
   readonly cloudSongDataRepository = createCloudSongDataRepository(
     firestore,
-    auth,
+    auth
   )
   readonly cloudMidiRepository = createCloudMidiRepository(firestore, functions)
   readonly userRepository = createUserRepository(firestore, auth)
@@ -70,7 +70,7 @@ export default class RootStore {
   readonly cloudFileStore = new CloudFileStore(
     this,
     this.cloudSongRepository,
-    this.cloudSongDataRepository,
+    this.cloudSongDataRepository
   )
   readonly settingStore = new SettingStore()
   readonly player: Player
@@ -160,7 +160,7 @@ export default class RootStore {
 async function loadMetronomeSoundFontData() {
   if (isRunningInElectron()) {
     return await window.electronAPI.readFile(
-      "./assets/soundfonts/A320U_drums.sf2",
+      "./assets/soundfonts/A320U_drums.sf2"
     )
   }
   const soundFontURL =

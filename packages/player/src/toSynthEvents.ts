@@ -1,6 +1,6 @@
 import { SynthEvent } from "@ryohey/wavelet"
-import { PlayerEvent } from "./PlayerEvent.js"
-import { tickToMillisec } from "./tick.js"
+import { PlayerEvent } from "./PlayerEvent"
+import { tickToMillisec } from "./tick"
 
 interface Keyframe {
   tick: number
@@ -11,7 +11,7 @@ interface Keyframe {
 export const toSynthEvents = (
   events: PlayerEvent[],
   timebase: number,
-  sampleRate: number,
+  sampleRate: number
 ): SynthEvent[] => {
   events = events.sort((a, b) => a.tick - b.tick)
 

@@ -1,4 +1,8 @@
-import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
+import {
+  IEventSource,
+  PlayerEvent,
+  SendableEvent,
+} from "/imports/signal/packages/player/src"
 import { Beat } from "../entities/beat/Beat"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"

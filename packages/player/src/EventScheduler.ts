@@ -1,4 +1,4 @@
-import { tickToMillisec } from "./tick.js"
+import { tickToMillisec } from "./tick"
 
 export type SchedulableEvent = {
   tick: number
@@ -38,7 +38,7 @@ export class EventScheduler<E extends SchedulableEvent> {
     createLoopEndEvents: () => Omit<E, "tick">[],
     tick = 0,
     timebase = 480,
-    lookAheadTime = 100,
+    lookAheadTime = 100
   ) {
     this._getEvents = getEvents
     this._createLoopEndEvents = createLoopEndEvents
@@ -73,7 +73,7 @@ export class EventScheduler<E extends SchedulableEvent> {
     const getEventsInRange = (
       startTick: number,
       endTick: number,
-      currentTick: number,
+      currentTick: number
     ) => this._getEvents(startTick, endTick).map(withTimestamp(currentTick))
 
     if (this._prevTime === undefined) {
@@ -105,7 +105,7 @@ export class EventScheduler<E extends SchedulableEvent> {
       return [
         ...getEventsInRange(startTick, loop.end, nowTick),
         ...this._createLoopEndEvents().map((e) =>
-          withTimestamp(currentTick)({ ...e, tick: loop.begin } as E),
+          withTimestamp(currentTick)({ ...e, tick: loop.begin } as E)
         ),
         ...getEventsInRange(loop.begin, endTick2, currentTick),
       ]

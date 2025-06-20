@@ -1,4 +1,4 @@
-import { User } from "./IUserRepository.js"
+import { User } from "./IUserRepository"
 
 export interface CloudSong {
   id: string

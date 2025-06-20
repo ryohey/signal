@@ -13,11 +13,11 @@ import {
   runTransaction,
   where,
 } from "firebase/firestore"
-import { AuthUser, IUserRepository, User } from "./IUserRepository.js"
+import { AuthUser, IUserRepository, User } from "./IUserRepository"
 
 export const createUserRepository = (
   firestore: Firestore,
-  auth: Auth,
+  auth: Auth
 ): IUserRepository => new UserRepository(firestore, auth)
 
 export interface FirestoreUser {
@@ -30,7 +30,7 @@ export interface FirestoreUser {
 class UserRepository implements IUserRepository {
   constructor(
     private readonly firestore: Firestore,
-    private readonly auth: Auth,
+    private readonly auth: Auth
   ) {}
   private get userCollection() {
     return collection(this.firestore, "users").withConverter(userConverter)

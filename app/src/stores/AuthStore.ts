@@ -1,4 +1,8 @@
-import { AuthUser, IUserRepository, User } from "@signal-app/api"
+import {
+  AuthUser,
+  IUserRepository,
+  User,
+} from "/imports/signal/packages/api/src"
 import { makeObservable, observable } from "mobx"
 import { isRunningInElectron } from "../helpers/platform"
 

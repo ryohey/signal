@@ -1,5 +1,5 @@
 import { SynthEvent, getSampleEventsFromSoundFont } from "@ryohey/wavelet"
-import { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import { SendableEvent, SynthOutput } from "./SynthOutput"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: AudioWorkletNode | null = null
@@ -18,8 +18,8 @@ export class SoundFontSynth implements SynthOutput {
   constructor(private readonly context: AudioContext) {}
 
   async setup() {
-    const url = new URL("@ryohey/wavelet/dist/processor.js", import.meta.url)
-    await this.context.audioWorklet.addModule(url)
+    // const url = new URL("@ryohey/wavelet/dist/processor.js")
+    // await this.context.audioWorklet.addModule(url)
   }
 
   async loadSoundFontFromURL(url: string) {
@@ -47,7 +47,7 @@ export class SoundFontSynth implements SynthOutput {
     for (const e of sampleEvents) {
       this.postSynthMessage(
         e.event,
-        e.transfer, // transfer instead of copy
+        e.transfer // transfer instead of copy
       )
     }
   }
@@ -55,7 +55,7 @@ export class SoundFontSynth implements SynthOutput {
   private postSynthMessage(e: SynthEvent, transfer?: Transferable[]) {
     this.synth?.port.postMessage(
       { ...e, sequenceNumber: this.sequenceNumber++ },
-      transfer ?? [],
+      transfer ?? []
     )
   }
 
