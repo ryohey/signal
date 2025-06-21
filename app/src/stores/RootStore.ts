@@ -6,6 +6,7 @@ import { MIDIInput } from "../services/MIDIInput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
 import { SerializedArrangeViewStore } from "./ArrangeViewStore"
+import { BluetoothMIDIDeviceStore } from "./BluetoothMIDIDeviceStore"
 import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
 import { SerializedPianoRollStore } from "./PianoRollStore"
@@ -34,6 +35,7 @@ export default class RootStore {
   readonly midiRecorder: MIDIRecorder
   readonly midiMonitor: MIDIMonitor
   readonly soundFontStore: SoundFontStore
+  readonly bluetoothMIDIDeviceStore = new BluetoothMIDIDeviceStore()
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()

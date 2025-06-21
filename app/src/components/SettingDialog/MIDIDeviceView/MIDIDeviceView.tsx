@@ -4,6 +4,7 @@ import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
 import { Alert } from "../../ui/Alert"
+import { Button } from "../../ui/Button"
 import { Checkbox } from "../../ui/Checkbox"
 import { CircularProgress } from "../../ui/CircularProgress"
 import { Label } from "../../ui/Label"
@@ -60,6 +61,7 @@ export const MIDIDeviceView: FC = () => {
     requestError,
     setInputEnable,
     setOutputEnable,
+    requestBluetoothMIDIDevice,
   } = useMIDIDevice()
 
   return (
@@ -80,6 +82,12 @@ export const MIDIDeviceView: FC = () => {
             <SectionTitle>
               <Localized name="inputs" />
             </SectionTitle>
+            <Button
+              onClick={requestBluetoothMIDIDevice}
+              style={{ marginBottom: 8 }}
+            >
+              Connect Bluetooth MIDI Device
+            </Button>
             <DeviceList>
               {inputDevices.length === 0 && (
                 <Notice>
@@ -90,7 +98,9 @@ export const MIDIDeviceView: FC = () => {
                 <DeviceRow
                   key={device.id}
                   device={device}
-                  onCheck={(checked) => setInputEnable(device.id, checked)}
+                  onCheck={async (checked) => {
+                    setInputEnable(device.id, checked)
+                  }}
                 />
               ))}
             </DeviceList>

@@ -90,6 +90,7 @@
     "@types/react-window": "^1.8.8",
     "@types/use-sync-external-store": "^1.5.0",
     "@types/wav-encoder": "^1.3.3",
+    "@types/web-bluetooth": "^0.0.21",
     "@types/webmidi": "2.1.0",
     "@types/webpack-env": "1.18.8",
     "@types/wicg-file-system-access": "^2023.10.6",

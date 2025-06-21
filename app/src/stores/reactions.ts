@@ -46,11 +46,16 @@ const updateOutputDevices: Reaction =
   }
 
 const updateInputDevices: Reaction =
-  ({ midiDeviceStore, midiInput }) =>
+  ({ midiDeviceStore, bluetoothMIDIDeviceStore, midiInput }) =>
   () => {
     const { inputs, enabledInputs } = midiDeviceStore
+    const { inputs: btInputs, enabledInputs: btEnabledInputs } =
+      bluetoothMIDIDeviceStore
 
-    const devices = inputs.filter((d) => enabledInputs[d.id])
+    const devices = [
+      ...inputs.filter((d) => enabledInputs[d.id]),
+      ...btInputs.filter((d) => btEnabledInputs[d.id]),
+    ]
 
     midiInput.removeAllDevices()
     devices.forEach(midiInput.addDevice)

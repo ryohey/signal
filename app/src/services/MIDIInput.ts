@@ -1,20 +1,33 @@
+// MIDI入力デバイスの共通インターフェース
+export interface IMIDIInputDevice {
+  id: string
+  addEventListener(
+    type: "midimessage",
+    listener: (e: WebMidi.MIDIMessageEvent) => void,
+  ): void
+  removeEventListener(
+    type: "midimessage",
+    listener: (e: WebMidi.MIDIMessageEvent) => void,
+  ): void
+}
+
 export class MIDIInput {
-  private devices: WebMidi.MIDIInput[] = []
+  private devices: IMIDIInputDevice[] = []
   private listeners: ((e: WebMidi.MIDIMessageEvent) => void)[] = []
 
   readonly removeAllDevices = () => {
     this.devices.forEach(this.removeDevice)
   }
 
-  readonly removeDevice = (device: WebMidi.MIDIInput) => {
+  readonly removeDevice = (device: IMIDIInputDevice) => {
     device.removeEventListener(
       "midimessage",
-      this.onMidiMessage as (e: Event) => void,
+      this.onMidiMessage as (e: WebMidi.MIDIMessageEvent) => void,
     )
     this.devices = this.devices.filter((d) => d.id !== device.id)
   }
 
-  readonly addDevice = (device: WebMidi.MIDIInput) => {
+  readonly addDevice = (device: IMIDIInputDevice) => {
     device.addEventListener("midimessage", this.onMidiMessage)
     this.devices.push(device)
   }

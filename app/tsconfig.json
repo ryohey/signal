@@ -5,7 +5,8 @@
       "jest",
       "webpack-env",
       "webmidi",
-      "wicg-file-system-access"
+      "wicg-file-system-access",
+      "web-bluetooth"
     ],
     "baseUrl": "./src",
     "sourceMap": true,
