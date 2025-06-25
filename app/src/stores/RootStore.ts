@@ -26,7 +26,7 @@ export interface SerializedRootStore {
 
 export default class RootStore {
   readonly songStore = new SongStore()
-  readonly midiDeviceStore = new MIDIDeviceStore()
+  readonly midiDeviceStore: MIDIDeviceStore
   readonly player: Player
   readonly synth: SoundFontSynth
   readonly metronomeSynth: SoundFontSynth
@@ -35,7 +35,7 @@ export default class RootStore {
   readonly midiRecorder: MIDIRecorder
   readonly midiMonitor: MIDIMonitor
   readonly soundFontStore: SoundFontStore
-  readonly bluetoothMIDIDeviceStore = new BluetoothMIDIDeviceStore()
+  readonly bluetoothMIDIDeviceStore: BluetoothMIDIDeviceStore
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()
@@ -51,6 +51,8 @@ export default class RootStore {
 
     this.midiRecorder = new MIDIRecorder(this.songStore, this.player)
     this.midiMonitor = new MIDIMonitor(this.player)
+    this.midiDeviceStore = new MIDIDeviceStore(this.midiInput)
+    this.bluetoothMIDIDeviceStore = new BluetoothMIDIDeviceStore(this.midiInput)
 
     this.midiInput.on("midiMessage", (e) => {
       this.midiMonitor.onMessage(e)

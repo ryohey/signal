@@ -1,10 +1,7 @@
 import { action, makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
-import { BluetoothMIDIInputDevice } from "../services/BluetoothMIDIInputDevice"
-
-const MIDI_SERVICE_UUID = "03b80e5a-ede8-4b33-a751-6ce34ec4c700".toLowerCase()
-const MIDI_CHARACTERISTIC_UUID =
-  "7772e5db-3868-4112-a1a9-f2669d106bf3".toLowerCase()
+import { BLEMIDI, BLEMIDIDevice, MIDIMessageEvent } from "web-ble-midi"
+import { MIDIInput } from "../services/MIDIInput"
 
 export interface BluetoothMIDIDeviceInfo {
   id: string
@@ -13,16 +10,14 @@ export interface BluetoothMIDIDeviceInfo {
 }
 
 export class BluetoothMIDIDeviceStore {
-  inputs: BluetoothMIDIInputDevice[] = []
-  devices: BluetoothMIDIDeviceInfo[] = []
+  inputs: BLEMIDIDevice[] = []
   requestError: Error | null = null
   isLoading = false
   enabledInputs: { [deviceId: string]: boolean } = {}
 
-  constructor() {
+  constructor(private readonly midiInput: MIDIInput) {
     makeObservable(this, {
       inputs: observable,
-      devices: observable,
       requestError: observable,
       isLoading: observable,
       enabledInputs: observable,
@@ -37,18 +32,30 @@ export class BluetoothMIDIDeviceStore {
     })
   }
 
-  setInputEnable(deviceId: string, enabled: boolean) {
-    if (enabled && !this.inputs.some((d) => d.id === deviceId)) {
-      const device = this.devices.find((d) => d.id === deviceId)?.device
-      if (!device) {
-        console.warn(`Device with id ${deviceId} not found`)
-        return
-      }
-      this.connectDevice(device)
+  async setInputEnable(deviceId: string, enabled: boolean) {
+    const device = this.inputs.find((d) => d.id === deviceId)
+
+    if (!device) {
+      console.warn(`Device with id ${deviceId} not found`)
+      return
     }
 
-    if (!enabled && this.inputs.some((d) => d.id === deviceId)) {
-      this.disconnectDevice(deviceId)
+    if (enabled && !device.isConnected()) {
+      await device.connect()
+
+      this.enabledInputs = {
+        ...this.enabledInputs,
+        [deviceId]: true,
+      }
+    }
+
+    if (!enabled && device.isConnected()) {
+      device.disconnect()
+
+      this.enabledInputs = {
+        ...this.enabledInputs,
+        [deviceId]: false,
+      }
     }
   }
 
@@ -57,53 +64,22 @@ export class BluetoothMIDIDeviceStore {
     this.isLoading = true
     this.requestError = null
     try {
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [MIDI_SERVICE_UUID] }],
-      })
-      this.devices = [
-        ...this.devices.filter((d) => d.id !== device.id),
-        { id: device.id, name: device.name || device.id, device },
-      ]
-      await this.connectDevice(device)
-    } catch (e) {
-      this.requestError = e as Error
-    } finally {
-      this.isLoading = false
-    }
-  }
-
-  private async disconnectDevice(deviceId: string) {
-    const input = this.inputs.find((d) => d.id === deviceId)
-    if (input) {
-      input.disconnect()
-      this.inputs = this.inputs.filter((d) => d.id !== deviceId)
-    }
-    this.enabledInputs = {
-      ...this.enabledInputs,
-      [deviceId]: false,
-    }
-  }
-
-  // BLE MIDIデバイスへ接続し、BluetoothMIDIInputDeviceを生成
-  private async connectDevice(device: BluetoothDevice) {
-    if (this.inputs.some((d) => d.id === device.id)) {
-      // 既に接続済みのデバイスは再接続しない
-      return
-    }
-    this.isLoading = true
-    this.requestError = null
-    try {
-      const server = await device.gatt?.connect()
-      const service = await server?.getPrimaryService(MIDI_SERVICE_UUID)
-      const characteristic = await service?.getCharacteristic(
-        MIDI_CHARACTERISTIC_UUID,
-      )
-      const input = new BluetoothMIDIInputDevice(device.id, characteristic)
-      this.inputs.push(input)
-      this.enabledInputs = {
-        ...this.enabledInputs,
-        [device.id]: true,
+      const device = await BLEMIDI.scan()
+      if (!this.inputs.some((d) => d.id === device.id)) {
+        device.addEventListener("disconnect", () => {
+          this.inputs = this.inputs.filter((d) => d.id !== device.id)
+        })
+        device.addEventListener("midimessage", (event) => {
+          if (this.enabledInputs[device.id]) {
+            this.midiInput.onMidiMessage({
+              data: (event as MIDIMessageEvent).message.message.slice(0),
+              // timeStamp: message.timestampMs,
+            })
+          }
+        })
+        this.inputs.push(device)
       }
+      await this.setInputEnable(device.id, true)
     } catch (e) {
       this.requestError = e as Error
     } finally {

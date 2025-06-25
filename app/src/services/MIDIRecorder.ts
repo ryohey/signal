@@ -3,6 +3,7 @@ import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { makeObservable, observable, observe } from "mobx"
 import { SongStore } from "../stores/SongStore"
 import { NoteEvent, TrackEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
+import { MIDIInputEvent } from "./MIDIInput"
 
 export class MIDIRecorder {
   private recordedNotes: NoteEvent[] = []
@@ -52,7 +53,7 @@ export class MIDIRecorder {
     })
   }
 
-  onMessage(e: WebMidi.MIDIMessageEvent) {
+  onMessage(e: MIDIInputEvent) {
     if (!this.isRecording) {
       return
     }

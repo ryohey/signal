@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
+import { MIDIInput } from "../services/MIDIInput"
 
 export class MIDIDeviceStore {
   inputs: WebMidi.MIDIInput[] = []
@@ -10,7 +11,7 @@ export class MIDIDeviceStore {
   enabledInputs: { [deviceId: string]: boolean } = {}
   isFactorySoundEnabled = true
 
-  constructor() {
+  constructor(private readonly midiInput: MIDIInput) {
     makeObservable(this, {
       inputs: observable,
       outputs: observable,
@@ -53,6 +54,13 @@ export class MIDIDeviceStore {
       this.updatePorts(midiAccess)
       midiAccess.onstatechange = () => {
         this.updatePorts(midiAccess)
+      }
+      for (const input of midiAccess.inputs.values()) {
+        input.onmidimessage = (event) => {
+          if (this.enabledInputs[input.id]) {
+            this.midiInput.onMidiMessage(event)
+          }
+        }
       }
     } catch (error) {
       this.requestError = error as Error

@@ -8,7 +8,6 @@ export interface Device {
   isConnected: boolean
   isEnabled: boolean
   isBluetooth?: boolean
-  deviceObj?: any // BluetoothDeviceなどを格納
 }
 
 export function useMIDIDevice() {
@@ -16,9 +15,6 @@ export function useMIDIDevice() {
 
   const inputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.inputs)
   const outputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.outputs)
-  const btDevices = useMobxStore(
-    ({ bluetoothMIDIDeviceStore }) => bluetoothMIDIDeviceStore.devices,
-  )
   const btInputs = useMobxStore(
     ({ bluetoothMIDIDeviceStore }) => bluetoothMIDIDeviceStore.inputs,
   )
@@ -46,13 +42,12 @@ export function useMIDIDevice() {
       isEnabled: enabledInputs[device.id],
       isBluetooth: false,
     })),
-    ...btDevices.map((d) => ({
+    ...btInputs.map((d) => ({
       id: d.id,
-      name: d.name,
+      name: d.name ?? "Bluetooth MIDI Device",
       isConnected: btInputs.some((i) => i.id === d.id),
       isEnabled: btEnabledInputs[d.id],
       isBluetooth: true,
-      deviceObj: d.device,
     })),
   ]
 
@@ -98,13 +93,13 @@ export function useMIDIDevice() {
     }, [bluetoothMIDIDeviceStore]),
     setInputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {
-        if (btDevices.some((d) => d.id === deviceId)) {
+        if (btInputs.some((d) => d.id === deviceId)) {
           bluetoothMIDIDeviceStore.setInputEnable(deviceId, isEnabled)
         } else {
           midiDeviceStore.setInputEnable(deviceId, isEnabled)
         }
       },
-      [midiDeviceStore, bluetoothMIDIDeviceStore, btDevices],
+      [midiDeviceStore, bluetoothMIDIDeviceStore, btInputs],
     ),
     setOutputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {
