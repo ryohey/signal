@@ -11,6 +11,7 @@ import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
+import { useQuantizer } from "../hooks/useQuantizer"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
 import {
@@ -58,7 +59,8 @@ export const useChangeNotesVelocity = () => {
 }
 
 export const useCreateEvent = () => {
-  const { quantizer, selectedTrackId } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { quantizer } = useQuantizer()
   const { createOrUpdate } = useTrack(selectedTrackId)
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
@@ -192,7 +194,8 @@ export const useUpdateEventsInRange = (
 }
 
 export const useUpdateValueEvents = (type: ValueEventType) => {
-  const { selectedTrackId, quantizer } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const { quantizer } = useQuantizer()
 
   return useUpdateEventsInRange(
     selectedTrackId,

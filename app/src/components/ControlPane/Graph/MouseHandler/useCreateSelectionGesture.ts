@@ -5,13 +5,15 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
+import { useQuantizer } from "../../../../hooks/useQuantizer"
 
 export const useCreateSelectionGesture = () => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
-  const { setSelectedEventIds, setSelection, quantizer } = useControlPane()
+  const { setSelectedEventIds, setSelection } = useControlPane()
   let { selection } = useControlPane()
+  const { quantizer } = useQuantizer()
 
   return {
     onMouseDown(

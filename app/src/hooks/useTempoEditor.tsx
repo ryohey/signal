@@ -9,6 +9,7 @@ import { TempoSelection } from "../entities/selection/TempoSelection"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import TempoEditorStore from "../stores/TempoEditorStore"
 import { useMobxSelector } from "./useMobxSelector"
+import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider, useRuler } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider } from "./useTickScroll"
@@ -27,7 +28,7 @@ export function TempoEditorProvider({
   )
 
   useEffect(() => {
-    tempoEditorStore.setUpAutorun()
+    tempoEditorStore.tickScrollStore.setUpAutoScroll()
   }, [tempoEditorStore])
 
   return (
@@ -38,11 +39,15 @@ export function TempoEditorProvider({
 }
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, rulerStore } = useContext(TempoEditorStoreContext)
+  const { tickScrollStore, rulerStore, quantizerStore } = useContext(
+    TempoEditorStoreContext,
+  )
 
   return (
     <TickScrollProvider value={tickScrollStore}>
-      <RulerProvider value={rulerStore}>{children}</RulerProvider>
+      <RulerProvider value={rulerStore}>
+        <QuantizerProvider value={quantizerStore}>{children}</QuantizerProvider>
+      </RulerProvider>
     </TickScrollProvider>
   )
 }
@@ -84,12 +89,6 @@ export function useTempoEditor() {
     selectionRect,
     beats,
     cursor,
-    get quantizer() {
-      return useMobxSelector(
-        () => tempoEditorStore.quantizer,
-        [tempoEditorStore],
-      )
-    },
     get selectedEventIds() {
       return useMobxSelector(
         () => tempoEditorStore.selectedEventIds,
@@ -99,18 +98,6 @@ export function useTempoEditor() {
     get mouseMode() {
       return useMobxSelector(
         () => tempoEditorStore.mouseMode,
-        [tempoEditorStore],
-      )
-    },
-    get isQuantizeEnabled() {
-      return useMobxSelector(
-        () => tempoEditorStore.isQuantizeEnabled,
-        [tempoEditorStore],
-      )
-    },
-    get quantize() {
-      return useMobxSelector(
-        () => tempoEditorStore.quantize,
         [tempoEditorStore],
       )
     },
@@ -125,12 +112,6 @@ export function useTempoEditor() {
     }, []),
     setCanvasHeight: useCallback((height: number) => {
       tempoEditorStore.canvasHeight = height
-    }, []),
-    setQuantize: useCallback((quantize: number) => {
-      tempoEditorStore.quantize = quantize
-    }, []),
-    setQuantizeEnabled: useCallback((isEnabled: boolean) => {
-      tempoEditorStore.isQuantizeEnabled = isEnabled
     }, []),
   }
 }
