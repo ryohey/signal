@@ -5,9 +5,9 @@ import { useMobxSelector } from "./useMobxSelector"
 const QuantizerContext = createContext<QuantizerStore>(null!)
 export const QuantizerProvider = QuantizerContext.Provider
 
-export function useQuantizer() {
-  const quantizerStore = useContext(QuantizerContext)
-
+export function useQuantizer(
+  quantizerStore: QuantizerStore = useContext(QuantizerContext),
+) {
   return {
     get quantize() {
       return useMobxSelector(() => quantizerStore.quantize, [quantizerStore])
