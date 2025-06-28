@@ -111,6 +111,7 @@ export const useRemoveTrack = () => {
   } = useArrangeView()
 
   return (trackId: TrackId) => {
+    const trackCount = tracks.length
     if (tracks.filter((t) => !t.isConductorTrack).length <= 1) {
       // conductor track を除き、最後のトラックの場合
       // トラックがなくなるとエラーが出るので削除できなくする
@@ -120,11 +121,10 @@ export const useRemoveTrack = () => {
     }
     pushHistory()
     removeTrack(trackId)
-    setSelectedTrackIndex(
-      Math.min(pianoRollSelectedTrackIndex, tracks.length - 1),
-    )
+    const maxTrackIndex = trackCount - 2
+    setSelectedTrackIndex(Math.min(pianoRollSelectedTrackIndex, maxTrackIndex))
     setArrangeSelectedTrackIndex(
-      Math.min(arrangeSelectedTrackIndex, tracks.length - 1),
+      Math.min(arrangeSelectedTrackIndex, maxTrackIndex),
     )
   }
 }
