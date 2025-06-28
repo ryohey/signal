@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import KeyboardTab from "mdi-react/KeyboardTabIcon"
-import { FC } from "react"
+import { FC, useCallback } from "react"
+import { useTickScroll } from "../../hooks/useTickScroll"
 import { Localized } from "../../localize/useLocalization"
 import { Tooltip } from "../ui/Tooltip"
 import { ToolbarButton } from "./ToolbarButton"
@@ -15,7 +16,7 @@ export interface AutoScrollButtonProps {
   selected: boolean
 }
 
-export const AutoScrollButton: FC<AutoScrollButtonProps> = ({
+const AutoScrollButtonContent: FC<AutoScrollButtonProps> = ({
   onClick,
   selected,
 }) => (
@@ -31,3 +32,19 @@ export const AutoScrollButton: FC<AutoScrollButtonProps> = ({
     </ToolbarButton>
   </Tooltip>
 )
+
+export const AutoScrollButton: FC = () => {
+  const { autoScroll, setAutoScroll } = useTickScroll()
+
+  const onClickAutoScroll = useCallback(
+    () => setAutoScroll(!autoScroll),
+    [autoScroll, setAutoScroll],
+  )
+
+  return (
+    <AutoScrollButtonContent
+      onClick={onClickAutoScroll}
+      selected={autoScroll}
+    />
+  )
+}

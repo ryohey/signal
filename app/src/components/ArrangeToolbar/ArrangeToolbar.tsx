@@ -1,9 +1,9 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
+import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 import { QuantizeSelector } from "../Toolbar/QuantizeSelector/QuantizeSelector"
 import { Toolbar } from "../Toolbar/Toolbar"
-import { ArrangeAutoScrollButton } from "./ArrangeAutoScrollButton"
 
 const Title = styled.div`
   font-weight: bold;
@@ -31,7 +31,7 @@ export const ArrangeToolbar: FC = () => {
 
       <QuantizeSelector />
 
-      <ArrangeAutoScrollButton />
+      <AutoScrollButton />
     </Toolbar>
   )
 }
