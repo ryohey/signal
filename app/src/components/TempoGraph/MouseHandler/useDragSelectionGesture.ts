@@ -9,7 +9,6 @@ import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
-import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
@@ -18,8 +17,7 @@ export const useDragSelectionGesture = (): MouseGesture<
 > => {
   const { getEventById, updateEvents } = useConductorTrack()
   const { pushHistory } = useHistory()
-  const { setSelectedEventIds } = useTempoEditor()
-  const { quantizer } = useQuantizer()
+  const { setSelectedEventIds, quantizer } = useTempoEditor()
   let { selectedEventIds } = useTempoEditor()
 
   return {

@@ -7,7 +7,6 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePianoRollDraggable } from "../../../../hooks/usePianoRollDraggable"
-import { useQuantizer } from "../../../../hooks/useQuantizer"
 import {
   DraggableArea,
   PianoRollDraggable,
@@ -42,8 +41,7 @@ const constraintToDraggableArea = (
 export const useMoveDraggableGesture = (): MouseGesture<
   [PianoRollDraggable, PianoRollDraggable[]?, MoveDraggableCallback?]
 > => {
-  const { transform, getLocal } = usePianoRoll()
-  const { isQuantizeEnabled, quantizer } = useQuantizer()
+  const { isQuantizeEnabled, transform, quantizer, getLocal } = usePianoRoll()
   const { getDraggablePosition, getDraggableArea, updateDraggable } =
     usePianoRollDraggable()
 

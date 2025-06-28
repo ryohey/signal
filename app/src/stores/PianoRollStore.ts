@@ -1,12 +1,15 @@
 import { Player } from "@signal-app/player"
 import { cloneDeep } from "lodash"
 import { computed, makeObservable, observable, reaction } from "mobx"
+import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { Measure } from "../entities/measure/Measure"
+import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
+import Quantizer from "../quantizer"
 import Track, {
   NoteEvent,
   TrackEvent,
@@ -15,7 +18,6 @@ import Track, {
   isNoteEvent,
 } from "../track"
 import { KeyScrollStore } from "./KeyScrollStore"
-import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
@@ -53,12 +55,27 @@ export default class PianoRollStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
   readonly keyScrollStore: KeyScrollStore
-  readonly quantizerStore: QuantizerStore
 
+  notesCursor = "auto"
+  mouseMode: PianoRollMouseMode = "pencil"
+  quantize = 8
+  isQuantizeEnabled = true
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
   selection: Selection | null = null
   selectedNoteIds: number[] = []
+  lastNoteDuration: number | null = null
+  openInstrumentBrowser = false
+  instrumentBrowserSetting: InstrumentSetting = {
+    isRhythmTrack: false,
+    programNumber: 0,
+  }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
+  showTrackList = false
+  showEventList = false
+  openTransposeDialog = false
+  openVelocityDialog = false
+  newNoteVelocity = 100
+  keySignature: KeySignature | null = null
   previewingNoteNumbers: ReadonlySet<number> = new Set()
 
   constructor(
@@ -72,14 +89,26 @@ export default class PianoRollStore {
       15,
     )
     this.keyScrollStore = new KeyScrollStore()
-    this.rulerStore = new RulerStore(this.tickScrollStore, this.songStore)
-    this.quantizerStore = new QuantizerStore(this.songStore, 8)
+    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
+      notesCursor: observable,
+      mouseMode: observable,
+      quantize: observable,
+      isQuantizeEnabled: observable,
       selectedTrackId: observable,
       selection: observable.shallow,
       selectedNoteIds: observable,
+      lastNoteDuration: observable,
+      openInstrumentBrowser: observable,
+      instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
+      showTrackList: observable,
+      showEventList: observable,
+      openTransposeDialog: observable,
+      openVelocityDialog: observable,
+      newNoteVelocity: observable,
+      keySignature: observable,
       previewingNoteNumbers: observable.ref,
       transform: computed,
       windowedEvents: computed,
@@ -91,6 +120,9 @@ export default class PianoRollStore {
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
+      quantizer: computed,
+      enabledQuantizer: computed,
+      controlCursor: computed,
       selectedTrack: computed,
     })
   }
@@ -98,10 +130,11 @@ export default class PianoRollStore {
   setUpAutorun() {
     this.tickScrollStore.setUpAutoScroll()
 
-    // reset selection when change track
+    // reset selection when change track or mouse mode
     reaction(
       () => ({
         selectedTrackId: this.selectedTrackId,
+        mouseMode: this.mouseMode,
       }),
       () => {
         this.selection = null
@@ -230,5 +263,19 @@ export default class PianoRollStore {
       this.player.position,
       this.songStore.song.timebase,
     )
+  }
+
+  get quantizer(): Quantizer {
+    return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
+  }
+
+  get enabledQuantizer(): Quantizer {
+    return new Quantizer(this.songStore, this.quantize, true)
+  }
+
+  get controlCursor(): string {
+    return this.mouseMode === "pencil"
+      ? `url("./cursor-pencil.svg") 0 20, pointer`
+      : "auto"
   }
 }
