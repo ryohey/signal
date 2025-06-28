@@ -1,16 +1,10 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { createContext, useContext, useEffect, useMemo } from "react"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import TempoEditorStore from "../stores/TempoEditorStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider, useRuler } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -29,7 +23,7 @@ export function TempoEditorProvider({
   )
 
   useEffect(() => {
-    tempoEditorStore.setUpAutorun()
+    tempoEditorStore.tickScrollStore.setUpAutoScroll()
   }, [tempoEditorStore])
 
   return (
@@ -40,11 +34,15 @@ export function TempoEditorProvider({
 }
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, rulerStore } = useContext(TempoEditorStoreContext)
+  const { tickScrollStore, rulerStore, quantizerStore } = useContext(
+    TempoEditorStoreContext,
+  )
 
   return (
     <TickScrollProvider value={tickScrollStore}>
-      <RulerProvider value={rulerStore}>{children}</RulerProvider>
+      <RulerProvider value={rulerStore}>
+        <QuantizerProvider value={quantizerStore}>{children}</QuantizerProvider>
+      </RulerProvider>
     </TickScrollProvider>
   )
 }
@@ -78,40 +76,16 @@ export function useTempoEditor() {
     get cursor() {
       return useAtomValue(cursorAtom)
     },
-    get quantizer() {
-      return useMobxSelector(
-        () => tempoEditorStore.quantizer,
-        [tempoEditorStore],
-      )
-    },
     get selectedEventIds() {
       return useAtomValue(selectedEventIdsAtom)
     },
     get mouseMode() {
       return useAtomValue(mouseModeAtom)
     },
-    get isQuantizeEnabled() {
-      return useMobxSelector(
-        () => tempoEditorStore.isQuantizeEnabled,
-        [tempoEditorStore],
-      )
-    },
-    get quantize() {
-      return useMobxSelector(
-        () => tempoEditorStore.quantize,
-        [tempoEditorStore],
-      )
-    },
     setSelection: useSetAtom(selectionAtom),
     setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
     setMouseMode: useSetAtom(mouseModeAtom),
     setCanvasHeight: useSetAtom(canvasHeightAtom),
-    setQuantize: useCallback((quantize: number) => {
-      tempoEditorStore.quantize = quantize
-    }, []),
-    setQuantizeEnabled: useCallback((isEnabled: boolean) => {
-      tempoEditorStore.isQuantizeEnabled = isEnabled
-    }, []),
   }
 }
 

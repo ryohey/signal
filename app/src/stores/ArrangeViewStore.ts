@@ -9,8 +9,8 @@ import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransfo
 import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
-import Quantizer from "../quantizer"
 import { isNoteEvent, TrackId } from "../track"
+import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
@@ -27,10 +27,10 @@ export default class ArrangeViewStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
   readonly trackScrollStore: TrackScrollStore
+  readonly quantizerStore: QuantizerStore
 
   selection: ArrangeSelection | null = null
   selectedEventIds: { [key: number]: number[] } = {} // { trackIndex: [eventId] }
-  quantize = 1
   selectedTrackIndex = 0
 
   constructor(
@@ -39,18 +39,17 @@ export default class ArrangeViewStore {
   ) {
     this.tickScrollStore = new TickScrollStore(this.songStore, player, 0.15, 15)
     this.trackScrollStore = new TrackScrollStore(this.songStore)
-    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
+    this.rulerStore = new RulerStore(this.tickScrollStore, this.songStore)
+    this.quantizerStore = new QuantizerStore(this.songStore, 1)
 
     makeObservable(this, {
       selection: observable.shallow,
       selectedEventIds: observable,
-      quantize: observable,
       selectedTrackIndex: observable,
       transform: computed,
       trackTransform: computed,
       notes: computed,
       selectionRect: computed,
-      quantizer: computed,
       selectedTrackId: computed,
     })
   }
@@ -130,10 +129,6 @@ export default class ArrangeViewStore {
       y,
       height: bottom - y,
     }
-  }
-
-  get quantizer(): Quantizer {
-    return new Quantizer(this.songStore, this.quantize, true)
   }
 
   get selectedTrackId(): TrackId | undefined {

@@ -11,6 +11,7 @@ import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "../stores/ArrangeViewStore"
 import { useMobxSelector } from "./useMobxSelector"
+import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -41,14 +42,17 @@ export function ArrangeViewProvider({
 }
 
 export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, trackScrollStore, rulerStore } = useContext(
-    ArrangeViewStoreContext,
-  )
+  const { tickScrollStore, trackScrollStore, rulerStore, quantizerStore } =
+    useContext(ArrangeViewStoreContext)
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <TrackScrollProvider value={trackScrollStore}>
-        <RulerProvider value={rulerStore}>{children}</RulerProvider>
+        <RulerProvider value={rulerStore}>
+          <QuantizerProvider value={quantizerStore}>
+            {children}
+          </QuantizerProvider>
+        </RulerProvider>
       </TrackScrollProvider>
     </TickScrollProvider>
   )
@@ -100,18 +104,6 @@ export function useArrangeView() {
         [arrangeViewStore],
       )
     },
-    get quantize() {
-      return useMobxSelector(
-        () => arrangeViewStore.quantize,
-        [arrangeViewStore],
-      )
-    },
-    get quantizer() {
-      return useMobxSelector(
-        () => arrangeViewStore.quantizer,
-        [arrangeViewStore],
-      )
-    },
     get trackTransform() {
       return useMobxSelector(
         () => arrangeViewStore.trackTransform,
@@ -144,9 +136,6 @@ export function useArrangeView() {
       },
       [],
     ),
-    setQuantize: useCallback((value: number) => {
-      arrangeViewStore.quantize = value
-    }, []),
     resetSelection: useCallback(() => {
       arrangeViewStore.selection = null
       arrangeViewStore.selectedEventIds = {}

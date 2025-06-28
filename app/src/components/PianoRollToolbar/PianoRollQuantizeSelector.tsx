@@ -1,10 +1,10 @@
 import { FC, useCallback } from "react"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useQuantizer } from "../../hooks/useQuantizer"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
 
 export const PianoRollQuantizeSelector: FC = () => {
   const { quantize, isQuantizeEnabled, setQuantize, setIsQuantizeEnabled } =
-    usePianoRoll()
+    useQuantizer()
 
   const onSelectQuantize = useCallback(
     (denominator: number) => {
