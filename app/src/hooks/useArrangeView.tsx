@@ -1,4 +1,3 @@
-import { atom, useAtomValue, useSetAtom } from "jotai"
 import {
   createContext,
   useCallback,
@@ -11,7 +10,6 @@ import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "../stores/ArrangeViewStore"
 import { useMobxSelector } from "./useMobxSelector"
-import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -42,17 +40,14 @@ export function ArrangeViewProvider({
 }
 
 export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, trackScrollStore, rulerStore, quantizerStore } =
-    useContext(ArrangeViewStoreContext)
+  const { tickScrollStore, trackScrollStore, rulerStore } = useContext(
+    ArrangeViewStoreContext,
+  )
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <TrackScrollProvider value={trackScrollStore}>
-        <RulerProvider value={rulerStore}>
-          <QuantizerProvider value={quantizerStore}>
-            {children}
-          </QuantizerProvider>
-        </RulerProvider>
+        <RulerProvider value={rulerStore}>{children}</RulerProvider>
       </TrackScrollProvider>
     </TickScrollProvider>
   )
@@ -104,6 +99,18 @@ export function useArrangeView() {
         [arrangeViewStore],
       )
     },
+    get quantize() {
+      return useMobxSelector(
+        () => arrangeViewStore.quantize,
+        [arrangeViewStore],
+      )
+    },
+    get quantizer() {
+      return useMobxSelector(
+        () => arrangeViewStore.quantizer,
+        [arrangeViewStore],
+      )
+    },
     get trackTransform() {
       return useMobxSelector(
         () => arrangeViewStore.trackTransform,
@@ -111,10 +118,16 @@ export function useArrangeView() {
       )
     },
     get openTransposeDialog() {
-      return useAtomValue(openTransposeDialogAtom)
+      return useMobxSelector(
+        () => arrangeViewStore.openTransposeDialog,
+        [arrangeViewStore],
+      )
     },
     get openVelocityDialog() {
-      return useAtomValue(openVelocityDialogAtom)
+      return useMobxSelector(
+        () => arrangeViewStore.openVelocityDialog,
+        [arrangeViewStore],
+      )
     },
     rulerStore: arrangeViewStore.rulerStore,
     scrollBy: useCallback(
@@ -136,12 +149,19 @@ export function useArrangeView() {
       },
       [],
     ),
+    setQuantize: useCallback((value: number) => {
+      arrangeViewStore.quantize = value
+    }, []),
     resetSelection: useCallback(() => {
       arrangeViewStore.selection = null
       arrangeViewStore.selectedEventIds = {}
     }, []),
-    setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
-    setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
+    setOpenTransposeDialog: useCallback((value: boolean) => {
+      arrangeViewStore.openTransposeDialog = value
+    }, []),
+    setOpenVelocityDialog: useCallback((value: boolean) => {
+      arrangeViewStore.openVelocityDialog = value
+    }, []),
     serializeState: useCallback(
       () => arrangeViewStore.serialize(),
       [arrangeViewStore],
@@ -154,8 +174,3 @@ export function useArrangeView() {
     ),
   }
 }
-
-// atoms
-
-const openTransposeDialogAtom = atom(false)
-const openVelocityDialogAtom = atom(false)

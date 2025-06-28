@@ -12,7 +12,6 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
-import { useQuantizer } from "../hooks/useQuantizer"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
 import { readClipboardData, writeClipboardData } from "../services/Clipboard"
@@ -275,8 +274,11 @@ export const useSelectPreviousNote = () => {
 }
 
 export const useQuantizeSelectedNotes = () => {
-  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const { enabledQuantizer: quantizer } = useQuantizer()
+  const {
+    selectedTrackId,
+    selectedNoteIds,
+    enabledQuantizer: quantizer,
+  } = usePianoRoll()
   const { getEventById, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 

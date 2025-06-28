@@ -51,7 +51,6 @@
     "dialog-hooks": "*",
     "firebase": "^10.14.1",
     "gl-matrix": "^3.4.3",
-    "jotai": "^2.12.5",
     "lodash": "^4.17.21",
     "mdi-react": "^9.4.0",
     "midifile-ts": "1.5.1",

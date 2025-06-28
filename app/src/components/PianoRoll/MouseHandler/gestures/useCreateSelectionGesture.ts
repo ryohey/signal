@@ -6,19 +6,18 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
-import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useTrack } from "../../../../hooks/useTrack"
 
 // 選択範囲外でクリックした場合は選択範囲をリセット
 export const useCreateSelectionGesture = (): MouseGesture => {
   const {
     transform,
+    quantizer,
     selectedTrackId,
     getLocal,
     setSelection,
     setSelectedNoteIds,
   } = usePianoRoll()
-  const { quantizer } = useQuantizer()
   let { selection } = usePianoRoll()
   const { getEvents } = useTrack(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()

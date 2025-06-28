@@ -7,7 +7,7 @@ import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
-import { useQuantizer } from "../../../hooks/useQuantizer"
+import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { setTempoMidiEvent } from "../../../midi/MidiEvent"
 import { isSetTempoEvent } from "../../../track"
 
@@ -15,7 +15,7 @@ export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
   const { pushHistory } = useHistory()
-  const { quantizer } = useQuantizer()
+  const { quantizer } = useTempoEditor()
   const { id: conductorTrackId, createOrUpdate } = useConductorTrack()
   const updateEventsInRange = useUpdateEventsInRange(
     conductorTrackId,

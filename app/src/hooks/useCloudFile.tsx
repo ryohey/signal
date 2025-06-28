@@ -23,7 +23,6 @@ import {
 } from "../services/repositories"
 import { emptySong } from "../song"
 import { SongStore } from "../stores/SongStore"
-import { useAutoSave } from "./useAutoSave"
 import { useMobxSelector } from "./useMobxSelector"
 import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"
@@ -125,7 +124,6 @@ export const useCloudFile = () => {
   const openFile = useOpenFile()
   const updateSong = useUpdateSong()
   const createSong = useCreateSong()
-  const { onUserExplicitAction } = useAutoSave()
 
   const saveOrCreateSong = async () => {
     if (cloudSongId !== null) {
@@ -322,7 +320,6 @@ export const useCloudFile = () => {
       try {
         if (hasFSAccess) {
           await saveFileAs(getSong())
-          onUserExplicitAction()
         } else {
           saveSong()
         }

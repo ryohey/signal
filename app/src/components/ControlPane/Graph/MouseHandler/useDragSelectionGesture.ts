@@ -6,7 +6,6 @@ import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
-import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useTrack } from "../../../../hooks/useTrack"
 import { TrackEventOf } from "../../../../track"
 
@@ -16,9 +15,8 @@ export const useDragSelectionGesture = () => {
     useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const controlPane = useControlPane()
-  const { setSelectedEventIds } = controlPane
+  const { quantizer, setSelectedEventIds } = controlPane
   let { selectedEventIds } = controlPane
-  const { quantizer } = useQuantizer()
 
   return {
     onMouseDown<T extends ControllerEvent | PitchBendEvent>(

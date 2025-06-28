@@ -1,7 +1,6 @@
 import { Player, SoundFontSynth } from "@signal-app/player"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
-import { AutoSaveService } from "../services/AutoSaveService"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput } from "../services/MIDIInput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
@@ -35,7 +34,6 @@ export default class RootStore {
   readonly midiRecorder: MIDIRecorder
   readonly midiMonitor: MIDIMonitor
   readonly soundFontStore: SoundFontStore
-  readonly autoSaveService: AutoSaveService
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()
@@ -57,8 +55,6 @@ export default class RootStore {
       this.midiRecorder.onMessage(e)
     })
 
-    this.autoSaveService = new AutoSaveService(this.songStore)
-
     registerReactions(this)
   }
 
@@ -66,7 +62,6 @@ export default class RootStore {
     await this.synth.setup()
     await this.soundFontStore.init()
     this.setupMetronomeSynth()
-    this.autoSaveService.startAutoSave()
   }
 
   private async setupMetronomeSynth() {
