@@ -1,4 +1,5 @@
 import { computed, makeObservable, observable } from "mobx"
+import { makePersistable } from "mobx-persist-store"
 import { Layout } from "../Constants"
 import { KeyTransform } from "../entities/transform/KeyTransform"
 
@@ -14,6 +15,12 @@ export class KeyScrollStore {
       canvasHeight: observable,
       scrollTop: computed,
       transform: computed,
+    })
+
+    makePersistable(this, {
+      name: "KeyScrollStore",
+      properties: ["scaleY"],
+      storage: window.localStorage,
     })
   }
 
