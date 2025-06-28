@@ -7,13 +7,20 @@ export interface Device {
   name: string
   isConnected: boolean
   isEnabled: boolean
+  isBluetooth?: boolean
 }
 
 export function useMIDIDevice() {
-  const { midiDeviceStore } = useStores()
+  const { midiDeviceStore, bluetoothMIDIDeviceStore } = useStores()
 
   const inputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.inputs)
   const outputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.outputs)
+  const btInputs = useMobxStore(
+    ({ bluetoothMIDIDeviceStore }) => bluetoothMIDIDeviceStore.inputs,
+  )
+  const btEnabledInputs = useMobxStore(
+    ({ bluetoothMIDIDeviceStore }) => bluetoothMIDIDeviceStore.enabledInputs,
+  )
 
   const enabledInputs = useMobxStore(
     ({ midiDeviceStore }) => midiDeviceStore.enabledInputs,
@@ -26,12 +33,23 @@ export function useMIDIDevice() {
     ({ midiDeviceStore }) => midiDeviceStore.isFactorySoundEnabled,
   )
 
-  const inputDevices: Device[] = inputs.map((device) => ({
-    id: device.id,
-    name: formatName(device),
-    isConnected: device.state === "connected",
-    isEnabled: enabledInputs[device.id],
-  }))
+  // 通常MIDI + Bluetooth MIDI
+  const inputDevices: Device[] = [
+    ...inputs.map((device) => ({
+      id: device.id,
+      name: formatName(device),
+      isConnected: device.state === "connected",
+      isEnabled: enabledInputs[device.id],
+      isBluetooth: false,
+    })),
+    ...btInputs.map((d) => ({
+      id: d.id,
+      name: d.name ?? "Bluetooth MIDI Device",
+      isConnected: btInputs.some((i) => i.id === d.id),
+      isEnabled: btEnabledInputs[d.id],
+      isBluetooth: true,
+    })),
+  ]
 
   const outputDevices: Device[] = [
     {
@@ -43,6 +61,7 @@ export function useMIDIDevice() {
       name: formatName(device),
       isConnected: device.state === "connected",
       isEnabled: enabledOutputs[device.id],
+      isBluetooth: false,
     })),
   ]
 
@@ -50,19 +69,37 @@ export function useMIDIDevice() {
     inputDevices,
     outputDevices,
     get isLoading() {
-      return useMobxStore(({ midiDeviceStore }) => midiDeviceStore.isLoading)
+      return (
+        useMobxStore(({ midiDeviceStore }) => midiDeviceStore.isLoading) ||
+        useMobxStore(
+          ({ bluetoothMIDIDeviceStore }) => bluetoothMIDIDeviceStore.isLoading,
+        )
+      )
     },
     get requestError() {
-      return useMobxStore(({ midiDeviceStore }) => midiDeviceStore.requestError)
+      return (
+        useMobxStore(({ midiDeviceStore }) => midiDeviceStore.requestError) ||
+        useMobxStore(
+          ({ bluetoothMIDIDeviceStore }) =>
+            bluetoothMIDIDeviceStore.requestError,
+        )
+      )
     },
     requestMIDIAccess: useCallback(() => {
       midiDeviceStore.requestMIDIAccess()
     }, [midiDeviceStore]),
+    requestBluetoothMIDIDevice: useCallback(() => {
+      bluetoothMIDIDeviceStore.requestDevice()
+    }, [bluetoothMIDIDeviceStore]),
     setInputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {
-        midiDeviceStore.setInputEnable(deviceId, isEnabled)
+        if (btInputs.some((d) => d.id === deviceId)) {
+          bluetoothMIDIDeviceStore.setInputEnable(deviceId, isEnabled)
+        } else {
+          midiDeviceStore.setInputEnable(deviceId, isEnabled)
+        }
       },
-      [midiDeviceStore],
+      [midiDeviceStore, bluetoothMIDIDeviceStore, btInputs],
     ),
     setOutputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {

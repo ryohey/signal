@@ -9,7 +9,6 @@ export const registerReactions = (rootStore: RootStore) => {
     updateOutputDevices(rootStore),
   )
 
-  autorun(updateInputDevices(rootStore))
   autorun(updateOutputDevices(rootStore))
 
   observe(
@@ -43,17 +42,6 @@ const updateOutputDevices: Reaction =
       },
       ...midiDeviceEntries,
     ]
-  }
-
-const updateInputDevices: Reaction =
-  ({ midiDeviceStore, midiInput }) =>
-  () => {
-    const { inputs, enabledInputs } = midiDeviceStore
-
-    const devices = inputs.filter((d) => enabledInputs[d.id])
-
-    midiInput.removeAllDevices()
-    devices.forEach(midiInput.addDevice)
   }
 
 const disableSeekWhileRecording: Reaction =
