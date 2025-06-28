@@ -1,11 +1,9 @@
 import { Player } from "@signal-app/player"
 import { cloneDeep } from "lodash"
 import { computed, makeObservable, observable, reaction } from "mobx"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { Measure } from "../entities/measure/Measure"
-import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
@@ -56,26 +54,12 @@ export default class PianoRollStore {
   readonly tickScrollStore: TickScrollStore
   readonly keyScrollStore: KeyScrollStore
 
-  notesCursor = "auto"
-  mouseMode: PianoRollMouseMode = "pencil"
   quantize = 8
   isQuantizeEnabled = true
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
   selection: Selection | null = null
   selectedNoteIds: number[] = []
-  lastNoteDuration: number | null = null
-  openInstrumentBrowser = false
-  instrumentBrowserSetting: InstrumentSetting = {
-    isRhythmTrack: false,
-    programNumber: 0,
-  }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
-  showTrackList = false
-  showEventList = false
-  openTransposeDialog = false
-  openVelocityDialog = false
-  newNoteVelocity = 100
-  keySignature: KeySignature | null = null
   previewingNoteNumbers: ReadonlySet<number> = new Set()
 
   constructor(
@@ -92,23 +76,12 @@ export default class PianoRollStore {
     this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
 
     makeObservable(this, {
-      notesCursor: observable,
-      mouseMode: observable,
       quantize: observable,
       isQuantizeEnabled: observable,
       selectedTrackId: observable,
       selection: observable.shallow,
       selectedNoteIds: observable,
-      lastNoteDuration: observable,
-      openInstrumentBrowser: observable,
-      instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
-      showTrackList: observable,
-      showEventList: observable,
-      openTransposeDialog: observable,
-      openVelocityDialog: observable,
-      newNoteVelocity: observable,
-      keySignature: observable,
       previewingNoteNumbers: observable.ref,
       transform: computed,
       windowedEvents: computed,
@@ -122,7 +95,6 @@ export default class PianoRollStore {
       currentMBTTime: computed,
       quantizer: computed,
       enabledQuantizer: computed,
-      controlCursor: computed,
       selectedTrack: computed,
     })
   }
@@ -130,11 +102,10 @@ export default class PianoRollStore {
   setUpAutorun() {
     this.tickScrollStore.setUpAutoScroll()
 
-    // reset selection when change track or mouse mode
+    // reset selection when change track
     reaction(
       () => ({
         selectedTrackId: this.selectedTrackId,
-        mouseMode: this.mouseMode,
       }),
       () => {
         this.selection = null
@@ -271,11 +242,5 @@ export default class PianoRollStore {
 
   get enabledQuantizer(): Quantizer {
     return new Quantizer(this.songStore, this.quantize, true)
-  }
-
-  get controlCursor(): string {
-    return this.mouseMode === "pencil"
-      ? `url("./cursor-pencil.svg") 0 20, pointer`
-      : "auto"
   }
 }
