@@ -1,3 +1,4 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import {
   createContext,
   useCallback,
@@ -6,12 +7,13 @@ import {
   useMemo,
 } from "react"
 import { TempoSelection } from "../entities/selection/TempoSelection"
+import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import TempoEditorStore from "../stores/TempoEditorStore"
 import { useMobxSelector } from "./useMobxSelector"
 import { RulerProvider, useRuler } from "./useRuler"
 import { useStores } from "./useStores"
-import { TickScrollProvider } from "./useTickScroll"
+import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 
 const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
 
@@ -49,19 +51,17 @@ export function TempoEditorScope({ children }: { children: React.ReactNode }) {
 
 export function useTempoEditor() {
   const tempoEditorStore = useContext(TempoEditorStoreContext)
-
-  const selection = useMobxSelector(
-    () => tempoEditorStore.selection,
-    [tempoEditorStore],
+  const { transform: tickTransform } = useTickScroll(
+    tempoEditorStore.tickScrollStore,
   )
   const { beats } = useRuler()
-  const transform = useMobxSelector(
-    () => tempoEditorStore.transform,
-    [tempoEditorStore],
-  )
-  const mouseMode = useMobxSelector(
-    () => tempoEditorStore.mouseMode,
-    [tempoEditorStore],
+
+  const selection = useAtomValue(selectionAtom)
+  const canvasHeight = useAtomValue(canvasHeightAtom)
+
+  const transform = useMemo(
+    () => new TempoCoordTransform(tickTransform, canvasHeight),
+    [tickTransform, canvasHeight],
   )
 
   const selectionRect = useMemo(
@@ -70,20 +70,14 @@ export function useTempoEditor() {
     [selection, transform],
   )
 
-  const cursor = useMemo(
-    () =>
-      mouseMode === "pencil"
-        ? `url("./cursor-pencil.svg") 0 20, pointer`
-        : "auto",
-    [mouseMode],
-  )
-
   return {
     selection,
     transform,
     selectionRect,
     beats,
-    cursor,
+    get cursor() {
+      return useAtomValue(cursorAtom)
+    },
     get quantizer() {
       return useMobxSelector(
         () => tempoEditorStore.quantizer,
@@ -91,16 +85,10 @@ export function useTempoEditor() {
       )
     },
     get selectedEventIds() {
-      return useMobxSelector(
-        () => tempoEditorStore.selectedEventIds,
-        [tempoEditorStore],
-      )
+      return useAtomValue(selectedEventIdsAtom)
     },
     get mouseMode() {
-      return useMobxSelector(
-        () => tempoEditorStore.mouseMode,
-        [tempoEditorStore],
-      )
+      return useAtomValue(mouseModeAtom)
     },
     get isQuantizeEnabled() {
       return useMobxSelector(
@@ -114,18 +102,10 @@ export function useTempoEditor() {
         [tempoEditorStore],
       )
     },
-    setSelection: useCallback((selection: TempoSelection | null) => {
-      tempoEditorStore.selection = selection
-    }, []),
-    setSelectedEventIds: useCallback((ids: number[]) => {
-      tempoEditorStore.selectedEventIds = ids
-    }, []),
-    setMouseMode: useCallback((mode: PianoRollMouseMode) => {
-      tempoEditorStore.mouseMode = mode
-    }, []),
-    setCanvasHeight: useCallback((height: number) => {
-      tempoEditorStore.canvasHeight = height
-    }, []),
+    setSelection: useSetAtom(selectionAtom),
+    setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
+    setMouseMode: useSetAtom(mouseModeAtom),
+    setCanvasHeight: useSetAtom(canvasHeightAtom),
     setQuantize: useCallback((quantize: number) => {
       tempoEditorStore.quantize = quantize
     }, []),
@@ -134,3 +114,18 @@ export function useTempoEditor() {
     }, []),
   }
 }
+
+// atoms
+
+const canvasHeightAtom = atom(0)
+const selectionAtom = atom<TempoSelection | null>(null)
+const selectedEventIdsAtom = atom<number[]>([])
+const mouseModeAtom = atom<PianoRollMouseMode>("pencil")
+
+// derived atoms
+
+const cursorAtom = atom((get) =>
+  get(mouseModeAtom) === "pencil"
+    ? `url("./cursor-pencil.svg") 0 20, pointer`
+    : "auto",
+)
