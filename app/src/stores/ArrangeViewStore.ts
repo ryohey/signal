@@ -32,8 +32,6 @@ export default class ArrangeViewStore {
   selectedEventIds: { [key: number]: number[] } = {} // { trackIndex: [eventId] }
   quantize = 1
   selectedTrackIndex = 0
-  openTransposeDialog = false
-  openVelocityDialog = false
 
   constructor(
     private readonly songStore: SongStore,
@@ -48,8 +46,6 @@ export default class ArrangeViewStore {
       selectedEventIds: observable,
       quantize: observable,
       selectedTrackIndex: observable,
-      openTransposeDialog: observable,
-      openVelocityDialog: observable,
       transform: computed,
       trackTransform: computed,
       notes: computed,

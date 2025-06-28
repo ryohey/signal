@@ -1,3 +1,4 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import {
   createContext,
   useCallback,
@@ -118,16 +119,10 @@ export function useArrangeView() {
       )
     },
     get openTransposeDialog() {
-      return useMobxSelector(
-        () => arrangeViewStore.openTransposeDialog,
-        [arrangeViewStore],
-      )
+      return useAtomValue(openTransposeDialogAtom)
     },
     get openVelocityDialog() {
-      return useMobxSelector(
-        () => arrangeViewStore.openVelocityDialog,
-        [arrangeViewStore],
-      )
+      return useAtomValue(openVelocityDialogAtom)
     },
     rulerStore: arrangeViewStore.rulerStore,
     scrollBy: useCallback(
@@ -156,12 +151,8 @@ export function useArrangeView() {
       arrangeViewStore.selection = null
       arrangeViewStore.selectedEventIds = {}
     }, []),
-    setOpenTransposeDialog: useCallback((value: boolean) => {
-      arrangeViewStore.openTransposeDialog = value
-    }, []),
-    setOpenVelocityDialog: useCallback((value: boolean) => {
-      arrangeViewStore.openVelocityDialog = value
-    }, []),
+    setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
+    setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
     serializeState: useCallback(
       () => arrangeViewStore.serialize(),
       [arrangeViewStore],
@@ -174,3 +165,8 @@ export function useArrangeView() {
     ),
   }
 }
+
+// atoms
+
+const openTransposeDialogAtom = atom(false)
+const openVelocityDialogAtom = atom(false)
