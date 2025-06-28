@@ -21,7 +21,7 @@ import PianoRollStore, {
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
-import { QuantizerProvider } from "./useQuantizer"
+import { QuantizerProvider, useQuantizer } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -420,4 +420,9 @@ export function usePianoRoll() {
 export function usePianoRollTickScroll() {
   const { tickScrollStore } = useContext(PianoRollStoreContext)
   return useTickScroll(tickScrollStore)
+}
+
+export function usePianoRollQuantizer() {
+  const { quantizerStore } = useContext(PianoRollStoreContext)
+  return useQuantizer(quantizerStore)
 }
