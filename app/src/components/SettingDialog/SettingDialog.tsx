@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
-import { AdvancedSettingsView } from "./AdvancedSettingsView"
 import { GeneralSettingsView } from "./GeneralSettingsView"
 import { MIDIDeviceView } from "./MIDIDeviceView/MIDIDeviceView"
 import { SettingNavigation, SettingRoute } from "./SettingNavigation"
@@ -23,8 +22,6 @@ const RouteContent: FC<{ route: SettingRoute }> = ({ route }) => {
       return <MIDIDeviceView />
     case "soundfont":
       return <SoundFontSettingsView />
-    case "advanced":
-      return <AdvancedSettingsView />
   }
 }
 const Content = styled.div`
