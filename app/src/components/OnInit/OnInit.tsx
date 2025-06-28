@@ -98,7 +98,6 @@ export const OnInit: FC = () => {
     }
   }
 
-
   useEffect(() => {
     ;(async () => {
       await init()

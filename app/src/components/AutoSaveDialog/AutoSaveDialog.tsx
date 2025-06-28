@@ -18,7 +18,8 @@ export const AutoSaveDialog: React.FC<AutoSaveDialogProps> = ({
   open,
   onClose,
 }) => {
-  const { restoreAutoSave, onUserExplicitAction, getLastSaveTime } = useAutoSave()
+  const { restoreAutoSave, onUserExplicitAction, getLastSaveTime } =
+    useAutoSave()
   const lastSaveTime = getLastSaveTime()
 
   const handleRestore = useCallback(() => {
