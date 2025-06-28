@@ -53,7 +53,7 @@ export const LineGraphItems: FC<LineGraphItemsProps> = ({
         rects={highlightedItems}
         zIndex={zIndex + 0.2}
         strokeColor={colorToVec4(Color(theme.themeColor))}
-        fillColor={colorToVec4(Color(theme.textColor))}
+        fillColor={colorToVec4(Color(theme.onSurfaceColor))}
       />
     </>
   )
