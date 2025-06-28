@@ -1,14 +1,14 @@
 import { FC, useCallback } from "react"
-import { useTempoEditor } from "../../hooks/useTempoEditor"
+import { useQuantizer } from "../../hooks/useQuantizer"
 import QuantizeSelector from "../Toolbar/QuantizeSelector/QuantizeSelector"
 
 export const TempoGraphQuantizeSelector: FC = () => {
-  const { quantize, setQuantize, isQuantizeEnabled, setQuantizeEnabled } =
-    useTempoEditor()
+  const { quantize, setQuantize, isQuantizeEnabled, setIsQuantizeEnabled } =
+    useQuantizer()
 
   const onClickQuantizeSwitch = useCallback(() => {
-    setQuantizeEnabled(!isQuantizeEnabled)
-  }, [setQuantizeEnabled, isQuantizeEnabled])
+    setIsQuantizeEnabled(!isQuantizeEnabled)
+  }, [setIsQuantizeEnabled, isQuantizeEnabled])
 
   return (
     <QuantizeSelector

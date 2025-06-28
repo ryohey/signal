@@ -52,9 +52,6 @@ export function useControlPane() {
     get transform() {
       return usePianoRoll().transform
     },
-    get quantizer() {
-      return usePianoRoll().quantizer
-    },
     resetSelection: useCallback(() => {
       controlStore.selection = null
       controlStore.selectedEventIds = []

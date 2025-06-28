@@ -8,6 +8,7 @@ import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { usePlayer } from "../../../../hooks/usePlayer"
+import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
 
 export const useCreateSelectionGesture = (): MouseGesture<
@@ -19,10 +20,10 @@ export const useCreateSelectionGesture = (): MouseGesture<
     trackTransform,
     setSelectedTrackIndex,
     resetSelection,
-    quantizer,
     setSelection,
     setSelectedEventIds,
   } = useArrangeView()
+  const { quantizer } = useQuantizer()
   const { tracks } = useSong()
   let selection: ArrangeSelection | null = null
 
