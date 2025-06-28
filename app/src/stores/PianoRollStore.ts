@@ -9,7 +9,6 @@ import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
-import Quantizer from "../quantizer"
 import Track, {
   NoteEvent,
   TrackEvent,
@@ -18,6 +17,7 @@ import Track, {
   isNoteEvent,
 } from "../track"
 import { KeyScrollStore } from "./KeyScrollStore"
+import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
@@ -56,11 +56,10 @@ export default class PianoRollStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
   readonly keyScrollStore: KeyScrollStore
+  readonly quantizerStore: QuantizerStore
 
   notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
-  quantize = 8
-  isQuantizeEnabled = true
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
   selection: Selection | null = null
   selectedNoteIds: number[] = []
@@ -90,13 +89,12 @@ export default class PianoRollStore {
       15,
     )
     this.keyScrollStore = new KeyScrollStore()
-    this.rulerStore = new RulerStore(this, this.tickScrollStore, this.songStore)
+    this.rulerStore = new RulerStore(this.tickScrollStore, this.songStore)
+    this.quantizerStore = new QuantizerStore(this.songStore, 8)
 
     makeObservable(this, {
       notesCursor: observable,
       mouseMode: observable,
-      quantize: observable,
-      isQuantizeEnabled: observable,
       selectedTrackId: observable,
       selection: observable.shallow,
       selectedNoteIds: observable,
@@ -121,8 +119,6 @@ export default class PianoRollStore {
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
-      quantizer: computed,
-      enabledQuantizer: computed,
       controlCursor: computed,
       selectedTrack: computed,
     })
@@ -265,14 +261,6 @@ export default class PianoRollStore {
       this.player.position,
       this.songStore.song.timebase,
     )
-  }
-
-  get quantizer(): Quantizer {
-    return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
-  }
-
-  get enabledQuantizer(): Quantizer {
-    return new Quantizer(this.songStore, this.quantize, true)
   }
 
   get controlCursor(): string {

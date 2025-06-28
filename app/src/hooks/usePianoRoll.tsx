@@ -21,6 +21,7 @@ import PianoRollStore, {
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
+import { QuantizerProvider, useQuantizer } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -100,14 +101,17 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, keyScrollStore, rulerStore } = useContext(
-    PianoRollStoreContext,
-  )
+  const { tickScrollStore, keyScrollStore, rulerStore, quantizerStore } =
+    useContext(PianoRollStoreContext)
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <KeyScrollProvider value={keyScrollStore}>
-        <RulerProvider value={rulerStore}>{children}</RulerProvider>
+        <RulerProvider value={rulerStore}>
+          <QuantizerProvider value={quantizerStore}>
+            {children}
+          </QuantizerProvider>
+        </RulerProvider>
       </KeyScrollProvider>
     </TickScrollProvider>
   )
@@ -128,12 +132,6 @@ export function usePianoRoll() {
     get currentVolume() {
       return useMobxSelector(
         () => pianoRollStore.currentVolume,
-        [pianoRollStore],
-      )
-    },
-    get enabledQuantizer() {
-      return useMobxSelector(
-        () => pianoRollStore.enabledQuantizer,
         [pianoRollStore],
       )
     },
@@ -194,12 +192,6 @@ export function usePianoRoll() {
         [pianoRollStore],
       )
     },
-    get quantizer() {
-      return useMobxSelector(() => pianoRollStore.quantizer, [pianoRollStore])
-    },
-    get quantize() {
-      return useMobxSelector(() => pianoRollStore.quantize, [pianoRollStore])
-    },
     get notesCursor() {
       return useMobxSelector(() => pianoRollStore.notesCursor, [pianoRollStore])
     },
@@ -254,12 +246,6 @@ export function usePianoRoll() {
     get lastNoteDuration() {
       return useMobxSelector(
         () => pianoRollStore.lastNoteDuration,
-        [pianoRollStore],
-      )
-    },
-    get isQuantizeEnabled() {
-      return useMobxSelector(
-        () => pianoRollStore.isQuantizeEnabled,
         [pianoRollStore],
       )
     },
@@ -411,14 +397,6 @@ export function usePianoRoll() {
       (velocity: number) => (pianoRollStore.newNoteVelocity = velocity),
       [pianoRollStore],
     ),
-    setQuantize: useCallback(
-      (denominator: number) => (pianoRollStore.quantize = denominator),
-      [pianoRollStore],
-    ),
-    setIsQuantizeEnabled: useCallback(
-      (enabled: boolean) => (pianoRollStore.isQuantizeEnabled = enabled),
-      [pianoRollStore],
-    ),
     setInstrumentBrowserSetting: useCallback(
       (setting: InstrumentSetting) =>
         (pianoRollStore.instrumentBrowserSetting = setting),
@@ -442,4 +420,9 @@ export function usePianoRoll() {
 export function usePianoRollTickScroll() {
   const { tickScrollStore } = useContext(PianoRollStoreContext)
   return useTickScroll(tickScrollStore)
+}
+
+export function usePianoRollQuantizer() {
+  const { quantizerStore } = useContext(PianoRollStoreContext)
+  return useQuantizer(quantizerStore)
 }

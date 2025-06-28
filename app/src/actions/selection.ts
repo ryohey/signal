@@ -9,7 +9,7 @@ import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
-import { usePianoRoll } from "../hooks/usePianoRoll"
+import { usePianoRoll, usePianoRollQuantizer } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
 import { useSong } from "../hooks/useSong"
@@ -274,11 +274,8 @@ export const useSelectPreviousNote = () => {
 }
 
 export const useQuantizeSelectedNotes = () => {
-  const {
-    selectedTrackId,
-    selectedNoteIds,
-    enabledQuantizer: quantizer,
-  } = usePianoRoll()
+  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
+  const { enabledQuantizer: quantizer } = usePianoRollQuantizer()
   const { getEventById, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 

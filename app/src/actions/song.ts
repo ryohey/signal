@@ -1,4 +1,5 @@
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useAutoSave } from "../hooks/useAutoSave"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -64,26 +65,36 @@ export const useSetSong = () => {
 
 export const useCreateSong = () => {
   const setSong = useSetSong()
-  return () => setSong(emptySong())
+  const { onUserExplicitAction } = useAutoSave()
+
+  return () => {
+    onUserExplicitAction()
+    setSong(emptySong())
+  }
 }
 
 export const useSaveSong = () => {
   const { getSong } = useSong()
   const { setSaved } = useSong()
+  const { onUserExplicitAction } = useAutoSave()
 
   return () => {
     setSaved(true)
+    onUserExplicitAction()
     downloadSongAsMidi(getSong())
   }
 }
 
 export const useOpenSong = () => {
   const setSong = useSetSong()
+  const { onUserExplicitAction } = useAutoSave()
+
   return async (input: HTMLInputElement) => {
     const song = await openSongFile(input)
     if (song === null) {
       return
     }
+    onUserExplicitAction()
     setSong(song)
   }
 }
@@ -111,6 +122,7 @@ export const useRemoveTrack = () => {
   } = useArrangeView()
 
   return (trackId: TrackId) => {
+    const trackCount = tracks.length
     if (tracks.filter((t) => !t.isConductorTrack).length <= 1) {
       // conductor track を除き、最後のトラックの場合
       // トラックがなくなるとエラーが出るので削除できなくする
@@ -120,11 +132,10 @@ export const useRemoveTrack = () => {
     }
     pushHistory()
     removeTrack(trackId)
-    setSelectedTrackIndex(
-      Math.min(pianoRollSelectedTrackIndex, tracks.length - 1),
-    )
+    const maxTrackIndex = trackCount - 2
+    setSelectedTrackIndex(Math.min(pianoRollSelectedTrackIndex, maxTrackIndex))
     setArrangeSelectedTrackIndex(
-      Math.min(arrangeSelectedTrackIndex, tracks.length - 1),
+      Math.min(arrangeSelectedTrackIndex, maxTrackIndex),
     )
   }
 }

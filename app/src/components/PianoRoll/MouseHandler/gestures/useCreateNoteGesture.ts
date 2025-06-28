@@ -2,6 +2,7 @@ import { NoteNumber } from "../../../../entities/unit/NoteNumber"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
 import { useTrack } from "../../../../hooks/useTrack"
 import { NoteEvent } from "../../../../track"
@@ -11,11 +12,11 @@ export const useCreateNoteGesture = (): MouseGesture => {
   const {
     transform,
     selectedTrackId,
-    quantizer,
     newNoteVelocity,
     lastNoteDuration,
     getLocal,
   } = usePianoRoll()
+  const { quantizer } = useQuantizer()
   const { channel, isRhythmTrack, addEvent } = useTrack(selectedTrackId)
   const { timebase } = useSong()
   const { pushHistory } = useHistory()

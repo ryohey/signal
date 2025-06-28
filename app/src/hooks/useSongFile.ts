@@ -3,6 +3,7 @@ import { ChangeEvent } from "react"
 import { useCreateSong, useOpenSong, useSaveSong } from "../actions"
 import { saveFile, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
+import { useAutoSave } from "./useAutoSave"
 import { useSong } from "./useSong"
 
 export const useSongFile = () => {
@@ -13,6 +14,7 @@ export const useSongFile = () => {
   const openSong = useOpenSong()
   const saveSong = useSaveSong()
   const openFile = useOpenFile()
+  const { onUserExplicitAction } = useAutoSave()
 
   return {
     async createNewSong() {
@@ -40,9 +42,11 @@ export const useSongFile = () => {
     },
     async saveSong() {
       await saveFile(getSong())
+      onUserExplicitAction()
     },
     async saveAsSong() {
       await saveFileAs(getSong())
+      onUserExplicitAction()
     },
     async downloadSong() {
       saveSong()

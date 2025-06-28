@@ -5,17 +5,14 @@ import { ArrangeSelection } from "../../entities/selection/ArrangeSelection"
 import { MouseGesture } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
+import { useQuantizer } from "../../hooks/useQuantizer"
 import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const {
-    trackTransform,
-    resetSelection,
-    quantizer,
-    setSelection,
-    setSelectedEventIds,
-  } = useArrangeView()
+  const { trackTransform, resetSelection, setSelection, setSelectedEventIds } =
+    useArrangeView()
+  const { quantizer } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
 
