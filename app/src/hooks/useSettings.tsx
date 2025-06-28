@@ -23,15 +23,17 @@ class ThemeStore {
 
 class SettingStore {
   language: Language | null = null
+  showNoteLabels: boolean = true
 
   constructor() {
     makeObservable(this, {
       language: observable,
+      showNoteLabels: observable,
     })
 
     makePersistable(this, {
       name: "SettingStore",
-      properties: ["language"],
+      properties: ["language", "showNoteLabels"],
       storage: window.localStorage,
     })
   }
@@ -58,6 +60,15 @@ export function useSettings() {
     get language() {
       return useMobxSelector(() => settingStore.language, [settingStore])
     },
+    get showNoteLabels() {
+      return useMobxSelector(() => settingStore.showNoteLabels, [settingStore])
+    },
+    setShowNoteLabels: useCallback(
+      (value: boolean) => {
+        settingStore.showNoteLabels = value
+      },
+      [settingStore],
+    ),
     get themeType() {
       return useMobxSelector(() => themeStore.themeType, [themeStore])
     },

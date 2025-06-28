@@ -27,6 +27,7 @@ export type PianoRollMouseMode = "pencil" | "selection"
 export type PianoNoteItem = Rect & {
   id: number
   velocity: number
+  noteNumber: number
   isSelected: boolean
 }
 
@@ -222,6 +223,7 @@ export default class PianoRollStore {
           ...n.bounds,
           id: n.note.id,
           velocity: n.note.velocity,
+          noteNumber: n.note.noteNumber,
           isSelected,
         }
       })

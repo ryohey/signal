@@ -9,6 +9,7 @@ import {
 import { themes, ThemeType } from "../../theme/Theme"
 import { ThemeName } from "../../theme/ThemeName"
 import { DialogContent, DialogTitle } from "../Dialog/Dialog"
+import { Checkbox } from "../ui/Checkbox"
 import { Label } from "../ui/Label"
 import { Select } from "../ui/Select"
 
@@ -65,10 +66,32 @@ const ThemeSelect: FC = () => {
   )
 }
 
+const ShowNoteLabelCheckbox: FC = () => {
+  const { showNoteLabels, setShowNoteLabels } = useSettings()
+
+  return (
+    <Checkbox
+      checked={showNoteLabels}
+      onCheckedChange={setShowNoteLabels}
+      label={<Localized name="show-note-labels" />}
+    />
+  )
+}
+
 const Column = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`
+
+const SectionTitle = styled.div`
+  font-weight: bold;
+  margin: 1rem 0;
+`
+
+const SectionContent = styled.div`
+  display: flex;
+  flex-direction: column;
 `
 
 export const GeneralSettingsView: FC = () => {
@@ -81,6 +104,12 @@ export const GeneralSettingsView: FC = () => {
         <Column>
           <LanguageSelect />
           <ThemeSelect />
+          <SectionContent>
+            <SectionTitle>
+              <Localized name="appearance" />
+            </SectionTitle>
+            <ShowNoteLabelCheckbox />
+          </SectionContent>
         </Column>
       </DialogContent>
     </>
