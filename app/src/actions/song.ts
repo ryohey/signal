@@ -1,4 +1,5 @@
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useAutoSave } from "../hooks/useAutoSave"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -64,26 +65,36 @@ export const useSetSong = () => {
 
 export const useCreateSong = () => {
   const setSong = useSetSong()
-  return () => setSong(emptySong())
+  const { onUserExplicitAction } = useAutoSave()
+
+  return () => {
+    onUserExplicitAction()
+    setSong(emptySong())
+  }
 }
 
 export const useSaveSong = () => {
   const { getSong } = useSong()
   const { setSaved } = useSong()
+  const { onUserExplicitAction } = useAutoSave()
 
   return () => {
     setSaved(true)
+    onUserExplicitAction()
     downloadSongAsMidi(getSong())
   }
 }
 
 export const useOpenSong = () => {
   const setSong = useSetSong()
+  const { onUserExplicitAction } = useAutoSave()
+
   return async (input: HTMLInputElement) => {
     const song = await openSongFile(input)
     if (song === null) {
       return
     }
+    onUserExplicitAction()
     setSong(song)
   }
 }

@@ -6,6 +6,7 @@ import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
+import { useQuantizer } from "./useQuantizer"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
 
@@ -29,10 +30,9 @@ export const RulerProvider = RulerContext.Provider
 export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
-  const { parent } = rulerStore
   const { timeSignatures } = useSong()
   const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
-  const quantizer = useMobxSelector(() => parent.quantizer, [parent])
+  const { quantizer } = useQuantizer()
   const selectedTimeSignatureEventIds = useMobxSelector(
     () => rulerStore.selectedTimeSignatureEventIds,
     [rulerStore],

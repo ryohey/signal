@@ -1,9 +1,9 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
+import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
+import { QuantizeSelector } from "../Toolbar/QuantizeSelector/QuantizeSelector"
 import { Toolbar } from "../Toolbar/Toolbar"
-import { TempoGraphAutoScrollButton } from "./TempoGraphAutoScrollButton"
-import { TempoGraphQuantizeSelector } from "./TempoGraphQuantizeSelector"
 import { TempoGraphToolSelector } from "./TempoGraphToolSelector"
 
 const Title = styled.span`
@@ -28,9 +28,9 @@ export const TempoGraphToolbar: FC = () => {
 
       <TempoGraphToolSelector />
 
-      <TempoGraphQuantizeSelector />
+      <QuantizeSelector />
 
-      <TempoGraphAutoScrollButton />
+      <AutoScrollButton />
     </Toolbar>
   )
 }

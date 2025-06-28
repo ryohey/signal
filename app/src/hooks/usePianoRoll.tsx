@@ -1,3 +1,5 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomCallback } from "jotai/utils"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { autorun } from "mobx"
 import {
@@ -21,6 +23,7 @@ import PianoRollStore, {
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
+import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
@@ -100,14 +103,17 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, keyScrollStore, rulerStore } = useContext(
-    PianoRollStoreContext,
-  )
+  const { tickScrollStore, keyScrollStore, rulerStore, quantizerStore } =
+    useContext(PianoRollStoreContext)
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <KeyScrollProvider value={keyScrollStore}>
-        <RulerProvider value={rulerStore}>{children}</RulerProvider>
+        <RulerProvider value={rulerStore}>
+          <QuantizerProvider value={quantizerStore}>
+            {children}
+          </QuantizerProvider>
+        </RulerProvider>
       </KeyScrollProvider>
     </TickScrollProvider>
   )
@@ -131,12 +137,6 @@ export function usePianoRoll() {
         [pianoRollStore],
       )
     },
-    get enabledQuantizer() {
-      return useMobxSelector(
-        () => pianoRollStore.enabledQuantizer,
-        [pianoRollStore],
-      )
-    },
     get notes() {
       return useMobxSelector(() => pianoRollStore.notes, [pianoRollStore])
     },
@@ -150,13 +150,10 @@ export function usePianoRoll() {
       return useMobxSelector(() => pianoRollStore.rulerStore, [pianoRollStore])
     },
     get mouseMode() {
-      return useMobxSelector(() => pianoRollStore.mouseMode, [pianoRollStore])
+      return useAtomValue(mouseModeAtom)
     },
     get keySignature() {
-      return useMobxSelector(
-        () => pianoRollStore.keySignature,
-        [pianoRollStore],
-      )
+      return useAtomValue(keySignatureAtom)
     },
     get selection() {
       return useMobxSelector(() => pianoRollStore.selection, [pianoRollStore])
@@ -194,14 +191,8 @@ export function usePianoRoll() {
         [pianoRollStore],
       )
     },
-    get quantizer() {
-      return useMobxSelector(() => pianoRollStore.quantizer, [pianoRollStore])
-    },
-    get quantize() {
-      return useMobxSelector(() => pianoRollStore.quantize, [pianoRollStore])
-    },
     get notesCursor() {
-      return useMobxSelector(() => pianoRollStore.notesCursor, [pianoRollStore])
+      return useAtomValue(notesCursorAtom)
     },
     get selectionBounds() {
       return useMobxSelector(
@@ -210,16 +201,10 @@ export function usePianoRoll() {
       )
     },
     get showTrackList() {
-      return useMobxSelector(
-        () => pianoRollStore.showTrackList,
-        [pianoRollStore],
-      )
+      return useAtomValue(showTrackListAtom)
     },
     get showEventList() {
-      return useMobxSelector(
-        () => pianoRollStore.showEventList,
-        [pianoRollStore],
-      )
+      return useAtomValue(showEventListAtom)
     },
     get ghostTrackIds() {
       return useMobxSelector(
@@ -234,34 +219,16 @@ export function usePianoRoll() {
       )
     },
     get openTransposeDialog() {
-      return useMobxSelector(
-        () => pianoRollStore.openTransposeDialog,
-        [pianoRollStore],
-      )
+      return useAtomValue(openTransposeDialogAtom)
     },
     get openVelocityDialog() {
-      return useMobxSelector(
-        () => pianoRollStore.openVelocityDialog,
-        [pianoRollStore],
-      )
+      return useAtomValue(openVelocityDialogAtom)
     },
     get newNoteVelocity() {
-      return useMobxSelector(
-        () => pianoRollStore.newNoteVelocity,
-        [pianoRollStore],
-      )
+      return useAtomValue(newNoteVelocityAtom)
     },
     get lastNoteDuration() {
-      return useMobxSelector(
-        () => pianoRollStore.lastNoteDuration,
-        [pianoRollStore],
-      )
-    },
-    get isQuantizeEnabled() {
-      return useMobxSelector(
-        () => pianoRollStore.isQuantizeEnabled,
-        [pianoRollStore],
-      )
+      return useAtomValue(lastNoteDurationAtom)
     },
     get currentMBTTime() {
       return useMobxSelector(
@@ -270,22 +237,13 @@ export function usePianoRoll() {
       )
     },
     get controlCursor() {
-      return useMobxSelector(
-        () => pianoRollStore.controlCursor,
-        [pianoRollStore],
-      )
+      return useAtomValue(controlCursorAtom)
     },
     get instrumentBrowserSetting() {
-      return useMobxSelector(
-        () => pianoRollStore.instrumentBrowserSetting,
-        [pianoRollStore],
-      )
+      return useAtomValue(instrumentBrowserSettingAtom)
     },
     get openInstrumentBrowser() {
-      return useMobxSelector(
-        () => pianoRollStore.openInstrumentBrowser,
-        [pianoRollStore],
-      )
+      return useAtomValue(openInstrumentBrowserAtom)
     },
     resetSelection: useCallback(() => {
       pianoRollStore.selection = null
@@ -307,26 +265,17 @@ export function usePianoRoll() {
       (ids: Set<TrackId>) => (pianoRollStore.notGhostTrackIds = ids),
       [pianoRollStore],
     ),
-    setOpenTransposeDialog: useCallback(
-      (open: boolean) => (pianoRollStore.openTransposeDialog = open),
-      [pianoRollStore],
-    ),
-    setOpenVelocityDialog: useCallback(
-      (open: boolean) => (pianoRollStore.openVelocityDialog = open),
-      [pianoRollStore],
-    ),
-    setKeySignature: useCallback(
-      (keySignature: KeySignature | null) =>
-        (pianoRollStore.keySignature = keySignature),
-      [pianoRollStore],
-    ),
-    setMouseMode: useCallback(
-      (mode: PianoRollMouseMode) => {
-        pianoRollStore.mouseMode = mode
-        pianoRollStore.notesCursor = mode === "pencil" ? "auto" : "crosshair"
-      },
-      [pianoRollStore],
-    ),
+    setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
+    setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
+    setKeySignature: useSetAtom(keySignatureAtom),
+    setMouseMode: useAtomCallback((_get, set, mode: PianoRollMouseMode) => {
+      set(mouseModeAtom, mode)
+      set(notesCursorAtom, mode === "pencil" ? "auto" : "crosshair")
+
+      // reset selection when change mouse mode
+      pianoRollStore.selection = null
+      pianoRollStore.selectedNoteIds = []
+    }),
     addPreviewingNoteNumbers: useCallback(
       (noteNumber: number) =>
         (pianoRollStore.previewingNoteNumbers = new Set([
@@ -348,14 +297,8 @@ export function usePianoRoll() {
       (selection: Selection | null) => (pianoRollStore.selection = selection),
       [pianoRollStore],
     ),
-    setShowTrackList: useCallback(
-      (show: boolean) => (pianoRollStore.showTrackList = show),
-      [pianoRollStore],
-    ),
-    setShowEventList: useCallback(
-      (show: boolean) => (pianoRollStore.showEventList = show),
-      [pianoRollStore],
-    ),
+    setShowTrackList: useSetAtom(showTrackListAtom),
+    setShowEventList: useSetAtom(showEventListAtom),
     setScrollLeftInTicks,
     setScrollLeftInPixels,
     setSelectedTrackId: useCallback(
@@ -371,10 +314,7 @@ export function usePianoRoll() {
       (ids: number[]) => (pianoRollStore.selectedNoteIds = ids),
       [pianoRollStore],
     ),
-    setNotesCursor: useCallback(
-      (cursor: string) => (pianoRollStore.notesCursor = cursor),
-      [pianoRollStore],
-    ),
+    setNotesCursor: useSetAtom(notesCursorAtom),
     // convert mouse position to the local coordinate on the canvas
     getLocal: useCallback(
       (e: { offsetX: number; offsetY: number }): Point => ({
@@ -397,37 +337,17 @@ export function usePianoRoll() {
       () => pianoRollStore.selectedNoteIds,
       [pianoRollStore],
     ),
-    setLastNoteDuration: useCallback(
-      (duration: number | null) => (pianoRollStore.lastNoteDuration = duration),
-      [pianoRollStore],
-    ),
-    toggleTool: useCallback(
-      () =>
-        (pianoRollStore.mouseMode =
-          pianoRollStore.mouseMode === "pencil" ? "selection" : "pencil"),
-      [pianoRollStore],
-    ),
-    setNewNoteVelocity: useCallback(
-      (velocity: number) => (pianoRollStore.newNoteVelocity = velocity),
-      [pianoRollStore],
-    ),
-    setQuantize: useCallback(
-      (denominator: number) => (pianoRollStore.quantize = denominator),
-      [pianoRollStore],
-    ),
-    setIsQuantizeEnabled: useCallback(
-      (enabled: boolean) => (pianoRollStore.isQuantizeEnabled = enabled),
-      [pianoRollStore],
-    ),
-    setInstrumentBrowserSetting: useCallback(
-      (setting: InstrumentSetting) =>
-        (pianoRollStore.instrumentBrowserSetting = setting),
-      [pianoRollStore],
-    ),
-    setOpenInstrumentBrowser: useCallback(
-      (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
-      [pianoRollStore],
-    ),
+    setLastNoteDuration: useSetAtom(lastNoteDurationAtom),
+    toggleTool: useAtomCallback((_get, set) => {
+      set(mouseModeAtom, (prev) => (prev === "pencil" ? "selection" : "pencil"))
+
+      // reset selection when change mouse mode
+      pianoRollStore.selection = null
+      pianoRollStore.selectedNoteIds = []
+    }),
+    setNewNoteVelocity: useSetAtom(newNoteVelocityAtom),
+    setInstrumentBrowserSetting: useSetAtom(instrumentBrowserSettingAtom),
+    setOpenInstrumentBrowser: useSetAtom(openInstrumentBrowserAtom),
     serializeState: useCallback(
       () => pianoRollStore.serialize(),
       [pianoRollStore],
@@ -443,3 +363,28 @@ export function usePianoRollTickScroll() {
   const { tickScrollStore } = useContext(PianoRollStoreContext)
   return useTickScroll(tickScrollStore)
 }
+
+// atoms
+
+const mouseModeAtom = atom<PianoRollMouseMode>("pencil")
+const showTrackListAtom = atom(false)
+const showEventListAtom = atom(false)
+const openTransposeDialogAtom = atom(false)
+const openVelocityDialogAtom = atom(false)
+const newNoteVelocityAtom = atom(100)
+const keySignatureAtom = atom<KeySignature | null>(null)
+const lastNoteDurationAtom = atom<number | null>(null)
+const openInstrumentBrowserAtom = atom(false)
+const instrumentBrowserSettingAtom = atom<InstrumentSetting>({
+  isRhythmTrack: false,
+  programNumber: 0,
+})
+const notesCursorAtom = atom("auto")
+
+// derived atoms
+
+const controlCursorAtom = atom((get) =>
+  get(mouseModeAtom) === "pencil"
+    ? `url("./cursor-pencil.svg") 0 20, pointer`
+    : "auto",
+)
