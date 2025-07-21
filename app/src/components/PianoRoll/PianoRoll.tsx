@@ -7,6 +7,7 @@ import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTickScroll } from "../../hooks/useTickScroll"
+import { useTrack } from "../../hooks/useTrack"
 import ControlPane from "../ControlPane/ControlPane"
 import {
   HorizontalScaleScrollBar,
@@ -38,7 +39,8 @@ const Beta = styled.div`
 `
 
 const PianoRollWrapper: FC = () => {
-  const { transform, scrollBy } = usePianoRoll()
+  const { transform, scrollBy, selectedTrackId } = usePianoRoll()
+  const { isRhythmTrack } = useTrack(selectedTrackId)
   const {
     contentHeight,
     scaleY,
@@ -62,7 +64,9 @@ const PianoRollWrapper: FC = () => {
 
   const alphaRef = useRef(null)
   const { height: alphaHeight = 0 } = useComponentSize(alphaRef)
-  const keyWidth = Layout.keyWidth
+  const keyWidth = isRhythmTrack
+    ? Layout.keyWidth + Layout.drumKeysWidth
+    : Layout.keyWidth
 
   const onClickScaleUpHorizontal = useCallback(
     () => scaleAroundPointX(0.2, 0),

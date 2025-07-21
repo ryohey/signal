@@ -4,6 +4,7 @@ export const Layout = {
   keyWidth: 64,
   blackKeyWidthRatio: 0.64,
   rulerHeight: 32,
+  drumKeysWidth: 128,
 }
 
 export const MaxNoteNumber = 127
