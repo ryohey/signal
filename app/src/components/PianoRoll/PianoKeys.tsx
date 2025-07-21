@@ -1,14 +1,13 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback } from "react"
 import { Layout } from "../../Constants"
 import { Point } from "../../entities/geometry/Point"
 import { KeySignature } from "../../entities/scale/KeySignature"
 import { noteNameWithOctString } from "../../helpers/noteNumberString"
 import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
-import { usePreviewNote } from "../../hooks/usePreviewNote"
+import { usePianoKeys } from "../../hooks/usePianoKeys"
 import { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { PianoKeysContextMenu } from "./PianoKeysContextMenu"
@@ -205,17 +204,18 @@ function drawKeys(
 
 export const PianoKeys: FC = () => {
   const theme = useTheme()
-  const {
-    keySignature,
-    transform: { numberOfKeys, pixelsPerKey: keyHeight },
-    previewingNoteNumbers,
-  } = usePianoRoll()
   const width = Layout.keyWidth
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
-  const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())
   const { onContextMenu, menuProps } = useContextMenu()
-  const { previewNoteOn, previewNoteOff } = usePreviewNote()
-  const selectedKeys = new Set([...touchingKeys, ...previewingNoteNumbers])
+  const {
+    keySignature,
+    keyHeight,
+    numberOfKeys,
+    selectedKeys,
+    onMouseDownKey,
+    onMouseMoveKey,
+    onMouseUpKey,
+  } = usePianoKeys()
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D) => {
@@ -262,28 +262,30 @@ export const PianoKeys: FC = () => {
       }
 
       let prevNoteNumber = posToNoteNumber(startPosition.x, startPosition.y)
-      previewNoteOn(prevNoteNumber)
-
-      setTouchingKeys(new Set([prevNoteNumber]))
+      onMouseDownKey(prevNoteNumber)
 
       observeDrag2(e.nativeEvent, {
         onMouseMove(_e, delta) {
           const pos = Point.add(startPosition, delta)
           const noteNumber = posToNoteNumber(pos.x, pos.y)
           if (noteNumber !== prevNoteNumber) {
-            previewNoteOff()
-            previewNoteOn(noteNumber)
+            onMouseMoveKey(noteNumber)
             prevNoteNumber = noteNumber
-            setTouchingKeys(new Set([noteNumber]))
           }
         },
         onMouseUp() {
-          previewNoteOff()
-          setTouchingKeys(new Set())
+          onMouseUpKey()
         },
       })
     },
-    [numberOfKeys, keyHeight, previewNoteOn, previewNoteOff, blackKeyWidth],
+    [
+      numberOfKeys,
+      keyHeight,
+      blackKeyWidth,
+      onMouseDownKey,
+      onMouseMoveKey,
+      onMouseUpKey,
+    ],
   )
 
   return (
