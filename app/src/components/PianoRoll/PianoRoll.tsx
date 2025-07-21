@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
 import { FC, useCallback, useRef } from "react"
-import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
+import { WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
@@ -64,11 +64,11 @@ const PianoRollWrapper: FC = () => {
   const { height: alphaHeight = 0 } = useComponentSize(alphaRef)
 
   const onClickScaleUpHorizontal = useCallback(
-    () => scaleAroundPointX(0.2, Layout.keyWidth),
+    () => scaleAroundPointX(0.2, 0),
     [scaleX, scaleAroundPointX],
   )
   const onClickScaleDownHorizontal = useCallback(
-    () => scaleAroundPointX(-0.2, Layout.keyWidth),
+    () => scaleAroundPointX(-0.2, 0),
     [scaleX, scaleAroundPointX],
   )
   const onClickScaleResetHorizontal = useCallback(
