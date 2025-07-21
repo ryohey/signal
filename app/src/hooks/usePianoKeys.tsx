@@ -15,7 +15,10 @@ export function usePianoKeys() {
   const { previewNoteOn, previewNoteOff } = usePreviewNote()
   const { synth } = useStores()
   const { programNumber, isRhythmTrack } = useTrack(selectedTrackId)
-  const selectedKeys = new Set([...touchingKeys, ...previewingNoteNumbers])
+  const selectedKeys = useMemo(
+    () => new Set([...touchingKeys, ...previewingNoteNumbers]),
+    [touchingKeys, previewingNoteNumbers],
+  )
 
   const onMouseDownKey = useCallback(
     (noteNumber: number) => {
