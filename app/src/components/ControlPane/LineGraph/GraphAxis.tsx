@@ -3,7 +3,6 @@ import React, { FC } from "react"
 
 const Parent = styled.div`
   text-align: right;
-  width: var(--size-key-width);
   padding-right: 0.3em;
   box-sizing: border-box;
 `
@@ -28,15 +27,21 @@ const Value = styled.div`
 `
 
 export interface GraphAxisProps {
+  width: number
   values: number[]
   valueFormatter?: (value: number) => string
   onClick: (value: number) => void
 }
 
 export const GraphAxis: FC<GraphAxisProps> = React.memo(
-  ({ values, valueFormatter = (v: number) => v.toString(), onClick }) => {
+  ({
+    width,
+    values,
+    valueFormatter = (v: number) => v.toString(),
+    onClick,
+  }) => {
     return (
-      <Parent>
+      <Parent style={{ width }}>
         <Values>
           {values
             .slice()

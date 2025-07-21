@@ -54,6 +54,7 @@ function isDisplayControlEvent(e: TrackEvent): e is DisplayEvent {
 
 export interface PianoControlEventsProps {
   width: number
+  keyWidth: number
   events: readonly TrackEvent[]
   scrollLeft: number
   transform: TickTransform
@@ -61,7 +62,6 @@ export interface PianoControlEventsProps {
 }
 
 const Container = styled.div`
-  margin-left: var(--size-key-width) px;
   margin-top: var(--size-ruler-height) px;
   position: absolute;
 
@@ -75,6 +75,7 @@ const Container = styled.div`
 
 const PianoControlEvents: FC<PianoControlEventsProps> = ({
   width,
+  keyWidth,
   events,
   scrollLeft,
   transform,
@@ -86,7 +87,7 @@ const PianoControlEvents: FC<PianoControlEventsProps> = ({
   )
 
   return (
-    <Container style={{ width }}>
+    <Container style={{ width, marginLeft: keyWidth }}>
       <div className="inner">
         <div className="content" style={{ left: -scrollLeft }}>
           {eventGroups.map((g, i) => (

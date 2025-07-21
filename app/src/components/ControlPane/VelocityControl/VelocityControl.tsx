@@ -6,6 +6,7 @@ import { VelocityControlCanvas } from "./VelocityControlCanvas"
 export interface PianoVelocityControlProps {
   width: number
   height: number
+  axisWidth: number
 }
 
 const Parent = styled.div`
@@ -18,10 +19,15 @@ const Parent = styled.div`
 const PianoVelocityControl: FC<PianoVelocityControlProps> = ({
   width,
   height,
+  axisWidth,
 }: PianoVelocityControlProps) => {
   return (
     <Parent>
-      <GraphAxis values={[1, 32, 64, 96, 127]} onClick={() => {}} />
+      <GraphAxis
+        width={axisWidth}
+        values={[1, 32, 64, 96, 127]}
+        onClick={() => {}}
+      />
       <VelocityControlCanvas width={width} height={height} />
     </Parent>
   )

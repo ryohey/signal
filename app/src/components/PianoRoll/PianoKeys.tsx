@@ -208,10 +208,13 @@ function drawKeys(
   ctx.restore()
 }
 
-export const PianoKeys: FC = () => {
+export interface PianoKeysProps {
+  width: number
+}
+
+export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
   const theme = useTheme()
-  const width = Layout.keyWidth
-  const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
+  const blackKeyWidth = width * Layout.blackKeyWidthRatio
   const { onContextMenu, menuProps } = useContextMenu()
   const {
     keySignature,
