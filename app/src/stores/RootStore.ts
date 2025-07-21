@@ -1,4 +1,4 @@
-import { Player, SoundFontSynth } from "@signal-app/player"
+import { Player, SoundFont, SoundFontSynth } from "@signal-app/player"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { AutoSaveService } from "../services/AutoSaveService"
@@ -71,7 +71,7 @@ export default class RootStore {
 
   private async setupMetronomeSynth() {
     const data = await loadMetronomeSoundFontData()
-    await this.metronomeSynth.loadSoundFont(data)
+    await this.metronomeSynth.loadSoundFont(await SoundFont.load(data))
   }
 }
 
