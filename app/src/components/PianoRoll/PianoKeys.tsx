@@ -96,7 +96,7 @@ function drawLabel(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  keyNum: number,
+  label: string,
   font: string,
   color: string,
 ) {
@@ -105,7 +105,7 @@ function drawLabel(
   ctx.textBaseline = "middle"
   ctx.font = `12px ${font}`
   ctx.fillStyle = color
-  ctx.fillText(noteNameWithOctString(keyNum), x, height / 2)
+  ctx.fillText(label, x, height / 2)
 }
 
 function drawKeys(
@@ -117,6 +117,7 @@ function drawKeys(
   theme: Theme,
   selectedKeys: Set<number>,
   scale: number[],
+  keyNames: Map<number, string> | null,
 ) {
   ctx.save()
   ctx.translate(0, 0.5)
@@ -127,7 +128,6 @@ function drawKeys(
   const allKeys = [...Array(numberOfKeys).keys()]
   const whiteKeys = allKeys.filter((i) => Colors[i % Colors.length] === 0)
   const blackKeys = allKeys.filter((i) => Colors[i % Colors.length] === 1)
-  const labelKeys = allKeys.filter((i) => i % 12 === 0)
 
   drawBorder(ctx, width, theme.dividerColor)
 
@@ -183,16 +183,22 @@ function drawKeys(
   }
 
   // Draw labels
-  for (const keyNum of labelKeys) {
+  const labels = keyNames
+    ? Array.from(keyNames.entries())
+    : new Map(
+        allKeys
+          .filter((i) => i % 12 === 0)
+          .map((i) => [i, noteNameWithOctString(i)]),
+      )
+  for (const [keyNum, label] of labels) {
     const y = (numberOfKeys - keyNum - 1) * keyHeight
     ctx.save()
     ctx.translate(0, y)
-
     drawLabel(
       ctx,
       width,
       keyHeight,
-      keyNum,
+      label,
       theme.canvasFont,
       theme.secondaryTextColor,
     )
@@ -212,6 +218,7 @@ export const PianoKeys: FC = () => {
     keyHeight,
     numberOfKeys,
     selectedKeys,
+    keyNames,
     onMouseDownKey,
     onMouseMoveKey,
     onMouseUpKey,
@@ -230,9 +237,18 @@ export const PianoKeys: FC = () => {
         theme,
         selectedKeys,
         scale,
+        keyNames,
       )
     },
-    [numberOfKeys, theme, selectedKeys, keySignature, keyHeight, blackKeyWidth],
+    [
+      numberOfKeys,
+      theme,
+      selectedKeys,
+      keySignature,
+      keyHeight,
+      blackKeyWidth,
+      keyNames,
+    ],
   )
 
   const onMouseDown = useCallback(
