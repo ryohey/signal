@@ -1,6 +1,6 @@
 import { SendableEvent } from "@signal-app/player"
 import { useCallback } from "react"
-import { useMobxGetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function usePlayer() {
@@ -16,10 +16,7 @@ export function usePlayer() {
     get loop() {
       return useMobxGetter(player, "loop")
     },
-    setPosition: useCallback(
-      (position: number) => (player.position = position),
-      [player],
-    ),
+    setPosition: useMobxSetter(player, "position"),
     playOrPause: useCallback(() => player.playOrPause(), [player]),
     play: useCallback(() => player.play(), [player]),
     stop: useCallback(() => player.stop(), [player]),
@@ -37,10 +34,7 @@ export function usePlayer() {
       (tick: number) => player.setLoopEnd(tick),
       [player],
     ),
-    setCurrentTempo: useCallback(
-      (tempo: number) => (player.currentTempo = tempo),
-      [player],
-    ),
+    setCurrentTempo: useMobxSetter(player, "currentTempo"),
     allSoundsOffChannel: useCallback(
       (channel: number) => player.allSoundsOffChannel(channel),
       [player],

@@ -1,11 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from "react"
-import { ControlSelection } from "../entities/selection/ControlSelection"
-import {
-  ControlMode,
-  ControlStore,
-  SerializedControlStore,
-} from "../stores/ControlStore"
-import { useMobxGetter } from "./useMobxSelector"
+import { ControlStore, SerializedControlStore } from "../stores/ControlStore"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 
 const ControlStoreContext = createContext<ControlStore>(null!)
@@ -53,18 +48,10 @@ export function useControlPane() {
       controlStore.selection = null
       controlStore.selectedEventIds = []
     }, []),
-    setControlMode: useCallback((controlMode: ControlMode) => {
-      controlStore.controlMode = controlMode
-    }, []),
-    setControlModes: useCallback((controlModes: ControlMode[]) => {
-      controlStore.controlModes = controlModes
-    }, []),
-    setSelection: useCallback((selection: ControlSelection | null) => {
-      controlStore.selection = selection
-    }, []),
-    setSelectedEventIds: useCallback((selectedEventIds: number[]) => {
-      controlStore.selectedEventIds = selectedEventIds
-    }, []),
+    setControlMode: useMobxSetter(controlStore, "controlMode"),
+    setControlModes: useMobxSetter(controlStore, "controlModes"),
+    setSelection: useMobxSetter(controlStore, "selection"),
+    setSelectedEventIds: useMobxSetter(controlStore, "selectedEventIds"),
     serializeState: useCallback(() => controlStore.serialize(), [controlStore]),
     restoreState: useCallback(
       (serializedState: SerializedControlStore) =>

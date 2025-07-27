@@ -1,7 +1,7 @@
 import { clamp } from "lodash"
 import { createContext, useCallback, useContext } from "react"
 import { KeyScrollStore } from "../stores/KeyScrollStore"
-import { useMobxGetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 const SCALE_Y_MIN = 0.5
 const SCALE_Y_MAX = 4
@@ -52,14 +52,8 @@ export function useKeyScroll(
     },
     setScrollTopInPixels,
     setScrollTopInKeys,
-    setCanvasHeight: useCallback(
-      (height: number) => (keyScrollStore.canvasHeight = height),
-      [keyScrollStore],
-    ),
-    setScaleY: useCallback(
-      (scale: number) => (keyScrollStore.scaleY = scale),
-      [keyScrollStore],
-    ),
+    setCanvasHeight: useMobxSetter(keyScrollStore, "canvasHeight"),
+    setScaleY: useMobxSetter(keyScrollStore, "scaleY"),
     scaleAroundPointY: useCallback(
       (scaleYDelta: number, pixelY: number) => {
         const { transform, scrollTop, scaleY, scrollTopKeys } = keyScrollStore

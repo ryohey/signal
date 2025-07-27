@@ -1,7 +1,6 @@
 import { useCallback } from "react"
-import Song from "../song"
 import Track, { TrackId } from "../track"
-import { useMobxGetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export const useSong = () => {
@@ -36,31 +35,11 @@ export const useSong = () => {
     get cloudSongId() {
       return useMobxGetter(song, "cloudSongId")
     },
-    setName: useCallback(
-      (name: string) => {
-        song.name = name
-      },
-      [song],
-    ),
+    setName: useMobxSetter(song, "name"),
     getSong: useCallback(() => songStore.song, [songStore]),
-    setSong: useCallback(
-      (song: Song) => {
-        songStore.song = song
-      },
-      [song],
-    ),
-    setSaved: useCallback(
-      (saved: boolean) => {
-        song.isSaved = saved
-      },
-      [song],
-    ),
-    setFilepath: useCallback(
-      (filepath: string) => {
-        song.filepath = filepath
-      },
-      [song],
-    ),
+    setSong: useMobxSetter(songStore, "song"),
+    setSaved: useMobxSetter(song, "isSaved"),
+    setFilepath: useMobxSetter(song, "filepath"),
     addTrack: useCallback(
       (track: Track) => {
         song.addTrack(track)

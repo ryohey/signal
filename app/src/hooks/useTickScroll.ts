@@ -1,7 +1,7 @@
 import { clamp } from "lodash"
 import { createContext, useCallback, useContext } from "react"
 import { TickScrollStore } from "../stores/TickScrollStore"
-import { useMobxGetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 const TickScrollContext = createContext<TickScrollStore>(null!)
 export const TickScrollProvider = TickScrollContext.Provider
@@ -56,12 +56,7 @@ export function useTickScroll(
         tickScrollStore.transform.getTick(offsetX + tickScrollStore.scrollLeft),
       [tickScrollStore],
     ),
-    setCanvasWidth: useCallback(
-      (width: number) => {
-        tickScrollStore.canvasWidth = width
-      },
-      [tickScrollStore],
-    ),
+    setCanvasWidth: useMobxSetter(tickScrollStore, "canvasWidth"),
     setScrollLeftInPixels,
     // Unlike scrollLeft = tick, this method keeps the scroll position within the content area
     setScrollLeftInTicks,
@@ -91,11 +86,6 @@ export function useTickScroll(
       const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
       setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
     },
-    setAutoScroll: useCallback(
-      (autoScroll: boolean) => {
-        tickScrollStore.autoScroll = autoScroll
-      },
-      [tickScrollStore],
-    ),
+    setAutoScroll: useMobxSetter(tickScrollStore, "autoScroll"),
   }
 }
