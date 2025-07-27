@@ -2,7 +2,7 @@ import { makeObservable, observable } from "mobx"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { TrackId } from "../track"
 import { TrackMute } from "../trackMute/TrackMute"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
@@ -35,10 +35,7 @@ export function TrackMuteProvider({ children }: { children: React.ReactNode }) {
 export function useTrackMute() {
   const trackMuteStore = useContext(TrackMuteStoreContext)
   const { synthGroup } = useStores()
-  const trackMute = useMobxSelector(
-    () => trackMuteStore.trackMute,
-    [trackMuteStore],
-  )
+  const trackMute = useMobxGetter(trackMuteStore, "trackMute")
   const { getChannelForTrack } = useSong()
   const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
   const setTrackMute = useCallback(

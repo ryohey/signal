@@ -1,7 +1,7 @@
 import { clamp } from "lodash"
 import { createContext, useCallback, useContext } from "react"
 import { TickScrollStore } from "../stores/TickScrollStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 const TickScrollContext = createContext<TickScrollStore>(null!)
 export const TickScrollProvider = TickScrollContext.Provider
@@ -28,43 +28,28 @@ export function useTickScroll(
 
   return {
     get autoScroll() {
-      return useMobxSelector(
-        () => tickScrollStore.autoScroll,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "autoScroll")
     },
     get cursorX() {
-      return useMobxSelector(() => tickScrollStore.cursorX, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "cursorX")
     },
     get scrollLeft() {
-      return useMobxSelector(
-        () => tickScrollStore.scrollLeft,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "scrollLeft")
     },
     get scrollLeftTicks() {
-      return useMobxSelector(
-        () => tickScrollStore.scrollLeftTicks,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "scrollLeftTicks")
     },
     get scaleX() {
-      return useMobxSelector(() => tickScrollStore.scaleX, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "scaleX")
     },
     get transform() {
-      return useMobxSelector(() => tickScrollStore.transform, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "transform")
     },
     get canvasWidth() {
-      return useMobxSelector(
-        () => tickScrollStore.canvasWidth,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "canvasWidth")
     },
     get contentWidth() {
-      return useMobxSelector(
-        () => tickScrollStore.contentWidth,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "contentWidth")
     },
     getTick: useCallback(
       (offsetX: number) =>

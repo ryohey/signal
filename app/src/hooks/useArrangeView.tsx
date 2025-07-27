@@ -9,7 +9,7 @@ import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import ArrangeViewStore, {
   SerializedArrangeViewStore,
 } from "../stores/ArrangeViewStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
@@ -65,61 +65,34 @@ export function useArrangeView() {
 
   return {
     get notes() {
-      return useMobxSelector(() => arrangeViewStore.notes, [arrangeViewStore])
+      return useMobxGetter(arrangeViewStore, "notes")
     },
     get transform() {
-      return useMobxSelector(
-        () => arrangeViewStore.transform,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "transform")
     },
     get selectedTrackIndex() {
-      return useMobxSelector(
-        () => arrangeViewStore.selectedTrackIndex,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "selectedTrackIndex")
     },
     get selectedTrackId() {
-      return useMobxSelector(
-        () => arrangeViewStore.selectedTrackId,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "selectedTrackId")
     },
     get selection() {
-      return useMobxSelector(
-        () => arrangeViewStore.selection,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "selection")
     },
     get selectionRect() {
-      return useMobxSelector(
-        () => arrangeViewStore.selectionRect,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "selectionRect")
     },
     get selectedEventIds() {
-      return useMobxSelector(
-        () => arrangeViewStore.selectedEventIds,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "selectedEventIds")
     },
     get trackTransform() {
-      return useMobxSelector(
-        () => arrangeViewStore.trackTransform,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "trackTransform")
     },
     get openTransposeDialog() {
-      return useMobxSelector(
-        () => arrangeViewStore.openTransposeDialog,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "openTransposeDialog")
     },
     get openVelocityDialog() {
-      return useMobxSelector(
-        () => arrangeViewStore.openVelocityDialog,
-        [arrangeViewStore],
-      )
+      return useMobxGetter(arrangeViewStore, "openVelocityDialog")
     },
     rulerStore: arrangeViewStore.rulerStore,
     scrollBy: useCallback(

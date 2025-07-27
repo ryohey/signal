@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useMemo } from "react"
 import { auth } from "../firebase/firebase"
 import { isRunningInElectron } from "../helpers/platform"
 import { userRepository } from "../services/repositories"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 class AuthStore {
   authUser: AuthUser | null = null
@@ -74,13 +74,13 @@ export function useAuth() {
 
   return {
     get authUser() {
-      return useMobxSelector(() => authStore.authUser, [authStore])
+      return useMobxGetter(authStore, "authUser")
     },
     get user() {
-      return useMobxSelector(() => authStore.user, [authStore])
+      return useMobxGetter(authStore, "user")
     },
     get isLoggedIn() {
-      return useMobxSelector(() => authStore.isLoggedIn, [authStore])
+      return useMobxGetter(authStore, "isLoggedIn")
     },
     signOut: useCallback(async () => {
       await auth.signOut()

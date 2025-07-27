@@ -24,7 +24,7 @@ import {
 import { emptySong } from "../song"
 import { SongStore } from "../stores/SongStore"
 import { useAutoSave } from "./useAutoSave"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
@@ -195,25 +195,19 @@ export const useCloudFile = () => {
 
   return {
     get isLoading() {
-      return useMobxSelector(() => cloudFileStore.isLoading, [cloudFileStore])
+      return useMobxGetter(cloudFileStore, "isLoading")
     },
     get dateType() {
-      return useMobxSelector(() => cloudFileStore.dateType, [cloudFileStore])
+      return useMobxGetter(cloudFileStore, "dateType")
     },
     get files() {
-      return useMobxSelector(() => cloudFileStore.files, [cloudFileStore])
+      return useMobxGetter(cloudFileStore, "files")
     },
     get selectedColumn() {
-      return useMobxSelector(
-        () => cloudFileStore.selectedColumn,
-        [cloudFileStore],
-      )
+      return useMobxGetter(cloudFileStore, "selectedColumn")
     },
     get sortAscending() {
-      return useMobxSelector(
-        () => cloudFileStore.sortAscending,
-        [cloudFileStore],
-      )
+      return useMobxGetter(cloudFileStore, "sortAscending")
     },
     setDateType: useCallback(
       (type: "created" | "updated") => {

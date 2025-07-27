@@ -1,7 +1,7 @@
 import { makeObservable, observable } from "mobx"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { TrackEvent } from "../track"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 class RootViewStore {
   openFileDrawer = false
@@ -54,79 +54,43 @@ export function useRootView() {
 
   return {
     get openFileDrawer() {
-      return useMobxSelector(
-        () => rootViewStore.openFileDrawer,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openFileDrawer")
     },
     get openEditDrawer() {
-      return useMobxSelector(
-        () => rootViewStore.openEditDrawer,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openEditDrawer")
     },
     get openHelpDialog() {
-      return useMobxSelector(() => rootViewStore.openHelp, [rootViewStore])
+      return useMobxGetter(rootViewStore, "openHelp")
     },
     get eventEditorEvents() {
-      return useMobxSelector(
-        () => rootViewStore.eventEditorEvents,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "eventEditorEvents")
     },
     get openSignInDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openSignInDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openSignInDialog")
     },
     get openCloudFileDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openCloudFileDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openCloudFileDialog")
     },
     get openSettingDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openSettingDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openSettingDialog")
     },
     get openControlSettingDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openControlSettingDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openControlSettingDialog")
     },
     get initializeError() {
-      return useMobxSelector(
-        () => rootViewStore.initializeError,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "initializeError")
     },
     get openInitializeErrorDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openInitializeErrorDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openInitializeErrorDialog")
     },
     get openPublishDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openPublishDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openPublishDialog")
     },
     get openUserSettingsDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openUserSettingsDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openUserSettingsDialog")
     },
     get openDeleteAccountDialog() {
-      return useMobxSelector(
-        () => rootViewStore.openDeleteAccountDialog,
-        [rootViewStore],
-      )
+      return useMobxGetter(rootViewStore, "openDeleteAccountDialog")
     },
     setOpenFileDrawer: useCallback(
       (open: boolean) => (rootViewStore.openFileDrawer = open),

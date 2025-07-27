@@ -5,7 +5,7 @@ import {
   ControlStore,
   SerializedControlStore,
 } from "../stores/ControlStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 
 const ControlStoreContext = createContext<ControlStore>(null!)
@@ -35,19 +35,16 @@ export function useControlPane() {
       return usePianoRoll().mouseMode
     },
     get controlMode() {
-      return useMobxSelector(() => controlStore.controlMode, [controlStore])
+      return useMobxGetter(controlStore, "controlMode")
     },
     get controlModes() {
-      return useMobxSelector(() => controlStore.controlModes, [controlStore])
+      return useMobxGetter(controlStore, "controlModes")
     },
     get selection() {
-      return useMobxSelector(() => controlStore.selection, [controlStore])
+      return useMobxGetter(controlStore, "selection")
     },
     get selectedEventIds() {
-      return useMobxSelector(
-        () => controlStore.selectedEventIds,
-        [controlStore],
-      )
+      return useMobxGetter(controlStore, "selectedEventIds")
     },
     get transform() {
       return usePianoRoll().transform

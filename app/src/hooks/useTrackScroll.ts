@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext } from "react"
 import { TrackScrollStore } from "../stores/TrackScrollStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 const TrackScrollContext = createContext<TrackScrollStore>(null!)
 export const TrackScrollProvider = TrackScrollContext.Provider
@@ -11,31 +11,19 @@ export function useTrackScroll(
 ) {
   return {
     get canvasHeight() {
-      return useMobxSelector(
-        () => trackScrollStore.canvasHeight,
-        [trackScrollStore],
-      )
+      return useMobxGetter(trackScrollStore, "canvasHeight")
     },
     get contentHeight() {
-      return useMobxSelector(
-        () => trackScrollStore.contentHeight,
-        [trackScrollStore],
-      )
+      return useMobxGetter(trackScrollStore, "contentHeight")
     },
     get scaleY() {
-      return useMobxSelector(() => trackScrollStore.scaleY, [trackScrollStore])
+      return useMobxGetter(trackScrollStore, "scaleY")
     },
     get scrollTop() {
-      return useMobxSelector(
-        () => trackScrollStore.scrollTop,
-        [trackScrollStore],
-      )
+      return useMobxGetter(trackScrollStore, "scrollTop")
     },
     get trackHeight() {
-      return useMobxSelector(
-        () => trackScrollStore.trackHeight,
-        [trackScrollStore],
-      )
+      return useMobxGetter(trackScrollStore, "trackHeight")
     },
     setCanvasHeight: useCallback(
       (height: number) => {

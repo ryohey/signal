@@ -8,7 +8,7 @@ import {
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import TempoEditorStore from "../stores/TempoEditorStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider, useRuler } from "./useRuler"
 import { useStores } from "./useStores"
@@ -55,19 +55,10 @@ export function TempoEditorScope({ children }: { children: React.ReactNode }) {
 export function useTempoEditor() {
   const tempoEditorStore = useContext(TempoEditorStoreContext)
 
-  const selection = useMobxSelector(
-    () => tempoEditorStore.selection,
-    [tempoEditorStore],
-  )
+  const selection = useMobxGetter(tempoEditorStore, "selection")
   const { beats } = useRuler()
-  const transform = useMobxSelector(
-    () => tempoEditorStore.transform,
-    [tempoEditorStore],
-  )
-  const mouseMode = useMobxSelector(
-    () => tempoEditorStore.mouseMode,
-    [tempoEditorStore],
-  )
+  const transform = useMobxGetter(tempoEditorStore, "transform")
+  const mouseMode = useMobxGetter(tempoEditorStore, "mouseMode")
 
   const selectionRect = useMemo(
     () =>
@@ -90,16 +81,10 @@ export function useTempoEditor() {
     beats,
     cursor,
     get selectedEventIds() {
-      return useMobxSelector(
-        () => tempoEditorStore.selectedEventIds,
-        [tempoEditorStore],
-      )
+      return useMobxGetter(tempoEditorStore, "selectedEventIds")
     },
     get mouseMode() {
-      return useMobxSelector(
-        () => tempoEditorStore.mouseMode,
-        [tempoEditorStore],
-      )
+      return useMobxGetter(tempoEditorStore, "mouseMode")
     },
     setSelection: useCallback((selection: TempoSelection | null) => {
       tempoEditorStore.selection = selection
