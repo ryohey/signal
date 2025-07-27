@@ -56,6 +56,9 @@ export function useKeyScroll(
         [keyScrollStore],
       )
     },
+    get transform() {
+      return useMobxSelector(() => keyScrollStore.transform, [keyScrollStore])
+    },
     setScrollTopInPixels,
     setScrollTopInKeys,
     setCanvasHeight: useCallback(

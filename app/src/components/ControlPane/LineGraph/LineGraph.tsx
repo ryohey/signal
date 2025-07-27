@@ -33,6 +33,7 @@ export interface LineGraphProps<T extends ControllerEvent | PitchBendEvent> {
   lineWidth?: number
   circleRadius?: number
   axis: number[]
+  axisWidth: number
   axisLabelFormatter?: (value: number) => string
 }
 
@@ -45,6 +46,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   lineWidth = 2,
   circleRadius = 4,
   axis,
+  axisWidth,
   axisLabelFormatter = (v) => v.toString(),
 }: LineGraphProps<T>) => {
   const { cursor, mouseMode } = useControlPane()
@@ -145,6 +147,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
       }}
     >
       <GraphAxis
+        width={axisWidth}
         values={axis}
         valueFormatter={axisLabelFormatter}
         onClick={onClickAxis}

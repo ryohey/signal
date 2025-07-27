@@ -17,6 +17,8 @@ const Wrapper = styled.div`
   color: var(--color-text-secondary);
 `
 
+const AXIS_WIDTH = 64
+
 export const TempoGraph: FC = () => {
   const { transform, setCanvasHeight } = useTempoEditor()
   const {
@@ -59,7 +61,7 @@ export const TempoGraph: FC = () => {
           borderBottom: `1px solid ${theme.dividerColor}`,
           boxSizing: "border-box",
           position: "absolute",
-          left: Layout.keyWidth,
+          left: AXIS_WIDTH,
         }}
       />
       <TempoGraphCanvas
@@ -68,12 +70,12 @@ export const TempoGraph: FC = () => {
         style={{
           position: "absolute",
           top: Layout.rulerHeight,
-          left: Layout.keyWidth,
+          left: AXIS_WIDTH,
           backgroundColor: theme.editorBackgroundColor,
         }}
       />
       <TempoGraphAxis
-        width={Layout.keyWidth}
+        width={AXIS_WIDTH}
         offset={Layout.rulerHeight}
         transform={transform}
       />

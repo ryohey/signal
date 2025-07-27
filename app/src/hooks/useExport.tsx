@@ -85,8 +85,8 @@ const useExportSong = () => {
       return
     }
 
-    const soundFontData = synth.loadedSoundFontData
-    if (soundFontData === null) {
+    const soundFontData = synth.loadedSoundFont?.data
+    if (soundFontData === undefined) {
       return
     }
 

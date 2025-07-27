@@ -22,9 +22,9 @@ export const useContextMenu = () => {
     })
   }, [])
 
-  const handleClose = () => {
-    setState({ ...state, isOpen: false })
-  }
+  const handleClose = useCallback(() => {
+    setState((state) => ({ ...state, isOpen: false }))
+  }, [])
 
   return {
     onContextMenu,

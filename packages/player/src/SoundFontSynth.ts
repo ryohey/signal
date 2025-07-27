@@ -1,16 +1,17 @@
-import { SynthEvent, getSampleEventsFromSoundFont } from "@ryohey/wavelet"
+import { SynthEvent } from "@ryohey/wavelet"
+import { SoundFont } from "./SoundFont.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: AudioWorkletNode | null = null
 
-  private _loadedSoundFontData: ArrayBuffer | null = null
-  get loadedSoundFontData(): ArrayBuffer | null {
-    return this._loadedSoundFontData
+  private _loadedSoundFont: SoundFont | null = null
+  get loadedSoundFont(): SoundFont | null {
+    return this._loadedSoundFont
   }
 
   get isLoaded(): boolean {
-    return this._loadedSoundFontData !== null
+    return this._loadedSoundFont !== null
   }
 
   private sequenceNumber = 0
@@ -22,13 +23,7 @@ export class SoundFontSynth implements SynthOutput {
     await this.context.audioWorklet.addModule(url)
   }
 
-  async loadSoundFontFromURL(url: string) {
-    const response = await fetch(url)
-    const data = await response.arrayBuffer()
-    await this.loadSoundFont(data)
-  }
-
-  async loadSoundFont(data: ArrayBuffer) {
+  async loadSoundFont(soundFont: SoundFont) {
     if (this.synth !== null) {
       this.synth.disconnect()
     }
@@ -41,10 +36,9 @@ export class SoundFontSynth implements SynthOutput {
     this.synth.connect(this.context.destination)
     this.sequenceNumber = 0
 
-    const sampleEvents = getSampleEventsFromSoundFont(new Uint8Array(data))
-    this._loadedSoundFontData = data
+    this._loadedSoundFont = soundFont
 
-    for (const e of sampleEvents) {
+    for (const e of soundFont.sampleEvents) {
       this.postSynthMessage(
         e.event,
         e.transfer, // transfer instead of copy

@@ -2,7 +2,6 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import React, { FC, useRef } from "react"
-import { Layout } from "../../Constants"
 import { useControlPane } from "../../hooks/useControlPane"
 import { useRootView } from "../../hooks/useRootView"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
@@ -55,7 +54,6 @@ const NoWrap = styled.span`
 const Toolbar = styled.div`
   box-sizing: border-box;
   display: flex;
-  margin-left: var(--size-key-width);
   height: 2rem;
   flex-shrink: 0;
   overflow-x: auto;
@@ -109,17 +107,26 @@ const Content = styled.div`
   }
 `
 
+const TabBarWrapper = styled.div`
+  position: relative;
+`
+
 const TAB_HEIGHT = 30
 const BORDER_WIDTH = 1
 
-const ControlPane: FC = () => {
+export interface ControlPaneProps {
+  axisWidth: number
+}
+
+const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   const ref = useRef(null)
   const containerSize = useComponentSize(ref)
   const { controlMode: mode, setControlMode } = useControlPane()
 
   const controlSize = {
-    width: containerSize.width - Layout.keyWidth - BORDER_WIDTH,
+    width: containerSize.width - axisWidth - BORDER_WIDTH,
     height: containerSize.height - TAB_HEIGHT,
+    axisWidth,
   }
 
   const control = (() => {
@@ -133,7 +140,9 @@ const ControlPane: FC = () => {
 
   return (
     <Parent ref={ref}>
-      <TabBar onSelect={setControlMode} selectedMode={mode} />
+      <TabBarWrapper style={{ paddingLeft: axisWidth }}>
+        <TabBar onSelect={setControlMode} selectedMode={mode} />
+      </TabBarWrapper>
       <Content>{control}</Content>
     </Parent>
   )

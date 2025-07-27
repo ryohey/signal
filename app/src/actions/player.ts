@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { Measure } from "../entities/measure/Measure"
 import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -11,11 +12,11 @@ export const useStop = () => {
   const { setScrollLeftInTicks } = usePianoRoll()
   const { stop, setPosition } = usePlayer()
 
-  return () => {
+  return useCallback(() => {
     stop()
     setPosition(0)
     setScrollLeftInTicks(0)
-  }
+  }, [stop, setPosition, setScrollLeftInTicks])
 }
 
 export const useRewindOneBar = () => {
@@ -23,7 +24,7 @@ export const useRewindOneBar = () => {
   const { scrollLeftTicks, setScrollLeftInTicks } = usePianoRollTickScroll()
   const { position, setPosition } = usePlayer()
 
-  return () => {
+  return useCallback(() => {
     const tick = Measure.getPreviousMeasureTick(measures, position, timebase)
     setPosition(tick)
 
@@ -31,7 +32,14 @@ export const useRewindOneBar = () => {
     if (position < scrollLeftTicks) {
       setScrollLeftInTicks(position)
     }
-  }
+  }, [
+    measures,
+    timebase,
+    position,
+    scrollLeftTicks,
+    setPosition,
+    setScrollLeftInTicks,
+  ])
 }
 
 export const useFastForwardOneBar = () => {
@@ -40,7 +48,7 @@ export const useFastForwardOneBar = () => {
   const { measures, timebase } = useSong()
   const { position, setPosition } = usePlayer()
 
-  return () => {
+  return useCallback(() => {
     const tick = Measure.getNextMeasureTick(measures, position, timebase)
     setPosition(tick)
 
@@ -50,81 +58,105 @@ export const useFastForwardOneBar = () => {
     if (screenX > canvasWidth * 0.7) {
       setScrollLeftInPixels(x - canvasWidth * 0.7)
     }
-  }
+  }, [
+    measures,
+    timebase,
+    position,
+    transform,
+    scrollLeft,
+    canvasWidth,
+    setPosition,
+    setScrollLeftInPixels,
+  ])
 }
 
 export const useNextTrack = () => {
   const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
   const { tracks } = useSong()
 
-  return () => {
+  return useCallback(() => {
     setSelectedTrackIndex(Math.min(selectedTrackIndex + 1, tracks.length - 1))
-  }
+  }, [selectedTrackIndex, setSelectedTrackIndex, tracks.length])
 }
 
 export const usePreviousTrack = () => {
   const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
 
-  return () => {
+  return useCallback(() => {
     setSelectedTrackIndex(Math.max(selectedTrackIndex - 1, 1))
-  }
+  }, [selectedTrackIndex, setSelectedTrackIndex])
 }
 
 export const useToggleSolo = () => {
   const { toggleSolo } = useTrackMute()
   const { selectedTrackId } = usePianoRoll()
 
-  return () => toggleSolo(selectedTrackId)
+  return useCallback(
+    () => toggleSolo(selectedTrackId),
+    [toggleSolo, selectedTrackId],
+  )
 }
 
 export const useToggleMute = () => {
   const { toggleMute } = useTrackMute()
   const { selectedTrackId } = usePianoRoll()
 
-  return () => toggleMute(selectedTrackId)
+  return useCallback(
+    () => toggleMute(selectedTrackId),
+    [toggleMute, selectedTrackId],
+  )
 }
 
 export const useToggleGhost = () => {
   const { selectedTrackId } = usePianoRoll()
   const toggleGhostTrack = useToggleGhostTrack()
 
-  return () => toggleGhostTrack(selectedTrackId)
+  return useCallback(
+    () => toggleGhostTrack(selectedTrackId),
+    [toggleGhostTrack, selectedTrackId],
+  )
 }
 
 export const useStartNote = () => {
   const { synthGroup } = useStores()
   const { sendEvent } = usePlayer()
 
-  return (
-    {
-      channel,
-      noteNumber,
-      velocity,
-    }: {
-      noteNumber: number
-      velocity: number
-      channel: number
+  return useCallback(
+    (
+      {
+        channel,
+        noteNumber,
+        velocity,
+      }: {
+        noteNumber: number
+        velocity: number
+        channel: number
+      },
+      delayTime = 0,
+    ) => {
+      synthGroup.activate()
+      sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
     },
-    delayTime = 0,
-  ) => {
-    synthGroup.activate()
-    sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
-  }
+    [synthGroup, sendEvent],
+  )
 }
 
 export const useStopNote = () => {
   const { sendEvent } = usePlayer()
 
-  return (
-    {
-      channel,
-      noteNumber,
-    }: {
-      noteNumber: number
-      channel: number
+  return useCallback(
+    (
+      {
+        channel,
+        noteNumber,
+      }: {
+        noteNumber: number
+        channel: number
+      },
+      delayTime = 0,
+    ) => {
+      sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
     },
-    delayTime = 0,
-  ) => {
-    sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
-  }
+    [sendEvent],
+  )
 }

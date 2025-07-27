@@ -7,6 +7,7 @@ import LineGraphControl from "../LineGraph/LineGraph"
 
 export type ValueEventGraphProps = Size & {
   type: ValueEventType
+  axisWidth: number
 }
 
 const axisForType = (type: ValueEventType) => {
@@ -46,7 +47,7 @@ const labelFormatterForType = (
 }
 
 export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
-  ({ width, height, type }) => {
+  ({ width, height, type, axisWidth }) => {
     const events = useControlValueEvents()
 
     const axis = useMemo(() => axisForType(type), [type])
@@ -60,6 +61,7 @@ export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
         maxValue={maxValue}
         events={events}
         axis={axis}
+        axisWidth={axisWidth}
         eventType={type}
         axisLabelFormatter={labelFormatter}
       />

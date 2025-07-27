@@ -37,7 +37,6 @@ export const GlobalCSS = () => {
           --color-green: ${theme.greenColor};
           --color-red: ${theme.redColor};
           --color-yellow: ${theme.yellowColor};
-          --size-key-width: ${Layout.keyWidth}px;
           --size-key-height: ${Layout.keyHeight}px;
           --size-ruler-height: ${Layout.rulerHeight}px;
         }
