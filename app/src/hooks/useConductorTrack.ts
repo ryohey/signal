@@ -53,9 +53,7 @@ export function useConductorTrack() {
     ),
     setTempo: useCallback(
       (bpm: number, tick: number) => {
-        if (conductorTrack) {
-          conductorTrack.setTempo(bpm, tick)
-        }
+        conductorTrack?.setTempo(bpm, tick)
       },
       [conductorTrack],
     ),

@@ -1,5 +1,4 @@
-import { useCallback } from "react"
-import { Metadata, SoundFontItem } from "../stores/SoundFontStore"
+export type { Metadata, SoundFontItem } from "../stores/SoundFontStore"
 import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
@@ -19,38 +18,11 @@ export function useSoundFont() {
     get isLoading() {
       return useMobxGetter(soundFontStore, "isLoading")
     },
-    load: useCallback(
-      async (id: number) => {
-        return await soundFontStore.load(id)
-      },
-      [soundFontStore],
-    ),
-    addSoundFont: useCallback(
-      async (item: SoundFontItem, metadata: Metadata) => {
-        return await soundFontStore.addSoundFont(item, metadata)
-      },
-      [soundFontStore],
-    ),
-    removeSoundFont: useCallback(
-      async (id: number) => {
-        return await soundFontStore.removeSoundFont(id)
-      },
-      [soundFontStore],
-    ),
-    scanSoundFonts: useCallback(async () => {
-      return await soundFontStore.scanSoundFonts()
-    }, [soundFontStore]),
-    removeScanPath: useCallback(
-      async (path: string) => {
-        return await soundFontStore.removeScanPath(path)
-      },
-      [soundFontStore],
-    ),
-    addScanPath: useCallback(
-      async (path: string) => {
-        return await soundFontStore.addScanPath(path)
-      },
-      [soundFontStore],
-    ),
+    load: soundFontStore.load,
+    addSoundFont: soundFontStore.addSoundFont,
+    removeSoundFont: soundFontStore.removeSoundFont,
+    scanSoundFonts: soundFontStore.scanSoundFonts,
+    removeScanPath: soundFontStore.removeScanPath,
+    addScanPath: soundFontStore.addScanPath,
   }
 }

@@ -39,13 +39,13 @@ export class TrackScrollStore {
     return DEFAULT_TRACK_HEIGHT * scaleY
   }
 
-  setScrollTop(value: number) {
+  setScrollTop = (value: number) => {
     const maxOffset =
       this.contentHeight + Layout.rulerHeight + BAR_WIDTH - this.canvasHeight
     this.scrollTop = clamp(value, 0, maxOffset)
   }
 
-  setScaleY(scaleY: number) {
+  setScaleY = (scaleY: number) => {
     this.scaleY = clamp(scaleY, SCALE_Y_MIN, SCALE_Y_MAX)
     this.setScrollTop(this.scrollTop)
   }

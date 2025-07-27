@@ -140,7 +140,7 @@ export default class PianoRollStore {
     )
   }
 
-  serialize(): SerializedPianoRollStore {
+  serialize = (): SerializedPianoRollStore => {
     return {
       selection: this.selection ? { ...this.selection } : null,
       selectedNoteIds: cloneDeep(this.selectedNoteIds),
@@ -148,7 +148,7 @@ export default class PianoRollStore {
     }
   }
 
-  restore(serialized: SerializedPianoRollStore) {
+  restore = (serialized: SerializedPianoRollStore) => {
     this.selection = serialized.selection
     this.selectedNoteIds = serialized.selectedNoteIds
     this.selectedTrackId = serialized.selectedTrackId

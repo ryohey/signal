@@ -5,16 +5,15 @@ import {
   useEffect,
   useMemo,
 } from "react"
-import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-import ArrangeViewStore, {
-  SerializedArrangeViewStore,
-} from "../stores/ArrangeViewStore"
-import { useMobxGetter } from "./useMobxSelector"
+import ArrangeViewStore from "../stores/ArrangeViewStore"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 import { TrackScrollProvider, useTrackScroll } from "./useTrackScroll"
+export type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
+export type { SerializedArrangeViewStore } from "../stores/ArrangeViewStore"
 
 const ArrangeViewStoreContext = createContext<ArrangeViewStore>(null!)
 
@@ -102,37 +101,25 @@ export function useArrangeView() {
       },
       [setScrollLeftInPixels, setScrollTop, tickScrollStore, trackScrollStore],
     ),
-    setSelectedTrackIndex: useCallback((index: number) => {
-      arrangeViewStore.selectedTrackIndex = index
-    }, []),
-    setSelection: useCallback((selection: ArrangeSelection | null) => {
-      arrangeViewStore.selection = selection
-    }, []),
-    setSelectedEventIds: useCallback(
-      (ids: { [trackIndex: number]: number[] } = {}) => {
-        arrangeViewStore.selectedEventIds = ids
-      },
-      [],
+    setSelectedTrackIndex: useMobxSetter(
+      arrangeViewStore,
+      "selectedTrackIndex",
     ),
+    setSelection: useMobxSetter(arrangeViewStore, "selection"),
+    setSelectedEventIds: useMobxSetter(arrangeViewStore, "selectedEventIds"),
     resetSelection: useCallback(() => {
       arrangeViewStore.selection = null
       arrangeViewStore.selectedEventIds = {}
     }, []),
-    setOpenTransposeDialog: useCallback((value: boolean) => {
-      arrangeViewStore.openTransposeDialog = value
-    }, []),
-    setOpenVelocityDialog: useCallback((value: boolean) => {
-      arrangeViewStore.openVelocityDialog = value
-    }, []),
-    serializeState: useCallback(
-      () => arrangeViewStore.serialize(),
-      [arrangeViewStore],
+    setOpenTransposeDialog: useMobxSetter(
+      arrangeViewStore,
+      "openTransposeDialog",
     ),
-    restoreState: useCallback(
-      (state: SerializedArrangeViewStore) => {
-        arrangeViewStore.restore(state)
-      },
-      [arrangeViewStore],
+    setOpenVelocityDialog: useMobxSetter(
+      arrangeViewStore,
+      "openVelocityDialog",
     ),
+    serializeState: arrangeViewStore.serialize,
+    restoreState: arrangeViewStore.restore,
   }
 }

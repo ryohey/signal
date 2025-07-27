@@ -52,15 +52,8 @@ export function useMIDIDevice() {
     get requestError() {
       return useMobxGetter(midiDeviceStore, "requestError")
     },
-    requestMIDIAccess: useCallback(() => {
-      midiDeviceStore.requestMIDIAccess()
-    }, [midiDeviceStore]),
-    setInputEnable: useCallback(
-      (deviceId: string, isEnabled: boolean) => {
-        midiDeviceStore.setInputEnable(deviceId, isEnabled)
-      },
-      [midiDeviceStore],
-    ),
+    requestMIDIAccess: midiDeviceStore.requestMIDIAccess,
+    setInputEnable: midiDeviceStore.setInputEnable,
     setOutputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {
         if (deviceId === factorySound.id) {

@@ -32,7 +32,7 @@ export class MIDIDeviceStore {
     this.requestMIDIAccess()
   }
 
-  async requestMIDIAccess() {
+  requestMIDIAccess = async () => {
     this.isLoading = true
     this.inputs = []
     this.outputs = []
@@ -66,14 +66,14 @@ export class MIDIDeviceStore {
     this.outputs = Array.from(midiAccess.outputs.values())
   }
 
-  setInputEnable(deviceId: string, enabled: boolean) {
+  setInputEnable = (deviceId: string, enabled: boolean) => {
     this.enabledInputs = {
       ...this.enabledInputs,
       [deviceId]: enabled,
     }
   }
 
-  setOutputEnable(deviceId: string, enabled: boolean) {
+  setOutputEnable = (deviceId: string, enabled: boolean) => {
     this.enabledOutputs = {
       ...this.enabledOutputs,
       [deviceId]: enabled,

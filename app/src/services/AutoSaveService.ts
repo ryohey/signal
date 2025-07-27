@@ -1,7 +1,7 @@
+import { base64ToUint8Array, uint8ArrayToBase64 } from "../helpers/base64"
+import { songFromMidi, songToMidi } from "../midi/midiConversion"
 import Song from "../song/Song"
 import { SongStore } from "../stores/SongStore"
-import { songFromMidi, songToMidi } from "../midi/midiConversion"
-import { base64ToUint8Array, uint8ArrayToBase64 } from "../helpers/base64"
 
 const AUTO_SAVE_KEY = "signal_autosave"
 const AUTO_SAVE_FLAG_KEY = "signal_autosave_flag"
@@ -23,7 +23,7 @@ export class AutoSaveService {
   /**
    * Start periodic auto save
    */
-  startAutoSave() {
+  startAutoSave = () => {
     if (this.intervalId) {
       clearInterval(this.intervalId)
     }
@@ -43,7 +43,7 @@ export class AutoSaveService {
   /**
    * Stop auto save
    */
-  stopAutoSave() {
+  stopAutoSave = () => {
     if (this.intervalId) {
       clearInterval(this.intervalId)
       this.intervalId = null
@@ -71,7 +71,7 @@ export class AutoSaveService {
   /**
    * Check if there is an auto saved song
    */
-  hasAutoSavedSong(): boolean {
+  hasAutoSavedSong = (): boolean => {
     const data = localStorage.getItem(AUTO_SAVE_KEY)
     return data !== null
   }
@@ -79,7 +79,7 @@ export class AutoSaveService {
   /**
    * Restore auto saved song
    */
-  restore(): Song | null {
+  restore = (): Song | null => {
     try {
       const data = localStorage.getItem(AUTO_SAVE_KEY)
       if (!data) {
@@ -99,7 +99,7 @@ export class AutoSaveService {
   /**
    * Get the last save time of auto saved data
    */
-  getLastSaveTime(): Date | null {
+  getLastSaveTime = (): Date | null => {
     try {
       const data = localStorage.getItem(AUTO_SAVE_KEY)
       if (!data) {
@@ -116,21 +116,21 @@ export class AutoSaveService {
   /**
    * Clear auto save data
    */
-  clearAutoSave() {
+  clearAutoSave = () => {
     localStorage.removeItem(AUTO_SAVE_KEY)
   }
 
   /**
    * Get flag indicating whether to offer restore
    */
-  getShouldOfferRestore(): boolean {
+  getShouldOfferRestore = (): boolean => {
     return localStorage.getItem(AUTO_SAVE_FLAG_KEY) === "true"
   }
 
   /**
    * Set flag for restore confirmation
    */
-  setShouldOfferRestore(should: boolean) {
+  setShouldOfferRestore = (should: boolean) => {
     this.shouldOfferRestore = should
     if (should) {
       localStorage.setItem(AUTO_SAVE_FLAG_KEY, "true")
@@ -143,7 +143,7 @@ export class AutoSaveService {
    * Called when user performs explicit save/export/upload/discard actions
    * Reset restore flag and clear auto save data
    */
-  onUserExplicitAction() {
+  onUserExplicitAction = () => {
     this.setShouldOfferRestore(false)
     this.clearAutoSave()
   }
@@ -151,7 +151,7 @@ export class AutoSaveService {
   /**
    * Set restore flag when song is changed
    */
-  onSongChanged() {
+  onSongChanged = () => {
     if (!this.shouldOfferRestore) {
       this.setShouldOfferRestore(true)
     }

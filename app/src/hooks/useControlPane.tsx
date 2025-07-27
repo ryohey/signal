@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from "react"
-import { ControlStore, SerializedControlStore } from "../stores/ControlStore"
+import { ControlStore } from "../stores/ControlStore"
+export type { SerializedControlStore } from "../stores/ControlStore"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 
@@ -52,11 +53,7 @@ export function useControlPane() {
     setControlModes: useMobxSetter(controlStore, "controlModes"),
     setSelection: useMobxSetter(controlStore, "selection"),
     setSelectedEventIds: useMobxSetter(controlStore, "selectedEventIds"),
-    serializeState: useCallback(() => controlStore.serialize(), [controlStore]),
-    restoreState: useCallback(
-      (serializedState: SerializedControlStore) =>
-        controlStore.restore(serializedState),
-      [controlStore],
-    ),
+    serializeState: controlStore.serialize,
+    restoreState: controlStore.restore,
   }
 }
