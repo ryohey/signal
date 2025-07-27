@@ -34,3 +34,21 @@ export function useMobxStore<T>(
   const rootStore = useStores()
   return useMobxSelector(() => selector(rootStore), [rootStore], equals)
 }
+
+export function useMobxGetter<T, K extends keyof T>(
+  store: T,
+  prop: K,
+  equals?: IEqualsComparer<T[K]>,
+): T[K]
+export function useMobxGetter<T, K extends keyof T>(
+  store: T | undefined,
+  prop: K,
+  equals?: IEqualsComparer<T[K] | undefined>,
+): T[K] | undefined
+export function useMobxGetter<T, K extends keyof T>(
+  store: T | undefined,
+  prop: K,
+  equals?: IEqualsComparer<T[K] | undefined>,
+): T[K] | undefined {
+  return useMobxSelector(() => store?.[prop], [store], equals)
+}
