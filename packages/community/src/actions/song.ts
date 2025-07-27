@@ -1,5 +1,5 @@
 import { CloudSong, ICloudSongRepository } from "@signal-app/api"
-import { SoundFontSynth } from "@signal-app/player"
+import { SoundFont, SoundFontSynth } from "@signal-app/player"
 import debounce from "lodash/debounce.js"
 import RootStore from "../stores/RootStore.js"
 
@@ -50,7 +50,8 @@ const setupSynthIfNeeded = async (synth: SoundFontSynth) => {
     return
   }
   await synth.setup()
-  await synth.loadSoundFontFromURL(
+  const soundFont = await SoundFont.loadFromURL(
     "https://cdn.jsdelivr.net/gh/ryohey/signal@4569a31/public/A320U.sf2",
   )
+  await synth.loadSoundFont(soundFont)
 }
