@@ -1,6 +1,6 @@
 import { SendableEvent } from "@signal-app/player"
 import { useCallback } from "react"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function usePlayer() {
@@ -8,13 +8,13 @@ export function usePlayer() {
 
   return {
     get position() {
-      return useMobxStore(({ player }) => player.position)
+      return useMobxGetter(player, "position")
     },
     get isPlaying() {
-      return useMobxStore(({ player }) => player.isPlaying)
+      return useMobxGetter(player, "isPlaying")
     },
     get loop() {
-      return useMobxStore(({ player }) => player.loop)
+      return useMobxGetter(player, "loop")
     },
     setPosition: useCallback(
       (position: number) => (player.position = position),

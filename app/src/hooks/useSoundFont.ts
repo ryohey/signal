@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { Metadata, SoundFontItem } from "../stores/SoundFontStore"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function useSoundFont() {
@@ -8,18 +8,16 @@ export function useSoundFont() {
 
   return {
     get files() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.files)
+      return useMobxGetter(soundFontStore, "files")
     },
     get selectedSoundFontId() {
-      return useMobxStore(
-        ({ soundFontStore }) => soundFontStore.selectedSoundFontId,
-      )
+      return useMobxGetter(soundFontStore, "selectedSoundFontId")
     },
     get scanPaths() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.scanPaths)
+      return useMobxGetter(soundFontStore, "scanPaths")
     },
     get isLoading() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.isLoading)
+      return useMobxGetter(soundFontStore, "isLoading")
     },
     load: useCallback(
       async (id: number) => {

@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export interface Device {
@@ -12,18 +12,15 @@ export interface Device {
 export function useMIDIDevice() {
   const { midiDeviceStore } = useStores()
 
-  const inputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.inputs)
-  const outputs = useMobxStore(({ midiDeviceStore }) => midiDeviceStore.outputs)
+  const inputs = useMobxGetter(midiDeviceStore, "inputs")
+  const outputs = useMobxGetter(midiDeviceStore, "outputs")
 
-  const enabledInputs = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.enabledInputs,
-  )
-  const enabledOutputs = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.enabledOutputs,
-  )
+  const enabledInputs = useMobxGetter(midiDeviceStore, "enabledInputs")
+  const enabledOutputs = useMobxGetter(midiDeviceStore, "enabledOutputs")
 
-  const isFactorySoundEnabled = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.isFactorySoundEnabled,
+  const isFactorySoundEnabled = useMobxGetter(
+    midiDeviceStore,
+    "isFactorySoundEnabled",
   )
 
   const inputDevices: Device[] = inputs.map((device) => ({
@@ -50,10 +47,10 @@ export function useMIDIDevice() {
     inputDevices,
     outputDevices,
     get isLoading() {
-      return useMobxStore(({ midiDeviceStore }) => midiDeviceStore.isLoading)
+      return useMobxGetter(midiDeviceStore, "isLoading")
     },
     get requestError() {
-      return useMobxStore(({ midiDeviceStore }) => midiDeviceStore.requestError)
+      return useMobxGetter(midiDeviceStore, "requestError")
     },
     requestMIDIAccess: useCallback(() => {
       midiDeviceStore.requestMIDIAccess()
@@ -88,9 +85,8 @@ const factorySound = {
 }
 
 export const useCanRecord = () => {
-  const enabledInputs = useMobxStore(
-    ({ midiDeviceStore }) => midiDeviceStore.enabledInputs,
-  )
+  const { midiDeviceStore } = useStores()
+  const enabledInputs = useMobxGetter(midiDeviceStore, "enabledInputs")
 
   return Object.values(enabledInputs).filter((e) => e).length > 0
 }

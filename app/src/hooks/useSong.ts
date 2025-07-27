@@ -1,12 +1,12 @@
 import { useCallback } from "react"
 import Song from "../song"
 import Track, { TrackId } from "../track"
-import { useMobxGetter, useMobxStore } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export const useSong = () => {
   const { songStore } = useStores()
-  const song = useMobxStore(({ songStore }) => songStore.song)
+  const song = useMobxGetter(songStore, "song")
 
   return {
     get name() {
