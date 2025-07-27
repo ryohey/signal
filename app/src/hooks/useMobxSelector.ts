@@ -42,3 +42,10 @@ export function useMobxGetter<T, K extends keyof T>(
 ): T[K] | undefined {
   return useMobxSelector(() => store?.[prop], [store], equals)
 }
+
+export function useMobxSetter<T, K extends keyof T>(
+  store: T,
+  prop: K,
+): (value: T[K]) => void {
+  return useCallback((value: T[K]) => (store[prop] = value), [store])
+}
