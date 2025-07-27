@@ -2,7 +2,6 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import React, { FC, useRef } from "react"
-import { Layout } from "../../Constants"
 import { useControlPane } from "../../hooks/useControlPane"
 import { useRootView } from "../../hooks/useRootView"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
@@ -125,7 +124,7 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   const { controlMode: mode, setControlMode } = useControlPane()
 
   const controlSize = {
-    width: containerSize.width - Layout.keyWidth - BORDER_WIDTH,
+    width: containerSize.width - axisWidth - BORDER_WIDTH,
     height: containerSize.height - TAB_HEIGHT,
     axisWidth,
   }
