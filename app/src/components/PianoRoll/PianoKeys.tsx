@@ -209,6 +209,31 @@ function drawKeys(
 
 const Wrapper = styled.div``
 
+const DrumKeysContainer = styled.div`
+  border-right: 1px solid var(--color-divider);
+  pointer-events: none;
+`
+
+const DrumKeyLabel = styled.div`
+  position: absolute;
+  left: 0;
+  width: ${Layout.drumKeysWidth}px;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  border-bottom: 1px solid rgb(from var(--color-divider) r g b / 40%);
+  padding-left: 0.25rem;
+
+  &:last-child {
+    border-top: 1px solid var(--color-divider);
+  }
+
+  &[data-highlighted="true"] {
+    border-bottom: 1px solid var(--color-divider);
+  }
+`
+
 const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
   width,
   keyNames,
@@ -217,23 +242,21 @@ const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
   const drumKeyNames = Array.from(keyNames.entries())
 
   return (
-    <div style={{ width, pointerEvents: "none" }}>
+    <DrumKeysContainer style={{ width: width - 1 }}>
       {drumKeyNames.map(([key, name]) => (
-        <div
+        <DrumKeyLabel
           key={key}
           style={{
-            position: "absolute",
             top: transform.getY(key),
             height: transform.pixelsPerKey,
-            left: 0,
-            display: "flex",
             alignItems: "center",
           }}
+          data-highlighted={key % 12 === 0 ? true : false}
         >
           {name}
-        </div>
+        </DrumKeyLabel>
       ))}
-    </div>
+    </DrumKeysContainer>
   )
 }
 
