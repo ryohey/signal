@@ -1,5 +1,5 @@
 import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { createContext, useContext, useMemo } from "react"
 import { TrackEvent } from "../track"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
@@ -99,11 +99,23 @@ export function useRootView() {
     setOpenSignInDialog: useMobxSetter(rootViewStore, "openSignInDialog"),
     setOpenCloudFileDialog: useMobxSetter(rootViewStore, "openCloudFileDialog"),
     setOpenSettingDialog: useMobxSetter(rootViewStore, "openSettingDialog"),
-    setOpenControlSettingDialog: useMobxSetter(rootViewStore, "openControlSettingDialog"),
+    setOpenControlSettingDialog: useMobxSetter(
+      rootViewStore,
+      "openControlSettingDialog",
+    ),
     setInitializeError: useMobxSetter(rootViewStore, "initializeError"),
-    setOpenInitializeErrorDialog: useMobxSetter(rootViewStore, "openInitializeErrorDialog"),
+    setOpenInitializeErrorDialog: useMobxSetter(
+      rootViewStore,
+      "openInitializeErrorDialog",
+    ),
     setOpenPublishDialog: useMobxSetter(rootViewStore, "openPublishDialog"),
-    setOpenUserSettingsDialog: useMobxSetter(rootViewStore, "openUserSettingsDialog"),
-    setOpenDeleteAccountDialog: useMobxSetter(rootViewStore, "openDeleteAccountDialog"),
+    setOpenUserSettingsDialog: useMobxSetter(
+      rootViewStore,
+      "openUserSettingsDialog",
+    ),
+    setOpenDeleteAccountDialog: useMobxSetter(
+      rootViewStore,
+      "openDeleteAccountDialog",
+    ),
   }
 }
