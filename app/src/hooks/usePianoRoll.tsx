@@ -46,6 +46,7 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
     pianoRollStore.selectedTrackId =
       songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
       UNASSIGNED_TRACK_ID
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pianoRollStore])
 
   // highlight notes when receiving MIDI input
@@ -71,7 +72,7 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
           )
         }
       }),
-    [pianoRollStore],
+    [midiInput, pianoRollStore],
   )
 
   // sync MIDIMonitor channel with selected track
@@ -288,7 +289,7 @@ export function usePianoRoll() {
     setSelectedTrackIndex: useCallback(
       (index: number) =>
         (pianoRollStore.selectedTrackId = songStore.song.tracks[index]?.id),
-      [pianoRollStore],
+      [pianoRollStore, songStore.song.tracks],
     ),
     setSelectedNoteIds: useCallback(
       (ids: number[]) => (pianoRollStore.selectedNoteIds = ids),

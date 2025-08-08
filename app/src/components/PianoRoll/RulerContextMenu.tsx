@@ -34,22 +34,22 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   const onClickAddTimeSignature = useCallback(() => {
     setOpenTimeSignatureDialog(true)
     handleClose()
-  }, [])
+  }, [handleClose])
 
   const onClickRemoveTimeSignature = useCallback(() => {
     removeEvents(selectedTimeSignatureEventIds)
     handleClose()
-  }, [removeEvents, selectedTimeSignatureEventIds])
+  }, [removeEvents, selectedTimeSignatureEventIds, handleClose])
 
   const onClickSetLoopStart = useCallback(() => {
     setLoopBegin(tick)
     handleClose()
-  }, [tick, setLoopBegin])
+  }, [tick, setLoopBegin, handleClose])
 
   const onClickSetLoopEnd = useCallback(() => {
     setLoopEnd(tick)
     handleClose()
-  }, [tick, setLoopEnd])
+  }, [tick, setLoopEnd, handleClose])
 
   const closeOpenTimeSignatureDialog = useCallback(() => {
     setOpenTimeSignatureDialog(false)

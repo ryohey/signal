@@ -16,6 +16,7 @@ export function useMobxSelector<T>(
           fireImmediately: true,
           equals,
         }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       deps,
     ),
     selector,
@@ -47,5 +48,6 @@ export function useMobxSetter<T, K extends keyof T>(
   store: T,
   prop: K,
 ): (value: T[K]) => void {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback((value: T[K]) => (store[prop] = value), [store])
 }

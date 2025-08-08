@@ -27,7 +27,7 @@ export function useVolumeSlider() {
         sendEvent(volumeMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, setVolume, position, sendEvent, channel],
+    [pushHistory, setVolume, position, sendEvent, channel, isDragging],
   )
 
   return {

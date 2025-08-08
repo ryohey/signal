@@ -123,6 +123,7 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
       setIsInitialized(true)
       window.electronAPI.ready()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return <></>

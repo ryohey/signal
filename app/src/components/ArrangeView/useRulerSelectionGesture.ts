@@ -52,6 +52,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           const deltaPx = e.clientX - startClientX
           const selectionToPx = startPosX + deltaPx
           const endTick = transform.getTick(selectionToPx)
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           selection = selectionFromTickRange([startTick, endTick])
           setSelection(selection)
         },

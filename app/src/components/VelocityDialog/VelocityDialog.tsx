@@ -47,12 +47,13 @@ export const VelocityDialog: FC<VelocityDialogProps> = ({
     if (open) {
       setValue(initialValue)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const _onClickOK = useCallback(() => {
     onClickOK(value, operationType)
     onClose()
-  }, [value, operationType])
+  }, [value, operationType, onClickOK, onClose])
 
   return (
     <Dialog open={open} style={{ minWidth: "20rem" }}>

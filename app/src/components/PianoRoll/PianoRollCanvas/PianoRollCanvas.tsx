@@ -48,11 +48,11 @@ export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
 
   useEffect(() => {
     setCanvasWidth(width)
-  }, [width])
+  }, [width, setCanvasWidth])
 
   useEffect(() => {
     setCanvasHeight(height)
-  }, [height])
+  }, [height, setCanvasHeight])
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
@@ -61,7 +61,7 @@ export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
 
   const scrollYMatrix = useMemo(
     () => matrixFromTranslation(0, -scrollTop),
-    [scrollLeft, scrollTop],
+    [scrollTop],
   )
 
   const scrollXYMatrix = useMemo(

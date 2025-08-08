@@ -43,14 +43,12 @@ const PianoRollWrapper: FC = () => {
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const {
     contentHeight,
-    scaleY,
     scrollTop,
     scaleAroundPointY,
     setScrollTopInPixels,
     setScaleY,
   } = useKeyScroll()
   const {
-    scaleX,
     scrollLeft,
     contentWidth,
     scaleAroundPointX,
@@ -70,11 +68,11 @@ const PianoRollWrapper: FC = () => {
 
   const onClickScaleUpHorizontal = useCallback(
     () => scaleAroundPointX(0.2, 0),
-    [scaleX, scaleAroundPointX],
+    [scaleAroundPointX],
   )
   const onClickScaleDownHorizontal = useCallback(
     () => scaleAroundPointX(-0.2, 0),
-    [scaleX, scaleAroundPointX],
+    [scaleAroundPointX],
   )
   const onClickScaleResetHorizontal = useCallback(
     () => setScaleX(1),
@@ -83,11 +81,11 @@ const PianoRollWrapper: FC = () => {
 
   const onClickScaleUpVertical = useCallback(
     () => scaleAroundPointY(0.2, 0),
-    [scaleY, scaleAroundPointY],
+    [scaleAroundPointY],
   )
   const onClickScaleDownVertical = useCallback(
     () => scaleAroundPointY(-0.2, 0),
-    [scaleY, scaleAroundPointY],
+    [scaleAroundPointY],
   )
   const onClickScaleResetVertical = useCallback(() => setScaleY(1), [setScaleY])
 

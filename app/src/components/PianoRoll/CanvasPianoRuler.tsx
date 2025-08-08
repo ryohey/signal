@@ -251,7 +251,16 @@ const PianoRuler: FC<PianoRulerProps> = ({
       drawTimeSignatures(ctx, height, timeSignatures, theme)
       ctx.restore()
     },
-    [width, transform, scrollLeft, rulerBeats, timeSignatures, loop, theme],
+    [
+      width,
+      height,
+      transform,
+      scrollLeft,
+      rulerBeats,
+      timeSignatures,
+      loop,
+      theme,
+    ],
   )
 
   const closeOpenTimeSignatureDialog = useCallback(() => {

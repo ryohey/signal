@@ -23,7 +23,7 @@ export function useTickScroll(
     (tick: number) => {
       setScrollLeftInPixels(tickScrollStore.transform.getX(tick))
     },
-    [tickScrollStore],
+    [tickScrollStore, setScrollLeftInPixels],
   )
 
   return {
@@ -70,22 +70,25 @@ export function useTickScroll(
       },
       [tickScrollStore],
     ),
-    scaleAroundPointX: (scaleXDelta: number, pixelX: number) => {
-      const { maxScaleX, minScaleX } = tickScrollStore
-      const pixelXInTicks0 = tickScrollStore.transform.getTick(
-        tickScrollStore.scrollLeft + pixelX,
-      )
-      tickScrollStore.scaleX = clamp(
-        tickScrollStore.scaleX * (1 + scaleXDelta),
-        minScaleX,
-        maxScaleX,
-      )
-      const pixelXInTicks1 = tickScrollStore.transform.getTick(
-        tickScrollStore.scrollLeft + pixelX,
-      )
-      const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
-      setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
-    },
+    scaleAroundPointX: useCallback(
+      (scaleXDelta: number, pixelX: number) => {
+        const { maxScaleX, minScaleX } = tickScrollStore
+        const pixelXInTicks0 = tickScrollStore.transform.getTick(
+          tickScrollStore.scrollLeft + pixelX,
+        )
+        tickScrollStore.scaleX = clamp(
+          tickScrollStore.scaleX * (1 + scaleXDelta),
+          minScaleX,
+          maxScaleX,
+        )
+        const pixelXInTicks1 = tickScrollStore.transform.getTick(
+          tickScrollStore.scrollLeft + pixelX,
+        )
+        const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
+        setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
+      },
+      [tickScrollStore, setScrollLeftInTicks],
+    ),
     setAutoScroll: useMobxSetter(tickScrollStore, "autoScroll"),
   }
 }

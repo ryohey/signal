@@ -20,7 +20,7 @@ export function useAutoSave() {
         setSong(restoredSong)
         autoSaveService.clearAutoSave()
       }
-    }, [autoSaveService]),
+    }, [autoSaveService, setSong]),
     getLastSaveTime: autoSaveService.getLastSaveTime,
   }
 }

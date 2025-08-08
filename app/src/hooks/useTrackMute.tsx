@@ -45,7 +45,7 @@ export function useTrackMute() {
       // sync with synth group
       synthGroup.trackMute = trackMute
     },
-    [trackMuteStore],
+    [trackMuteStore, synthGroup],
   )
 
   const mute = useCallback(

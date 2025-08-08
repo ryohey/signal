@@ -23,7 +23,7 @@ export function useGhostNotes(trackId: TrackId) {
           ),
         ),
       ),
-    [scrollLeft, canvasWidth, tickTransform.id, noteEvents],
+    [scrollLeft, canvasWidth, tickTransform, noteEvents],
   )
 
   const getRect = useCallback(

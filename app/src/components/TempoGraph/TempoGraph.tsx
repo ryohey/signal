@@ -65,7 +65,7 @@ export const TempoGraph: FC = () => {
   useEffect(() => {
     setCanvasWidth(containerWidth)
     setCanvasHeight(contentHeight)
-  }, [containerWidth, contentHeight])
+  }, [containerWidth, contentHeight, setCanvasWidth, setCanvasHeight])
 
   return (
     <Wrapper ref={ref}>

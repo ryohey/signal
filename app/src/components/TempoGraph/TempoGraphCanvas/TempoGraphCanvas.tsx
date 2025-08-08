@@ -69,7 +69,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
         transform,
       )
     },
-    [pencilGesture, transform, scrollLeft, mouseMode],
+    [pencilGesture, transform, getLocal],
   )
 
   const selectionMouseDown = useCallback(
@@ -92,7 +92,13 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
         createSelectionGesture.onMouseDown(e.nativeEvent, local, transform)
       }
     },
-    [dragSelectionGesture, createSelectionGesture, transform, scrollLeft],
+    [
+      dragSelectionGesture,
+      createSelectionGesture,
+      transform,
+      hitTest,
+      getLocal,
+    ],
   )
 
   const onMouseDownGraph =
@@ -110,7 +116,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       const bpm = uSecPerBeatToBPM(event.microsecondsPerBeat)
       changeTempo(event.id, Math.floor(bpmToUSecPerBeat(bpm + movement)))
     },
-    [items, scrollLeft, changeTempo],
+    [items, changeTempo, findEvent, getLocal],
   )
 
   const scrollXMatrix = useMemo(

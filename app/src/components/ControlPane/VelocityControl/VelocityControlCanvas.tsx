@@ -58,9 +58,12 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
     [windowedEvents, height, transform, selectedNoteIds],
   )
 
-  const hitTest = (point: Point) => {
-    return items.filter((n) => Rect.containsPoint(n.hitArea, point))
-  }
+  const hitTest = useCallback(
+    (point: Point) => {
+      return items.filter((n) => Rect.containsPoint(n.hitArea, point))
+    },
+    [items],
+  )
 
   const onMouseDown = useCallback(
     (ev: React.MouseEvent) => {
@@ -120,11 +123,12 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
     },
     [
       height,
-      items,
       selectedNoteIds,
       scrollLeft,
       updateVelocitiesInRange,
       changeNotesVelocity,
+      hitTest,
+      transform,
     ],
   )
 

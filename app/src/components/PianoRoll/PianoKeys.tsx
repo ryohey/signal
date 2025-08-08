@@ -376,6 +376,7 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
       onMouseDownKey,
       onMouseMoveKey,
       onMouseUpKey,
+      keyNames,
     ],
   )
 

@@ -31,7 +31,7 @@ export const ToolSelector: FC<ToolSelectorProps> = ({
   return (
     <ButtonGroup>
       <ToolbarButtonGroupItem
-        onMouseDown={useCallback(() => onSelect("pencil"), [])}
+        onMouseDown={useCallback(() => onSelect("pencil"), [onSelect])}
         selected={mouseMode === "pencil"}
       >
         <Tooltip
@@ -54,7 +54,7 @@ export const ToolSelector: FC<ToolSelectorProps> = ({
         </Tooltip>
       </ToolbarButtonGroupItem>
       <ToolbarButtonGroupItem
-        onMouseDown={useCallback(() => onSelect("selection"), [])}
+        onMouseDown={useCallback(() => onSelect("selection"), [onSelect])}
         selected={mouseMode === "selection"}
       >
         <Tooltip

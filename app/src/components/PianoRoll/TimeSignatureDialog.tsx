@@ -48,6 +48,7 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
       setNumerator(initialNumerator)
       setDenominator(initialDenominator)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   return (

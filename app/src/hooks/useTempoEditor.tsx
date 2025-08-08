@@ -17,6 +17,7 @@ export function TempoEditorProvider({
   const { songStore, player } = useStores()
   const tempoEditorStore = useMemo(
     () => new TempoEditorStore(songStore, player),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 

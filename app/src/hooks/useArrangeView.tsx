@@ -110,7 +110,7 @@ export function useArrangeView() {
     resetSelection: useCallback(() => {
       arrangeViewStore.selection = null
       arrangeViewStore.selectedEventIds = {}
-    }, []),
+    }, [arrangeViewStore]),
     setOpenTransposeDialog: useMobxSetter(
       arrangeViewStore,
       "openTransposeDialog",
