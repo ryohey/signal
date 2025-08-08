@@ -273,24 +273,10 @@ const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
   )
 }
 
-export interface PianoKeysProps {
-  width: number
-}
-
-export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
+const PianoKeysCanvas: FC<{ style: React.CSSProperties }> = ({ style }) => {
   const theme = useTheme()
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
-  const { onContextMenu, menuProps } = useContextMenu()
-  const {
-    keySignature,
-    keyHeight,
-    numberOfKeys,
-    selectedKeys,
-    keyNames,
-    onMouseDownKey,
-    onMouseMoveKey,
-    onMouseUpKey,
-  } = usePianoKeys()
+  const { keySignature, keyHeight, numberOfKeys, selectedKeys } = usePianoKeys()
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D) => {
@@ -309,6 +295,32 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
     },
     [numberOfKeys, theme, selectedKeys, keySignature, keyHeight, blackKeyWidth],
   )
+
+  return (
+    <DrawCanvas
+      draw={draw}
+      width={Layout.keyWidth}
+      height={keyHeight * numberOfKeys}
+      style={style}
+    />
+  )
+}
+
+export interface PianoKeysProps {
+  width: number
+}
+
+export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
+  const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
+  const { onContextMenu, menuProps } = useContextMenu()
+  const {
+    keyHeight,
+    numberOfKeys,
+    keyNames,
+    onMouseDownKey,
+    onMouseMoveKey,
+    onMouseUpKey,
+  } = usePianoKeys()
 
   const onMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -371,6 +383,7 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
     () => ({ width, height: keyHeight * numberOfKeys }),
     [width, keyHeight, numberOfKeys],
   )
+
   const canvasStyle: React.CSSProperties = useMemo(
     () => ({
       position: "absolute",
@@ -391,12 +404,7 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
         {keyNames && (
           <DrumKeys width={Layout.drumKeysWidth} keyNames={keyNames} />
         )}
-        <DrawCanvas
-          draw={draw}
-          width={Layout.keyWidth}
-          height={keyHeight * numberOfKeys}
-          style={canvasStyle}
-        />
+        <PianoKeysCanvas style={canvasStyle} />
       </Wrapper>
       <PianoKeysContextMenu {...menuProps} />
     </>
