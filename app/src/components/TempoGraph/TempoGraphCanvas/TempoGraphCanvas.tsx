@@ -21,12 +21,14 @@ export interface TempoGraphCanvasProps {
   width: number
   height: number
   style?: CSSProperties
+  className?: string
 }
 
 export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   width,
   height,
   style,
+  className,
 }) => {
   const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
   const { beats } = useRuler()
@@ -116,13 +118,22 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     [scrollLeft],
   )
 
+  const computedStyle = useMemo(
+    () => ({
+      ...style,
+      cursor,
+    }),
+    [style, cursor],
+  )
+
   return (
     <GLCanvas
       width={width}
       height={height}
       onMouseDown={onMouseDownGraph}
       onWheel={onWheelGraph}
-      style={{ ...style, cursor }}
+      style={computedStyle}
+      className={className}
     >
       <Lines width={width} zIndex={0} />
       <Transform matrix={scrollXMatrix}>

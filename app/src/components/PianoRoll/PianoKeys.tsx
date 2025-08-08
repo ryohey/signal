@@ -1,7 +1,7 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import Color from "color"
-import React, { FC, useCallback } from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import { Layout } from "../../Constants"
 import { Point } from "../../entities/geometry/Point"
 import { KeySignature } from "../../entities/scale/KeySignature"
@@ -214,7 +214,7 @@ const DrumKeysContainer = styled.div`
   pointer-events: none;
 `
 
-const DrumKeyLabel = styled.div`
+const DrumKeyLabelBody = styled.div`
   position: absolute;
   left: 0;
   width: ${Layout.drumKeysWidth}px;
@@ -234,27 +234,40 @@ const DrumKeyLabel = styled.div`
   }
 `
 
+const DrumKeyLabel: FC<{
+  noteNumber: number
+  name: string
+}> = ({ noteNumber, name }) => {
+  const { transform } = useKeyScroll()
+  const style = useMemo(
+    () => ({
+      top: transform.getY(noteNumber),
+      height: transform.pixelsPerKey,
+    }),
+    [noteNumber, transform],
+  )
+
+  return (
+    <DrumKeyLabelBody
+      style={style}
+      data-highlighted={noteNumber % 12 === 0 ? true : false}
+    >
+      {name}
+    </DrumKeyLabelBody>
+  )
+}
+
 const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
   width,
   keyNames,
 }) => {
-  const { transform } = useKeyScroll()
   const drumKeyNames = Array.from(keyNames.entries())
+  const style = useMemo(() => ({ width: width - 1 }), [width])
 
   return (
-    <DrumKeysContainer style={{ width: width - 1 }}>
-      {drumKeyNames.map(([key, name]) => (
-        <DrumKeyLabel
-          key={key}
-          style={{
-            top: transform.getY(key),
-            height: transform.pixelsPerKey,
-            alignItems: "center",
-          }}
-          data-highlighted={key % 12 === 0 ? true : false}
-        >
-          {name}
-        </DrumKeyLabel>
+    <DrumKeysContainer style={style}>
+      {drumKeyNames.map(([noteNumber, name]) => (
+        <DrumKeyLabel key={noteNumber} noteNumber={noteNumber} name={name} />
       ))}
     </DrumKeysContainer>
   )
@@ -354,12 +367,26 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
     ],
   )
 
+  const style: React.CSSProperties = useMemo(
+    () => ({ width, height: keyHeight * numberOfKeys }),
+    [width, keyHeight, numberOfKeys],
+  )
+  const canvasStyle: React.CSSProperties = useMemo(
+    () => ({
+      position: "absolute",
+      top: 0,
+      left: keyNames ? Layout.drumKeysWidth : 0,
+      pointerEvents: "none",
+    }),
+    [keyNames],
+  )
+
   return (
     <>
       <Wrapper
         onMouseDown={onMouseDown}
         onContextMenu={onContextMenu}
-        style={{ width, height: keyHeight * numberOfKeys }}
+        style={style}
       >
         {keyNames && (
           <DrumKeys width={Layout.drumKeysWidth} keyNames={keyNames} />
@@ -368,12 +395,7 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
           draw={draw}
           width={Layout.keyWidth}
           height={keyHeight * numberOfKeys}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: keyNames ? Layout.drumKeysWidth : 0,
-            pointerEvents: "none",
-          }}
+          style={canvasStyle}
         />
       </Wrapper>
       <PianoKeysContextMenu {...menuProps} />

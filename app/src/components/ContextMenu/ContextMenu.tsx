@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import * as Portal from "@radix-ui/react-portal"
 import { FC, ReactNode, useEffect } from "react"
 import { Point } from "../../entities/geometry/Point"
+import { Positioned } from "../ui/Positioned"
 
 export const ContextMenuHotKey = styled.div`
   font-size: 0.9em;
@@ -19,8 +20,7 @@ const Wrapper = styled.div`
   bottom: 0;
 `
 
-const Content = styled.div`
-  position: absolute;
+const Content = styled(Positioned)`
   background: var(--color-background-secondary);
   border-radius: 0.5rem;
   box-shadow: 0 1rem 3rem var(--color-shadow);
@@ -74,7 +74,8 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     <Portal.Root>
       <Wrapper onClick={handleClose}>
         <Content
-          style={{ left: fixedX, top: position.y }}
+          left={fixedX}
+          top={position.y}
           onClick={(e) => e.stopPropagation()}
         >
           <List>{children}</List>

@@ -136,6 +136,7 @@ function drawTimeSignatures(
 export interface PianoRulerProps {
   onMouseDown?: React.MouseEventHandler<HTMLCanvasElement>
   style?: React.CSSProperties
+  className?: string
 }
 
 // null = closed
@@ -147,6 +148,7 @@ interface TimeSignatureDialogState {
 const PianoRuler: FC<PianoRulerProps> = ({
   onMouseDown: _onMouseDown,
   style,
+  className,
 }) => {
   const theme = useTheme()
   const { onContextMenu, menuProps } = useContextMenu()
@@ -271,6 +273,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
         onMouseDown={onMouseDown}
         onContextMenu={(e) => e.preventDefault()}
         style={style}
+        className={className}
       />
       <RulerContextMenu {...menuProps} tick={rightClickTick} />
       <TimeSignatureDialog

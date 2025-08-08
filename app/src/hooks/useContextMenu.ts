@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 export interface AbstractMouseEvent {
   preventDefault: () => void
@@ -26,12 +26,20 @@ export const useContextMenu = () => {
     setState((state) => ({ ...state, isOpen: false }))
   }, [])
 
+  const position = useMemo(
+    () => ({
+      x: state.mouseX,
+      y: state.mouseY,
+    }),
+    [state.mouseX, state.mouseY],
+  )
+
   return {
     onContextMenu,
     menuProps: {
       handleClose,
       isOpen: state.isOpen,
-      position: { x: state.mouseX, y: state.mouseY },
+      position,
     },
   }
 }
