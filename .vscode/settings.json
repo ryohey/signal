@@ -28,5 +28,10 @@
       "name": "player",
       "rootPath": "packages/player"
     }
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
   ]
 }
