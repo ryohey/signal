@@ -1,7 +1,7 @@
 import { clamp } from "lodash"
 import { createContext, useCallback, useContext } from "react"
 import { KeyScrollStore } from "../stores/KeyScrollStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 const SCALE_Y_MIN = 0.5
 const SCALE_Y_MAX = 4
@@ -33,42 +33,27 @@ export function useKeyScroll(
 
   return {
     get contentHeight(): number {
-      return useMobxSelector(
-        () => keyScrollStore.transform,
-        [keyScrollStore],
-      ).getMaxY()
+      return useMobxGetter(keyScrollStore, "transform").getMaxY()
     },
     get scrollTop() {
-      return useMobxSelector(() => keyScrollStore.scrollTop, [keyScrollStore])
+      return useMobxGetter(keyScrollStore, "scrollTop")
     },
     get scrollTopKeys() {
-      return useMobxSelector(
-        () => keyScrollStore.scrollTopKeys,
-        [keyScrollStore],
-      )
+      return useMobxGetter(keyScrollStore, "scrollTopKeys")
     },
     get scaleY() {
-      return useMobxSelector(() => keyScrollStore.scaleY, [keyScrollStore])
+      return useMobxGetter(keyScrollStore, "scaleY")
     },
     get canvasHeight() {
-      return useMobxSelector(
-        () => keyScrollStore.canvasHeight,
-        [keyScrollStore],
-      )
+      return useMobxGetter(keyScrollStore, "canvasHeight")
     },
     get transform() {
-      return useMobxSelector(() => keyScrollStore.transform, [keyScrollStore])
+      return useMobxGetter(keyScrollStore, "transform")
     },
     setScrollTopInPixels,
     setScrollTopInKeys,
-    setCanvasHeight: useCallback(
-      (height: number) => (keyScrollStore.canvasHeight = height),
-      [keyScrollStore],
-    ),
-    setScaleY: useCallback(
-      (scale: number) => (keyScrollStore.scaleY = scale),
-      [keyScrollStore],
-    ),
+    setCanvasHeight: useMobxSetter(keyScrollStore, "canvasHeight"),
+    setScaleY: useMobxSetter(keyScrollStore, "scaleY"),
     scaleAroundPointY: useCallback(
       (scaleYDelta: number, pixelY: number) => {
         const { transform, scrollTop, scaleY, scrollTopKeys } = keyScrollStore

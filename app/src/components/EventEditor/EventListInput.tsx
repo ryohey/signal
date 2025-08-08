@@ -37,7 +37,7 @@ export const EventListInput: FC<EventListInputProps> = ({
 
   const sendChange = useCallback(() => {
     onChange(inputValue)
-  }, [inputValue])
+  }, [inputValue, onChange])
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback(
     (e) => {
@@ -63,7 +63,7 @@ export const EventListInput: FC<EventListInputProps> = ({
         sendChange()
       }
     },
-    [sendChange, value],
+    [sendChange],
   )
 
   return (

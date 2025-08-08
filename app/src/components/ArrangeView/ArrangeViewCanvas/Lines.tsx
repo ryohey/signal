@@ -1,7 +1,8 @@
 import { useTheme } from "@emotion/react"
 import { Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { range } from "lodash"
+import { FC, useCallback, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
 import { useArrangeView } from "../../../hooks/useArrangeView"
@@ -15,16 +16,24 @@ export const Lines: FC<{ width: number; zIndex: number }> = ({
   const { tracks } = useSong()
   const theme = useTheme()
 
-  const hline = (y: number): Rect => ({
-    x: 0,
-    y,
-    width,
-    height: 1,
-  })
+  const hline = useCallback(
+    (y: number): Rect => ({
+      x: 0,
+      y,
+      width,
+      height: 1,
+    }),
+    [width],
+  )
+
+  const trackCount = tracks.length
 
   const rects = useMemo(
-    () => tracks.map((_, i) => trackTransform.getY(i + 1) - 1).map(hline),
-    [tracks.length, width, trackTransform],
+    () =>
+      range(trackCount)
+        .map((_, i) => trackTransform.getY(i + 1) - 1)
+        .map(hline),
+    [trackCount, trackTransform, hline],
   )
 
   const color = colorToVec4(Color(theme.dividerColor))

@@ -1,7 +1,7 @@
 import { clamp } from "lodash"
 import { createContext, useCallback, useContext } from "react"
 import { TickScrollStore } from "../stores/TickScrollStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 const TickScrollContext = createContext<TickScrollStore>(null!)
 export const TickScrollProvider = TickScrollContext.Provider
@@ -23,60 +23,40 @@ export function useTickScroll(
     (tick: number) => {
       setScrollLeftInPixels(tickScrollStore.transform.getX(tick))
     },
-    [tickScrollStore],
+    [tickScrollStore, setScrollLeftInPixels],
   )
 
   return {
     get autoScroll() {
-      return useMobxSelector(
-        () => tickScrollStore.autoScroll,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "autoScroll")
     },
     get cursorX() {
-      return useMobxSelector(() => tickScrollStore.cursorX, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "cursorX")
     },
     get scrollLeft() {
-      return useMobxSelector(
-        () => tickScrollStore.scrollLeft,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "scrollLeft")
     },
     get scrollLeftTicks() {
-      return useMobxSelector(
-        () => tickScrollStore.scrollLeftTicks,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "scrollLeftTicks")
     },
     get scaleX() {
-      return useMobxSelector(() => tickScrollStore.scaleX, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "scaleX")
     },
     get transform() {
-      return useMobxSelector(() => tickScrollStore.transform, [tickScrollStore])
+      return useMobxGetter(tickScrollStore, "transform")
     },
     get canvasWidth() {
-      return useMobxSelector(
-        () => tickScrollStore.canvasWidth,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "canvasWidth")
     },
     get contentWidth() {
-      return useMobxSelector(
-        () => tickScrollStore.contentWidth,
-        [tickScrollStore],
-      )
+      return useMobxGetter(tickScrollStore, "contentWidth")
     },
     getTick: useCallback(
       (offsetX: number) =>
         tickScrollStore.transform.getTick(offsetX + tickScrollStore.scrollLeft),
       [tickScrollStore],
     ),
-    setCanvasWidth: useCallback(
-      (width: number) => {
-        tickScrollStore.canvasWidth = width
-      },
-      [tickScrollStore],
-    ),
+    setCanvasWidth: useMobxSetter(tickScrollStore, "canvasWidth"),
     setScrollLeftInPixels,
     // Unlike scrollLeft = tick, this method keeps the scroll position within the content area
     setScrollLeftInTicks,
@@ -90,27 +70,25 @@ export function useTickScroll(
       },
       [tickScrollStore],
     ),
-    scaleAroundPointX: (scaleXDelta: number, pixelX: number) => {
-      const { maxScaleX, minScaleX } = tickScrollStore
-      const pixelXInTicks0 = tickScrollStore.transform.getTick(
-        tickScrollStore.scrollLeft + pixelX,
-      )
-      tickScrollStore.scaleX = clamp(
-        tickScrollStore.scaleX * (1 + scaleXDelta),
-        minScaleX,
-        maxScaleX,
-      )
-      const pixelXInTicks1 = tickScrollStore.transform.getTick(
-        tickScrollStore.scrollLeft + pixelX,
-      )
-      const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
-      setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
-    },
-    setAutoScroll: useCallback(
-      (autoScroll: boolean) => {
-        tickScrollStore.autoScroll = autoScroll
+    scaleAroundPointX: useCallback(
+      (scaleXDelta: number, pixelX: number) => {
+        const { maxScaleX, minScaleX } = tickScrollStore
+        const pixelXInTicks0 = tickScrollStore.transform.getTick(
+          tickScrollStore.scrollLeft + pixelX,
+        )
+        tickScrollStore.scaleX = clamp(
+          tickScrollStore.scaleX * (1 + scaleXDelta),
+          minScaleX,
+          maxScaleX,
+        )
+        const pixelXInTicks1 = tickScrollStore.transform.getTick(
+          tickScrollStore.scrollLeft + pixelX,
+        )
+        const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
+        setScrollLeftInTicks(tickScrollStore.scrollLeftTicks - scrollInTicks)
       },
-      [tickScrollStore],
+      [tickScrollStore, setScrollLeftInTicks],
     ),
+    setAutoScroll: useMobxSetter(tickScrollStore, "autoScroll"),
   }
 }

@@ -6,7 +6,7 @@ import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
 import { useLocalization } from "../localize/useLocalization"
 import Song from "../song"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
@@ -40,13 +40,10 @@ export function useExport() {
 
   return {
     get openExportProgressDialog() {
-      return useMobxSelector(
-        () => exportStore.openExportProgressDialog,
-        [exportStore],
-      )
+      return useMobxGetter(exportStore, "openExportProgressDialog")
     },
     get progress() {
-      return useMobxSelector(() => exportStore.progress, [exportStore])
+      return useMobxGetter(exportStore, "progress")
     },
     get exportSong() {
       return useExportSong()

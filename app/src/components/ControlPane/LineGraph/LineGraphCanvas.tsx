@@ -45,7 +45,7 @@ export const LineGraphCanvas: FC<LineGraphCanvasProps> = ({
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),
-    [tickTransform.id, maxValue, height],
+    [tickTransform, maxValue, height],
   )
 
   const selectionRect =

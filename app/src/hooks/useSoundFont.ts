@@ -1,6 +1,5 @@
-import { useCallback } from "react"
-import { Metadata, SoundFontItem } from "../stores/SoundFontStore"
-import { useMobxStore } from "./useMobxSelector"
+export type { Metadata, SoundFontItem } from "../stores/SoundFontStore"
+import { useMobxGetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function useSoundFont() {
@@ -8,51 +7,22 @@ export function useSoundFont() {
 
   return {
     get files() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.files)
+      return useMobxGetter(soundFontStore, "files")
     },
     get selectedSoundFontId() {
-      return useMobxStore(
-        ({ soundFontStore }) => soundFontStore.selectedSoundFontId,
-      )
+      return useMobxGetter(soundFontStore, "selectedSoundFontId")
     },
     get scanPaths() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.scanPaths)
+      return useMobxGetter(soundFontStore, "scanPaths")
     },
     get isLoading() {
-      return useMobxStore(({ soundFontStore }) => soundFontStore.isLoading)
+      return useMobxGetter(soundFontStore, "isLoading")
     },
-    load: useCallback(
-      async (id: number) => {
-        return await soundFontStore.load(id)
-      },
-      [soundFontStore],
-    ),
-    addSoundFont: useCallback(
-      async (item: SoundFontItem, metadata: Metadata) => {
-        return await soundFontStore.addSoundFont(item, metadata)
-      },
-      [soundFontStore],
-    ),
-    removeSoundFont: useCallback(
-      async (id: number) => {
-        return await soundFontStore.removeSoundFont(id)
-      },
-      [soundFontStore],
-    ),
-    scanSoundFonts: useCallback(async () => {
-      return await soundFontStore.scanSoundFonts()
-    }, [soundFontStore]),
-    removeScanPath: useCallback(
-      async (path: string) => {
-        return await soundFontStore.removeScanPath(path)
-      },
-      [soundFontStore],
-    ),
-    addScanPath: useCallback(
-      async (path: string) => {
-        return await soundFontStore.addScanPath(path)
-      },
-      [soundFontStore],
-    ),
+    load: soundFontStore.load,
+    addSoundFont: soundFontStore.addSoundFont,
+    removeSoundFont: soundFontStore.removeSoundFont,
+    scanSoundFonts: soundFontStore.scanSoundFonts,
+    removeScanPath: soundFontStore.removeScanPath,
+    addScanPath: soundFontStore.addScanPath,
   }
 }

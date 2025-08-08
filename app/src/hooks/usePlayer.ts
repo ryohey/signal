@@ -1,6 +1,4 @@
-import { SendableEvent } from "@signal-app/player"
-import { useCallback } from "react"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 
 export function usePlayer() {
@@ -8,46 +6,25 @@ export function usePlayer() {
 
   return {
     get position() {
-      return useMobxStore(({ player }) => player.position)
+      return useMobxGetter(player, "position")
     },
     get isPlaying() {
-      return useMobxStore(({ player }) => player.isPlaying)
+      return useMobxGetter(player, "isPlaying")
     },
     get loop() {
-      return useMobxStore(({ player }) => player.loop)
+      return useMobxGetter(player, "loop")
     },
-    setPosition: useCallback(
-      (position: number) => (player.position = position),
-      [player],
-    ),
-    playOrPause: useCallback(() => player.playOrPause(), [player]),
-    play: useCallback(() => player.play(), [player]),
-    stop: useCallback(() => player.stop(), [player]),
-    reset: useCallback(() => player.reset(), [player]),
-    sendEvent: useCallback(
-      (e: SendableEvent, delayTime?: number) => player.sendEvent(e, delayTime),
-      [player],
-    ),
-    toggleEnableLoop: useCallback(() => player.toggleEnableLoop(), [player]),
-    setLoopBegin: useCallback(
-      (tick: number) => player.setLoopBegin(tick),
-      [player],
-    ),
-    setLoopEnd: useCallback(
-      (tick: number) => player.setLoopEnd(tick),
-      [player],
-    ),
-    setCurrentTempo: useCallback(
-      (tempo: number) => (player.currentTempo = tempo),
-      [player],
-    ),
-    allSoundsOffChannel: useCallback(
-      (channel: number) => player.allSoundsOffChannel(channel),
-      [player],
-    ),
-    allSoundsOffExclude: useCallback(
-      (channel: number) => player.allSoundsOffExclude(channel),
-      [player],
-    ),
+    setPosition: useMobxSetter(player, "position"),
+    playOrPause: player.playOrPause,
+    play: player.play,
+    stop: player.stop,
+    reset: player.reset,
+    sendEvent: player.sendEvent,
+    toggleEnableLoop: player.toggleEnableLoop,
+    setLoopBegin: player.setLoopBegin,
+    setLoopEnd: player.setLoopEnd,
+    setCurrentTempo: useMobxSetter(player, "currentTempo"),
+    allSoundsOffChannel: player.allSoundsOffChannel,
+    allSoundsOffExclude: player.allSoundsOffExclude,
   }
 }

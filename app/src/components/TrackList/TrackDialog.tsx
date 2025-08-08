@@ -36,6 +36,7 @@ export const TrackDialog: FC<TrackDialogProps> = ({
     }
     _setName(name)
     _setChannel(channel)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackId, open])
 
   return (

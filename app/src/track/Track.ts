@@ -159,7 +159,7 @@ export default class Track {
   setProgramNumber(value: number) {
     TrackEvents.setProgramNumber(value)(this._events)
   }
-  setTempo(bpm: number, tick: number) {
+  setTempo = (bpm: number, tick: number) => {
     TrackEvents.setTempo(bpm, tick)(this._events)
   }
   setName(text: string) {

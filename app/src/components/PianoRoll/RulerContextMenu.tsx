@@ -34,26 +34,39 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   const onClickAddTimeSignature = useCallback(() => {
     setOpenTimeSignatureDialog(true)
     handleClose()
-  }, [])
+  }, [handleClose])
 
   const onClickRemoveTimeSignature = useCallback(() => {
     removeEvents(selectedTimeSignatureEventIds)
     handleClose()
-  }, [removeEvents, selectedTimeSignatureEventIds])
+  }, [removeEvents, selectedTimeSignatureEventIds, handleClose])
 
   const onClickSetLoopStart = useCallback(() => {
     setLoopBegin(tick)
     handleClose()
-  }, [tick, setLoopBegin])
+  }, [tick, setLoopBegin, handleClose])
 
   const onClickSetLoopEnd = useCallback(() => {
     setLoopEnd(tick)
     handleClose()
-  }, [tick, setLoopEnd])
+  }, [tick, setLoopEnd, handleClose])
 
   const closeOpenTimeSignatureDialog = useCallback(() => {
     setOpenTimeSignatureDialog(false)
   }, [])
+
+  const _addTimeSignature = useCallback(
+    ({
+      numerator,
+      denominator,
+    }: {
+      numerator: number
+      denominator: number
+    }) => {
+      addTimeSignature(tick, numerator, denominator)
+    },
+    [tick, addTimeSignature],
+  )
 
   return (
     <>
@@ -79,9 +92,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
       <TimeSignatureDialog
         open={isOpenTimeSignatureDialog}
         onClose={closeOpenTimeSignatureDialog}
-        onClickOK={({ numerator, denominator }) => {
-          addTimeSignature(tick, numerator, denominator)
-        }}
+        onClickOK={_addTimeSignature}
       />
     </>
   )

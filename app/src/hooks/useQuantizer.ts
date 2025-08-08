@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react"
 import QuantizerStore from "../stores/QuantizerStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 const QuantizerContext = createContext<QuantizerStore>(null!)
 export const QuantizerProvider = QuantizerContext.Provider
@@ -10,22 +10,16 @@ export function useQuantizer(
 ) {
   return {
     get quantize() {
-      return useMobxSelector(() => quantizerStore.quantize, [quantizerStore])
+      return useMobxGetter(quantizerStore, "quantize")
     },
     get isQuantizeEnabled() {
-      return useMobxSelector(
-        () => quantizerStore.isQuantizeEnabled,
-        [quantizerStore],
-      )
+      return useMobxGetter(quantizerStore, "isQuantizeEnabled")
     },
     get quantizer() {
-      return useMobxSelector(() => quantizerStore.quantizer, [quantizerStore])
+      return useMobxGetter(quantizerStore, "quantizer")
     },
     get enabledQuantizer() {
-      return useMobxSelector(
-        () => quantizerStore.enabledQuantizer,
-        [quantizerStore],
-      )
+      return useMobxGetter(quantizerStore, "enabledQuantizer")
     },
     setQuantize: (quantize: number) => {
       quantizerStore.quantize = quantize

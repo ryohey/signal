@@ -79,13 +79,16 @@ const ItemRenderer = ({ index, style, data }: ListChildComponentProps) => {
   const { events, setSelectedEventIds } = data
   const e = events[index]
 
-  const onClickRow = useCallback((e: React.MouseEvent, ev: TrackEvent) => {
-    if (e.ctrlKey || e.metaKey) {
-      setSelectedEventIds?.((ids: number[]) => [...ids, ev.id])
-    } else {
-      setSelectedEventIds?.([ev.id])
-    }
-  }, [])
+  const onClickRow = useCallback(
+    (e: React.MouseEvent, ev: TrackEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        setSelectedEventIds?.((ids: number[]) => [...ids, ev.id])
+      } else {
+        setSelectedEventIds?.([ev.id])
+      }
+    },
+    [setSelectedEventIds],
+  )
 
   return (
     <EventListItem style={style} item={e} key={e.id} onClick={onClickRow} />

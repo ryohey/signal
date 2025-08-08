@@ -1,6 +1,7 @@
 import { clamp } from "lodash"
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
+import { useCallback } from "react"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
@@ -31,12 +32,15 @@ import { useStopNote } from "./player"
 export const useChangeTempo = () => {
   const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
-  return (id: number, microsecondsPerBeat: number) => {
-    pushHistory()
-    updateEvent<TrackEventOf<SetTempoEvent>>(id, {
-      microsecondsPerBeat: microsecondsPerBeat,
-    })
-  }
+  return useCallback(
+    (id: number, microsecondsPerBeat: number) => {
+      pushHistory()
+      updateEvent<TrackEventOf<SetTempoEvent>>(id, {
+        microsecondsPerBeat: microsecondsPerBeat,
+      })
+    },
+    [updateEvent, pushHistory],
+  )
 }
 
 /* events */
@@ -46,16 +50,19 @@ export const useChangeNotesVelocity = () => {
   const { updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
-  return (noteIds: number[], velocity: number) => {
-    pushHistory()
-    updateEvents(
-      noteIds.map((id) => ({
-        id,
-        velocity: velocity,
-      })),
-    )
-    setNewNoteVelocity(velocity)
-  }
+  return useCallback(
+    (noteIds: number[], velocity: number) => {
+      pushHistory()
+      updateEvents(
+        noteIds.map((id) => ({
+          id,
+          velocity: velocity,
+        })),
+      )
+      setNewNoteVelocity(velocity)
+    },
+    [pushHistory, updateEvents, setNewNoteVelocity],
+  )
 }
 
 export const useCreateEvent = () => {
@@ -65,66 +72,74 @@ export const useCreateEvent = () => {
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
 
-  return (e: AnyChannelEvent, tick?: number) => {
-    pushHistory()
-    const id = createOrUpdate({
-      ...e,
-      tick: quantizer.round(tick ?? position),
-    })?.id
+  return useCallback(
+    (e: AnyChannelEvent, tick?: number) => {
+      pushHistory()
+      const id = createOrUpdate({
+        ...e,
+        tick: quantizer.round(tick ?? position),
+      })?.id
 
-    // 即座に反映する
-    // Reflect immediately
-    if (tick !== undefined) {
-      sendEvent(e)
-    }
+      // 即座に反映する
+      // Reflect immediately
+      if (tick !== undefined) {
+        sendEvent(e)
+      }
 
-    return id
-  }
+      return id
+    },
+    [pushHistory, createOrUpdate, quantizer, position, sendEvent],
+  )
 }
 
 export const useUpdateVelocitiesInRange = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
   const { getEventById, getEvents, updateEvents } = useTrack(selectedTrackId)
 
-  return (
-    startTick: number,
-    startValue: number,
-    endTick: number,
-    endValue: number,
-  ) => {
-    const minTick = Math.min(startTick, endTick)
-    const maxTick = Math.max(startTick, endTick)
-    const minValue = Math.min(startValue, endValue)
-    const maxValue = Math.max(startValue, endValue)
-    const getValue = (tick: number) =>
-      Math.floor(
-        Math.min(
-          maxValue,
-          Math.max(
-            minValue,
-            ((tick - startTick) / (endTick - startTick)) *
-              (endValue - startValue) +
-              startValue,
+  return useCallback(
+    (
+      startTick: number,
+      startValue: number,
+      endTick: number,
+      endValue: number,
+    ) => {
+      const minTick = Math.min(startTick, endTick)
+      const maxTick = Math.max(startTick, endTick)
+      const minValue = Math.min(startValue, endValue)
+      const maxValue = Math.max(startValue, endValue)
+      const getValue = (tick: number) =>
+        Math.floor(
+          Math.min(
+            maxValue,
+            Math.max(
+              minValue,
+              ((tick - startTick) / (endTick - startTick)) *
+                (endValue - startValue) +
+                startValue,
+            ),
           ),
-        ),
+        )
+
+      const notes =
+        selectedNoteIds.length > 0
+          ? selectedNoteIds.map((id) => getEventById(id) as NoteEvent)
+          : getEvents().filter(isNoteEvent)
+
+      const events = notes.filter(
+        isEventInRange(Range.create(minTick, maxTick)),
       )
 
-    const notes =
-      selectedNoteIds.length > 0
-        ? selectedNoteIds.map((id) => getEventById(id) as NoteEvent)
-        : getEvents().filter(isNoteEvent)
-
-    const events = notes.filter(isEventInRange(Range.create(minTick, maxTick)))
-
-    transaction(() => {
-      updateEvents(
-        events.map((e) => ({
-          id: e.id,
-          velocity: getValue(e.tick),
-        })),
-      )
-    })
-  }
+      transaction(() => {
+        updateEvents(
+          events.map((e) => ({
+            id: e.id,
+            velocity: getValue(e.tick),
+          })),
+        )
+      })
+    },
+    [selectedNoteIds, getEventById, getEvents, updateEvents],
+  )
 }
 
 // Update controller events in the range with linear interpolation values
@@ -136,61 +151,64 @@ export const useUpdateEventsInRange = (
 ) => {
   const { getEvents, removeEvents, addEvents } = useTrack(trackId)
 
-  return (
-    startValue: number,
-    endValue: number,
-    startTick: number,
-    endTick: number,
-  ) => {
-    const minTick = Math.min(startTick, endTick)
-    const maxTick = Math.max(startTick, endTick)
-    const _startTick = quantizer.floor(Math.max(0, minTick))
-    const _endTick = quantizer.floor(Math.max(0, maxTick))
+  return useCallback(
+    (
+      startValue: number,
+      endValue: number,
+      startTick: number,
+      endTick: number,
+    ) => {
+      const minTick = Math.min(startTick, endTick)
+      const maxTick = Math.max(startTick, endTick)
+      const _startTick = quantizer.floor(Math.max(0, minTick))
+      const _endTick = quantizer.floor(Math.max(0, maxTick))
 
-    const minValue = Math.min(startValue, endValue)
-    const maxValue = Math.max(startValue, endValue)
+      const minValue = Math.min(startValue, endValue)
+      const maxValue = Math.max(startValue, endValue)
 
-    // linear interpolate
-    const getValue =
-      endTick === startTick
-        ? () => endValue
-        : (tick: number) =>
-            Math.floor(
-              Math.min(
-                maxValue,
-                Math.max(
-                  minValue,
-                  ((tick - startTick) / (endTick - startTick)) *
-                    (endValue - startValue) +
-                    startValue,
+      // linear interpolate
+      const getValue =
+        endTick === startTick
+          ? () => endValue
+          : (tick: number) =>
+              Math.floor(
+                Math.min(
+                  maxValue,
+                  Math.max(
+                    minValue,
+                    ((tick - startTick) / (endTick - startTick)) *
+                      (endValue - startValue) +
+                      startValue,
+                  ),
                 ),
-              ),
-            )
+              )
 
-    // Delete events in the dragged area
-    const events = getEvents()
-      .filter(filterEvent)
-      .filter(
-        (e) =>
-          // to prevent remove the event created previously, do not remove the event placed at startTick
-          e.tick !== startTick &&
-          e.tick >= Math.min(minTick, _startTick) &&
-          e.tick <= Math.max(maxTick, _endTick),
-      )
+      // Delete events in the dragged area
+      const events = getEvents()
+        .filter(filterEvent)
+        .filter(
+          (e) =>
+            // to prevent remove the event created previously, do not remove the event placed at startTick
+            e.tick !== startTick &&
+            e.tick >= Math.min(minTick, _startTick) &&
+            e.tick <= Math.max(maxTick, _endTick),
+        )
 
-    transaction(() => {
-      removeEvents(events.map((e) => e.id))
+      transaction(() => {
+        removeEvents(events.map((e) => e.id))
 
-      const newEvents = closedRange(_startTick, _endTick, quantizer.unit).map(
-        (tick) => ({
-          ...createEvent(getValue(tick)),
-          tick,
-        }),
-      )
+        const newEvents = closedRange(_startTick, _endTick, quantizer.unit).map(
+          (tick) => ({
+            ...createEvent(getValue(tick)),
+            tick,
+          }),
+        )
 
-      addEvents(newEvents)
-    })
-  }
+        addEvents(newEvents)
+      })
+    },
+    [quantizer, filterEvent, createEvent, getEvents, removeEvents, addEvents],
+  )
 }
 
 export const useUpdateValueEvents = (type: ValueEventType) => {
@@ -212,12 +230,15 @@ export const useMuteNote = () => {
   const { channel } = useTrack(selectedTrackId)
   const stopNote = useStopNote()
 
-  return (noteNumber: number) => {
-    if (channel == undefined) {
-      return
-    }
-    stopNote({ channel, noteNumber })
-  }
+  return useCallback(
+    (noteNumber: number) => {
+      if (channel == undefined) {
+        return
+      }
+      stopNote({ channel, noteNumber })
+    },
+    [channel, stopNote],
+  )
 }
 
 /* track meta */
@@ -227,10 +248,13 @@ export const useSetTrackName = () => {
   const { setName } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
-  return (name: string) => {
-    pushHistory()
-    setName(name)
-  }
+  return useCallback(
+    (name: string) => {
+      pushHistory()
+      setName(name)
+    },
+    [pushHistory, setName],
+  )
 }
 
 export const useSetTrackInstrument = (trackId: TrackId) => {
@@ -238,30 +262,36 @@ export const useSetTrackInstrument = (trackId: TrackId) => {
   const { pushHistory } = useHistory()
   const { channel, setProgramNumber } = useTrack(trackId)
 
-  return (programNumber: number) => {
-    pushHistory()
-    setProgramNumber(programNumber)
+  return useCallback(
+    (programNumber: number) => {
+      pushHistory()
+      setProgramNumber(programNumber)
 
-    // 即座に反映する
-    // Reflect immediately
-    if (channel !== undefined) {
-      sendEvent(programChangeMidiEvent(0, channel, programNumber))
-    }
-  }
+      // 即座に反映する
+      // Reflect immediately
+      if (channel !== undefined) {
+        sendEvent(programChangeMidiEvent(0, channel, programNumber))
+      }
+    },
+    [pushHistory, setProgramNumber, channel, sendEvent],
+  )
 }
 
 export const useToggleGhostTrack = () => {
   const { notGhostTrackIds, setNotGhostTrackIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
-  return (trackId: TrackId) => {
-    pushHistory()
-    if (notGhostTrackIds.has(trackId)) {
-      setNotGhostTrackIds(deletedSet(notGhostTrackIds, trackId))
-    } else {
-      setNotGhostTrackIds(addedSet(notGhostTrackIds, trackId))
-    }
-  }
+  return useCallback(
+    (trackId: TrackId) => {
+      pushHistory()
+      if (notGhostTrackIds.has(trackId)) {
+        setNotGhostTrackIds(deletedSet(notGhostTrackIds, trackId))
+      } else {
+        setNotGhostTrackIds(addedSet(notGhostTrackIds, trackId))
+      }
+    },
+    [pushHistory, notGhostTrackIds, setNotGhostTrackIds],
+  )
 }
 
 export const useToggleAllGhostTracks = () => {
@@ -269,14 +299,14 @@ export const useToggleAllGhostTracks = () => {
   const { tracks } = useSong()
   const { pushHistory } = useHistory()
 
-  return () => {
+  return useCallback(() => {
     pushHistory()
     if (notGhostTrackIds.size > Math.floor(tracks.length / 2)) {
       setNotGhostTrackIds(new Set())
     } else {
       setNotGhostTrackIds(new Set(tracks.map((t) => t.id)))
     }
-  }
+  }, [pushHistory, notGhostTrackIds, setNotGhostTrackIds, tracks])
 }
 
 export const useAddTimeSignature = () => {
@@ -284,38 +314,44 @@ export const useAddTimeSignature = () => {
   const { pushHistory } = useHistory()
   const { measures, timeSignatures, addEvent } = useConductorTrack()
 
-  return (tick: number, numerator: number, denominator: number) => {
-    const measureStartTick = Measure.getMeasureStart(
-      measures,
-      tick,
-      timebase,
-    ).tick
+  return useCallback(
+    (tick: number, numerator: number, denominator: number) => {
+      const measureStartTick = Measure.getMeasureStart(
+        measures,
+        tick,
+        timebase,
+      ).tick
 
-    // prevent duplication
-    if (timeSignatures.some((e) => e.tick === measureStartTick)) {
-      return
-    }
+      // prevent duplication
+      if (timeSignatures.some((e) => e.tick === measureStartTick)) {
+        return
+      }
 
-    pushHistory()
+      pushHistory()
 
-    addEvent({
-      ...timeSignatureMidiEvent(0, numerator, denominator),
-      tick: measureStartTick,
-    })
-  }
+      addEvent({
+        ...timeSignatureMidiEvent(0, numerator, denominator),
+        tick: measureStartTick,
+      })
+    },
+    [timebase, pushHistory, measures, timeSignatures, addEvent],
+  )
 }
 
 export const useUpdateTimeSignature = () => {
   const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
 
-  return (id: number, numerator: number, denominator: number) => {
-    pushHistory()
-    updateEvent(id, {
-      numerator,
-      denominator,
-    })
-  }
+  return useCallback(
+    (id: number, numerator: number, denominator: number) => {
+      pushHistory()
+      updateEvent(id, {
+        numerator,
+        denominator,
+      })
+    },
+    [pushHistory, updateEvent],
+  )
 }
 
 export interface BatchUpdateOperation {
@@ -348,13 +384,16 @@ export const useBatchUpdateSelectedNotesVelocity = () => {
   const { selectedTrack, selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
 
-  return (operation: BatchUpdateOperation) => {
-    if (selectedTrack === undefined) {
-      return
-    }
-    pushHistory()
-    batchUpdateNotesVelocity(selectedTrack, selectedNoteIds, operation)
-  }
+  return useCallback(
+    (operation: BatchUpdateOperation) => {
+      if (selectedTrack === undefined) {
+        return
+      }
+      pushHistory()
+      batchUpdateNotesVelocity(selectedTrack, selectedNoteIds, operation)
+    },
+    [selectedTrack, selectedNoteIds, pushHistory],
+  )
 }
 
 const applyOperation = (operation: BatchUpdateOperation, value: number) => {

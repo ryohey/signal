@@ -1,6 +1,6 @@
 import { makeObservable, observable } from "mobx"
 import { createContext, useCallback, useContext, useMemo } from "react"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 export type RoutePath = "/track" | "/arrange" | "/tempo"
 
@@ -29,7 +29,7 @@ export function useRouter() {
 
   return {
     get path() {
-      return useMobxSelector(() => router.path, [router])
+      return useMobxGetter(router, "path")
     },
     setPath: useCallback(
       (path: RoutePath) => {

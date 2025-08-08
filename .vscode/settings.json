@@ -11,7 +11,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit"
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
   "testing.openTesting": "neverOpen",
   "testing.automaticallyOpenTestResults": "neverOpen",
@@ -28,5 +29,19 @@
       "name": "player",
       "rootPath": "packages/player"
     }
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  // Enable ESLint flat config support
+  "eslint.experimental.useFlatConfig": true,
+  // Enable ESLint for TypeScript and JavaScript files
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact", 
+    "typescript",
+    "typescriptreact"
   ]
 }

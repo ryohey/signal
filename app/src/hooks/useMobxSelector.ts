@@ -1,8 +1,6 @@
 import { IEqualsComparer, reaction } from "mobx"
 import { useCallback } from "react"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
-import RootStore from "../stores/RootStore"
-import { useStores } from "./useStores"
 
 type Selector<T> = () => T
 
@@ -18,6 +16,7 @@ export function useMobxSelector<T>(
           fireImmediately: true,
           equals,
         }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       deps,
     ),
     selector,
@@ -27,10 +26,28 @@ export function useMobxSelector<T>(
   )
 }
 
-export function useMobxStore<T>(
-  selector: (rootStore: RootStore) => T,
-  equals?: IEqualsComparer<T>,
-): T {
-  const rootStore = useStores()
-  return useMobxSelector(() => selector(rootStore), [rootStore], equals)
+export function useMobxGetter<T, K extends keyof T>(
+  store: T,
+  prop: K,
+  equals?: IEqualsComparer<T[K]>,
+): T[K]
+export function useMobxGetter<T, K extends keyof T>(
+  store: T | undefined,
+  prop: K,
+  equals?: IEqualsComparer<T[K] | undefined>,
+): T[K] | undefined
+export function useMobxGetter<T, K extends keyof T>(
+  store: T | undefined,
+  prop: K,
+  equals?: IEqualsComparer<T[K] | undefined>,
+): T[K] | undefined {
+  return useMobxSelector(() => store?.[prop], [store], equals)
+}
+
+export function useMobxSetter<T, K extends keyof T>(
+  store: T,
+  prop: K,
+): (value: T[K]) => void {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useCallback((value: T[K]) => (store[prop] = value), [store])
 }

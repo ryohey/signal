@@ -28,27 +28,27 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
     copyControlSelection()
     deleteControlSelection()
     handleClose()
-  }, [copyControlSelection, deleteControlSelection])
+  }, [copyControlSelection, deleteControlSelection, handleClose])
 
   const onClickCopy = useCallback(() => {
     copyControlSelection()
     handleClose()
-  }, [copyControlSelection])
+  }, [copyControlSelection, handleClose])
 
   const onClickPaste = useCallback(() => {
     pasteControlSelection()
     handleClose()
-  }, [pasteControlSelection])
+  }, [pasteControlSelection, handleClose])
 
   const onClickDuplicate = useCallback(() => {
     duplicateControlSelection()
     handleClose()
-  }, [duplicateControlSelection])
+  }, [duplicateControlSelection, handleClose])
 
   const onClickDelete = useCallback(() => {
     deleteControlSelection()
     handleClose()
-  }, [deleteControlSelection])
+  }, [deleteControlSelection, handleClose])
 
   return (
     <ContextMenu {...props}>

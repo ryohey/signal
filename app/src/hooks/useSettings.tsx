@@ -3,7 +3,7 @@ import { makePersistable } from "mobx-persist-store"
 import { createContext, useCallback, useContext } from "react"
 import { Language } from "../localize/useLocalization"
 import { ThemeType } from "../theme/Theme"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 
 class ThemeStore {
   themeType: ThemeType = "dark"
@@ -58,10 +58,10 @@ export function useSettings() {
 
   return {
     get language() {
-      return useMobxSelector(() => settingStore.language, [settingStore])
+      return useMobxGetter(settingStore, "language")
     },
     get showNoteLabels() {
-      return useMobxSelector(() => settingStore.showNoteLabels, [settingStore])
+      return useMobxGetter(settingStore, "showNoteLabels")
     },
     setShowNoteLabels: useCallback(
       (value: boolean) => {
@@ -70,7 +70,7 @@ export function useSettings() {
       [settingStore],
     ),
     get themeType() {
-      return useMobxSelector(() => themeStore.themeType, [themeStore])
+      return useMobxGetter(themeStore, "themeType")
     },
     setLanguage: useCallback(
       (language: Language | null) => {

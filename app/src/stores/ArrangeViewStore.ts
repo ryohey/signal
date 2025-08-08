@@ -62,14 +62,14 @@ export default class ArrangeViewStore {
     this.tickScrollStore.setUpAutoScroll()
   }
 
-  serialize(): SerializedArrangeViewStore {
+  serialize = (): SerializedArrangeViewStore => {
     return {
       selection: cloneDeep(this.selection),
       selectedEventIds: cloneDeep(this.selectedEventIds),
     }
   }
 
-  restore(state: SerializedArrangeViewStore) {
+  restore = (state: SerializedArrangeViewStore) => {
     this.selection = state.selection
     this.selectedEventIds = state.selectedEventIds
   }

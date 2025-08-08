@@ -59,7 +59,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(transform, maxValue, height, lineWidth),
-    [transform.id, maxValue, height, lineWidth],
+    [transform, maxValue, height, lineWidth],
   )
 
   const items = events.map((e) => ({
@@ -78,10 +78,13 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
     [controlPoints],
   )
 
-  const getLocal = (e: MouseEvent): Point => ({
-    x: e.offsetX + scrollLeft,
-    y: e.offsetY,
-  })
+  const getLocal = useCallback(
+    (e: MouseEvent): Point => ({
+      x: e.offsetX + scrollLeft,
+      y: e.offsetY,
+    }),
+    [scrollLeft],
+  )
 
   const pencilMouseDown: MouseEventHandler = useCallback(
     (ev) => {
@@ -89,7 +92,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
 
       handlePencilMouseDown.onMouseDown(ev.nativeEvent, local, controlTransform)
     },
-    [scrollLeft, controlTransform, handlePencilMouseDown],
+    [controlTransform, handlePencilMouseDown, getLocal],
   )
 
   const selectionMouseDown: MouseEventHandler = useCallback(
@@ -118,12 +121,11 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
     },
     [
       controlTransform,
-      scrollLeft,
       events,
-      eventType,
       hitTest,
       dragSelectionGesture,
       createSelectionGesture,
+      getLocal,
     ],
   )
 

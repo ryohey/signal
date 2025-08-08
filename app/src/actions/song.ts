@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useAutoSave } from "../hooks/useAutoSave"
 import { useHistory } from "../hooks/useHistory"
@@ -38,39 +39,57 @@ export const useSetSong = () => {
     setSelectedEventIds: setArrangeSelectedEventIds,
   } = useArrangeView()
 
-  return (newSong: Song) => {
-    setSong(newSong)
-    resetTrackMute()
+  return useCallback(
+    (newSong: Song) => {
+      setSong(newSong)
+      resetTrackMute()
 
-    setScrollLeftInPixels(0)
-    setNotGhostTrackIds(new Set())
-    setShowTrackList(true)
-    setSelection(null)
-    setSelectedNoteIds([])
-    setSelectedTrackId(
-      newSong.tracks.find((t) => !t.isConductorTrack)?.id ??
-        UNASSIGNED_TRACK_ID,
-    )
+      setScrollLeftInPixels(0)
+      setNotGhostTrackIds(new Set())
+      setShowTrackList(true)
+      setSelection(null)
+      setSelectedNoteIds([])
+      setSelectedTrackId(
+        newSong.tracks.find((t) => !t.isConductorTrack)?.id ??
+          UNASSIGNED_TRACK_ID,
+      )
 
-    setArrangeSelection(null)
-    setArrangeSelectedEventIds({})
+      setArrangeSelection(null)
+      setArrangeSelectedEventIds({})
 
-    clearHistory()
+      clearHistory()
 
-    stop()
-    reset()
-    setPosition(0)
-  }
+      stop()
+      reset()
+      setPosition(0)
+    },
+    [
+      setSong,
+      clearHistory,
+      resetTrackMute,
+      stop,
+      reset,
+      setPosition,
+      setNotGhostTrackIds,
+      setScrollLeftInPixels,
+      setShowTrackList,
+      setSelection,
+      setSelectedNoteIds,
+      setSelectedTrackId,
+      setArrangeSelection,
+      setArrangeSelectedEventIds,
+    ],
+  )
 }
 
 export const useCreateSong = () => {
   const setSong = useSetSong()
   const { onUserExplicitAction } = useAutoSave()
 
-  return () => {
+  return useCallback(() => {
     onUserExplicitAction()
     setSong(emptySong())
-  }
+  }, [onUserExplicitAction, setSong])
 }
 
 export const useSaveSong = () => {
@@ -78,35 +97,38 @@ export const useSaveSong = () => {
   const { setSaved } = useSong()
   const { onUserExplicitAction } = useAutoSave()
 
-  return () => {
+  return useCallback(() => {
     setSaved(true)
     onUserExplicitAction()
     downloadSongAsMidi(getSong())
-  }
+  }, [setSaved, onUserExplicitAction, getSong])
 }
 
 export const useOpenSong = () => {
   const setSong = useSetSong()
   const { onUserExplicitAction } = useAutoSave()
 
-  return async (input: HTMLInputElement) => {
-    const song = await openSongFile(input)
-    if (song === null) {
-      return
-    }
-    onUserExplicitAction()
-    setSong(song)
-  }
+  return useCallback(
+    async (input: HTMLInputElement) => {
+      const song = await openSongFile(input)
+      if (song === null) {
+        return
+      }
+      onUserExplicitAction()
+      setSong(song)
+    },
+    [setSong, onUserExplicitAction],
+  )
 }
 
 export const useAddTrack = () => {
   const { addTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
 
-  return () => {
+  return useCallback(() => {
     pushHistory()
     addTrack(emptyTrack(Math.min(tracks.length - 1, 0xf)))
-  }
+  }, [pushHistory, addTrack, tracks])
 }
 
 export const useRemoveTrack = () => {
@@ -121,23 +143,36 @@ export const useRemoveTrack = () => {
     setSelectedTrackIndex: setArrangeSelectedTrackIndex,
   } = useArrangeView()
 
-  return (trackId: TrackId) => {
-    const trackCount = tracks.length
-    if (tracks.filter((t) => !t.isConductorTrack).length <= 1) {
-      // conductor track を除き、最後のトラックの場合
-      // トラックがなくなるとエラーが出るので削除できなくする
-      // For the last track except for Conductor Track
-      // I can not delete it because there is an error when there is no track
-      return
-    }
-    pushHistory()
-    removeTrack(trackId)
-    const maxTrackIndex = trackCount - 2
-    setSelectedTrackIndex(Math.min(pianoRollSelectedTrackIndex, maxTrackIndex))
-    setArrangeSelectedTrackIndex(
-      Math.min(arrangeSelectedTrackIndex, maxTrackIndex),
-    )
-  }
+  return useCallback(
+    (trackId: TrackId) => {
+      const trackCount = tracks.length
+      if (tracks.filter((t) => !t.isConductorTrack).length <= 1) {
+        // conductor track を除き、最後のトラックの場合
+        // トラックがなくなるとエラーが出るので削除できなくする
+        // For the last track except for Conductor Track
+        // I can not delete it because there is an error when there is no track
+        return
+      }
+      pushHistory()
+      removeTrack(trackId)
+      const maxTrackIndex = trackCount - 2
+      setSelectedTrackIndex(
+        Math.min(pianoRollSelectedTrackIndex, maxTrackIndex),
+      )
+      setArrangeSelectedTrackIndex(
+        Math.min(arrangeSelectedTrackIndex, maxTrackIndex),
+      )
+    },
+    [
+      tracks,
+      pushHistory,
+      removeTrack,
+      pianoRollSelectedTrackIndex,
+      setSelectedTrackIndex,
+      arrangeSelectedTrackIndex,
+      setArrangeSelectedTrackIndex,
+    ],
+  )
 }
 
 export const useSelectTrack = () => {
@@ -149,25 +184,31 @@ export const useInsertTrack = () => {
   const { insertTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
 
-  return (trackIndex: number) => {
-    pushHistory()
-    insertTrack(emptyTrack(tracks.length - 1), trackIndex)
-  }
+  return useCallback(
+    (trackIndex: number) => {
+      pushHistory()
+      insertTrack(emptyTrack(tracks.length - 1), trackIndex)
+    },
+    [pushHistory, insertTrack, tracks],
+  )
 }
 
 export const useDuplicateTrack = () => {
   const { getTrack, tracks, insertTrack } = useSong()
   const { pushHistory } = useHistory()
 
-  return (trackId: TrackId) => {
-    const track = getTrack(trackId)
-    if (track === undefined) {
-      throw new Error("No track found")
-    }
-    const trackIndex = tracks.findIndex((t) => t.id === trackId)
-    const newTrack = track.clone()
-    newTrack.channel = undefined
-    pushHistory()
-    insertTrack(newTrack, trackIndex + 1)
-  }
+  return useCallback(
+    (trackId: TrackId) => {
+      const track = getTrack(trackId)
+      if (track === undefined) {
+        throw new Error("No track found")
+      }
+      const trackIndex = tracks.findIndex((t) => t.id === trackId)
+      const newTrack = track.clone()
+      newTrack.channel = undefined
+      pushHistory()
+      insertTrack(newTrack, trackIndex + 1)
+    },
+    [getTrack, tracks, insertTrack, pushHistory],
+  )
 }

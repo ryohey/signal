@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import Track, { TrackId } from "../track"
 import { TrackColor } from "../track/TrackColor"
 import { TrackEvent } from "../track/TrackEvent"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { useSong } from "./useSong"
 
 export function useTrack(id: TrackId) {
@@ -11,28 +11,28 @@ export function useTrack(id: TrackId) {
 
   return {
     get isRhythmTrack() {
-      return useMobxSelector(() => track?.isRhythmTrack ?? false, [track])
+      return useMobxGetter(track, "isRhythmTrack") ?? false
     },
     get isConductorTrack() {
-      return useMobxSelector(() => track?.isConductorTrack ?? false, [track])
+      return useMobxGetter(track, "isConductorTrack") ?? false
     },
     get programNumber() {
-      return useMobxSelector(() => track?.programNumber ?? 0, [track])
+      return useMobxGetter(track, "programNumber") ?? 0
     },
     get name() {
-      return useMobxSelector(() => track?.name ?? "", [track])
+      return useMobxGetter(track, "name") ?? ""
     },
     get channel() {
-      return useMobxSelector(() => track?.channel, [track])
+      return useMobxGetter(track, "channel")
     },
     get events() {
-      return useMobxSelector(() => track?.events ?? [], [track])
+      return useMobxGetter(track, "events") ?? []
     },
     getEvents() {
       return track?.events ?? []
     },
     get color() {
-      return useMobxSelector(() => track?.color, [track])
+      return useMobxGetter(track, "color")
     },
     setColor: useCallback(
       (color: TrackColor | null) => {
