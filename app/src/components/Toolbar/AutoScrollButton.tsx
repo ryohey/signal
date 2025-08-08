@@ -19,19 +19,22 @@ export interface AutoScrollButtonProps {
 const AutoScrollButtonContent: FC<AutoScrollButtonProps> = ({
   onClick,
   selected,
-}) => (
-  <Tooltip title={<Localized name="auto-scroll" />}>
-    <ToolbarButton
-      onMouseDown={(e) => {
-        e.preventDefault()
-        onClick()
-      }}
-      selected={selected}
-    >
-      <AutoScrollIcon />
-    </ToolbarButton>
-  </Tooltip>
-)
+}) => {
+  const onMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      onClick()
+    },
+    [onClick],
+  )
+  return (
+    <Tooltip title={<Localized name="auto-scroll" />}>
+      <ToolbarButton onMouseDown={onMouseDown} selected={selected}>
+        <AutoScrollIcon />
+      </ToolbarButton>
+    </Tooltip>
+  )
+}
 
 export const AutoScrollButton: FC = () => {
   const { autoScroll, setAutoScroll } = useTickScroll()

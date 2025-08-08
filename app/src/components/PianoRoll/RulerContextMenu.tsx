@@ -55,6 +55,19 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
     setOpenTimeSignatureDialog(false)
   }, [])
 
+  const _addTimeSignature = useCallback(
+    ({
+      numerator,
+      denominator,
+    }: {
+      numerator: number
+      denominator: number
+    }) => {
+      addTimeSignature(tick, numerator, denominator)
+    },
+    [tick, addTimeSignature],
+  )
+
   return (
     <>
       <ContextMenu {...props}>
@@ -79,9 +92,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
       <TimeSignatureDialog
         open={isOpenTimeSignatureDialog}
         onClose={closeOpenTimeSignatureDialog}
-        onClickOK={({ numerator, denominator }) => {
-          addTimeSignature(tick, numerator, denominator)
-        }}
+        onClickOK={_addTimeSignature}
       />
     </>
   )
