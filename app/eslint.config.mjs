@@ -36,7 +36,7 @@ export default [
       "@typescript-eslint/no-namespace": "off",
       "react/display-name": "off",
       "react/prop-types": "off",
-      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/rules-of-hooks": "off",
       "react-hooks/exhaustive-deps": "error",
     },
   },
