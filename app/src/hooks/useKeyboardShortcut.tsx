@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { isFocusable } from "../components/KeyboardShortcut/isFocusable"
+import { isFocusable } from "../helpers/isFocusable"
 
 export interface Action {
   code: KeyboardEvent["code"]

@@ -5,7 +5,7 @@ import {
   ControlEventsClipboardDataSchema,
   PianoNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
-import { isFocusable } from "../components/KeyboardShortcut/isFocusable"
+import { isFocusable } from "../helpers/isFocusable"
 import { readClipboardData } from "../services/Clipboard"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePianoRoll } from "./usePianoRoll"
