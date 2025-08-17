@@ -11,6 +11,7 @@ import {
   useToggleSolo,
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
+import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
 import { useDisableZoom } from "../../hooks/useDisableZoom"
 import { useHistory } from "../../hooks/useHistory"
 import { usePlayer } from "../../hooks/usePlayer"
@@ -41,6 +42,7 @@ export const GlobalKeyboardShortcut: FC = () => {
     useSongFile()
   const localized = useLocalization()
   useDisableZoom()
+  useDisableBounceScroll()
 
   const openLegacy = async () => {
     if (isSaved || confirm(localized["confirm-open"])) {
