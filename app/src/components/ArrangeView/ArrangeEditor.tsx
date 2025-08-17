@@ -16,17 +16,25 @@ const Container = styled.div`
   outline: none;
 `
 
-export const ArrangeEditor: FC = () => {
+const Content: FC = () => {
   const keyboardShortcutProps = useArrangeViewKeyboardShortcut()
 
   return (
-    <ArrangeViewScope>
+    <>
       <Container {...keyboardShortcutProps} tabIndex={0}>
         <ArrangeToolbar />
         <ArrangeView />
       </Container>
       <ArrangeTransposeDialog />
       <ArrangeVelocityDialog />
+    </>
+  )
+}
+
+export const ArrangeEditor: FC = () => {
+  return (
+    <ArrangeViewScope>
+      <Content />
     </ArrangeViewScope>
   )
 }

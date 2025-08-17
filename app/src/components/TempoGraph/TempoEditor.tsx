@@ -13,15 +13,21 @@ const Container = styled.div`
   outline: none;
 `
 
-export const TempoEditor: FC = () => {
+const Content: FC = () => {
   const keyboardShortcutProps = useTempoEditorKeyboardShortcut()
 
   return (
+    <Container {...keyboardShortcutProps} tabIndex={0}>
+      <TempoGraphToolbar />
+      <TempoGraph />
+    </Container>
+  )
+}
+
+export const TempoEditor: FC = () => {
+  return (
     <TempoEditorScope>
-      <Container {...keyboardShortcutProps} tabIndex={0}>
-        <TempoGraphToolbar />
-        <TempoGraph />
-      </Container>
+      <Content />
     </TempoEditorScope>
   )
 }
