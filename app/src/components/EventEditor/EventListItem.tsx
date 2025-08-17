@@ -74,7 +74,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
     return (
       <Row
         style={style}
-        onClick={useCallback((e: React.MouseEvent) => onClick(e, item), [item])}
+        onClick={useCallback(
+          (e: React.MouseEvent) => onClick(e, item),
+          [item, onClick],
+        )}
         onKeyDown={useCallback(
           (e: React.KeyboardEvent) => {
             if (
@@ -85,7 +88,7 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
               e.stopPropagation()
             }
           },
-          [item],
+          [item, onDelete],
         )}
         tabIndex={-1}
       >

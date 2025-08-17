@@ -6,7 +6,7 @@ import {
   isTimeSignatureEvent,
   UNASSIGNED_TRACK_ID,
 } from "../track"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useTrackEvents } from "./useTrack"
@@ -29,10 +29,7 @@ export function useConductorTrack() {
 
   return {
     get id() {
-      return useMobxSelector(
-        () => conductorTrack?.id ?? UNASSIGNED_TRACK_ID,
-        [conductorTrack],
-      )
+      return useMobxGetter(conductorTrack, "id") ?? UNASSIGNED_TRACK_ID
     },
     get currentTempo() {
       const { position } = usePlayer()
@@ -56,9 +53,7 @@ export function useConductorTrack() {
     ),
     setTempo: useCallback(
       (bpm: number, tick: number) => {
-        if (conductorTrack) {
-          conductorTrack.setTempo(bpm, tick)
-        }
+        conductorTrack?.setTempo(bpm, tick)
       },
       [conductorTrack],
     ),

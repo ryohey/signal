@@ -7,9 +7,7 @@ export function useAutoSave() {
   const setSong = useSetSong()
 
   return {
-    onUserExplicitAction: useCallback(() => {
-      autoSaveService.onUserExplicitAction()
-    }, [autoSaveService]),
+    onUserExplicitAction: autoSaveService.onUserExplicitAction,
     shouldShowAutoSaveDialog: useCallback(() => {
       return (
         autoSaveService.getShouldOfferRestore() &&
@@ -22,9 +20,7 @@ export function useAutoSave() {
         setSong(restoredSong)
         autoSaveService.clearAutoSave()
       }
-    }, [autoSaveService]),
-    getLastSaveTime: useCallback(() => {
-      return autoSaveService.getLastSaveTime()
-    }, [autoSaveService]),
+    }, [autoSaveService, setSong]),
+    getLastSaveTime: autoSaveService.getLastSaveTime,
   }
 }

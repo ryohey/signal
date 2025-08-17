@@ -6,12 +6,12 @@ import {
   useToggleRecording,
 } from "../actions"
 import { useCanRecord } from "./useMIDIDevice"
-import { useMobxStore } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
 
 export function useTransportPanel() {
-  const { synthGroup } = useStores()
+  const { synthGroup, midiRecorder } = useStores()
   const canRecording = useCanRecord()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
@@ -30,10 +30,10 @@ export function useTransportPanel() {
     isLoopActive: loop?.enabled ?? false,
     canRecording,
     get isRecording() {
-      return useMobxStore(({ midiRecorder }) => midiRecorder.isRecording)
+      return useMobxGetter(midiRecorder, "isRecording")
     },
     get isMetronomeEnabled() {
-      return useMobxStore(({ synthGroup }) => synthGroup.isMetronomeEnabled)
+      return useMobxGetter(synthGroup, "isMetronomeEnabled")
     },
   }
 }

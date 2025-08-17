@@ -1,5 +1,6 @@
 import pluginJs from "@eslint/js"
 import pluginReact from "eslint-plugin-react"
+import pluginReactHooks from "eslint-plugin-react-hooks"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
@@ -22,7 +23,11 @@ export default [
   },
   pluginReact.configs.flat["jsx-runtime"],
   {
+    plugins: {
+      "react-hooks": pluginReactHooks,
+    },
     rules: {
+      ...pluginReactHooks.configs.recommended.rules,
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -31,6 +36,8 @@ export default [
       "@typescript-eslint/no-namespace": "off",
       "react/display-name": "off",
       "react/prop-types": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 ]

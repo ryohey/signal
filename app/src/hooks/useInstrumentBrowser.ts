@@ -50,13 +50,20 @@ export function useInstrumentBrowser() {
       })
       setTrackInstrumentAction(0)
     },
-    [isRhythmTrack, selectedTrackId, setChannel, tracks, setSetting],
+    [
+      isRhythmTrack,
+      selectedTrackId,
+      setChannel,
+      tracks,
+      setSetting,
+      setTrackInstrumentAction,
+    ],
   )
 
   const onClickOK = useCallback(() => {
     setTrackInstrumentAction(setting.programNumber)
     setOpen(false)
-  }, [changeRhythmTrack, setTrackInstrumentAction, setting, setOpen])
+  }, [setTrackInstrumentAction, setting, setOpen])
 
   const selectedCategoryIndex = isRhythmTrack
     ? 0
@@ -76,6 +83,7 @@ export function useInstrumentBrowser() {
           return [0]
         }
         return range(0, 127, 8)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [setting.isRhythmTrack])
     },
     get categoryInstruments() {
@@ -85,6 +93,7 @@ export function useInstrumentBrowser() {
         }
         const offset = selectedCategoryIndex * 8
         return range(offset, offset + 8)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [selectedCategoryIndex, setting.isRhythmTrack])
     },
     onChangeInstrument: useCallback(
@@ -105,7 +114,7 @@ export function useInstrumentBrowser() {
           isRhythmTrack: setting.isRhythmTrack,
         })
       },
-      [setSetting, setting, channel, previewNoteOn],
+      [setSetting, setting, channel, previewNoteOn, sendEvent, isPlaying],
     ),
     onChangeRhythmTrack: useCallback(
       (state: boolean) => {

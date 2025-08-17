@@ -1,8 +1,9 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { FC, ReactNode, useEffect } from "react"
+import { FC, ReactNode, useCallback, useEffect } from "react"
 import { Point } from "../../entities/geometry/Point"
+import { Positioned } from "../ui/Positioned"
 
 export const ContextMenuHotKey = styled.div`
   font-size: 0.9em;
@@ -20,8 +21,7 @@ const Wrapper = styled.div`
   bottom: 0;
 `
 
-const Content = styled.div`
-  position: absolute;
+const Content = styled(Positioned)`
   background: var(--color-background-secondary);
   border-radius: 0.5rem;
   box-shadow: 0 1rem 3rem var(--color-shadow);
@@ -62,6 +62,7 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     return () => {
       document.removeEventListener("keydown", onKeyDown)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   if (!isOpen) {
@@ -71,14 +72,16 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   // fix position to avoid placing menu outside of the screen
   const fixedX = Math.min(position.x, window.innerWidth - estimatedWidth)
 
+  const onClickContent = useCallback(
+    (e: React.MouseEvent) => e.stopPropagation(),
+    [],
+  )
+
   return (
     <Portal.Root>
       <Wrapper onClick={handleClose}>
         <FocusScope>
-          <Content
-            style={{ left: fixedX, top: position.y }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <Content left={fixedX} top={position.y} onClick={onClickContent}>
             <List>{children}</List>
           </Content>
         </FocusScope>

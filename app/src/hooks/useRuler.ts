@@ -4,7 +4,7 @@ import { useUpdateTimeSignature } from "../actions"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useQuantizer } from "./useQuantizer"
 import { useSong } from "./useSong"
@@ -31,11 +31,11 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { timeSignatures } = useSong()
-  const beats = useMobxSelector(() => rulerStore.beats, [rulerStore])
+  const beats = useMobxGetter(rulerStore, "beats")
   const { quantizer } = useQuantizer()
-  const selectedTimeSignatureEventIds = useMobxSelector(
-    () => rulerStore.selectedTimeSignatureEventIds,
-    [rulerStore],
+  const selectedTimeSignatureEventIds = useMobxGetter(
+    rulerStore,
+    "selectedTimeSignatureEventIds",
   )
   const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
 
@@ -117,10 +117,7 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
     loop,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {
-      return useMobxSelector(
-        () => rulerStore.selectedTimeSignatureEventIds,
-        [rulerStore],
-      )
+      return useMobxGetter(rulerStore, "selectedTimeSignatureEventIds")
     },
     timeSignatureHitTest,
     setLoopBegin,

@@ -1,6 +1,7 @@
 import { maxBy, min, minBy } from "lodash"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { transaction } from "mobx"
+import { useCallback } from "react"
 import {
   ControlEventsClipboardData,
   ControlEventsClipboardDataSchema,
@@ -21,22 +22,34 @@ export const useCreateOrUpdateControlEventsValue = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
 
-  return <T extends ControllerEvent | PitchBendEvent>(event: T) => {
-    pushHistory()
+  return useCallback(
+    <T extends ControllerEvent | PitchBendEvent>(event: T) => {
+      pushHistory()
 
-    const controllerEvents = selectedEventIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
+      const controllerEvents = selectedEventIds
+        .map((id) => getEventById(id))
+        .filter(isNotUndefined)
 
-    if (controllerEvents.length > 0) {
-      controllerEvents.forEach((e) => updateEvent(e.id, { value: event.value }))
-    } else {
-      createOrUpdate({
-        ...event,
-        tick: position,
-      })
-    }
-  }
+      if (controllerEvents.length > 0) {
+        controllerEvents.forEach((e) =>
+          updateEvent(e.id, { value: event.value }),
+        )
+      } else {
+        createOrUpdate({
+          ...event,
+          tick: position,
+        })
+      }
+    },
+    [
+      selectedEventIds,
+      getEventById,
+      updateEvent,
+      createOrUpdate,
+      position,
+      pushHistory,
+    ],
+  )
 }
 
 export const useDeleteControlSelection = () => {
@@ -45,7 +58,7 @@ export const useDeleteControlSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()
 
-  return () => {
+  return useCallback(() => {
     if (selectedEventIds.length === 0) {
       return
     }
@@ -55,7 +68,7 @@ export const useDeleteControlSelection = () => {
     // Remove selected notes and selected notes
     removeEvents(selectedEventIds)
     setSelection(null)
-  }
+  }, [selectedEventIds, removeEvents, pushHistory, setSelection])
 }
 
 export const useCopyControlSelection = () => {
@@ -63,7 +76,7 @@ export const useCopyControlSelection = () => {
   const { getEventById } = useTrack(selectedTrackId)
   const { selectedEventIds } = useControlPane()
 
-  return async () => {
+  return useCallback(async () => {
     if (selectedEventIds.length === 0) {
       return
     }
@@ -90,7 +103,7 @@ export const useCopyControlSelection = () => {
     }
 
     await writeClipboardData(data)
-  }
+  }, [selectedEventIds, getEventById])
 }
 
 export const usePasteControlSelection = () => {
@@ -99,22 +112,25 @@ export const usePasteControlSelection = () => {
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
-  return async (clipboardData?: any) => {
-    const obj = clipboardData ?? (await readClipboardData())
-    const { data } = ControlEventsClipboardDataSchema.safeParse(obj)
+  return useCallback(
+    async (clipboardData?: any) => {
+      const obj = clipboardData ?? (await readClipboardData())
+      const { data } = ControlEventsClipboardDataSchema.safeParse(obj)
 
-    if (!data) {
-      return
-    }
+      if (!data) {
+        return
+      }
 
-    pushHistory()
+      pushHistory()
 
-    const events = data.events.map((e) => ({
-      ...e,
-      tick: e.tick + position,
-    }))
-    transaction(() => events.forEach(createOrUpdate))
-  }
+      const events = data.events.map((e) => ({
+        ...e,
+        tick: e.tick + position,
+      }))
+      transaction(() => events.forEach(createOrUpdate))
+    },
+    [createOrUpdate, position, pushHistory],
+  )
 }
 
 export const useDuplicateControlSelection = () => {
@@ -123,7 +139,7 @@ export const useDuplicateControlSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
 
-  return () => {
+  return useCallback(() => {
     if (selectedEventIds.length === 0) {
       return
     }
@@ -149,5 +165,11 @@ export const useDuplicateControlSelection = () => {
       isNotUndefined,
     )
     setSelectedEventIds(addedEvents.map((e) => e.id))
-  }
+  }, [
+    selectedEventIds,
+    getEventById,
+    createOrUpdate,
+    pushHistory,
+    setSelectedEventIds,
+  ])
 }

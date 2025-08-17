@@ -1,12 +1,8 @@
 import { createContext, useCallback, useContext, useMemo } from "react"
-import { ControlSelection } from "../entities/selection/ControlSelection"
-import {
-  ControlMode,
-  ControlStore,
-  SerializedControlStore,
-} from "../stores/ControlStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { ControlStore } from "../stores/ControlStore"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
+export type { SerializedControlStore } from "../stores/ControlStore"
 
 const ControlStoreContext = createContext<ControlStore>(null!)
 
@@ -35,19 +31,16 @@ export function useControlPane() {
       return usePianoRoll().mouseMode
     },
     get controlMode() {
-      return useMobxSelector(() => controlStore.controlMode, [controlStore])
+      return useMobxGetter(controlStore, "controlMode")
     },
     get controlModes() {
-      return useMobxSelector(() => controlStore.controlModes, [controlStore])
+      return useMobxGetter(controlStore, "controlModes")
     },
     get selection() {
-      return useMobxSelector(() => controlStore.selection, [controlStore])
+      return useMobxGetter(controlStore, "selection")
     },
     get selectedEventIds() {
-      return useMobxSelector(
-        () => controlStore.selectedEventIds,
-        [controlStore],
-      )
+      return useMobxGetter(controlStore, "selectedEventIds")
     },
     get transform() {
       return usePianoRoll().transform
@@ -55,24 +48,12 @@ export function useControlPane() {
     resetSelection: useCallback(() => {
       controlStore.selection = null
       controlStore.selectedEventIds = []
-    }, []),
-    setControlMode: useCallback((controlMode: ControlMode) => {
-      controlStore.controlMode = controlMode
-    }, []),
-    setControlModes: useCallback((controlModes: ControlMode[]) => {
-      controlStore.controlModes = controlModes
-    }, []),
-    setSelection: useCallback((selection: ControlSelection | null) => {
-      controlStore.selection = selection
-    }, []),
-    setSelectedEventIds: useCallback((selectedEventIds: number[]) => {
-      controlStore.selectedEventIds = selectedEventIds
-    }, []),
-    serializeState: useCallback(() => controlStore.serialize(), [controlStore]),
-    restoreState: useCallback(
-      (serializedState: SerializedControlStore) =>
-        controlStore.restore(serializedState),
-      [controlStore],
-    ),
+    }, [controlStore]),
+    setControlMode: useMobxSetter(controlStore, "controlMode"),
+    setControlModes: useMobxSetter(controlStore, "controlModes"),
+    setSelection: useMobxSetter(controlStore, "selection"),
+    setSelectedEventIds: useMobxSetter(controlStore, "selectedEventIds"),
+    serializeState: controlStore.serialize,
+    restoreState: controlStore.restore,
   }
 }

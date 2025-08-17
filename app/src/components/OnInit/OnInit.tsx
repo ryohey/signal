@@ -105,6 +105,7 @@ export const OnInit: FC = () => {
       await loadArgumentFileIfNeeded()
       await checkAutoSave()
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

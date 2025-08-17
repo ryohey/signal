@@ -98,7 +98,7 @@ export class SoundFontStore {
     return await this.storage.load(id)
   }
 
-  async load(id: number) {
+  load = async (id: number) => {
     const soundfont = await this.getSoundFont(id)
 
     if (soundfont === null) {
@@ -111,17 +111,17 @@ export class SoundFontStore {
     this.isLoading = false
   }
 
-  async addSoundFont(item: SoundFontItem, metadata: Metadata) {
+  addSoundFont = async (item: SoundFontItem, metadata: Metadata) => {
     await this.storage.save(item, metadata)
     await this.updateFileList()
   }
 
-  async removeSoundFont(id: number) {
+  removeSoundFont = async (id: number) => {
     await this.storage.delete(id)
     await this.updateFileList()
   }
 
-  async scanSoundFonts() {
+  scanSoundFonts = async () => {
     if (!isRunningInElectron()) {
       return
     }
@@ -156,13 +156,13 @@ export class SoundFontStore {
     await this.storage.deleteMany(itemsInScanPaths)
   }
 
-  async removeScanPath(path: string) {
+  removeScanPath = async (path: string) => {
     await this.clearScannedSoundFonts()
     this.scanPaths = this.scanPaths.filter((p) => p !== path)
     this.scanSoundFonts()
   }
 
-  async addScanPath(path: string) {
+  addScanPath = async (path: string) => {
     if (this.scanPaths.includes(path)) {
       return
     }

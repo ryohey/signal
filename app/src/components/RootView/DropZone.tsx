@@ -34,7 +34,7 @@ export const DropZone: FC<PropsWithChildren> = ({ children }) => {
         setSong(newSong)
       }
     },
-    [isSaved, setSong],
+    [isSaved, setSong, localized],
   )
 
   return (

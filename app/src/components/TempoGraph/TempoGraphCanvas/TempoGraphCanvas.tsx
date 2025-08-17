@@ -21,12 +21,14 @@ export interface TempoGraphCanvasProps {
   width: number
   height: number
   style?: CSSProperties
+  className?: string
 }
 
 export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   width,
   height,
   style,
+  className,
 }) => {
   const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
   const { beats } = useRuler()
@@ -67,7 +69,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
         transform,
       )
     },
-    [pencilGesture, transform, scrollLeft, mouseMode],
+    [pencilGesture, transform, getLocal],
   )
 
   const selectionMouseDown = useCallback(
@@ -90,7 +92,13 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
         createSelectionGesture.onMouseDown(e.nativeEvent, local, transform)
       }
     },
-    [dragSelectionGesture, createSelectionGesture, transform, scrollLeft],
+    [
+      dragSelectionGesture,
+      createSelectionGesture,
+      transform,
+      hitTest,
+      getLocal,
+    ],
   )
 
   const onMouseDownGraph =
@@ -108,12 +116,20 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       const bpm = uSecPerBeatToBPM(event.microsecondsPerBeat)
       changeTempo(event.id, Math.floor(bpmToUSecPerBeat(bpm + movement)))
     },
-    [items, scrollLeft, changeTempo],
+    [items, changeTempo, findEvent, getLocal],
   )
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
     [scrollLeft],
+  )
+
+  const computedStyle = useMemo(
+    () => ({
+      ...style,
+      cursor,
+    }),
+    [style, cursor],
   )
 
   return (
@@ -122,7 +138,8 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       height={height}
       onMouseDown={onMouseDownGraph}
       onWheel={onWheelGraph}
-      style={{ ...style, cursor }}
+      style={computedStyle}
+      className={className}
     >
       <Lines width={width} zIndex={0} />
       <Transform matrix={scrollXMatrix}>

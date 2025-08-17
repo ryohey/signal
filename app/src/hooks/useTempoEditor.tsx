@@ -1,14 +1,7 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { createContext, useContext, useEffect, useMemo } from "react"
 import { TempoSelection } from "../entities/selection/TempoSelection"
-import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import TempoEditorStore from "../stores/TempoEditorStore"
-import { useMobxSelector } from "./useMobxSelector"
+import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider, useRuler } from "./useRuler"
 import { useStores } from "./useStores"
@@ -24,6 +17,7 @@ export function TempoEditorProvider({
   const { songStore, player } = useStores()
   const tempoEditorStore = useMemo(
     () => new TempoEditorStore(songStore, player),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 
@@ -55,19 +49,10 @@ export function TempoEditorScope({ children }: { children: React.ReactNode }) {
 export function useTempoEditor() {
   const tempoEditorStore = useContext(TempoEditorStoreContext)
 
-  const selection = useMobxSelector(
-    () => tempoEditorStore.selection,
-    [tempoEditorStore],
-  )
+  const selection = useMobxGetter(tempoEditorStore, "selection")
   const { beats } = useRuler()
-  const transform = useMobxSelector(
-    () => tempoEditorStore.transform,
-    [tempoEditorStore],
-  )
-  const mouseMode = useMobxSelector(
-    () => tempoEditorStore.mouseMode,
-    [tempoEditorStore],
-  )
+  const transform = useMobxGetter(tempoEditorStore, "transform")
+  const mouseMode = useMobxGetter(tempoEditorStore, "mouseMode")
 
   const selectionRect = useMemo(
     () =>
@@ -90,28 +75,14 @@ export function useTempoEditor() {
     beats,
     cursor,
     get selectedEventIds() {
-      return useMobxSelector(
-        () => tempoEditorStore.selectedEventIds,
-        [tempoEditorStore],
-      )
+      return useMobxGetter(tempoEditorStore, "selectedEventIds")
     },
     get mouseMode() {
-      return useMobxSelector(
-        () => tempoEditorStore.mouseMode,
-        [tempoEditorStore],
-      )
+      return useMobxGetter(tempoEditorStore, "mouseMode")
     },
-    setSelection: useCallback((selection: TempoSelection | null) => {
-      tempoEditorStore.selection = selection
-    }, []),
-    setSelectedEventIds: useCallback((ids: number[]) => {
-      tempoEditorStore.selectedEventIds = ids
-    }, []),
-    setMouseMode: useCallback((mode: PianoRollMouseMode) => {
-      tempoEditorStore.mouseMode = mode
-    }, []),
-    setCanvasHeight: useCallback((height: number) => {
-      tempoEditorStore.canvasHeight = height
-    }, []),
+    setSelection: useMobxSetter(tempoEditorStore, "selection"),
+    setSelectedEventIds: useMobxSetter(tempoEditorStore, "selectedEventIds"),
+    setMouseMode: useMobxSetter(tempoEditorStore, "mouseMode"),
+    setCanvasHeight: useMobxSetter(tempoEditorStore, "canvasHeight"),
   }
 }

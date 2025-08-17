@@ -90,7 +90,7 @@ export class ControlStore {
     })
   }
 
-  serialize(): SerializedControlStore {
+  serialize = (): SerializedControlStore => {
     return cloneDeep({
       controlModes: this.controlModes,
       selection: this.selection,
@@ -98,7 +98,7 @@ export class ControlStore {
     })
   }
 
-  restore(serialized: SerializedControlStore) {
+  restore = (serialized: SerializedControlStore) => {
     this.controlModes = serialized.controlModes
     this.selection = serialized.selection
     this.selectedEventIds = serialized.selectedEventIds

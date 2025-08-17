@@ -29,10 +29,10 @@ const _VelocityItems: FC<VelocityItemsProps> = ({ rects, zIndex }) => {
   const strokeColor = colorToVec4(
     enhanceContrast(baseColor, theme.isLightContent, 0.3),
   )
-  const activeColor = useMemo(() => colorToVec4(baseColor), [theme])
+  const activeColor = useMemo(() => colorToVec4(baseColor), [baseColor])
   const selectedColor = useMemo(
     () => colorToVec4(baseColor.lighten(0.7)),
-    [theme],
+    [baseColor],
   )
 
   return (

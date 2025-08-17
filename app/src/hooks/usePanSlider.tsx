@@ -27,7 +27,7 @@ export function usePanSlider() {
         sendEvent(panMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, setPan, position, sendEvent, channel],
+    [pushHistory, setPan, position, sendEvent, channel, isDragging],
   )
 
   return {

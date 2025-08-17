@@ -46,18 +46,28 @@ export const useTransposeSelection = () => {
     usePianoRoll()
   const { pushHistory } = useHistory()
 
-  return (deltaPitch: number) => {
-    pushHistory()
+  return useCallback(
+    (deltaPitch: number) => {
+      pushHistory()
 
-    if (selection !== null) {
-      const s = Selection.moved(selection, 0, deltaPitch)
-      setSelection(s)
-    }
+      if (selection !== null) {
+        const s = Selection.moved(selection, 0, deltaPitch)
+        setSelection(s)
+      }
 
-    transposeNotes(deltaPitch, {
-      [selectedTrackIndex]: selectedNoteIds,
-    })
-  }
+      transposeNotes(deltaPitch, {
+        [selectedTrackIndex]: selectedNoteIds,
+      })
+    },
+    [
+      pushHistory,
+      selection,
+      setSelection,
+      transposeNotes,
+      selectedTrackIndex,
+      selectedNoteIds,
+    ],
+  )
 }
 
 export const useCloneSelection = () => {
@@ -65,7 +75,7 @@ export const useCloneSelection = () => {
     usePianoRoll()
   const { getEventById, addEvents } = useTrack(selectedTrackId)
 
-  return () => {
+  return useCallback(() => {
     if (selection === null) {
       return
     }
@@ -80,14 +90,14 @@ export const useCloneSelection = () => {
       }))
     addEvents(notes)
     setSelectedNoteIds(notes.map((e) => e.id))
-  }
+  }, [selection, selectedNoteIds, getEventById, addEvents, setSelectedNoteIds])
 }
 
 export const useCopySelection = () => {
   const { selection, selectedNoteIds, selectedTrackId } = usePianoRoll()
   const { getEventById } = useTrack(selectedTrackId)
 
-  return async () => {
+  return useCallback(async () => {
     if (selectedNoteIds.length === 0) {
       return
     }
@@ -113,7 +123,7 @@ export const useCopySelection = () => {
     }
 
     await writeClipboardData(data)
-  }
+  }, [selection, selectedNoteIds, getEventById])
 }
 
 export const useDeleteSelection = () => {
@@ -127,7 +137,7 @@ export const useDeleteSelection = () => {
   const { removeEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
-  return () => {
+  return useCallback(() => {
     if (selectedNoteIds.length === 0 && selection === null) {
       return
     }
@@ -139,7 +149,14 @@ export const useDeleteSelection = () => {
     removeEvents(selectedNoteIds)
     setSelection(null)
     setSelectedNoteIds([])
-  }
+  }, [
+    selectedNoteIds,
+    selection,
+    pushHistory,
+    removeEvents,
+    setSelection,
+    setSelectedNoteIds,
+  ])
 }
 
 // Paste notes copied to the current position
@@ -149,22 +166,25 @@ export const usePasteSelection = () => {
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
 
-  return async (clipboardData?: any) => {
-    const obj = clipboardData ?? (await readClipboardData())
-    const { data } = PianoNotesClipboardDataSchema.safeParse(obj)
+  return useCallback(
+    async (clipboardData?: any) => {
+      const obj = clipboardData ?? (await readClipboardData())
+      const { data } = PianoNotesClipboardDataSchema.safeParse(obj)
 
-    if (!data) {
-      return
-    }
+      if (!data) {
+        return
+      }
 
-    pushHistory()
+      pushHistory()
 
-    const notes = data.notes.map((note) => ({
-      ...note,
-      tick: Math.max(0, note.tick + position),
-    }))
-    addEvents(notes)
-  }
+      const notes = data.notes.map((note) => ({
+        ...note,
+        tick: Math.max(0, note.tick + position),
+      }))
+      addEvents(notes)
+    },
+    [addEvents, position, pushHistory],
+  )
 }
 
 export const useDuplicateSelection = () => {
@@ -178,7 +198,7 @@ export const useDuplicateSelection = () => {
   const { getEventById, addEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
-  return () => {
+  return useCallback(() => {
     if (selection === null || selectedNoteIds.length === 0) {
       return
     }
@@ -208,17 +228,28 @@ export const useDuplicateSelection = () => {
     const addedNotes = addEvents(notes)
     setSelection(Selection.moved(selection, deltaTick, 0))
     setSelectedNoteIds(addedNotes?.map((n) => n.id) ?? [])
-  }
+  }, [
+    selection,
+    selectedNoteIds,
+    getEventById,
+    addEvents,
+    pushHistory,
+    setSelection,
+    setSelectedNoteIds,
+  ])
 }
 
 export const useSelectNote = () => {
   const { setSelectedNoteIds } = usePianoRoll()
   const { setSelectedEventIds } = useControlPane()
 
-  return (noteId: number) => {
-    setSelectedEventIds([])
-    setSelectedNoteIds([noteId])
-  }
+  return useCallback(
+    (noteId: number) => {
+      setSelectedEventIds([])
+      setSelectedNoteIds([noteId])
+    },
+    [setSelectedEventIds, setSelectedNoteIds],
+  )
 }
 
 const sortedNotes = (notes: NoteEvent[]): NoteEvent[] =>
@@ -236,41 +267,44 @@ const useSelectNeighborNote = () => {
   const { getEvents } = useTrack(selectedTrackId)
   const selectNote = useSelectNote()
 
-  return (deltaIndex: number) => {
-    if (selectedNoteIds.length === 0) {
-      return
-    }
+  return useCallback(
+    (deltaIndex: number) => {
+      if (selectedNoteIds.length === 0) {
+        return
+      }
 
-    const allNotes = getEvents().filter(isNoteEvent)
-    const selectedNotes = sortedNotes(
-      selectedNoteIds
-        .map((id) => allNotes.find((n) => n.id === id))
-        .filter(isNotUndefined),
-    )
-    if (selectedNotes.length === 0) {
-      return
-    }
-    const firstNote = sortedNotes(selectedNotes)[0]
-    const notes = sortedNotes(allNotes)
-    const currentIndex = notes.findIndex((n) => n.id === firstNote.id)
-    const nextNote = notes[currentIndex + deltaIndex]
-    if (nextNote === undefined) {
-      return
-    }
+      const allNotes = getEvents().filter(isNoteEvent)
+      const selectedNotes = sortedNotes(
+        selectedNoteIds
+          .map((id) => allNotes.find((n) => n.id === id))
+          .filter(isNotUndefined),
+      )
+      if (selectedNotes.length === 0) {
+        return
+      }
+      const firstNote = sortedNotes(selectedNotes)[0]
+      const notes = sortedNotes(allNotes)
+      const currentIndex = notes.findIndex((n) => n.id === firstNote.id)
+      const nextNote = notes[currentIndex + deltaIndex]
+      if (nextNote === undefined) {
+        return
+      }
 
-    selectNote(nextNote.id)
-    previewNoteOn(nextNote.noteNumber, nextNote.duration)
-  }
+      selectNote(nextNote.id)
+      previewNoteOn(nextNote.noteNumber, nextNote.duration)
+    },
+    [selectedNoteIds, getEvents, selectNote, previewNoteOn],
+  )
 }
 
 export const useSelectNextNote = () => {
   const selectNeighborNote = useSelectNeighborNote()
-  return () => selectNeighborNote(1)
+  return useCallback(() => selectNeighborNote(1), [selectNeighborNote])
 }
 
 export const useSelectPreviousNote = () => {
   const selectNeighborNote = useSelectNeighborNote()
-  return () => selectNeighborNote(-1)
+  return useCallback(() => selectNeighborNote(-1), [selectNeighborNote])
 }
 
 export const useQuantizeSelectedNotes = () => {
@@ -279,7 +313,7 @@ export const useQuantizeSelectedNotes = () => {
   const { getEventById, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
-  return () => {
+  return useCallback(() => {
     if (selectedNoteIds.length === 0) {
       return
     }
@@ -296,7 +330,7 @@ export const useQuantizeSelectedNotes = () => {
       }))
 
     updateEvents(notes)
-  }
+  }, [selectedNoteIds, quantizer, getEventById, updateEvents, pushHistory])
 }
 
 export const useSelectAllNotes = () => {
