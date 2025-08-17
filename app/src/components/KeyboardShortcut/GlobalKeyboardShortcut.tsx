@@ -11,6 +11,7 @@ import {
   useToggleSolo,
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
+import { useDisableZoom } from "../../hooks/useDisableZoom"
 import { useHistory } from "../../hooks/useHistory"
 import { usePlayer } from "../../hooks/usePlayer"
 import { useRootView } from "../../hooks/useRootView"
@@ -39,6 +40,7 @@ export const GlobalKeyboardShortcut: FC = () => {
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
   const localized = useLocalization()
+  useDisableZoom()
 
   const openLegacy = async () => {
     if (isSaved || confirm(localized["confirm-open"])) {
@@ -47,29 +49,10 @@ export const GlobalKeyboardShortcut: FC = () => {
   }
 
   useEffect(() => {
-    // prevent zooming
-    const onWheel = (e: WheelEvent) => {
-      // Touchpad pinches are translated into wheel with ctrl event
-      if (e.ctrlKey) {
-        e.preventDefault()
-      }
-    }
-
-    document.addEventListener("wheel", onWheel, { passive: false })
-
-    // disable bounce scroll (Safari does not support overscroll-behavior CSS)
-    const onTouchMove = (e: TouchEvent) => {
-      e.preventDefault()
-    }
-
-    document.addEventListener("touchmove", onTouchMove, { passive: false })
-
     // do not allow to open the default context menu
     document.oncontextmenu = (e) => e.preventDefault()
 
     return () => {
-      document.removeEventListener("wheel", onWheel)
-      document.removeEventListener("touchmove", onTouchMove)
       document.oncontextmenu = null
     }
   }, [])
