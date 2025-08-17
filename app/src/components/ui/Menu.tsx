@@ -9,6 +9,7 @@ import {
   SubTrigger,
   Trigger,
 } from "@radix-ui/react-dropdown-menu"
+import { FocusScope } from "@radix-ui/react-focus-scope"
 import React, { FC, PropsWithChildren } from "react"
 
 export type MenuProps = PropsWithChildren<{
@@ -25,12 +26,14 @@ const StyledContent = styled(Content)`
   border: 1px solid var(--color-popup-border);
   margin: 0 1rem;
   padding: 0.5rem 0;
+  outline: none;
 `
 
 const List = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
+  outline: none;
 `
 
 export const Menu: FC<MenuProps> = ({
@@ -45,7 +48,9 @@ export const Menu: FC<MenuProps> = ({
 
       <Portal>
         <StyledContent>
-          <List>{children}</List>
+          <FocusScope asChild>
+            <List>{children}</List>
+          </FocusScope>
         </StyledContent>
       </Portal>
     </Root>
