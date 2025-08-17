@@ -6,7 +6,6 @@ import {
   PianoNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { isFocusable } from "../components/KeyboardShortcut/isFocusable"
-import { usePianoNotesKeyboardShortcutActions } from "../components/KeyboardShortcut/pianoNotesKeyboardShortcutActions"
 import { readClipboardData } from "../services/Clipboard"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePianoRoll } from "./usePianoRoll"
@@ -14,9 +13,7 @@ import { usePianoRoll } from "./usePianoRoll"
 const SCROLL_DELTA = 24
 
 export const usePianoRollKeyboardShortcut = () => {
-  const { selectedNoteIds, setMouseMode, scrollBy } = usePianoRoll()
-  const pianoNotesKeyboardShortcutActions =
-    usePianoNotesKeyboardShortcutActions()
+  const { setMouseMode, scrollBy } = usePianoRoll()
   const pasteSelection = usePasteSelection()
   const pasteControlSelection = usePasteControlSelection()
   const selectAllNotes = useSelectAllNotes()
@@ -41,9 +38,6 @@ export const usePianoRollKeyboardShortcut = () => {
 
   const actions = useMemo(
     () => [
-      ...(selectedNoteIds.length > 0
-        ? pianoNotesKeyboardShortcutActions()
-        : []),
       {
         code: "ArrowUp",
         metaKey: true,
@@ -78,13 +72,7 @@ export const usePianoRollKeyboardShortcut = () => {
         run: selectAllNotes,
       },
     ],
-    [
-      selectedNoteIds,
-      scrollBy,
-      setMouseMode,
-      selectAllNotes,
-      pianoNotesKeyboardShortcutActions,
-    ],
+    [scrollBy, setMouseMode, selectAllNotes],
   )
 
   return useKeyboardShortcut({

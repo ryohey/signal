@@ -5,6 +5,7 @@ import { FC, useCallback, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
+import { usePianoNotesKeyboardShortcut } from "../../hooks/usePianoNotesKeyboardShortcut"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { useTrack } from "../../hooks/useTrack"
@@ -25,12 +26,7 @@ const Parent = styled.div`
 const Alpha = styled.div`
   flex-grow: 1;
   position: relative;
-
-  .alphaContent {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+  outline: none;
 `
 
 const Beta = styled.div`
@@ -58,6 +54,7 @@ const PianoRollWrapper: FC = () => {
     setScrollLeftInPixels,
     setScaleX,
   } = useTickScroll()
+  const keyboardShortcutProps = usePianoNotesKeyboardShortcut()
 
   const ref = useRef(null)
   const size = useComponentSize(ref)
@@ -129,7 +126,12 @@ const PianoRollWrapper: FC = () => {
         defaultSize={"60%"}
         onChange={onChangeSplitPane}
       >
-        <Alpha onWheel={onWheel} ref={alphaRef}>
+        <Alpha
+          onWheel={onWheel}
+          ref={alphaRef}
+          {...keyboardShortcutProps}
+          tabIndex={0}
+        >
           <PianoRollStage
             width={size.width}
             height={alphaHeight}
