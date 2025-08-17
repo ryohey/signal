@@ -1,6 +1,21 @@
-import { KeyboardEvent, useCallback } from "react"
-import { KeyboardShortcutProps } from "../components/KeyboardShortcut/KeyboardShortcut"
+import { useCallback } from "react"
 import { isFocusable } from "../components/KeyboardShortcut/isFocusable"
+
+export interface Action {
+  code: KeyboardEvent["code"]
+  metaKey?: boolean
+  altKey?: boolean
+  shiftKey?: boolean
+  enabled?: () => boolean
+  run: (e: KeyboardEvent) => void
+}
+
+export interface KeyboardShortcutProps {
+  actions: Action[]
+  onCut?: (e: ClipboardEvent) => void
+  onCopy?: (e: ClipboardEvent) => void
+  onPaste?: (e: ClipboardEvent) => void
+}
 
 export function useKeyboardShortcut({
   actions,
@@ -9,7 +24,7 @@ export function useKeyboardShortcut({
   onPaste: _onPaste,
 }: KeyboardShortcutProps) {
   const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
+    (e: React.KeyboardEvent) => {
       if (e.target !== null && isFocusable(e.target)) {
         return
       }
