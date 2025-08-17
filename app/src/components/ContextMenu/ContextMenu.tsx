@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
 import { FC, ReactNode, useEffect } from "react"
 import { Point } from "../../entities/geometry/Point"
@@ -73,12 +74,14 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   return (
     <Portal.Root>
       <Wrapper onClick={handleClose}>
-        <Content
-          style={{ left: fixedX, top: position.y }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <List>{children}</List>
-        </Content>
+        <FocusScope>
+          <Content
+            style={{ left: fixedX, top: position.y }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <List>{children}</List>
+          </Content>
+        </FocusScope>
       </Wrapper>
     </Portal.Root>
   )
