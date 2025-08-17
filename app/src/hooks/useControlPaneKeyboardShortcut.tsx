@@ -27,12 +27,7 @@ export const useControlPaneKeyboardShortcut = () => {
         run: () => duplicateControlSelection(),
       },
     ],
-    [
-      resetSelection,
-      deleteControlSelection,
-      copyControlSelection,
-      duplicateControlSelection,
-    ],
+    [resetSelection, deleteControlSelection, duplicateControlSelection],
   )
 
   const onPaste = useCallback(
