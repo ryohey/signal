@@ -4,7 +4,6 @@ import { TrackEvent } from "../track"
 import { useMobxSelector } from "./useMobxSelector"
 
 class RootViewStore {
-  openEditDrawer = false
   openHelp = false
   eventEditorEvents: TrackEvent[] = []
   openSignInDialog = false
@@ -19,7 +18,6 @@ class RootViewStore {
 
   constructor() {
     makeObservable(this, {
-      openEditDrawer: observable,
       openHelp: observable,
       eventEditorEvents: observable.shallow,
       openSignInDialog: observable,
@@ -51,12 +49,6 @@ export function useRootView() {
   const rootViewStore = useContext(RootViewStoreContext)
 
   return {
-    get openEditDrawer() {
-      return useMobxSelector(
-        () => rootViewStore.openEditDrawer,
-        [rootViewStore],
-      )
-    },
     get openHelpDialog() {
       return useMobxSelector(() => rootViewStore.openHelp, [rootViewStore])
     },
@@ -120,10 +112,6 @@ export function useRootView() {
         [rootViewStore],
       )
     },
-    setOpenEditDrawer: useCallback(
-      (open: boolean) => (rootViewStore.openEditDrawer = open),
-      [rootViewStore],
-    ),
     setOpenHelpDialog: useCallback(
       (open: boolean) => (rootViewStore.openHelp = open),
       [rootViewStore],
