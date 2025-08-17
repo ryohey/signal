@@ -4,7 +4,6 @@ import { TrackEvent } from "../track"
 import { useMobxSelector } from "./useMobxSelector"
 
 class RootViewStore {
-  openFileDrawer = false
   openEditDrawer = false
   openHelp = false
   eventEditorEvents: TrackEvent[] = []
@@ -20,7 +19,6 @@ class RootViewStore {
 
   constructor() {
     makeObservable(this, {
-      openFileDrawer: observable,
       openEditDrawer: observable,
       openHelp: observable,
       eventEditorEvents: observable.shallow,
@@ -53,12 +51,6 @@ export function useRootView() {
   const rootViewStore = useContext(RootViewStoreContext)
 
   return {
-    get openFileDrawer() {
-      return useMobxSelector(
-        () => rootViewStore.openFileDrawer,
-        [rootViewStore],
-      )
-    },
     get openEditDrawer() {
       return useMobxSelector(
         () => rootViewStore.openEditDrawer,
@@ -128,10 +120,6 @@ export function useRootView() {
         [rootViewStore],
       )
     },
-    setOpenFileDrawer: useCallback(
-      (open: boolean) => (rootViewStore.openFileDrawer = open),
-      [rootViewStore],
-    ),
     setOpenEditDrawer: useCallback(
       (open: boolean) => (rootViewStore.openEditDrawer = open),
       [rootViewStore],
