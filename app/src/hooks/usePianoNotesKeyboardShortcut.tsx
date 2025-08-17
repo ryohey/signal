@@ -9,6 +9,7 @@ import {
   useSelectPreviousNote,
   useTransposeSelection,
 } from "../actions"
+import { readJSONFromClipboard } from "../services/Clipboard"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePianoRoll } from "./usePianoRoll"
 
@@ -92,10 +93,17 @@ export const usePianoNotesKeyboardShortcut = () => {
     ],
   )
 
+  const onPaste = useCallback(
+    (e: ClipboardEvent) => {
+      pasteSelection(readJSONFromClipboard(e))
+    },
+    [pasteSelection],
+  )
+
   return useKeyboardShortcut({
     actions,
     onCopy: copySelection,
-    onPaste: pasteSelection,
+    onPaste,
     onCut,
   })
 }

@@ -1,9 +1,11 @@
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import {
   useCopyControlSelection,
   useDeleteControlSelection,
   useDuplicateControlSelection,
+  usePasteControlSelection,
 } from "../actions/control"
+import { readJSONFromClipboard } from "../services/Clipboard"
 import { useControlPane } from "./useControlPane"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 
@@ -12,25 +14,13 @@ export const useControlPaneKeyboardShortcut = () => {
   const deleteControlSelection = useDeleteControlSelection()
   const copyControlSelection = useCopyControlSelection()
   const duplicateControlSelection = useDuplicateControlSelection()
+  const pasteControlSelection = usePasteControlSelection()
 
   const actions = useMemo(
     () => [
       { code: "Escape", run: resetSelection },
       { code: "Backspace", run: deleteControlSelection },
       { code: "Delete", run: deleteControlSelection },
-      {
-        code: "KeyC",
-        metaKey: true,
-        run: () => copyControlSelection(),
-      },
-      {
-        code: "KeyX",
-        metaKey: true,
-        run: () => {
-          copyControlSelection()
-          deleteControlSelection()
-        },
-      },
       {
         code: "KeyD",
         metaKey: true,
@@ -45,7 +35,22 @@ export const useControlPaneKeyboardShortcut = () => {
     ],
   )
 
+  const onPaste = useCallback(
+    (e: ClipboardEvent) => {
+      pasteControlSelection(readJSONFromClipboard(e))
+    },
+    [pasteControlSelection],
+  )
+
+  const onCut = useCallback(() => {
+    copyControlSelection()
+    deleteControlSelection()
+  }, [copyControlSelection, deleteControlSelection])
+
   return useKeyboardShortcut({
     actions,
+    onCopy: copyControlSelection,
+    onPaste,
+    onCut,
   })
 }

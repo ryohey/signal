@@ -5,6 +5,7 @@ import {
   useArrangeDuplicateSelection,
   useArrangePasteSelection,
 } from "../actions"
+import { readJSONFromClipboard } from "../services/Clipboard"
 import { useArrangeView } from "./useArrangeView"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 
@@ -51,6 +52,13 @@ export const useArrangeViewKeyboardShortcut = () => {
     ],
   )
 
+  const onPaste = useCallback(
+    (e: ClipboardEvent) => {
+      arrangePasteSelection(readJSONFromClipboard(e))
+    },
+    [arrangePasteSelection],
+  )
+
   const onCut = useCallback(() => {
     arrangeCopySelection()
     arrangeDeleteSelection()
@@ -60,6 +68,6 @@ export const useArrangeViewKeyboardShortcut = () => {
     actions,
     onCut,
     onCopy: arrangeCopySelection,
-    onPaste: arrangePasteSelection,
+    onPaste,
   })
 }
