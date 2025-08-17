@@ -1,9 +1,10 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import React, { FC, useRef } from "react"
+import React, { FC, useCallback, useRef } from "react"
 import { useControlPane } from "../../hooks/useControlPane"
 import { useControlPaneKeyboardShortcut } from "../../hooks/useControlPaneKeyboardShortcut"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
 import { ControlName } from "./ControlName"
@@ -123,8 +124,12 @@ export interface ControlPaneProps {
 const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   const ref = useRef(null)
   const containerSize = useComponentSize(ref)
+  const { setActivePane } = usePianoRoll()
   const { controlMode: mode, setControlMode } = useControlPane()
   const keyboardShortcutProps = useControlPaneKeyboardShortcut()
+
+  const onFocus = useCallback(() => setActivePane("control"), [setActivePane])
+  const onBlur = useCallback(() => setActivePane(null), [setActivePane])
 
   const controlSize = {
     width: containerSize.width - axisWidth - BORDER_WIDTH,
@@ -142,7 +147,13 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   })()
 
   return (
-    <Parent ref={ref} {...keyboardShortcutProps} tabIndex={0}>
+    <Parent
+      ref={ref}
+      {...keyboardShortcutProps}
+      tabIndex={0}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    >
       <TabBarWrapper style={{ paddingLeft: axisWidth }}>
         <TabBar onSelect={setControlMode} selectedMode={mode} />
       </TabBarWrapper>

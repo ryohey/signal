@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
-import { FC, useCallback, useRef } from "react"
+import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
@@ -35,7 +35,7 @@ const Beta = styled.div`
 `
 
 const PianoRollWrapper: FC = () => {
-  const { transform, scrollBy, selectedTrackId } = usePianoRoll()
+  const { transform, scrollBy, selectedTrackId, setActivePane } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const {
     contentHeight,
@@ -118,6 +118,20 @@ const PianoRollWrapper: FC = () => {
     setScrollTopInPixels(scrollTop)
   }, [setScrollTopInPixels, scrollTop])
 
+  const onFocusNotes = useCallback(
+    () => setActivePane("notes"),
+    [setActivePane],
+  )
+
+  const onBlurNotes = useCallback(() => setActivePane(null), [setActivePane])
+
+  useEffect(
+    () => () => {
+      setActivePane(null)
+    },
+    [setActivePane],
+  )
+
   return (
     <Parent ref={ref}>
       <StyledSplitPane
@@ -130,6 +144,8 @@ const PianoRollWrapper: FC = () => {
           onWheel={onWheel}
           ref={alphaRef}
           {...keyboardShortcutProps}
+          onFocus={onFocusNotes}
+          onBlur={onBlurNotes}
           tabIndex={0}
         >
           <PianoRollStage
