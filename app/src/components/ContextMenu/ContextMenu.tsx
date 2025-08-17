@@ -50,6 +50,11 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   position,
   children,
 }) => {
+  const onClickContent = useCallback(
+    (e: React.MouseEvent) => e.stopPropagation(),
+    [],
+  )
+
   // Menu cannot handle keydown while disabling focus, so we deal with global keydown event
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -71,11 +76,6 @@ export const ContextMenu: FC<ContextMenuProps> = ({
 
   // fix position to avoid placing menu outside of the screen
   const fixedX = Math.min(position.x, window.innerWidth - estimatedWidth)
-
-  const onClickContent = useCallback(
-    (e: React.MouseEvent) => e.stopPropagation(),
-    [],
-  )
 
   return (
     <Portal.Root>
