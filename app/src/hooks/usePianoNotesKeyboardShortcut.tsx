@@ -82,9 +82,7 @@ export const usePianoNotesKeyboardShortcut = () => {
     [
       mouseMode,
       setOpenTransposeDialog,
-      copySelection,
       deleteSelection,
-      pasteSelection,
       duplicateSelection,
       quantizeSelectedNotes,
       transposeSelection,
