@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import {
   useFastForwardOneBar,
   useNextTrack,
@@ -12,6 +12,7 @@ import {
 } from "../../actions"
 import { hasFSAccess } from "../../actions/file"
 import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
+import { useDisableBrowserContextMenu } from "../../hooks/useDisableBrowserContextMenu"
 import { useDisableZoom } from "../../hooks/useDisableZoom"
 import { useHistory } from "../../hooks/useHistory"
 import { usePlayer } from "../../hooks/usePlayer"
@@ -43,21 +44,13 @@ export const GlobalKeyboardShortcut: FC = () => {
   const localized = useLocalization()
   useDisableZoom()
   useDisableBounceScroll()
+  useDisableBrowserContextMenu()
 
   const openLegacy = async () => {
     if (isSaved || confirm(localized["confirm-open"])) {
       document.getElementById(fileInputID)?.click()
     }
   }
-
-  useEffect(() => {
-    // do not allow to open the default context menu
-    document.oncontextmenu = (e) => e.preventDefault()
-
-    return () => {
-      document.oncontextmenu = null
-    }
-  }, [])
 
   return (
     <>
