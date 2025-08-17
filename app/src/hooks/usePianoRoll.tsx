@@ -212,7 +212,7 @@ export function usePianoRoll() {
       return useMobxGetter(pianoRollStore, "openInstrumentBrowser")
     },
     get activePane() {
-      return useMobxSelector(() => pianoRollStore.activePane, [pianoRollStore])
+      return useMobxGetter(pianoRollStore, "activePane")
     },
     resetSelection: useCallback(() => {
       pianoRollStore.selection = null
