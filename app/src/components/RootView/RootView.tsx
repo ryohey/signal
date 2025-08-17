@@ -1,5 +1,9 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
+import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
+import { useDisableBrowserContextMenu } from "../../hooks/useDisableBrowserContextMenu"
+import { useDisableZoom } from "../../hooks/useDisableZoom"
+import { useGlobalKeyboardShortcut } from "../../hooks/useGlobalKeyboardShortcut"
 import { useRouter } from "../../hooks/useRouter"
 import { ArrangeEditor } from "../ArrangeView/ArrangeEditor"
 import { BuildInfo } from "../BuildInfo"
@@ -34,6 +38,7 @@ const Column = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+  outline: none;
 `
 
 const Routes: FC = () => {
@@ -47,29 +52,36 @@ const Routes: FC = () => {
   )
 }
 
-export const RootView: FC = () => (
-  <>
-    <DropZone>
-      <Column>
-        <Navigation />
-        <Container>
-          <Routes />
-          <TransportPanel />
-          <BuildInfo />
-        </Container>
-      </Column>
-    </DropZone>
-    <HelpDialog />
-    <ExportProgressDialog />
-    <Head />
-    <SignInDialog />
-    <CloudFileDialog />
-    <SettingDialog />
-    <ControlSettingDialog />
-    <OnInit />
-    <OnBeforeUnload />
-    <PublishDialog />
-    <UserSettingsDialog />
-    <DeleteAccountDialog />
-  </>
-)
+export const RootView: FC = () => {
+  const keyboardShortcutProps = useGlobalKeyboardShortcut()
+  useDisableZoom()
+  useDisableBounceScroll()
+  useDisableBrowserContextMenu()
+
+  return (
+    <>
+      <DropZone>
+        <Column {...keyboardShortcutProps} tabIndex={0}>
+          <Navigation />
+          <Container>
+            <Routes />
+            <TransportPanel />
+            <BuildInfo />
+          </Container>
+        </Column>
+      </DropZone>
+      <HelpDialog />
+      <ExportProgressDialog />
+      <Head />
+      <SignInDialog />
+      <CloudFileDialog />
+      <SettingDialog />
+      <ControlSettingDialog />
+      <OnInit />
+      <OnBeforeUnload />
+      <PublishDialog />
+      <UserSettingsDialog />
+      <DeleteAccountDialog />
+    </>
+  )
+}
