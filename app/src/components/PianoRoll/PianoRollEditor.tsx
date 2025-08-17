@@ -2,8 +2,8 @@ import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
 import { PianoRollScope, usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
 import EventList from "../EventEditor/EventList"
-import { PianoRollKeyboardShortcut } from "../KeyboardShortcut/PianoRollKeyboardShortcut"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
 import { TrackList } from "../TrackList/TrackList"
 import { PianoRollTransposeDialog } from "../TransposeDialog/PianoRollTransposeDialog"
@@ -15,6 +15,7 @@ const ColumnContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  outline: none;
 `
 
 const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
@@ -63,10 +64,11 @@ const PianoRollPanes: FC = () => {
 }
 
 export const PianoRollEditor: FC = () => {
+  const keyboardShortcutProps = usePianoRollKeyboardShortcut()
+
   return (
     <PianoRollScope>
-      <ColumnContainer>
-        <PianoRollKeyboardShortcut />
+      <ColumnContainer {...keyboardShortcutProps} tabIndex={0}>
         <PianoRollToolbar />
         <PianoRollPanes />
       </ColumnContainer>
