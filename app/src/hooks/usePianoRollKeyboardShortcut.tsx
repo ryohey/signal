@@ -5,11 +5,9 @@ import {
   ControlEventsClipboardDataSchema,
   PianoNotesClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
-import { useControlPaneKeyboardShortcutActions } from "../components/KeyboardShortcut/controlPaneKeyboardShortcutActions"
 import { isFocusable } from "../components/KeyboardShortcut/isFocusable"
 import { usePianoNotesKeyboardShortcutActions } from "../components/KeyboardShortcut/pianoNotesKeyboardShortcutActions"
 import { readClipboardData } from "../services/Clipboard"
-import { useControlPane } from "./useControlPane"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePianoRoll } from "./usePianoRoll"
 
@@ -17,11 +15,8 @@ const SCROLL_DELTA = 24
 
 export const usePianoRollKeyboardShortcut = () => {
   const { selectedNoteIds, setMouseMode, scrollBy } = usePianoRoll()
-  const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const pianoNotesKeyboardShortcutActions =
     usePianoNotesKeyboardShortcutActions()
-  const controlPaneKeyboardShortcutActions =
-    useControlPaneKeyboardShortcutActions()
   const pasteSelection = usePasteSelection()
   const pasteControlSelection = usePasteControlSelection()
   const selectAllNotes = useSelectAllNotes()
@@ -48,9 +43,6 @@ export const usePianoRollKeyboardShortcut = () => {
     () => [
       ...(selectedNoteIds.length > 0
         ? pianoNotesKeyboardShortcutActions()
-        : []),
-      ...(controlSelectedEventIds.length > 0
-        ? controlPaneKeyboardShortcutActions()
         : []),
       {
         code: "ArrowUp",
@@ -88,12 +80,10 @@ export const usePianoRollKeyboardShortcut = () => {
     ],
     [
       selectedNoteIds,
-      controlSelectedEventIds,
       scrollBy,
       setMouseMode,
       selectAllNotes,
       pianoNotesKeyboardShortcutActions,
-      controlPaneKeyboardShortcutActions,
     ],
   )
 

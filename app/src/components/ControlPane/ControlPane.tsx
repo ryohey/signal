@@ -3,6 +3,7 @@ import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import React, { FC, useRef } from "react"
 import { useControlPane } from "../../hooks/useControlPane"
+import { useControlPaneKeyboardShortcut } from "../../hooks/useControlPaneKeyboardShortcut"
 import { useRootView } from "../../hooks/useRootView"
 import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
 import { ControlName } from "./ControlName"
@@ -93,6 +94,7 @@ const Parent = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--color-background-dark);
+  outline: none;
 `
 
 const Content = styled.div`
@@ -122,6 +124,7 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   const ref = useRef(null)
   const containerSize = useComponentSize(ref)
   const { controlMode: mode, setControlMode } = useControlPane()
+  const keyboardShortcutProps = useControlPaneKeyboardShortcut()
 
   const controlSize = {
     width: containerSize.width - axisWidth - BORDER_WIDTH,
@@ -139,7 +142,7 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   })()
 
   return (
-    <Parent ref={ref}>
+    <Parent ref={ref} {...keyboardShortcutProps} tabIndex={0}>
       <TabBarWrapper style={{ paddingLeft: axisWidth }}>
         <TabBar onSelect={setControlMode} selectedMode={mode} />
       </TabBarWrapper>
