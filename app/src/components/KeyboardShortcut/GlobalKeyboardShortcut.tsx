@@ -1,9 +1,7 @@
-import { useToast } from "dialog-hooks"
 import { FC, useEffect } from "react"
 import {
   useFastForwardOneBar,
   useNextTrack,
-  useOpenSong,
   usePreviousTrack,
   useRewindOneBar,
   useStop,
@@ -20,7 +18,7 @@ import { useRouter } from "../../hooks/useRouter"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useLocalization } from "../../localize/useLocalization"
-import { FileInput } from "../Navigation/LegacyFileMenu"
+import { fileInputID } from "../Navigation/LegacyFileMenu"
 import { KeyboardShortcut } from "./KeyboardShortcut"
 
 export const GlobalKeyboardShortcut: FC = () => {
@@ -38,16 +36,13 @@ export const GlobalKeyboardShortcut: FC = () => {
   const toggleGhost = useToggleGhost()
   const toggleRecording = useToggleRecording()
   const { undo, redo } = useHistory()
-  const openSongFile = useOpenSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
-  const LegacyOpenId: string = "LegacyOpenButtonInputFile"
   const localized = useLocalization()
-  const toast = useToast()
 
   const openLegacy = async () => {
     if (isSaved || confirm(localized["confirm-open"])) {
-      document.getElementById(LegacyOpenId)?.click()
+      document.getElementById(fileInputID)?.click()
     }
   }
 
@@ -81,17 +76,6 @@ export const GlobalKeyboardShortcut: FC = () => {
 
   return (
     <>
-      <FileInput
-        id={LegacyOpenId}
-        onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-          try {
-            await openSongFile(e.currentTarget)
-          } catch (e) {
-            toast.error((e as Error).message)
-          }
-        }}
-        accept=".mid,audio/midi"
-      ></FileInput>
       <KeyboardShortcut
         actions={[
           // Play/Pause (Space)
