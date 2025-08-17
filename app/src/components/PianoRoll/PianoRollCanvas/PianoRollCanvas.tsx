@@ -11,13 +11,20 @@ import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
 import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
-import { PianoRollStageProps } from "../PianoRollStage"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
 import { Lines } from "./Lines"
 import { Notes } from "./Notes"
 
-export const PianoRollCanvas: FC<PianoRollStageProps> = ({ width, height }) => {
+export interface PianoRollCanvasProps {
+  width: number
+  height: number
+}
+
+export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
+  width,
+  height,
+}) => {
   const { notesCursor, selectionBounds, ghostTrackIds, mouseMode } =
     usePianoRoll()
   const { beats } = useRuler()

@@ -43,11 +43,7 @@ export const PianoRollStage: FC<PianoRollStageProps> = ({
   return (
     <Container>
       <ContentPosition style={{ top: Layout.rulerHeight, left: keyWidth }}>
-        <PianoRollCanvas
-          width={width}
-          height={height - Layout.rulerHeight}
-          keyWidth={keyWidth}
-        />
+        <PianoRollCanvas width={width} height={height - Layout.rulerHeight} />
       </ContentPosition>
       <PianoKeyPosition style={{ top: -scrollTop + Layout.rulerHeight }}>
         <PianoKeys width={keyWidth} />
