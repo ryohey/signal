@@ -1,14 +1,9 @@
 import { useCallback, useMemo } from "react"
 import {
   useFastForwardOneBar,
-  useNextTrack,
-  usePreviousTrack,
   useRewindOneBar,
   useStop,
-  useToggleGhost,
-  useToggleMute,
   useToggleRecording,
-  useToggleSolo,
 } from "../actions"
 import { hasFSAccess } from "../actions/file"
 import { fileInputID } from "../components/Navigation/LegacyFileMenu"
@@ -29,11 +24,6 @@ export const useGlobalKeyboardShortcut = () => {
   const rewindOneBar = useRewindOneBar()
   const fastForwardOneBar = useFastForwardOneBar()
   const stop = useStop()
-  const nextTrack = useNextTrack()
-  const previousTrack = usePreviousTrack()
-  const toggleSolo = useToggleSolo()
-  const toggleMute = useToggleMute()
-  const toggleGhost = useToggleGhost()
   const toggleRecording = useToggleRecording()
   const { undo, redo } = useHistory()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
@@ -77,18 +67,8 @@ export const useGlobalKeyboardShortcut = () => {
       { code: "KeyA", run: rewindOneBar },
       // Fast forward one bar (D)
       { code: "KeyD", run: fastForwardOneBar },
-      // Next track (S)
-      { code: "KeyS", run: nextTrack },
-      // Previous track (W)
-      { code: "KeyW", run: previousTrack },
-      // Toggle solo (N)
-      { code: "KeyN", run: toggleSolo },
-      // Toggle mute (M)
-      { code: "KeyM", run: toggleMute },
       // Toggle recording (R)
       { code: "KeyR", run: toggleRecording },
-      // Toggle ghost (,)
-      { code: "Comma", run: toggleGhost },
       // Switch to piano roll (Meta-1)
       {
         code: "Digit1",
@@ -167,12 +147,7 @@ export const useGlobalKeyboardShortcut = () => {
       stop,
       rewindOneBar,
       fastForwardOneBar,
-      nextTrack,
-      previousTrack,
-      toggleSolo,
-      toggleMute,
       toggleRecording,
-      toggleGhost,
       setPath,
       saveSong,
       downloadSong,
