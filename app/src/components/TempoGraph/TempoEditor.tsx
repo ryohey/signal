@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
+import { useAutoFocus } from "../../hooks/useAutoFocus"
 import { TempoEditorScope } from "../../hooks/useTempoEditor"
 import { useTempoEditorKeyboardShortcut } from "../../hooks/useTempoEditorKeyboardShortcut"
 import { TempoGraphToolbar } from "../TempoGraphToolbar/TempoGraphToolbar"
@@ -15,9 +16,10 @@ const Container = styled.div`
 
 const Content: FC = () => {
   const keyboardShortcutProps = useTempoEditorKeyboardShortcut()
+  const ref = useAutoFocus<HTMLDivElement>()
 
   return (
-    <Container {...keyboardShortcutProps} tabIndex={0}>
+    <Container {...keyboardShortcutProps} tabIndex={0} ref={ref}>
       <TempoGraphToolbar />
       <TempoGraph />
     </Container>

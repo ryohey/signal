@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
+import { useAutoFocus } from "../../hooks/useAutoFocus"
 import { PianoRollScope, usePianoRoll } from "../../hooks/usePianoRoll"
 import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
 import EventList from "../EventEditor/EventList"
@@ -65,10 +66,11 @@ const PianoRollPanes: FC = () => {
 
 export const PianoRollEditor: FC = () => {
   const keyboardShortcutProps = usePianoRollKeyboardShortcut()
+  const ref = useAutoFocus<HTMLDivElement>()
 
   return (
     <PianoRollScope>
-      <ColumnContainer {...keyboardShortcutProps} tabIndex={0}>
+      <ColumnContainer {...keyboardShortcutProps} tabIndex={0} ref={ref}>
         <PianoRollToolbar />
         <PianoRollPanes />
       </ColumnContainer>

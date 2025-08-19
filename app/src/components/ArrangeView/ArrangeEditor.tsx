@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { FC } from "react"
 import { ArrangeViewScope } from "../../hooks/useArrangeView"
 import { useArrangeViewKeyboardShortcut } from "../../hooks/useArrangeViewKeyboardShortcut"
+import { useAutoFocus } from "../../hooks/useAutoFocus"
 import { ArrangeToolbar } from "../ArrangeToolbar/ArrangeToolbar"
 import { ArrangeTransposeDialog } from "../TransposeDialog/ArrangeTransposeDialog"
 import { ArrangeVelocityDialog } from "../VelocityDialog/ArrangeVelocityDialog"
@@ -18,10 +19,11 @@ const Container = styled.div`
 
 const Content: FC = () => {
   const keyboardShortcutProps = useArrangeViewKeyboardShortcut()
+  const ref = useAutoFocus<HTMLDivElement>()
 
   return (
     <>
-      <Container {...keyboardShortcutProps} tabIndex={0}>
+      <Container {...keyboardShortcutProps} tabIndex={0} ref={ref}>
         <ArrangeToolbar />
         <ArrangeView />
       </Container>
