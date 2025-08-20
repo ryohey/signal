@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useCallback, useState } from "react"
 import {
   useCopySelection,
   useDeleteSelection,
@@ -14,9 +14,13 @@ import { useHistory } from "../../hooks/useHistory"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
-import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
+import { MenuHotKey as HotKey, Menu, MenuDivider, MenuItem } from "../ui/Menu"
 
-export const EditMenu: FC<{ close: () => void }> = ({ close }) => {
+export interface EditMenuProps {
+  trigger: React.ReactNode
+}
+
+export const EditMenu: FC<EditMenuProps> = ({ trigger }) => {
   const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
     usePianoRoll()
   const { hasUndo, hasRedo, undo, redo } = useHistory()
@@ -30,85 +34,87 @@ export const EditMenu: FC<{ close: () => void }> = ({ close }) => {
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
   const anySelectedNotes = selectedNoteIds.length > 0
+  const [isOpen, setOpen] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
 
-  const onClickUndo = async () => {
+  const onClickUndo = useCallback(() => {
     close()
-    await undo()
-  }
+    undo()
+  }, [close, undo])
 
-  const onClickRedo = async () => {
+  const onClickRedo = useCallback(() => {
     close()
-    await redo()
-  }
+    redo()
+  }, [close, redo])
 
-  const onClickCut = async () => {
-    close()
-    await copySelection()
-    await deleteSelection()
-  }
-
-  const onClickCopy = async () => {
+  const onClickCut = useCallback(async () => {
     close()
     await copySelection()
-  }
+    deleteSelection()
+  }, [close, copySelection, deleteSelection])
 
-  const onClickPaste = async () => {
+  const onClickCopy = useCallback(async () => {
+    close()
+    await copySelection()
+  }, [close, copySelection])
+
+  const onClickPaste = useCallback(async () => {
     close()
     await pasteSelection()
-  }
+  }, [close, pasteSelection])
 
-  const onClickDelete = async () => {
+  const onClickDelete = useCallback(async () => {
     close()
-    await deleteSelection()
-  }
+    deleteSelection()
+  }, [close, deleteSelection])
 
-  const onClickSelectAll = async () => {
+  const onClickSelectAll = useCallback(() => {
     close()
-    await selectAllNotes()
-  }
+    selectAllNotes()
+  }, [close, selectAllNotes])
 
-  const onClickDuplicate = async () => {
+  const onClickDuplicate = useCallback(() => {
     close()
-    await duplicateSelection()
-  }
+    duplicateSelection()
+  }, [close, duplicateSelection])
 
-  const onClickSelectNextNote = async () => {
+  const onClickSelectNextNote = useCallback(() => {
     close()
-    await selectNextNote()
-  }
+    selectNextNote()
+  }, [close, selectNextNote])
 
-  const onClickSelectPreviousNote = async () => {
+  const onClickSelectPreviousNote = useCallback(() => {
     close()
-    await selectPreviousNote()
-  }
+    selectPreviousNote()
+  }, [close, selectPreviousNote])
 
-  const onClickQuantizeSelectedNotes = async () => {
+  const onClickQuantizeSelectedNotes = useCallback(() => {
     close()
-    await quantizeSelectedNotes()
-  }
+    quantizeSelectedNotes()
+  }, [close, quantizeSelectedNotes])
 
-  const onClickTransposeUpOctave = async () => {
+  const onClickTransposeUpOctave = useCallback(() => {
     close()
-    await transposeSelection(12)
-  }
+    transposeSelection(12)
+  }, [close, transposeSelection])
 
-  const onClickTransposeDownOctave = async () => {
+  const onClickTransposeDownOctave = useCallback(() => {
     close()
-    await transposeSelection(-12)
-  }
+    transposeSelection(-12)
+  }, [close, transposeSelection])
 
-  const onClickTranspose = () => {
+  const onClickTranspose = useCallback(() => {
     close()
     setOpenTransposeDialog(true)
-  }
+  }, [close, setOpenTransposeDialog])
 
-  const onClickVelocity = () => {
+  const onClickVelocity = useCallback(() => {
     close()
     setOpenVelocityDialog(true)
-  }
+  }, [close, setOpenVelocityDialog])
 
   return (
-    <>
+    <Menu open={isOpen} onOpenChange={setOpen} trigger={trigger}>
       <MenuItem onClick={onClickUndo} disabled={!hasUndo}>
         <Localized name="undo" />
         <HotKey>{envString.cmdOrCtrl}+Z</HotKey>
@@ -199,6 +205,6 @@ export const EditMenu: FC<{ close: () => void }> = ({ close }) => {
       <MenuItem onClick={onClickVelocity} disabled={!anySelectedNotes}>
         <Localized name="velocity" />
       </MenuItem>
-    </>
+    </Menu>
   )
 }

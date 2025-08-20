@@ -77,6 +77,7 @@ export default class PianoRollStore {
   newNoteVelocity = 100
   keySignature: KeySignature | null = null
   previewingNoteNumbers: ReadonlySet<number> = new Set()
+  activePane: "notes" | "control" | null = null
 
   constructor(
     private readonly songStore: SongStore,
@@ -108,6 +109,7 @@ export default class PianoRollStore {
       openVelocityDialog: observable,
       newNoteVelocity: observable,
       keySignature: observable,
+      activePane: observable,
       previewingNoteNumbers: observable.ref,
       transform: computed,
       windowedEvents: computed,

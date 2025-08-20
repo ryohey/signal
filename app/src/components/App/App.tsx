@@ -25,7 +25,6 @@ import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
 import { ProgressDialog } from "../Dialog/ProgressDialog"
 import { PromptDialog } from "../Dialog/PromptDialog"
-import { GlobalKeyboardShortcut } from "../KeyboardShortcut/GlobalKeyboardShortcut"
 import { RootView } from "../RootView/RootView"
 import { GlobalCSS } from "../Theme/GlobalCSS"
 import { Toast } from "../ui/Toast"
@@ -57,7 +56,6 @@ export function App() {
                                         <RootViewProvider>
                                           <TrackMuteProvider>
                                             <HistoryProvider>
-                                              <GlobalKeyboardShortcut />
                                               <GlobalCSS />
                                               {isRunningInElectron() && (
                                                 <ElectronCallbackHandler />

@@ -2,7 +2,7 @@ import { useTheme } from "@emotion/react"
 import ChevronRight from "mdi-react/ChevronRightIcon"
 import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
-import { FC, useCallback, useRef } from "react"
+import { FC, useCallback, useState } from "react"
 import { hasFSAccess } from "../../actions/file"
 import { useAuth } from "../../hooks/useAuth"
 import { useExport } from "../../hooks/useExport"
@@ -16,41 +16,29 @@ import { Tab } from "./Navigation"
 
 export const FileMenuButton: FC = () => {
   const { authUser: user } = useAuth()
-  const {
-    openFileDrawer: isOpen,
-    setOpenFileDrawer,
-    setOpenSignInDialog,
-  } = useRootView()
+  const { setOpenSignInDialog } = useRootView()
   const { exportSong } = useExport()
   const theme = useTheme()
+  const [isOpen, setOpen] = useState(false)
 
-  const handleClose = () => setOpenFileDrawer(false)
+  const handleClose = useCallback(() => setOpen(false), [])
 
-  const onClickExportWav = () => {
+  const onClickExportWav = useCallback(() => {
     handleClose()
     exportSong("WAV")
-  }
+  }, [handleClose, exportSong])
 
-  const onClickExportMp3 = () => {
+  const onClickExportMp3 = useCallback(() => {
     handleClose()
     exportSong("MP3")
-  }
-
-  const ref = useRef<HTMLDivElement>(null)
+  }, [handleClose, exportSong])
 
   return (
     <Menu
       open={isOpen}
-      onOpenChange={setOpenFileDrawer}
+      onOpenChange={setOpen}
       trigger={
-        <Tab
-          ref={ref}
-          onClick={useCallback(
-            () => setOpenFileDrawer(true),
-            [setOpenFileDrawer],
-          )}
-          id="tab-file"
-        >
+        <Tab id="tab-file">
           <span style={{ marginLeft: "0.25rem" }}>
             <Localized name="file" />
           </span>

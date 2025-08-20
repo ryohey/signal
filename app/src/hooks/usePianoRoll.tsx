@@ -211,6 +211,9 @@ export function usePianoRoll() {
     get openInstrumentBrowser() {
       return useMobxGetter(pianoRollStore, "openInstrumentBrowser")
     },
+    get activePane() {
+      return useMobxGetter(pianoRollStore, "activePane")
+    },
     resetSelection: useCallback(() => {
       pianoRollStore.selection = null
       pianoRollStore.selectedNoteIds = []
@@ -342,6 +345,10 @@ export function usePianoRoll() {
     ),
     setOpenInstrumentBrowser: useCallback(
       (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
+      [pianoRollStore],
+    ),
+    setActivePane: useCallback(
+      (pane: "notes" | "control" | null) => (pianoRollStore.activePane = pane),
       [pianoRollStore],
     ),
     serializeState: useCallback(

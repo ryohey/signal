@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
+import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { FC, ReactNode, useEffect } from "react"
+import { FC, ReactNode, useCallback, useEffect } from "react"
 import { Point } from "../../entities/geometry/Point"
 import { Positioned } from "../ui/Positioned"
 
@@ -49,6 +50,11 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   position,
   children,
 }) => {
+  const onClickContent = useCallback(
+    (e: React.MouseEvent) => e.stopPropagation(),
+    [],
+  )
+
   // Menu cannot handle keydown while disabling focus, so we deal with global keydown event
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -74,13 +80,11 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   return (
     <Portal.Root>
       <Wrapper onClick={handleClose}>
-        <Content
-          left={fixedX}
-          top={position.y}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <List>{children}</List>
-        </Content>
+        <FocusScope>
+          <Content left={fixedX} top={position.y} onClick={onClickContent}>
+            <List>{children}</List>
+          </Content>
+        </FocusScope>
       </Wrapper>
     </Portal.Root>
   )

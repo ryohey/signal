@@ -99,8 +99,8 @@ export const useArrangePasteSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
 
-  return async () => {
-    const obj = await readClipboardData()
+  return async (clipboardData?: any) => {
+    const obj = clipboardData ?? (await readClipboardData())
     const { data, error } = ArrangeNotesClipboardDataSchema.safeParse(obj)
 
     if (!data) {

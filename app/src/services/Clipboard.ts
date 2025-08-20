@@ -21,3 +21,12 @@ export async function writeClipboardData<T extends object>(
     console.error("Failed to write to clipboard:", error)
   }
 }
+
+export function readJSONFromClipboard(e: ClipboardEvent) {
+  const jsonString = e.clipboardData?.getData("text/plain")
+  if (jsonString) {
+    const obj = JSON.parse(jsonString)
+    return obj
+  }
+  return null
+}

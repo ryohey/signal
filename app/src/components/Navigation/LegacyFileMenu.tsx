@@ -3,7 +3,7 @@ import { useSongFile } from "../../hooks/useSongFile"
 import { Localized } from "../../localize/useLocalization"
 import { MenuDivider, MenuItem } from "../ui/Menu"
 
-const fileInputID = "OpenButtonInputFile"
+export const fileInputID = "OpenButtonInputFile"
 
 export const FileInput: FC<
   React.PropsWithChildren<{

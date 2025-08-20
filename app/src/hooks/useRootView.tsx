@@ -4,8 +4,6 @@ import { TrackEvent } from "../track"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 class RootViewStore {
-  openFileDrawer = false
-  openEditDrawer = false
   openHelp = false
   eventEditorEvents: TrackEvent[] = []
   openSignInDialog = false
@@ -20,8 +18,6 @@ class RootViewStore {
 
   constructor() {
     makeObservable(this, {
-      openFileDrawer: observable,
-      openEditDrawer: observable,
       openHelp: observable,
       eventEditorEvents: observable.shallow,
       openSignInDialog: observable,
@@ -53,12 +49,6 @@ export function useRootView() {
   const rootViewStore = useContext(RootViewStoreContext)
 
   return {
-    get openFileDrawer() {
-      return useMobxGetter(rootViewStore, "openFileDrawer")
-    },
-    get openEditDrawer() {
-      return useMobxGetter(rootViewStore, "openEditDrawer")
-    },
     get openHelpDialog() {
       return useMobxGetter(rootViewStore, "openHelp")
     },
@@ -92,8 +82,6 @@ export function useRootView() {
     get openDeleteAccountDialog() {
       return useMobxGetter(rootViewStore, "openDeleteAccountDialog")
     },
-    setOpenFileDrawer: useMobxSetter(rootViewStore, "openFileDrawer"),
-    setOpenEditDrawer: useMobxSetter(rootViewStore, "openEditDrawer"),
     setOpenHelpDialog: useMobxSetter(rootViewStore, "openHelp"),
     setEventEditorEvents: useMobxSetter(rootViewStore, "eventEditorEvents"),
     setOpenSignInDialog: useMobxSetter(rootViewStore, "openSignInDialog"),

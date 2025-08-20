@@ -1,5 +1,5 @@
-import { FC, useEffect } from "react"
-import { isFocusable } from "./isFocusable"
+import { useCallback } from "react"
+import { isFocusable } from "../helpers/isFocusable"
 
 export interface Action {
   code: KeyboardEvent["code"]
@@ -17,14 +17,14 @@ export interface KeyboardShortcutProps {
   onPaste?: (e: ClipboardEvent) => void
 }
 
-export const KeyboardShortcut: FC<KeyboardShortcutProps> = ({
+export function useKeyboardShortcut({
   actions,
-  onCut,
-  onCopy,
-  onPaste,
-}) => {
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+  onCopy: _onCopy,
+  onCut: _onCut,
+  onPaste: _onPaste,
+}: KeyboardShortcutProps) {
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
       if (e.target !== null && isFocusable(e.target)) {
         return
       }
@@ -37,37 +37,33 @@ export const KeyboardShortcut: FC<KeyboardShortcutProps> = ({
           (e.ctrlKey || e.metaKey) === (action.metaKey ?? false),
       )
       if (action !== undefined) {
-        action.run(e)
+        action.run(e.nativeEvent)
         e.preventDefault()
         e.stopPropagation()
       }
-    }
+    },
+    [actions],
+  )
 
-    document.addEventListener("keydown", onKeyDown)
+  const onCopy = useCallback(
+    (e: React.ClipboardEvent) => _onCopy?.(e.nativeEvent),
+    [_onCopy],
+  )
 
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [actions])
+  const onCut = useCallback(
+    (e: React.ClipboardEvent) => _onCut?.(e.nativeEvent),
+    [_onCut],
+  )
 
-  useEffect(() => {
-    document.oncut = onCut ?? null
-    return () => {
-      document.oncut = null
-    }
-  }, [onCut])
+  const onPaste = useCallback(
+    (e: React.ClipboardEvent) => _onPaste?.(e.nativeEvent),
+    [_onPaste],
+  )
 
-  useEffect(() => {
-    document.oncopy = onCopy ?? null
-    return () => {
-      document.oncopy = null
-    }
-  }, [onCopy])
-
-  useEffect(() => {
-    document.onpaste = onPaste ?? null
-    return () => {
-      document.onpaste = null
-    }
-  }, [onPaste])
-
-  return <></>
+  return {
+    onKeyDown,
+    onCopy,
+    onCut,
+    onPaste,
+  }
 }
