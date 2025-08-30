@@ -219,7 +219,7 @@ app.on("browser-window-focus", (_event, window) => {
 })
 
 function openSupportPage() {
-  shell.openExternal("https://signal.vercel.app/support")
+  shell.openExternal("https://signalmidi.app/support")
 }
 
 log.info("electron:event:app-ready")

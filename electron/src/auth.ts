@@ -7,7 +7,7 @@ const authURL = (redirectUri: string) => {
   const parameter = `redirect_uri=${redirectUri}`
 
   return app.isPackaged
-    ? `https://signal.vercel.app/auth?${parameter}`
+    ? `https://signalmidi.app/auth?${parameter}`
     : `http://localhost:3000/auth?${parameter}`
 }
 
