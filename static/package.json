@@ -11,7 +11,7 @@
   "dependencies": {
     "@kuma-ui/core": "^1.5.9",
     "@next/third-parties": "^15.3.1",
-    "next": "15.3.1",
+    "next": "15.5.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "use-l10n": "^0.0.4"
