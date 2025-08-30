@@ -16,41 +16,41 @@ export default function RootLayout({
       <html lang="en">
         <GoogleAnalytics gaId="G-C4N96XS293" />
         <head>
-          <link rel="canonical" href="https://signal.vercel.app/" />
+          <link rel="canonical" href="https://signalmidi.app/" />
           <link
             rel="alternate"
             hrefLang="x-default"
-            href="https://signal.vercel.app/"
+            href="https://signalmidi.app/"
           />
           <link
             rel="alternate"
             hrefLang="en"
-            href="https://signal.vercel.app/?lang=en"
+            href="https://signalmidi.app/?lang=en"
           />
           <link
             rel="alternate"
             hrefLang="fr"
-            href="https://signal.vercel.app/?lang=fr"
+            href="https://signalmidi.app/?lang=fr"
           />
           <link
             rel="alternate"
             hrefLang="ja"
-            href="https://signal.vercel.app/?lang=ja"
+            href="https://signalmidi.app/?lang=ja"
           />
           <link
             rel="alternate"
             hrefLang="zh"
-            href="https://signal.vercel.app/?lang=zh"
+            href="https://signalmidi.app/?lang=zh"
           />
           <link
             rel="alternate"
             hrefLang="zh-cmn-Hans"
-            href="https://signal.vercel.app/?lang=zh-Hans"
+            href="https://signalmidi.app/?lang=zh-Hans"
           />
           <link
             rel="alternate"
             hrefLang="zh-cmn-Hant"
-            href="https://signal.vercel.app/?lang=zh-Hant"
+            href="https://signalmidi.app/?lang=zh-Hant"
           />
           <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         </head>

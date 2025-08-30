@@ -8,7 +8,7 @@ export default class CustomEnvironment extends NodeEnvironment {
       language: "en",
     } as Navigator
     this.global.location = {
-      href: "https://signal.vercel.app/",
+      href: "https://signalmidi.app/",
     } as Location
   }
 }

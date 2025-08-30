@@ -65,7 +65,7 @@ export const UserSettingsDialog: FC = () => {
 
   const onClickProfile = () => {
     if (user !== null) {
-      window.open(`https://signal.vercel.app/users/${user.uid}`)
+      window.open(`https://signalmidi.app/users/${user.uid}`)
     }
   }
 
