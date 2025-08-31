@@ -3,6 +3,26 @@
   "rewrites": [
     { "source": "/", "destination": "https://signalmidi.vercel.app/" },
     {
+      "source": "/en/:path*",
+      "destination": "https://signalmidi.vercel.app/en/:path*"
+    },
+    {
+      "source": "/fr/:path*",
+      "destination": "https://signalmidi.vercel.app/fr/:path*"
+    },
+    {
+      "source": "/ja/:path*",
+      "destination": "https://signalmidi.vercel.app/ja/:path*"
+    },
+    {
+      "source": "/zh-hans/:path*",
+      "destination": "https://signalmidi.vercel.app/zh-hans/:path*"
+    },
+    {
+      "source": "/zh-hant/:path*",
+      "destination": "https://signalmidi.vercel.app/zh-hant/:path*"
+    },
+    {
       "source": "/privacy",
       "destination": "https://signalmidi.vercel.app/privacy"
     },
