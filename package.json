@@ -4,9 +4,8 @@
   "description": "A friendly music sequencer application for OS X and Windows.",
   "scripts": {
     "start": "turbo run dev --parallel",
-    "build": "npm run build:app && npm run build:static",
+    "build": "npm run build:app",
     "build:app": "turbo build && cpx \"app/dist/**/*\" dist",
-    "build:static": "npm install --prefix static && npm run build --prefix static && cpx \"static/out/**/*\" dist",
     "serve": "npx http-server dist",
     "test": "turbo test",
     "lint": "turbo lint",
