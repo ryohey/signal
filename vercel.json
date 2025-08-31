@@ -1,7 +1,7 @@
 {
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
+    { "source": "/", "destination": "https://signalmidi.vercel.app/" },
     { "source": "/edit", "destination": "/edit.html" },
     { "source": "/auth", "destination": "/auth.html" },
     { "source": "/support", "destination": "/support.html" },
