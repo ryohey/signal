@@ -2,10 +2,20 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/", "destination": "https://signalmidi.vercel.app/" },
+    {
+      "source": "/privacy",
+      "destination": "https://signalmidi.vercel.app/privacy"
+    },
+    {
+      "source": "/support",
+      "destination": "https://signalmidi.vercel.app/support"
+    },
+    {
+      "source": "/_next/:path*",
+      "destination": "https://signalmidi.vercel.app/_next/:path*"
+    },
     { "source": "/edit", "destination": "/edit.html" },
     { "source": "/auth", "destination": "/auth.html" },
-    { "source": "/support", "destination": "/support.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/profile", "destination": "/community.html" },
     { "source": "/home", "destination": "/community.html" },
     { "source": "/users/:path*", "destination": "/community.html" },
