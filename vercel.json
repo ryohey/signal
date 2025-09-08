@@ -4,35 +4,35 @@
     { "source": "/", "destination": "https://signalmidi.vercel.app/" },
     {
       "source": "/en/:path*",
-      "destination": "https://signalmidi.vercel.app/en/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/fr/:path*",
-      "destination": "https://signalmidi.vercel.app/fr/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/ja/:path*",
-      "destination": "https://signalmidi.vercel.app/ja/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/zh-hans/:path*",
-      "destination": "https://signalmidi.vercel.app/zh-hans/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/zh-hant/:path*",
-      "destination": "https://signalmidi.vercel.app/zh-hant/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/privacy",
-      "destination": "https://signalmidi.vercel.app/privacy"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/support",
-      "destination": "https://signalmidi.vercel.app/support"
+      "destination": "https://signalmidi.vercel.app/"
     },
     {
       "source": "/_next/:path*",
-      "destination": "https://signalmidi.vercel.app/_next/:path*"
+      "destination": "https://signalmidi.vercel.app/"
     },
     { "source": "/edit", "destination": "/edit.html" },
     { "source": "/auth", "destination": "/auth.html" },
