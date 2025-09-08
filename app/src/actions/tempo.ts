@@ -1,5 +1,6 @@
 import { maxBy, min, minBy } from "lodash"
 import { transaction } from "mobx"
+import { useCallback } from "react"
 import {
   TempoEventsClipboardData,
   TempoEventsClipboardDataSchema,
@@ -9,7 +10,11 @@ import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useTempoEditor } from "../hooks/useTempoEditor"
-import { readClipboardData, writeClipboardData } from "../services/Clipboard"
+import {
+  readClipboardData,
+  readJSONFromClipboard,
+  writeClipboardData,
+} from "../services/Clipboard"
 import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
@@ -80,8 +85,8 @@ export const usePasteTempoSelection = () => {
   const { createOrUpdate } = useConductorTrack()
   const { pushHistory } = useHistory()
 
-  return async (clipboardData?: any) => {
-    const obj = clipboardData ?? (await readClipboardData())
+  return async (e?: ClipboardEvent) => {
+    const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
     const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
 
     if (!data) {
@@ -98,6 +103,16 @@ export const usePasteTempoSelection = () => {
       events.forEach(createOrUpdate)
     })
   }
+}
+
+export const useCutTempoSelection = () => {
+  const copyTempoSelection = useCopyTempoSelection()
+  const deleteTempoSelection = useDeleteTempoSelection()
+
+  return useCallback(() => {
+    copyTempoSelection()
+    deleteTempoSelection()
+  }, [copyTempoSelection, deleteTempoSelection])
 }
 
 export const useDuplicateTempoSelection = () => {

@@ -102,9 +102,9 @@ export const usePasteSelectionGlobal = () => {
           return
         }
         if (PianoNotesClipboardDataSchema.safeParse(obj).success) {
-          pasteSelection(obj)
+          pasteSelection()
         } else if (ControlEventsClipboardDataSchema.safeParse(obj).success) {
-          pasteControlSelection(obj)
+          pasteControlSelection()
         }
         break
       }

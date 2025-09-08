@@ -12,7 +12,11 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useTrack } from "../hooks/useTrack"
-import { readClipboardData, writeClipboardData } from "../services/Clipboard"
+import {
+  readClipboardData,
+  readJSONFromClipboard,
+  writeClipboardData,
+} from "../services/Clipboard"
 
 export const useCreateOrUpdateControlEventsValue = () => {
   const { selectedTrackId } = usePianoRoll()
@@ -113,8 +117,8 @@ export const usePasteControlSelection = () => {
   const { pushHistory } = useHistory()
 
   return useCallback(
-    async (clipboardData?: any) => {
-      const obj = clipboardData ?? (await readClipboardData())
+    async (e?: ClipboardEvent) => {
+      const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
       const { data } = ControlEventsClipboardDataSchema.safeParse(obj)
 
       if (!data) {
@@ -131,6 +135,16 @@ export const usePasteControlSelection = () => {
     },
     [createOrUpdate, position, pushHistory],
   )
+}
+
+export const useCutControlSelection = () => {
+  const copyControlSelection = useCopyControlSelection()
+  const deleteControlSelection = useDeleteControlSelection()
+
+  return useCallback(() => {
+    copyControlSelection()
+    deleteControlSelection()
+  }, [copyControlSelection, deleteControlSelection])
 }
 
 export const useDuplicateControlSelection = () => {

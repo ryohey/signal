@@ -1,11 +1,11 @@
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import {
   useCopyControlSelection,
+  useCutControlSelection,
   useDeleteControlSelection,
   useDuplicateControlSelection,
   usePasteControlSelection,
 } from "../actions/control"
-import { readJSONFromClipboard } from "../services/Clipboard"
 import { useControlPane } from "./useControlPane"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 
@@ -15,6 +15,7 @@ export const useControlPaneKeyboardShortcut = () => {
   const copyControlSelection = useCopyControlSelection()
   const duplicateControlSelection = useDuplicateControlSelection()
   const pasteControlSelection = usePasteControlSelection()
+  const cutControlSelection = useCutControlSelection()
 
   const actions = useMemo(
     () => [
@@ -22,30 +23,40 @@ export const useControlPaneKeyboardShortcut = () => {
       { code: "Backspace", run: deleteControlSelection },
       { code: "Delete", run: deleteControlSelection },
       {
+        code: "KeyC",
+        metaKey: true,
+        run: copyControlSelection,
+      },
+      {
+        code: "KeyV",
+        metaKey: true,
+        run: () => pasteControlSelection(),
+      },
+      {
+        code: "KeyX",
+        metaKey: true,
+        run: cutControlSelection,
+      },
+      {
         code: "KeyD",
         metaKey: true,
         run: () => duplicateControlSelection(),
       },
     ],
-    [resetSelection, deleteControlSelection, duplicateControlSelection],
+    [
+      resetSelection,
+      deleteControlSelection,
+      duplicateControlSelection,
+      copyControlSelection,
+      pasteControlSelection,
+      cutControlSelection,
+    ],
   )
-
-  const onPaste = useCallback(
-    (e: ClipboardEvent) => {
-      pasteControlSelection(readJSONFromClipboard(e))
-    },
-    [pasteControlSelection],
-  )
-
-  const onCut = useCallback(() => {
-    copyControlSelection()
-    deleteControlSelection()
-  }, [copyControlSelection, deleteControlSelection])
 
   return useKeyboardShortcut({
     actions,
     onCopy: copyControlSelection,
-    onPaste,
-    onCut,
+    onPaste: pasteControlSelection,
+    onCut: cutControlSelection,
   })
 }

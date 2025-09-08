@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from "react"
 import {
   useCopyTempoSelection,
+  useCutTempoSelection,
   useDeleteTempoSelection,
   useDuplicateTempoSelection,
   usePasteTempoSelection,
   useResetTempoSelection,
 } from "../actions/tempo"
-import { readJSONFromClipboard } from "../services/Clipboard"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { useTempoEditor } from "./useTempoEditor"
 
@@ -15,6 +15,7 @@ export const useTempoEditorKeyboardShortcut = () => {
   const resetTempoSelection = useResetTempoSelection()
   const deleteTempoSelection = useDeleteTempoSelection()
   const copyTempoSelection = useCopyTempoSelection()
+  const cutTempoSelection = useCutTempoSelection()
   const duplicateTempoSelection = useDuplicateTempoSelection()
   const pasteTempoSelection = usePasteTempoSelection()
 
@@ -34,17 +35,17 @@ export const useTempoEditorKeyboardShortcut = () => {
       {
         code: "KeyC",
         metaKey: true,
-        run: () => copyTempoSelection(),
+        run: copyTempoSelection,
+      },
+      {
+        code: "KeyV",
+        metaKey: true,
+        run: () => pasteTempoSelection(),
       },
       {
         code: "KeyX",
         metaKey: true,
-        run: () => {
-          {
-            copyTempoSelection()
-            deleteTempoSelection()
-          }
-        },
+        run: cutTempoSelection,
       },
       {
         code: "KeyD",
@@ -58,14 +59,9 @@ export const useTempoEditorKeyboardShortcut = () => {
       deleteTempoSelection,
       copyTempoSelection,
       duplicateTempoSelection,
+      pasteTempoSelection,
+      cutTempoSelection,
     ],
-  )
-
-  const onPaste = useCallback(
-    (e: ClipboardEvent) => {
-      pasteTempoSelection(readJSONFromClipboard(e))
-    },
-    [pasteTempoSelection],
   )
 
   const onCut = useCallback(() => {
@@ -76,7 +72,7 @@ export const useTempoEditorKeyboardShortcut = () => {
   return useKeyboardShortcut({
     actions,
     onCopy: copyTempoSelection,
-    onPaste,
+    onPaste: pasteTempoSelection,
     onCut,
   })
 }

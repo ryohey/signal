@@ -157,5 +157,7 @@ export const useGlobalKeyboardShortcut = () => {
     ],
   )
 
-  return useKeyboardShortcut({ actions })
+  return useKeyboardShortcut({
+    actions,
+  })
 }
