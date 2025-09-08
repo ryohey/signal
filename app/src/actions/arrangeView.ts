@@ -1,5 +1,6 @@
 import mapValues from "lodash/mapValues"
 import { transaction } from "mobx"
+import { useCallback } from "react"
 import {
   ArrangeNotesClipboardData,
   ArrangeNotesClipboardDataSchema,
@@ -13,7 +14,11 @@ import { useArrangeView } from "../hooks/useArrangeView"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { readClipboardData, writeClipboardData } from "../services/Clipboard"
+import {
+  readClipboardData,
+  readJSONFromClipboard,
+  writeClipboardData,
+} from "../services/Clipboard"
 import Track from "../track"
 import { batchUpdateNotesVelocity, BatchUpdateOperation } from "./track"
 
@@ -99,8 +104,8 @@ export const useArrangePasteSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
 
-  return async (clipboardData?: any) => {
-    const obj = clipboardData ?? (await readClipboardData())
+  return async (e?: ClipboardEvent) => {
+    const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
     const { data, error } = ArrangeNotesClipboardDataSchema.safeParse(obj)
 
     if (!data) {
@@ -145,6 +150,16 @@ export const useArrangeDeleteSelection = () => {
     setSelectedEventIds({})
     setSelection(null)
   }
+}
+
+export const useArrangeCutSelection = () => {
+  const arrangeCopySelection = useArrangeCopySelection()
+  const arrangeDeleteSelection = useArrangeDeleteSelection()
+
+  return useCallback(() => {
+    arrangeCopySelection()
+    arrangeDeleteSelection()
+  }, [arrangeCopySelection, arrangeDeleteSelection])
 }
 
 // returns { trackIndex: [eventId] }

@@ -1,11 +1,11 @@
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import {
   useArrangeCopySelection,
+  useArrangeCutSelection,
   useArrangeDeleteSelection,
   useArrangeDuplicateSelection,
   useArrangePasteSelection,
 } from "../actions"
-import { readJSONFromClipboard } from "../services/Clipboard"
 import { useArrangeView } from "./useArrangeView"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 
@@ -17,6 +17,7 @@ export const useArrangeViewKeyboardShortcut = () => {
   const arrangeCopySelection = useArrangeCopySelection()
   const arrangePasteSelection = useArrangePasteSelection()
   const arrangeDuplicateSelection = useArrangeDuplicateSelection()
+  const arrangeCutSelection = useArrangeCutSelection()
 
   const actions = useMemo(
     () => [
@@ -42,6 +43,21 @@ export const useArrangeViewKeyboardShortcut = () => {
         metaKey: true,
         run: () => arrangeDuplicateSelection(),
       },
+      {
+        code: "KeyC",
+        metaKey: true,
+        run: () => arrangeCopySelection(),
+      },
+      {
+        code: "KeyV",
+        metaKey: true,
+        run: () => arrangePasteSelection(),
+      },
+      {
+        code: "KeyX",
+        metaKey: true,
+        run: () => arrangeCutSelection(),
+      },
     ],
     [
       resetSelection,
@@ -49,25 +65,16 @@ export const useArrangeViewKeyboardShortcut = () => {
       setOpenTransposeDialog,
       arrangeDeleteSelection,
       arrangeDuplicateSelection,
+      arrangeCopySelection,
+      arrangePasteSelection,
+      arrangeCutSelection,
     ],
   )
 
-  const onPaste = useCallback(
-    (e: ClipboardEvent) => {
-      arrangePasteSelection(readJSONFromClipboard(e))
-    },
-    [arrangePasteSelection],
-  )
-
-  const onCut = useCallback(() => {
-    arrangeCopySelection()
-    arrangeDeleteSelection()
-  }, [arrangeCopySelection, arrangeDeleteSelection])
-
   return useKeyboardShortcut({
     actions,
-    onCut,
+    onCut: arrangeCutSelection,
     onCopy: arrangeCopySelection,
-    onPaste,
+    onPaste: arrangePasteSelection,
   })
 }

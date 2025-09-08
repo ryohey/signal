@@ -14,7 +14,11 @@ import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
-import { readClipboardData, writeClipboardData } from "../services/Clipboard"
+import {
+  readClipboardData,
+  readJSONFromClipboard,
+  writeClipboardData,
+} from "../services/Clipboard"
 import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
 
 export function eventsInSelection(
@@ -167,8 +171,8 @@ export const usePasteSelection = () => {
   const { pushHistory } = useHistory()
 
   return useCallback(
-    async (clipboardData?: any) => {
-      const obj = clipboardData ?? (await readClipboardData())
+    async (e?: ClipboardEvent) => {
+      const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
       const { data } = PianoNotesClipboardDataSchema.safeParse(obj)
 
       if (!data) {
@@ -185,6 +189,15 @@ export const usePasteSelection = () => {
     },
     [addEvents, position, pushHistory],
   )
+}
+
+export const useCutSelection = () => {
+  const copySelection = useCopySelection()
+  const deleteSelection = useDeleteSelection()
+  return useCallback(() => {
+    copySelection()
+    deleteSelection()
+  }, [copySelection, deleteSelection])
 }
 
 export const useDuplicateSelection = () => {

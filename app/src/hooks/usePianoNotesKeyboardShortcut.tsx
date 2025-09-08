@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import {
   useCopySelection,
+  useCutSelection,
   useDeleteSelection,
   useDuplicateSelection,
   usePasteSelection,
@@ -9,7 +10,6 @@ import {
   useSelectPreviousNote,
   useTransposeSelection,
 } from "../actions"
-import { readJSONFromClipboard } from "../services/Clipboard"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePianoRoll } from "./usePianoRoll"
 
@@ -19,19 +19,30 @@ export const usePianoNotesKeyboardShortcut = () => {
   const copySelection = useCopySelection()
   const deleteSelection = useDeleteSelection()
   const pasteSelection = usePasteSelection()
+  const cutSelection = useCutSelection()
   const duplicateSelection = useDuplicateSelection()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
   const { mouseMode, resetSelection } = usePianoRoll()
   const { setOpenTransposeDialog } = usePianoRoll()
 
-  const onCut = useCallback(() => {
-    copySelection()
-    deleteSelection()
-  }, [copySelection, deleteSelection])
-
   const actions = useMemo(
     () => [
+      {
+        code: "KeyC",
+        metaKey: true,
+        run: copySelection,
+      },
+      {
+        code: "KeyV",
+        metaKey: true,
+        run: () => pasteSelection(),
+      },
+      {
+        code: "KeyX",
+        metaKey: true,
+        run: cutSelection,
+      },
       {
         code: "KeyD",
         metaKey: true,
@@ -90,20 +101,16 @@ export const usePianoNotesKeyboardShortcut = () => {
       selectNextNote,
       selectPreviousNote,
       resetSelection,
+      copySelection,
+      pasteSelection,
+      cutSelection,
     ],
-  )
-
-  const onPaste = useCallback(
-    (e: ClipboardEvent) => {
-      pasteSelection(readJSONFromClipboard(e))
-    },
-    [pasteSelection],
   )
 
   return useKeyboardShortcut({
     actions,
     onCopy: copySelection,
-    onPaste,
-    onCut,
+    onPaste: pasteSelection,
+    onCut: cutSelection,
   })
 }
