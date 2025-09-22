@@ -96,7 +96,7 @@ export class Player {
   }
 
   get numberOfChannels() {
-    return 0xf
+    return 16
   }
 
   allSoundsOffChannel = (ch: number) => {
