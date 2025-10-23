@@ -1,0 +1,29 @@
+tempo: 76
+time_signature: 4/4
+key: E minor
+
+track: Drums
+instrument: Acoustic Drum Kit
+notes:
+- { pitch: 36, start: 0,   duration: 0.5, velocity: 90 }     # kick
+- { pitch: 38, start: 0.5, duration: 0.5, velocity: 80 }     # snare
+- { pitch: 42, start: 0.25, duration: 0.25, velocity: 70 }   # hi-hat
+- repeat: every 1 beat for 160 measures
+
+track: Bass
+instrument: Electric Bass (finger)
+pattern:
+- { pitch: 40, start: 0,  duration: 2, velocity: 100 }   # E
+- { pitch: 45, start: 2,  duration: 2, velocity: 95 }    # A
+- { pitch: 42, start: 4,  duration: 2, velocity: 95 }    # F#
+- { pitch: 44, start: 6,  duration: 2, velocity: 95 }    # G#
+- repeat: every 8 beats for 20 times
+
+track: Guitar
+instrument: Clean Electric Guitar
+pattern:
+- { chord: [52,55,59], start: 0, duration: 2, velocity: 80 }   # E minor
+- { chord: [57,61,64], start: 2, duration: 2, velocity: 75 }   # Amaj7
+- { chord: [54,57,61], start: 4, duration: 2, velocity: 80 }   # F#m
+- { chord: [56,59,63], start: 6, duration: 2, velocity: 75 }   # G#m
+- repeat: every 8 beats for 20 times
