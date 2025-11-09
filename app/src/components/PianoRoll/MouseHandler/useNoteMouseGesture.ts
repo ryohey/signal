@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useMemo } from "react"
 import { MouseGesture } from "../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useChangeToolGesture } from "./gestures/useChangeToolGesture"
@@ -6,59 +6,47 @@ import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
 import { usePencilGesture } from "./usePencilGesture"
 import { useSelectionGesture } from "./useSelectionGesture"
 
-export interface CursorProvider {
-  getCursor(e: MouseEvent): string
-}
-
 export const useNoteMouseGesture = (): MouseGesture<[], React.MouseEvent> => {
-  const { mouseMode, setNotesCursor } = usePianoRoll()
-  const [isMouseDown, setMouseDown] = useState(false)
+  const { mouseMode } = usePianoRoll()
   const pencilGesture = usePencilGesture()
   const selectionGesture = useSelectionGesture()
-  const currentGesture = (() => {
+  const currentGesture = useMemo(() => {
     switch (mouseMode) {
       case "pencil":
         return pencilGesture
       case "selection":
         return selectionGesture
     }
-  })()
+  }, [mouseMode, pencilGesture, selectionGesture])
   const dragScrollAction = useDragScrollGesture()
   const changeToolAction = useChangeToolGesture()
 
-  function getGestureForMouseDown(e: MouseEvent) {
-    // Common Action
+  const getGestureForMouseDown = useCallback(
+    (e: MouseEvent) => {
+      // Common Action
 
-    // wheel drag to start scrolling
-    if (e.button === 1) {
-      return dragScrollAction
-    }
+      // wheel drag to start scrolling
+      if (e.button === 1) {
+        return dragScrollAction
+      }
 
-    // Right Double-click
-    if (e.button === 2 && e.detail % 2 === 0) {
-      return changeToolAction
-    }
+      // Right Double-click
+      if (e.button === 2 && e.detail % 2 === 0) {
+        return changeToolAction
+      }
 
-    return currentGesture
-  }
+      return currentGesture
+    },
+    [changeToolAction, currentGesture, dragScrollAction],
+  )
 
   return {
-    onMouseDown(ev) {
-      const e = ev.nativeEvent
-      setMouseDown(true)
-      getGestureForMouseDown(e).onMouseDown(e)
-    },
-
-    onMouseMove(ev) {
-      const e = ev.nativeEvent
-      if (!isMouseDown && "getCursor" in currentGesture) {
-        const cursor = (currentGesture as CursorProvider).getCursor(e)
-        setNotesCursor(cursor)
-      }
-    },
-
-    onMouseUp() {
-      setMouseDown(false)
-    },
+    onMouseDown: useCallback(
+      (ev) => {
+        const e = ev.nativeEvent
+        getGestureForMouseDown(e).onMouseDown(e)
+      },
+      [getGestureForMouseDown],
+    ),
   }
 }
