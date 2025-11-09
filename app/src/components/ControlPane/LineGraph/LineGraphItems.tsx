@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react"
-import { BorderedCircles, Rectangles } from "@ryohey/webgl-react"
+import { BorderedCircles, HitArea, Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
@@ -16,6 +16,7 @@ export interface LineGraphItemsProps {
   selectedEventIds: number[]
   lineWidth: number
   zIndex: number
+  onMouseDownItem?: (e: MouseEvent, itemId: number) => void
 }
 
 export const LineGraphItems: FC<LineGraphItemsProps> = ({
@@ -26,6 +27,7 @@ export const LineGraphItems: FC<LineGraphItemsProps> = ({
   controlPoints,
   lineWidth,
   zIndex,
+  onMouseDownItem,
 }) => {
   const theme = useTheme()
   const right = scrollLeft + width
@@ -55,6 +57,15 @@ export const LineGraphItems: FC<LineGraphItemsProps> = ({
         strokeColor={colorToVec4(Color(theme.themeColor))}
         fillColor={colorToVec4(Color(theme.onSurfaceColor))}
       />
+      {controlPoints.map((item) => (
+        <LineGraphItemHitArea
+          key={item.id}
+          bounds={item}
+          itemId={item.id}
+          zIndex={zIndex}
+          onMouseDown={onMouseDownItem}
+        />
+      ))}
     </>
   )
 }
@@ -86,4 +97,21 @@ const createLineRects = (
       height,
     }
   })
+}
+
+const LineGraphItemHitArea: FC<{
+  bounds: Rect
+  itemId: number
+  zIndex: number
+  onMouseDown?: (e: MouseEvent, itemId: number) => void
+}> = ({ bounds, itemId, zIndex, onMouseDown }) => {
+  const handleMouseDown = useCallback(
+    (e: MouseEvent) => {
+      onMouseDown?.(e, itemId)
+    },
+    [itemId, onMouseDown],
+  )
+  return (
+    <HitArea bounds={bounds} zIndex={zIndex} onMouseDown={handleMouseDown} />
+  )
 }

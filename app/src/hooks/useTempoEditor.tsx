@@ -57,7 +57,7 @@ export function useTempoEditor() {
   const tempoEditorStore = useContext(TempoEditorStoreContext)
 
   const selection = useMobxGetter(tempoEditorStore, "selection")
-  const { beats } = useRuler()
+  const { beats } = useRuler(tempoEditorStore.rulerStore)
   const transform = useMobxGetter(tempoEditorStore, "transform")
   const tickScrollStore = tempoEditorStore.tickScrollStore
   const mouseMode = useMobxGetter(tempoEditorStore, "mouseMode")

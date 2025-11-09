@@ -66,16 +66,8 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
         scrollLeft={scrollLeft}
         lineWidth={2}
         zIndex={zIndex}
+        onMouseDownItem={handleMouseDownItem}
       />
-      {controlPoints.map((item) => (
-        <TempoItemHitArea
-          key={item.id}
-          bounds={item}
-          itemId={item.id}
-          zIndex={zIndex}
-          onMouseDown={handleMouseDownItem}
-        />
-      ))}
       {/* Wheel hit area */}
       {items.map((item) => (
         <TempoItemWheelArea
@@ -87,23 +79,6 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
         />
       ))}
     </>
-  )
-}
-
-const TempoItemHitArea: FC<{
-  bounds: Rect
-  itemId: number
-  zIndex: number
-  onMouseDown: (e: MouseEvent, itemId: number) => void
-}> = ({ bounds, itemId, zIndex, onMouseDown }) => {
-  const handleMouseDown = useCallback(
-    (e: MouseEvent) => {
-      onMouseDown(e, itemId)
-    },
-    [onMouseDown, itemId],
-  )
-  return (
-    <HitArea bounds={bounds} zIndex={zIndex} onMouseDown={handleMouseDown} />
   )
 }
 
