@@ -3,29 +3,15 @@ import { MouseGesture } from "../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTrack } from "../../../hooks/useTrack"
 import { PianoNoteItem } from "../../../stores/PianoRollStore"
-import { useAddNoteToSelectionGesture } from "./gestures/useAddNoteToSelectionGesture"
 import { useCreateNoteGesture } from "./gestures/useCreateNoteGesture"
-import {
-  useDragNoteCenterGesture,
-  useDragNoteLeftGesture,
-  useDragNoteRightGesture,
-} from "./gestures/useDragNoteEdgeGesture"
-import { useRemoveNoteFromSelectionGesture } from "./gestures/useRemoveNoteFromSelectionGesture"
-import { useRemoveNoteGesture } from "./gestures/useRemoveNoteGesture"
 import { useSelectNoteGesture } from "./gestures/useSelectNoteGesture"
 import { CursorProvider } from "./useNoteMouseGesture"
 
 export const usePencilGesture = (): MouseGesture & CursorProvider => {
   const { getLocal, getNotes, selectedTrackId } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
-  const removeNoteGesture = useRemoveNoteGesture()
   const createNoteGesture = useCreateNoteGesture()
   const selectNoteGesture = useSelectNoteGesture()
-  const dragNoteCenterGesture = useDragNoteCenterGesture()
-  const dragNoteLeftGesture = useDragNoteLeftGesture()
-  const dragNoteRightGesture = useDragNoteRightGesture()
-  const removeNoteFromSelectionGesture = useRemoveNoteFromSelectionGesture()
-  const addNoteToSelectionGesture = useAddNoteToSelectionGesture()
 
   return {
     onMouseDown(e: MouseEvent) {
@@ -35,29 +21,7 @@ export const usePencilGesture = (): MouseGesture & CursorProvider => {
       switch (e.button) {
         case 0: {
           if (items.length > 0) {
-            if (e.detail % 2 === 0) {
-              return removeNoteGesture.onMouseDown(e)
-            }
-
-            const item = items[0]
-
-            if (e.shiftKey) {
-              if (item.isSelected) {
-                removeNoteFromSelectionGesture.onMouseDown(e, item.id)
-              } else {
-                addNoteToSelectionGesture.onMouseDown(e, item.id)
-              }
-            } else {
-              const position = getPositionType(local, item, isRhythmTrack)
-              switch (position) {
-                case "center":
-                  return dragNoteCenterGesture.onMouseDown(e, item.id)
-                case "left":
-                  return dragNoteLeftGesture.onMouseDown(e, item.id)
-                case "right":
-                  return dragNoteRightGesture.onMouseDown(e, item.id)
-              }
-            }
+            // no-op
           } else {
             if (e.shiftKey || e.metaKey) {
               return selectNoteGesture.onMouseDown(e)
@@ -67,8 +31,6 @@ export const usePencilGesture = (): MouseGesture & CursorProvider => {
           }
           break
         }
-        case 2:
-          return removeNoteGesture.onMouseDown(e)
         default:
           return null
       }
