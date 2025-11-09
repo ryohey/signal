@@ -1,4 +1,4 @@
-import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
+import { GLNode, useTransform } from "@ryohey/webgl-react"
 import { vec4 } from "gl-matrix"
 import { FC } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
@@ -21,7 +21,7 @@ export const NoteRectangles: FC<NoteRectanglesProps> = ({
   selectedColor,
   zIndex,
 }) => {
-  const projectionMatrix = useProjectionMatrix()
+  const projectionMatrix = useTransform()
 
   return (
     <GLNode

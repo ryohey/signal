@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react"
-import { GLFallback, GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
+import { GLFallback, GLNode, useTransform } from "@ryohey/webgl-react"
 import Color from "color"
 import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
@@ -23,7 +23,7 @@ export const VelocityItems: FC<VelocityItemsProps> = (props) => {
 }
 
 const _VelocityItems: FC<VelocityItemsProps> = ({ rects, zIndex }) => {
-  const projectionMatrix = useProjectionMatrix()
+  const projectionMatrix = useTransform()
   const theme = useTheme()
   const baseColor = Color(theme.themeColor)
   const strokeColor = colorToVec4(

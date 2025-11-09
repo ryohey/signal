@@ -1,4 +1,4 @@
-import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
+import { GLNode, useTransform } from "@ryohey/webgl-react"
 import { vec4 } from "gl-matrix"
 import { FC } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
@@ -22,7 +22,7 @@ export const NoteCircles: FC<NoteCirclesProps> = ({
   activeColor,
   zIndex,
 }) => {
-  const projectionMatrix = useProjectionMatrix()
+  const projectionMatrix = useTransform()
 
   return (
     <GLNode

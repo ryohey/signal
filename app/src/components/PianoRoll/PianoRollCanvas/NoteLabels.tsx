@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react"
-import { GLNode, useProjectionMatrix, useRenderer } from "@ryohey/webgl-react"
+import { GLNode, useRenderer, useTransform } from "@ryohey/webgl-react"
 import Color from "color"
 import { FC, useEffect, useMemo, useState } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
@@ -14,7 +14,7 @@ export interface NoteLabelProps {
 export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
   const renderer = useRenderer()
   const [texture, setTexture] = useState<WebGLTexture | null>(null)
-  const projectionMatrix = useProjectionMatrix()
+  const projectionMatrix = useTransform()
 
   useEffect(() => {
     const gl = renderer.gl
