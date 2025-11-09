@@ -58,7 +58,6 @@ export default class PianoRollStore {
   readonly keyScrollStore: KeyScrollStore
   readonly quantizerStore: QuantizerStore
 
-  notesCursor = "auto"
   mouseMode: PianoRollMouseMode = "pencil"
   selectedTrackId: TrackId = UNASSIGNED_TRACK_ID
   selection: Selection | null = null
@@ -94,7 +93,6 @@ export default class PianoRollStore {
     this.quantizerStore = new QuantizerStore(this.songStore, 8)
 
     makeObservable(this, {
-      notesCursor: observable,
       mouseMode: observable,
       selectedTrackId: observable,
       selection: observable.shallow,

@@ -9,12 +9,12 @@ import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { Selection } from "../../GLNodes/Selection"
 import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
 import { Lines } from "./Lines"
 import { Notes } from "./Notes"
+import { NoteSelection } from "./NoteSelection"
 
 export interface PianoRollCanvasProps {
   width: number
@@ -25,8 +25,7 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
   width,
   height,
 }) => {
-  const { notesCursor, selectionBounds, ghostTrackIds, mouseMode } =
-    usePianoRoll()
+  const { selectionBounds, ghostTrackIds, mouseMode } = usePianoRoll()
   const { beats } = useRuler()
   const { cursorX, setCanvasWidth, scrollLeft } = useTickScroll()
   const { scrollTop, setCanvasHeight } = useKeyScroll()
@@ -76,15 +75,20 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
     [scrollLeft, scrollTop],
   )
 
+  const style = useMemo(
+    () => ({
+      backgroundColor: theme.editorBackgroundColor,
+    }),
+    [theme],
+  )
+
   return (
     <>
       <GLCanvas
         width={width}
         height={height}
-        style={{
-          cursor: notesCursor,
-          background: theme.pianoWhiteKeyLaneColor,
-        }}
+        cursor={mouseMode === "pencil" ? "auto" : "crosshair"}
+        style={style}
         onContextMenu={handleContextMenu}
         onMouseDown={mouseHandler.onMouseDown}
         onMouseMove={mouseHandler.onMouseMove}
@@ -102,7 +106,9 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
             <GhostNotes key={trackId} trackId={trackId} zIndex={2} />
           ))}
           <Notes zIndex={3} />
-          <Selection rect={selectionBounds} zIndex={4} />
+          {selectionBounds && (
+            <NoteSelection rect={selectionBounds} zIndex={4} />
+          )}
         </Transform>
       </GLCanvas>
       <PianoSelectionContextMenu {...menuProps} />
