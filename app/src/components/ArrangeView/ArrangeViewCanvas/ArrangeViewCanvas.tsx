@@ -2,14 +2,13 @@ import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
-import { useArrangeView } from "../../../hooks/useArrangeView"
 import { AbstractMouseEvent } from "../../../hooks/useContextMenu"
 import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { useTrackScroll } from "../../../hooks/useTrackScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { Selection } from "../../GLNodes/Selection"
+import { ArrangeViewSelection } from "./ArrangeViewSelection"
 import { Lines } from "./Lines"
 import { Notes } from "./Notes"
 import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
@@ -24,7 +23,6 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
   width,
   onContextMenu,
 }) => {
-  const { selectionRect } = useArrangeView()
   const { beats } = useRuler()
   const { scrollTop, contentHeight: height } = useTrackScroll()
   const { cursorX, scrollLeft } = useTickScroll()
@@ -84,7 +82,7 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
       </Transform>
       <Transform matrix={scrollXYMatrix}>
         <Notes zIndex={2} />
-        <Selection rect={selectionRect} zIndex={3} />
+        <ArrangeViewSelection zIndex={3} />
       </Transform>
     </GLCanvas>
   )
