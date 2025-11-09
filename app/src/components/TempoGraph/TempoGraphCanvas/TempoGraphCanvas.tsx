@@ -12,7 +12,6 @@ import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
 import { useCreateSelectionGesture } from "../MouseHandler/useCreateSelectionGesture"
-import { useDragSelectionGesture } from "../MouseHandler/useDragSelectionGesture"
 import { usePencilGesture } from "../MouseHandler/usePencilGesture"
 import { Lines } from "./Lines"
 import { TempoItems } from "./TempoItems"
@@ -32,12 +31,11 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
 }) => {
   const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
   const { beats } = useRuler()
-  const { hitTest, items } = useTempoItems()
+  const { items } = useTempoItems()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const changeTempo = useChangeTempo()
   const pencilGesture = usePencilGesture()
   const createSelectionGesture = useCreateSelectionGesture()
-  const dragSelectionGesture = useDragSelectionGesture()
 
   const scrollLeft = Math.floor(_scrollLeft)
 
@@ -57,52 +55,20 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     [items],
   )
 
-  const pencilMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button !== 0) {
-        return
-      }
+  const currentGesture =
+    mouseMode === "pencil" ? pencilGesture : createSelectionGesture
 
-      pencilGesture.onMouseDown(
-        e.nativeEvent,
-        getLocal(e.nativeEvent),
-        transform,
-      )
-    },
-    [pencilGesture, transform, getLocal],
-  )
-
-  const selectionMouseDown = useCallback(
+  const onMouseDownGraph = useCallback(
     (e: React.MouseEvent) => {
       if (e.button !== 0) {
         return
       }
 
       const local = getLocal(e.nativeEvent)
-      const hitEventId = hitTest(local)
-
-      if (hitEventId !== undefined) {
-        dragSelectionGesture.onMouseDown(
-          e.nativeEvent,
-          hitEventId,
-          local,
-          transform,
-        )
-      } else {
-        createSelectionGesture.onMouseDown(e.nativeEvent, local, transform)
-      }
+      currentGesture.onMouseDown(e.nativeEvent, local, transform)
     },
-    [
-      dragSelectionGesture,
-      createSelectionGesture,
-      transform,
-      hitTest,
-      getLocal,
-    ],
+    [currentGesture, transform, getLocal],
   )
-
-  const onMouseDownGraph =
-    mouseMode === "pencil" ? pencilMouseDown : selectionMouseDown
 
   const onWheelGraph = useCallback(
     (e: React.WheelEvent) => {

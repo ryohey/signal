@@ -1,7 +1,6 @@
 import { clamp } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { Point } from "../../../entities/geometry/Point"
-import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
 import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isNotUndefined } from "../../../helpers/array"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
@@ -13,23 +12,17 @@ import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
-export const useDragSelectionGesture = (): MouseGesture<
-  [number, Point, TempoCoordTransform]
-> => {
+export const useDragSelectionGesture = (): MouseGesture<[number]> => {
   const { getEventById, updateEvents } = useConductorTrack()
   const { pushHistory } = useHistory()
-  const { setSelectedEventIds } = useTempoEditor()
+  const { setSelectedEventIds, transform, getLocal } = useTempoEditor()
   const { quantizer } = useQuantizer()
   let { selectedEventIds } = useTempoEditor()
 
   return {
-    onMouseDown(
-      e: MouseEvent,
-      hitEventId: number,
-      startPoint: Point,
-      transform: TempoCoordTransform,
-    ) {
+    onMouseDown(e: MouseEvent, hitEventId: number) {
       pushHistory()
+      const startPoint = getLocal(e)
 
       if (!selectedEventIds.includes(hitEventId)) {
         selectedEventIds = [hitEventId]
