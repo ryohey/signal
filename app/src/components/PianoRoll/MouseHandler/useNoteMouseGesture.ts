@@ -51,8 +51,8 @@ export const useNoteMouseGesture = (): MouseGesture<[], React.MouseEvent> => {
 
     onMouseMove(ev) {
       const e = ev.nativeEvent
-      if (!isMouseDown) {
-        const cursor = currentGesture.getCursor(e)
+      if (!isMouseDown && "getCursor" in currentGesture) {
+        const cursor = (currentGesture as CursorProvider).getCursor(e)
         setNotesCursor(cursor)
       }
     },

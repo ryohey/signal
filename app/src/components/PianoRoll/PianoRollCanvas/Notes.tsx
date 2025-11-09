@@ -198,6 +198,7 @@ const NoteHitArea = React.memo(
         <HitArea
           key={note.id + "-left"}
           bounds={leftEdgeBounds}
+          cursor="w-resize"
           zIndex={zIndex}
           onMouseDown={onMouseDownLeft}
         />
@@ -205,6 +206,7 @@ const NoteHitArea = React.memo(
         <HitArea
           key={note.id + "-center"}
           bounds={centerBounds}
+          cursor="move"
           zIndex={zIndex}
           onMouseDown={onMouseDownCenter}
         />
@@ -212,6 +214,7 @@ const NoteHitArea = React.memo(
         <HitArea
           key={note.id + "-right"}
           bounds={rightEdgeBounds}
+          cursor="e-resize"
           zIndex={zIndex}
           onMouseDown={onMouseDownRight}
         />
