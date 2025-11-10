@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { eventsInSelection } from "../../../../actions"
 import { Point } from "../../../../entities/geometry/Point"
 import { Selection } from "../../../../entities/selection/Selection"
@@ -19,53 +20,69 @@ export const useCreateSelectionGesture = (): MouseGesture => {
     setSelectedNoteIds,
   } = usePianoRoll()
   const { quantizer } = useQuantizer()
-  let { selection } = usePianoRoll()
+  const { selection: _selection } = usePianoRoll()
   const { getEvents } = useTrack(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
   return {
-    onMouseDown(e) {
-      const local = getLocal(e)
-      const start = transform.getNotePointFractional(local)
-      const startPos = local
+    onMouseDown: useCallback(
+      (e: MouseEvent) => {
+        let selection = _selection
 
-      if (!isPlaying) {
-        setPosition(quantizer.round(start.tick))
-      }
+        const local = getLocal(e)
+        const start = transform.getNotePointFractional(local)
+        const startPos = local
 
-      setSelectedEventIds([])
-      selection = Selection.fromPoints(start, start)
-      setSelection(selection)
+        if (!isPlaying) {
+          setPosition(quantizer.round(start.tick))
+        }
 
-      observeDrag2(e, {
-        onMouseMove: (_e, delta) => {
-          const offsetPos = Point.add(startPos, delta)
-          const end = transform.getNotePointFractional(offsetPos)
-          selection = Selection.fromPoints(
-            { ...start, tick: quantizer.round(start.tick) },
-            { ...end, tick: quantizer.round(end.tick) },
-          )
-          setSelection(selection)
-        },
-        onMouseUp: () => {
-          if (selection === null) {
-            return
-          }
+        setSelectedEventIds([])
+        selection = Selection.fromPoints(start, start)
+        setSelection(selection)
 
-          if (Selection.isEmpty(selection)) {
-            setSelection(null)
-            setSelectedNoteIds([])
-            return
-          }
+        observeDrag2(e, {
+          onMouseMove: (_e, delta) => {
+            const offsetPos = Point.add(startPos, delta)
+            const end = transform.getNotePointFractional(offsetPos)
+            selection = Selection.fromPoints(
+              { ...start, tick: quantizer.round(start.tick) },
+              { ...end, tick: quantizer.round(end.tick) },
+            )
+            setSelection(selection)
+          },
+          onMouseUp: () => {
+            if (selection === null) {
+              return
+            }
 
-          // 選択範囲を確定して選択範囲内のノートを選択状態にする
-          // Confirm the selection and select the notes in the selection state
-          setSelectedNoteIds(
-            eventsInSelection(getEvents(), selection).map((e) => e.id),
-          )
-        },
-      })
-    },
+            if (Selection.isEmpty(selection)) {
+              setSelection(null)
+              setSelectedNoteIds([])
+              return
+            }
+
+            // 選択範囲を確定して選択範囲内のノートを選択状態にする
+            // Confirm the selection and select the notes in the selection state
+            setSelectedNoteIds(
+              eventsInSelection(getEvents(), selection).map((e) => e.id),
+            )
+          },
+        })
+      },
+      [
+        getLocal,
+        setSelection,
+        setSelectedNoteIds,
+        _selection,
+        getEvents,
+        isPlaying,
+        setPosition,
+        transform,
+        quantizer,
+        setSelectedEventIds,
+      ],
+    ),
   }
 }
