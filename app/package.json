@@ -41,7 +41,7 @@
     "@rehooks/component-size": "1.0.3",
     "@ryohey/react-split-pane": "^0.1.94",
     "@ryohey/react-svg-spinners": "^0.3.2",
-    "@ryohey/webgl-react": "^0.6.3",
+    "@ryohey/webgl-react": "^0.7.0",
     "@sentry/browser": "^8.55.0",
     "@sentry/react": "^8.55.0",
     "@signal-app/api": "*",
