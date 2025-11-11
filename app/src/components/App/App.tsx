@@ -13,7 +13,6 @@ import { AuthProvider } from "../../hooks/useAuth"
 import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
-import { RootViewProvider } from "../../hooks/useRootView"
 import { RouterProvider } from "../../hooks/useRouter"
 import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
@@ -49,17 +48,15 @@ export function App() {
                               <ControlPaneProvider>
                                 <ArrangeViewProvider>
                                   <TempoEditorProvider>
-                                    <RootViewProvider>
-                                      <TrackMuteProvider>
-                                        <HistoryProvider>
-                                          <GlobalCSS />
-                                          {isRunningInElectron() && (
-                                            <ElectronCallbackHandler />
-                                          )}
-                                          <RootView />
-                                        </HistoryProvider>
-                                      </TrackMuteProvider>
-                                    </RootViewProvider>
+                                    <TrackMuteProvider>
+                                      <HistoryProvider>
+                                        <GlobalCSS />
+                                        {isRunningInElectron() && (
+                                          <ElectronCallbackHandler />
+                                        )}
+                                        <RootView />
+                                      </HistoryProvider>
+                                    </TrackMuteProvider>
                                   </TempoEditorProvider>
                                 </ArrangeViewProvider>
                               </ControlPaneProvider>
