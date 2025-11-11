@@ -1,18 +1,13 @@
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { CSSProperties, FC, useCallback, useMemo } from "react"
-import { useChangeTempo } from "../../../actions"
-import { Point } from "../../../entities/geometry/Point"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useRuler } from "../../../hooks/useRuler"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
-import { useTempoItems } from "../../../hooks/useTempoItems"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { Selection } from "../../GLNodes/Selection"
 import { useCreateSelectionGesture } from "../MouseHandler/useCreateSelectionGesture"
-import { useDragSelectionGesture } from "../MouseHandler/useDragSelectionGesture"
 import { usePencilGesture } from "../MouseHandler/usePencilGesture"
 import { Lines } from "./Lines"
 import { TempoItems } from "./TempoItems"
@@ -32,12 +27,9 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
 }) => {
   const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
   const { beats } = useRuler()
-  const { hitTest, items } = useTempoItems()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
-  const changeTempo = useChangeTempo()
   const pencilGesture = usePencilGesture()
   const createSelectionGesture = useCreateSelectionGesture()
-  const dragSelectionGesture = useDragSelectionGesture()
 
   const scrollLeft = Math.floor(_scrollLeft)
 
@@ -49,74 +41,19 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     [scrollLeft],
   )
 
-  const findEvent = useCallback(
-    (local: Point) =>
-      items.find(
-        (n) => local.x >= n.bounds.x && local.x < n.bounds.x + n.bounds.width,
-      ),
-    [items],
-  )
+  const currentGesture =
+    mouseMode === "pencil" ? pencilGesture : createSelectionGesture
 
-  const pencilMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button !== 0) {
-        return
-      }
-
-      pencilGesture.onMouseDown(
-        e.nativeEvent,
-        getLocal(e.nativeEvent),
-        transform,
-      )
-    },
-    [pencilGesture, transform, getLocal],
-  )
-
-  const selectionMouseDown = useCallback(
+  const onMouseDownGraph = useCallback(
     (e: React.MouseEvent) => {
       if (e.button !== 0) {
         return
       }
 
       const local = getLocal(e.nativeEvent)
-      const hitEventId = hitTest(local)
-
-      if (hitEventId !== undefined) {
-        dragSelectionGesture.onMouseDown(
-          e.nativeEvent,
-          hitEventId,
-          local,
-          transform,
-        )
-      } else {
-        createSelectionGesture.onMouseDown(e.nativeEvent, local, transform)
-      }
+      currentGesture.onMouseDown(e.nativeEvent, local, transform)
     },
-    [
-      dragSelectionGesture,
-      createSelectionGesture,
-      transform,
-      hitTest,
-      getLocal,
-    ],
-  )
-
-  const onMouseDownGraph =
-    mouseMode === "pencil" ? pencilMouseDown : selectionMouseDown
-
-  const onWheelGraph = useCallback(
-    (e: React.WheelEvent) => {
-      const local = getLocal(e.nativeEvent)
-      const item = findEvent(local)
-      if (!item) {
-        return
-      }
-      const event = items.filter((ev) => ev.id === item.id)[0]
-      const movement = e.nativeEvent.deltaY > 0 ? -1 : 1
-      const bpm = uSecPerBeatToBPM(event.microsecondsPerBeat)
-      changeTempo(event.id, Math.floor(bpmToUSecPerBeat(bpm + movement)))
-    },
-    [items, changeTempo, findEvent, getLocal],
+    [currentGesture, transform, getLocal],
   )
 
   const scrollXMatrix = useMemo(
@@ -137,7 +74,6 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       width={width}
       height={height}
       onMouseDown={onMouseDownGraph}
-      onWheel={onWheelGraph}
       style={computedStyle}
       className={className}
     >

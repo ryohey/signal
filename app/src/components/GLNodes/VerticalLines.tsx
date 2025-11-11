@@ -1,4 +1,4 @@
-import { GLNode, useProjectionMatrix } from "@ryohey/webgl-react"
+import { GLNode, useTransform } from "@ryohey/webgl-react"
 import { vec4 } from "gl-matrix"
 import { FC } from "react"
 import { VerticalLinesShader } from "./VerticalLinesShader"
@@ -18,7 +18,7 @@ export const VerticalLines: FC<VerticalLinesProps> = ({
   lineWidth,
   zIndex,
 }) => {
-  const projectionMatrix = useProjectionMatrix()
+  const projectionMatrix = useTransform()
 
   return (
     <GLNode

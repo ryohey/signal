@@ -1,6 +1,13 @@
 import styled from "@emotion/styled"
+import { composeEventHandlers } from "@radix-ui/primitive"
 import * as Popover from "@radix-ui/react-popover"
-import { ReactNode } from "react"
+import {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  ReactNode,
+  useRef,
+} from "react"
 import { Localized } from "../../../localize/useLocalization"
 import { Checkbox } from "../../ui/Checkbox"
 import { NumberPicker } from "./NumberPicker"
@@ -77,7 +84,7 @@ export function QuantizePopup({
     <Popover.Root>
       <Popover.Trigger asChild>{trigger}</Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content>
+        <FocusFixedContent>
           <Container>
             <NumberPicker
               value={value}
@@ -99,8 +106,31 @@ export function QuantizePopup({
               />
             </Right>
           </Container>
-        </Popover.Content>
+        </FocusFixedContent>
       </Popover.Portal>
     </Popover.Root>
   )
 }
+
+// https://github.com/radix-ui/primitives/discussions/3319#discussioncomment-11844283
+const FocusFixedContent = forwardRef<
+  ElementRef<typeof Popover.Content>,
+  ComponentPropsWithoutRef<typeof Popover.Content>
+>(({ ...props }, ref) => {
+  const previousActiveElement = useRef<HTMLElement | null>(null)
+
+  return (
+    <Popover.Content
+      onOpenAutoFocus={composeEventHandlers(props.onOpenAutoFocus, () => {
+        previousActiveElement.current = document.activeElement as HTMLElement
+      })}
+      onCloseAutoFocus={composeEventHandlers(props.onCloseAutoFocus, () => {
+        // Return focus to the previously active element
+        // Radix will immediately follow this callback and attempt to focus the DialogTrigger if it's provided
+        previousActiveElement.current?.focus()
+      })}
+      ref={ref}
+      {...props}
+    />
+  )
+})

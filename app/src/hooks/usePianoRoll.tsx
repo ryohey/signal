@@ -169,9 +169,6 @@ export function usePianoRoll() {
     get windowedEvents() {
       return useMobxGetter(pianoRollStore, "windowedEvents")
     },
-    get notesCursor() {
-      return useMobxGetter(pianoRollStore, "notesCursor")
-    },
     get selectionBounds() {
       return useMobxGetter(pianoRollStore, "selectionBounds")
     },
@@ -250,7 +247,6 @@ export function usePianoRoll() {
     setMouseMode: useCallback(
       (mode: PianoRollMouseMode) => {
         pianoRollStore.mouseMode = mode
-        pianoRollStore.notesCursor = mode === "pencil" ? "auto" : "crosshair"
       },
       [pianoRollStore],
     ),
@@ -296,10 +292,6 @@ export function usePianoRoll() {
     ),
     setSelectedNoteIds: useCallback(
       (ids: number[]) => (pianoRollStore.selectedNoteIds = ids),
-      [pianoRollStore],
-    ),
-    setNotesCursor: useCallback(
-      (cursor: string) => (pianoRollStore.notesCursor = cursor),
       [pianoRollStore],
     ),
     // convert mouse position to the local coordinate on the canvas

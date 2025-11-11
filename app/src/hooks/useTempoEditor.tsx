@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useMemo } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react"
+import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import TempoEditorStore from "../stores/TempoEditorStore"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
@@ -50,8 +57,9 @@ export function useTempoEditor() {
   const tempoEditorStore = useContext(TempoEditorStoreContext)
 
   const selection = useMobxGetter(tempoEditorStore, "selection")
-  const { beats } = useRuler()
+  const { beats } = useRuler(tempoEditorStore.rulerStore)
   const transform = useMobxGetter(tempoEditorStore, "transform")
+  const tickScrollStore = tempoEditorStore.tickScrollStore
   const mouseMode = useMobxGetter(tempoEditorStore, "mouseMode")
 
   const selectionRect = useMemo(
@@ -80,6 +88,14 @@ export function useTempoEditor() {
     get mouseMode() {
       return useMobxGetter(tempoEditorStore, "mouseMode")
     },
+    // convert mouse position to the local coordinate on the canvas
+    getLocal: useCallback(
+      (e: { offsetX: number; offsetY: number }): Point => ({
+        x: e.offsetX + tickScrollStore.scrollLeft,
+        y: e.offsetY,
+      }),
+      [tickScrollStore],
+    ),
     setSelection: useMobxSetter(tempoEditorStore, "selection"),
     setSelectedEventIds: useMobxSetter(tempoEditorStore, "selectedEventIds"),
     setMouseMode: useMobxSetter(tempoEditorStore, "mouseMode"),

@@ -1,4 +1,4 @@
-import { MouseEvent } from "react"
+import { useCallback } from "react"
 import { moveEventsBetweenTracks } from "../../../../actions/arrangeView"
 import { Point } from "../../../../entities/geometry/Point"
 import { Rect } from "../../../../entities/geometry/Rect"
@@ -20,62 +20,78 @@ export const useMoveSelectionGesture = (): MouseGesture<
   const { trackTransform, setSelection, setSelectedEventIds } = useArrangeView()
   const { quantizer } = useQuantizer()
   const { tracks } = useSong()
-  let { selection, selectedEventIds } = useArrangeView()
+  const { selection: _selection, selectedEventIds: _selectedEventIds } =
+    useArrangeView()
 
   return {
-    onMouseDown(_e, startClientPos, selectionRect) {
-      let isMoved = false
+    onMouseDown: useCallback(
+      (_e, startClientPos, selectionRect) => {
+        let isMoved = false
+        let selection = _selection
+        let selectedEventIds = _selectedEventIds
 
-      observeDrag({
-        onMouseMove: (e) => {
-          if (selection === null) {
-            return
-          }
+        observeDrag({
+          onMouseMove: (e) => {
+            if (selection === null) {
+              return
+            }
 
-          const deltaPx = Point.sub(getClientPos(e), startClientPos)
-          const selectionFromPx = Point.add(deltaPx, selectionRect)
+            const deltaPx = Point.sub(getClientPos(e), startClientPos)
+            const selectionFromPx = Point.add(deltaPx, selectionRect)
 
-          if ((deltaPx.x !== 0 || deltaPx.y !== 0) && !isMoved) {
-            isMoved = true
-            pushHistory()
-          }
+            if ((deltaPx.x !== 0 || deltaPx.y !== 0) && !isMoved) {
+              isMoved = true
+              pushHistory()
+            }
 
-          let point = trackTransform.getArrangePoint(selectionFromPx)
+            let point = trackTransform.getArrangePoint(selectionFromPx)
 
-          // quantize
-          point = {
-            tick: quantizer.round(point.tick),
-            trackIndex: Math.round(point.trackIndex),
-          }
+            // quantize
+            point = {
+              tick: quantizer.round(point.tick),
+              trackIndex: Math.round(point.trackIndex),
+            }
 
-          // clamp
-          point = ArrangePoint.clamp(
-            point,
-            tracks.length - (selection.toTrackIndex - selection.fromTrackIndex),
-          )
+            // clamp
+            point = ArrangePoint.clamp(
+              point,
+              tracks.length -
+                (selection.toTrackIndex - selection.fromTrackIndex),
+            )
 
-          const delta = ArrangePoint.sub(
-            point,
-            ArrangeSelection.start(selection),
-          )
+            const delta = ArrangePoint.sub(
+              point,
+              ArrangeSelection.start(selection),
+            )
 
-          if (delta.tick === 0 && delta.trackIndex === 0) {
-            return
-          }
+            if (delta.tick === 0 && delta.trackIndex === 0) {
+              return
+            }
 
-          // Move selection range
-          selection = ArrangeSelection.moved(selection, delta)
+            // Move selection range
+            selection = ArrangeSelection.moved(selection, delta)
 
-          selectedEventIds = moveEventsBetweenTracks(
-            tracks,
-            selectedEventIds,
-            delta,
-          )
+            selectedEventIds = moveEventsBetweenTracks(
+              tracks,
+              selectedEventIds,
+              delta,
+            )
 
-          setSelection(selection)
-          setSelectedEventIds(selectedEventIds)
-        },
-      })
-    },
+            setSelection(selection)
+            setSelectedEventIds(selectedEventIds)
+          },
+        })
+      },
+      [
+        pushHistory,
+        quantizer,
+        trackTransform,
+        tracks,
+        setSelection,
+        setSelectedEventIds,
+        _selection,
+        _selectedEventIds,
+      ],
+    ),
   }
 }
