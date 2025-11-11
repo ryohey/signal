@@ -1,18 +1,8 @@
-import {
-  CloudSong,
-  ICloudSongDataRepository,
-  ICloudSongRepository,
-} from "@signal-app/api"
+import { CloudSong } from "@signal-app/api"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import { orderBy } from "lodash"
-import { computed, makeObservable, observable } from "mobx"
-import {
-  ChangeEvent,
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react"
+import { ChangeEvent } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
@@ -22,97 +12,13 @@ import {
   cloudSongRepository,
 } from "../services/repositories"
 import { emptySong } from "../song"
-import { SongStore } from "../stores/SongStore"
 import { useAutoSave } from "./useAutoSave"
-import { useMobxGetter } from "./useMobxSelector"
 import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
-class CloudFileStore {
-  isLoading = false
-  selectedColumn: "name" | "date" = "date"
-  dateType: "created" | "updated" = "created"
-  sortAscending = false
-  _files: CloudSong[] = []
-
-  constructor(
-    private readonly songStore: SongStore,
-    private readonly cloudSongRepository: ICloudSongRepository,
-    private readonly cloudSongDataRepository: ICloudSongDataRepository,
-  ) {
-    makeObservable(this, {
-      isLoading: observable,
-      selectedColumn: observable,
-      dateType: observable,
-      sortAscending: observable,
-      _files: observable,
-      files: computed,
-    })
-  }
-
-  async load() {
-    this.isLoading = true
-    this._files = await this.cloudSongRepository.getMySongs()
-    this.isLoading = false
-  }
-
-  get files() {
-    return orderBy(
-      this._files,
-      (data) => {
-        switch (this.selectedColumn) {
-          case "name":
-            return data.name
-          case "date":
-            switch (this.dateType) {
-              case "created":
-                return data.createdAt.getTime()
-              case "updated":
-                return data.updatedAt.getTime()
-            }
-        }
-      },
-      this.sortAscending ? "asc" : "desc",
-    )
-  }
-
-  async deleteSong(song: CloudSong) {
-    await this.cloudSongDataRepository.delete(song.songDataId)
-    await this.cloudSongRepository.delete(song.id)
-
-    if (this.songStore.song.cloudSongId === song.id) {
-      this.songStore.song.cloudSongId = null
-      this.songStore.song.cloudSongDataId = null
-    }
-    await this.load()
-  }
-}
-
-const CloudFileStoreContext = createContext<CloudFileStore>(null!)
-
-export function CloudFileProvider({ children }: { children: React.ReactNode }) {
-  const { songStore } = useStores()
-  const cloudFileStore = useMemo(
-    () =>
-      new CloudFileStore(
-        songStore,
-        cloudSongRepository,
-        cloudSongDataRepository,
-      ),
-    [songStore],
-  )
-
-  return (
-    <CloudFileStoreContext.Provider value={cloudFileStore}>
-      {children}
-    </CloudFileStoreContext.Provider>
-  )
-}
-
 export const useCloudFile = () => {
   const { setOpenCloudFileDialog, setOpenPublishDialog } = useRootView()
-  const cloudFileStore = useContext(CloudFileStoreContext)
   const { cloudSongId, name, setName, isSaved, getSong } = useSong()
   const toast = useToast()
   const prompt = usePrompt()
@@ -126,6 +32,8 @@ export const useCloudFile = () => {
   const updateSong = useUpdateSong()
   const createSong = useCreateSong()
   const { onUserExplicitAction } = useAutoSave()
+  const loadFiles = useLoadFiles()
+  const deleteSong = useDeleteSong()
 
   const saveOrCreateSong = async () => {
     if (cloudSongId !== null) {
@@ -195,41 +103,24 @@ export const useCloudFile = () => {
 
   return {
     get isLoading() {
-      return useMobxGetter(cloudFileStore, "isLoading")
+      return useAtomValue(isLoadingAtom)
     },
     get dateType() {
-      return useMobxGetter(cloudFileStore, "dateType")
+      return useAtomValue(dateTypeAtom)
     },
     get files() {
-      return useMobxGetter(cloudFileStore, "files")
+      return useAtomValue(sortedFilesAtom)
     },
     get selectedColumn() {
-      return useMobxGetter(cloudFileStore, "selectedColumn")
+      return useAtomValue(selectedColumnAtom)
     },
     get sortAscending() {
-      return useMobxGetter(cloudFileStore, "sortAscending")
+      return useAtomValue(sortAscendingAtom)
     },
-    setDateType: useCallback(
-      (type: "created" | "updated") => {
-        cloudFileStore.dateType = type
-      },
-      [cloudFileStore],
-    ),
-    setSelectedColumn: useCallback(
-      (column: "name" | "date") => {
-        cloudFileStore.selectedColumn = column
-      },
-      [cloudFileStore],
-    ),
-    setSortAscending: useCallback(
-      (ascending: boolean) => {
-        cloudFileStore.sortAscending = ascending
-      },
-      [cloudFileStore],
-    ),
-    loadFiles: useCallback(() => {
-      cloudFileStore.load()
-    }, [cloudFileStore]),
+    setDateType: useSetAtom(dateTypeAtom),
+    setSelectedColumn: useSetAtom(selectedColumnAtom),
+    setSortAscending: useSetAtom(sortAscendingAtom),
+    loadFiles: loadFiles,
     async createNewSong() {
       try {
         if (!(await saveIfNeeded())) {
@@ -327,8 +218,67 @@ export const useCloudFile = () => {
     async publishSong() {
       setOpenPublishDialog(true)
     },
-    async deleteSong(song: CloudSong) {
-      await cloudFileStore.deleteSong(song)
+    deleteSong,
+  }
+}
+
+// atoms
+const isLoadingAtom = atom<boolean>(false)
+const selectedColumnAtom = atom<"name" | "date">("date")
+const dateTypeAtom = atom<"created" | "updated">("created")
+const sortAscendingAtom = atom<boolean>(false)
+const filesAtom = atom<CloudSong[]>([])
+
+// derived atom for sorted files
+const sortedFilesAtom = atom((get) => {
+  const files = get(filesAtom)
+  const selectedColumn = get(selectedColumnAtom)
+  const dateType = get(dateTypeAtom)
+  const sortAscending = get(sortAscendingAtom)
+
+  return orderBy(
+    files,
+    (data) => {
+      switch (selectedColumn) {
+        case "name":
+          return data.name
+        case "date":
+          switch (dateType) {
+            case "created":
+              return data.createdAt.getTime()
+            case "updated":
+              return data.updatedAt.getTime()
+          }
+      }
     },
+    sortAscending ? "asc" : "desc",
+  )
+})
+
+function useDeleteSong() {
+  const { songStore } = useStores()
+  const loadFiles = useLoadFiles()
+
+  return async (song: CloudSong) => {
+    await cloudSongDataRepository.delete(song.songDataId)
+    await cloudSongRepository.delete(song.id)
+
+    if (songStore.song.cloudSongId === song.id) {
+      songStore.song.cloudSongId = null
+      songStore.song.cloudSongDataId = null
+    }
+    await loadFiles()
+  }
+}
+
+function useLoadFiles() {
+  const setIsLoading = useSetAtom(isLoadingAtom)
+  const setFiles = useSetAtom(filesAtom)
+
+  return async () => {
+    setIsLoading(true)
+    const files = await cloudSongRepository.getMySongs()
+    setFiles(files)
+    setIsLoading(false)
   }
 }

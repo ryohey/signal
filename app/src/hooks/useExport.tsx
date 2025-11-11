@@ -1,74 +1,51 @@
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
-import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { downloadBlob } from "../helpers/Downloader"
 import { encodeMp3, encodeWAV } from "../helpers/encodeAudio"
 import { useLocalization } from "../localize/useLocalization"
 import Song from "../song"
-import { useMobxGetter } from "./useMobxSelector"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
-class ExportStore {
-  openExportProgressDialog = false
-  progress = 0
-  isCanceled = false
-
-  constructor() {
-    makeObservable(this, {
-      openExportProgressDialog: observable,
-      progress: observable,
-    })
-  }
-}
-
-const ExportStoreContext = createContext<ExportStore>(null!)
-
-export function ExportProvider({ children }: { children: React.ReactNode }) {
-  const exportStore = useMemo(() => new ExportStore(), [])
-
-  return (
-    <ExportStoreContext.Provider value={exportStore}>
-      {children}
-    </ExportStoreContext.Provider>
-  )
-}
-
 export function useExport() {
-  const exportStore = useContext(ExportStoreContext)
-
   return {
     get openExportProgressDialog() {
-      return useMobxGetter(exportStore, "openExportProgressDialog")
+      return useAtomValue(openExportProgressDialogAtom)
     },
     get progress() {
-      return useMobxGetter(exportStore, "progress")
+      return useAtomValue(progressAtom)
     },
     get exportSong() {
       return useExportSong()
     },
-    setOpenExportProgressDialog: useCallback(
-      (open: boolean) => {
-        exportStore.openExportProgressDialog = open
-      },
-      [exportStore],
-    ),
-    cancelExport: useCallback(() => {
-      exportStore.isCanceled = true
-    }, [exportStore]),
+    setOpenExportProgressDialog: useSetAtom(openExportProgressDialogAtom),
+    cancelExport: useSetAtom(cancelExportAtom),
   }
 }
+
+// atoms
+const openExportProgressDialogAtom = atom<boolean>(false)
+const progressAtom = atom<number>(0)
+const isCanceledAtom = atom<boolean>(false)
+
+// actions
+const cancelExportAtom = atom(null, (_get, set) => {
+  set(isCanceledAtom, true)
+})
 
 const waitForAnimationFrame = () =>
   new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
 const useExportSong = () => {
-  const exportStore = useContext(ExportStoreContext)
   const { synth } = useStores()
   const { updateEndOfSong, getSong, timebase } = useSong()
   const localized = useLocalization()
   const dialog = useDialog()
+  const setOpenDialog = useSetAtom(openExportProgressDialogAtom)
+  const setProgress = useSetAtom(progressAtom)
+  const setCanceled = useSetAtom(isCanceledAtom)
+  const store = useStore()
 
   return async (format: "WAV" | "MP3") => {
     updateEndOfSong()
@@ -89,9 +66,9 @@ const useExportSong = () => {
 
     const sampleRate = 44100
 
-    exportStore.isCanceled = false
-    exportStore.openExportProgressDialog = true
-    exportStore.progress = 0
+    setCanceled(false)
+    setOpenDialog(true)
+    setProgress(0)
 
     try {
       const audioBuffer = await renderAudio(
@@ -101,20 +78,20 @@ const useExportSong = () => {
         sampleRate,
         {
           bufferSize: 128,
-          cancel: () => exportStore.isCanceled,
+          cancel: () => store.get(isCanceledAtom),
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>
-            (exportStore.progress = numFrames / totalFrames),
+            setProgress(numFrames / totalFrames),
         },
       )
 
-      exportStore.progress = 1
+      setProgress(1)
 
       const encoder = getEncoder(format)
       const audioData = await encoder.encode(audioBuffer)
 
       const blob = new Blob([audioData], { type: encoder.mimeType })
-      exportStore.openExportProgressDialog = false
+      setOpenDialog(false)
       downloadBlob(blob, "song." + encoder.ext)
     } catch (e) {
       console.warn(e)

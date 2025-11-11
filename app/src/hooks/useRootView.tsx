@@ -1,109 +1,58 @@
-import { makeObservable, observable } from "mobx"
-import { createContext, useContext, useMemo } from "react"
-import { TrackEvent } from "../track"
-import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
-
-class RootViewStore {
-  openHelp = false
-  eventEditorEvents: TrackEvent[] = []
-  openSignInDialog = false
-  openCloudFileDialog = false
-  openSettingDialog = false
-  openControlSettingDialog = false
-  initializeError: Error | null = null
-  openInitializeErrorDialog = false
-  openPublishDialog = false
-  openUserSettingsDialog = false
-  openDeleteAccountDialog = false
-
-  constructor() {
-    makeObservable(this, {
-      openHelp: observable,
-      eventEditorEvents: observable.shallow,
-      openSignInDialog: observable,
-      openCloudFileDialog: observable,
-      openSettingDialog: observable,
-      openControlSettingDialog: observable,
-      initializeError: observable,
-      openInitializeErrorDialog: observable,
-      openPublishDialog: observable,
-      openUserSettingsDialog: observable,
-      openDeleteAccountDialog: observable,
-    })
-  }
-}
-
-const RootViewStoreContext = createContext<RootViewStore>(null!)
-
-export function RootViewProvider({ children }: { children: React.ReactNode }) {
-  const rootViewStore = useMemo(() => new RootViewStore(), [])
-
-  return (
-    <RootViewStoreContext.Provider value={rootViewStore}>
-      {children}
-    </RootViewStoreContext.Provider>
-  )
-}
+import { atom, useAtomValue, useSetAtom } from "jotai"
 
 export function useRootView() {
-  const rootViewStore = useContext(RootViewStoreContext)
-
   return {
     get openHelpDialog() {
-      return useMobxGetter(rootViewStore, "openHelp")
-    },
-    get eventEditorEvents() {
-      return useMobxGetter(rootViewStore, "eventEditorEvents")
+      return useAtomValue(openHelpAtom)
     },
     get openSignInDialog() {
-      return useMobxGetter(rootViewStore, "openSignInDialog")
+      return useAtomValue(openSignInDialogAtom)
     },
     get openCloudFileDialog() {
-      return useMobxGetter(rootViewStore, "openCloudFileDialog")
+      return useAtomValue(openCloudFileDialogAtom)
     },
     get openSettingDialog() {
-      return useMobxGetter(rootViewStore, "openSettingDialog")
+      return useAtomValue(openSettingDialogAtom)
     },
     get openControlSettingDialog() {
-      return useMobxGetter(rootViewStore, "openControlSettingDialog")
+      return useAtomValue(openControlSettingDialogAtom)
     },
     get initializeError() {
-      return useMobxGetter(rootViewStore, "initializeError")
+      return useAtomValue(initializeErrorAtom)
     },
     get openInitializeErrorDialog() {
-      return useMobxGetter(rootViewStore, "openInitializeErrorDialog")
+      return useAtomValue(openInitializeErrorDialogAtom)
     },
     get openPublishDialog() {
-      return useMobxGetter(rootViewStore, "openPublishDialog")
+      return useAtomValue(openPublishDialogAtom)
     },
     get openUserSettingsDialog() {
-      return useMobxGetter(rootViewStore, "openUserSettingsDialog")
+      return useAtomValue(openUserSettingsDialogAtom)
     },
     get openDeleteAccountDialog() {
-      return useMobxGetter(rootViewStore, "openDeleteAccountDialog")
+      return useAtomValue(openDeleteAccountDialogAtom)
     },
-    setOpenHelpDialog: useMobxSetter(rootViewStore, "openHelp"),
-    setEventEditorEvents: useMobxSetter(rootViewStore, "eventEditorEvents"),
-    setOpenSignInDialog: useMobxSetter(rootViewStore, "openSignInDialog"),
-    setOpenCloudFileDialog: useMobxSetter(rootViewStore, "openCloudFileDialog"),
-    setOpenSettingDialog: useMobxSetter(rootViewStore, "openSettingDialog"),
-    setOpenControlSettingDialog: useMobxSetter(
-      rootViewStore,
-      "openControlSettingDialog",
-    ),
-    setInitializeError: useMobxSetter(rootViewStore, "initializeError"),
-    setOpenInitializeErrorDialog: useMobxSetter(
-      rootViewStore,
-      "openInitializeErrorDialog",
-    ),
-    setOpenPublishDialog: useMobxSetter(rootViewStore, "openPublishDialog"),
-    setOpenUserSettingsDialog: useMobxSetter(
-      rootViewStore,
-      "openUserSettingsDialog",
-    ),
-    setOpenDeleteAccountDialog: useMobxSetter(
-      rootViewStore,
-      "openDeleteAccountDialog",
-    ),
+    setOpenHelpDialog: useSetAtom(openHelpAtom),
+    setOpenSignInDialog: useSetAtom(openSignInDialogAtom),
+    setOpenCloudFileDialog: useSetAtom(openCloudFileDialogAtom),
+    setOpenSettingDialog: useSetAtom(openSettingDialogAtom),
+    setOpenControlSettingDialog: useSetAtom(openControlSettingDialogAtom),
+    setInitializeError: useSetAtom(initializeErrorAtom),
+    setOpenInitializeErrorDialog: useSetAtom(openInitializeErrorDialogAtom),
+    setOpenPublishDialog: useSetAtom(openPublishDialogAtom),
+    setOpenUserSettingsDialog: useSetAtom(openUserSettingsDialogAtom),
+    setOpenDeleteAccountDialog: useSetAtom(openDeleteAccountDialogAtom),
   }
 }
+
+// atoms
+const openHelpAtom = atom<boolean>(false)
+const openSignInDialogAtom = atom<boolean>(false)
+const openCloudFileDialogAtom = atom<boolean>(false)
+const openSettingDialogAtom = atom<boolean>(false)
+const openControlSettingDialogAtom = atom<boolean>(false)
+const initializeErrorAtom = atom<Error | null>(null)
+const openInitializeErrorDialogAtom = atom<boolean>(false)
+const openPublishDialogAtom = atom<boolean>(false)
+const openUserSettingsDialogAtom = atom<boolean>(false)
+const openDeleteAccountDialogAtom = atom<boolean>(false)
