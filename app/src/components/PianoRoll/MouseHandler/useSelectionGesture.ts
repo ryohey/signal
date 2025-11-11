@@ -1,9 +1,7 @@
 import { MouseGesture } from "../../../gesture/MouseGesture"
-import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useCreateSelectionGesture } from "./gestures/useCreateSelectionGesture"
 
 export const useSelectionGesture = (): MouseGesture => {
-  const { selectionBounds } = usePianoRoll()
   const createSelectionAction = useCreateSelectionGesture()
 
   return {
@@ -13,11 +11,7 @@ export const useSelectionGesture = (): MouseGesture => {
       }
 
       if (e.button === 0) {
-        if (selectionBounds !== null) {
-          return createSelectionAction.onMouseDown(e)
-        } else {
-          return createSelectionAction.onMouseDown(e)
-        }
+        return createSelectionAction.onMouseDown(e)
       }
 
       return null
