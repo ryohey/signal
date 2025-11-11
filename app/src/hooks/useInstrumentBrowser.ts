@@ -1,6 +1,8 @@
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
 import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
+import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { isNotUndefined } from "../helpers/array"
 import { getCategoryIndex } from "../midi/GM"
 import { programChangeMidiEvent } from "../midi/MidiEvent"
@@ -11,12 +13,9 @@ import { useSong } from "./useSong"
 import { useTrack } from "./useTrack"
 
 export function useInstrumentBrowser() {
-  const {
-    selectedTrackId,
-    instrumentBrowserSetting: setting,
-    setInstrumentBrowserSetting: setSetting,
-    setOpenInstrumentBrowser: setOpen,
-  } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const [setting, setSetting] = useAtom(settingAtom)
+  const setOpen = useSetAtom(isOpenAtom)
   const { isRhythmTrack, channel, setChannel } = useTrack(selectedTrackId)
   const { isPlaying, sendEvent } = usePlayer()
   const setTrackInstrumentAction = useSetTrackInstrument(selectedTrackId)
@@ -73,7 +72,7 @@ export function useInstrumentBrowser() {
     setting,
     setSetting,
     get isOpen() {
-      return usePianoRoll().openInstrumentBrowser
+      return useAtomValue(isOpenAtom)
     },
     setOpen,
     selectedCategoryIndex,
@@ -125,3 +124,10 @@ export function useInstrumentBrowser() {
     onClickOK,
   }
 }
+
+// atoms
+const isOpenAtom = atom<boolean>(false)
+const settingAtom = atom<InstrumentSetting>({
+  isRhythmTrack: false,
+  programNumber: 0,
+})

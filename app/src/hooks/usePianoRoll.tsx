@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
 } from "react"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Point } from "../entities/geometry/Point"
 import { Rect } from "../entities/geometry/Rect"
 import { KeySignature } from "../entities/scale/KeySignature"
@@ -202,12 +201,6 @@ export function usePianoRoll() {
     get controlCursor() {
       return useMobxGetter(pianoRollStore, "controlCursor")
     },
-    get instrumentBrowserSetting() {
-      return useMobxGetter(pianoRollStore, "instrumentBrowserSetting")
-    },
-    get openInstrumentBrowser() {
-      return useMobxGetter(pianoRollStore, "openInstrumentBrowser")
-    },
     get activePane() {
       return useMobxGetter(pianoRollStore, "activePane")
     },
@@ -328,15 +321,6 @@ export function usePianoRoll() {
     ),
     setNewNoteVelocity: useCallback(
       (velocity: number) => (pianoRollStore.newNoteVelocity = velocity),
-      [pianoRollStore],
-    ),
-    setInstrumentBrowserSetting: useCallback(
-      (setting: InstrumentSetting) =>
-        (pianoRollStore.instrumentBrowserSetting = setting),
-      [pianoRollStore],
-    ),
-    setOpenInstrumentBrowser: useCallback(
-      (open: boolean) => (pianoRollStore.openInstrumentBrowser = open),
       [pianoRollStore],
     ),
     setActivePane: useCallback(
