@@ -10,7 +10,6 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
-import { CloudFileProvider } from "../../hooks/useCloudFile"
 import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
@@ -45,29 +44,27 @@ export function App() {
                     <ProgressProvider component={ProgressDialog}>
                       <LocalizationProvider>
                         <RouterProvider>
-                          <CloudFileProvider>
-                            <AuthProvider>
-                              <PianoRollProvider>
-                                <ControlPaneProvider>
-                                  <ArrangeViewProvider>
-                                    <TempoEditorProvider>
-                                      <RootViewProvider>
-                                        <TrackMuteProvider>
-                                          <HistoryProvider>
-                                            <GlobalCSS />
-                                            {isRunningInElectron() && (
-                                              <ElectronCallbackHandler />
-                                            )}
-                                            <RootView />
-                                          </HistoryProvider>
-                                        </TrackMuteProvider>
-                                      </RootViewProvider>
-                                    </TempoEditorProvider>
-                                  </ArrangeViewProvider>
-                                </ControlPaneProvider>
-                              </PianoRollProvider>
-                            </AuthProvider>
-                          </CloudFileProvider>
+                          <AuthProvider>
+                            <PianoRollProvider>
+                              <ControlPaneProvider>
+                                <ArrangeViewProvider>
+                                  <TempoEditorProvider>
+                                    <RootViewProvider>
+                                      <TrackMuteProvider>
+                                        <HistoryProvider>
+                                          <GlobalCSS />
+                                          {isRunningInElectron() && (
+                                            <ElectronCallbackHandler />
+                                          )}
+                                          <RootView />
+                                        </HistoryProvider>
+                                      </TrackMuteProvider>
+                                    </RootViewProvider>
+                                  </TempoEditorProvider>
+                                </ArrangeViewProvider>
+                              </ControlPaneProvider>
+                            </PianoRollProvider>
+                          </AuthProvider>
                         </RouterProvider>
                       </LocalizationProvider>
                     </ProgressProvider>
