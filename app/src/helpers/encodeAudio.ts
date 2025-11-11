@@ -64,9 +64,12 @@ function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
   return result
 }
 
-export const encodeWAV = async (audioBuffer: AudioBuffer) => {
-  return await encode({
+export const encodeWAV = async (
+  audioBuffer: AudioBuffer,
+): Promise<Uint8Array> => {
+  const arrayBuffer = await encode({
     sampleRate: audioBuffer.sampleRate,
     channelData: [audioBuffer.getChannelData(0), audioBuffer.getChannelData(1)],
   })
+  return new Uint8Array(arrayBuffer)
 }
