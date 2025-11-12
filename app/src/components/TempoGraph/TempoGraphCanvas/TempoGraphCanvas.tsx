@@ -25,7 +25,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   style,
   className,
 }) => {
-  const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
+  const { selectionRect, transform, mouseMode } = useTempoEditor()
   const { beats } = useRuler()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const pencilGesture = usePencilGesture()
@@ -61,12 +61,12 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     [scrollLeft],
   )
 
-  const computedStyle = useMemo(
-    () => ({
-      ...style,
-      cursor,
-    }),
-    [style, cursor],
+  const cursor = useMemo(
+    () =>
+      mouseMode === "pencil"
+        ? `url("./cursor-pencil.svg") 0 20, pointer`
+        : "auto",
+    [mouseMode],
   )
 
   return (
@@ -74,8 +74,9 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       width={width}
       height={height}
       onMouseDown={onMouseDownGraph}
-      style={computedStyle}
+      style={style}
       className={className}
+      cursor={cursor}
     >
       <Lines width={width} zIndex={0} />
       <Transform matrix={scrollXMatrix}>

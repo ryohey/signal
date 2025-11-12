@@ -60,7 +60,6 @@ export function useTempoEditor() {
   const { beats } = useRuler(tempoEditorStore.rulerStore)
   const transform = useMobxGetter(tempoEditorStore, "transform")
   const tickScrollStore = tempoEditorStore.tickScrollStore
-  const mouseMode = useMobxGetter(tempoEditorStore, "mouseMode")
 
   const selectionRect = useMemo(
     () =>
@@ -68,20 +67,11 @@ export function useTempoEditor() {
     [selection, transform],
   )
 
-  const cursor = useMemo(
-    () =>
-      mouseMode === "pencil"
-        ? `url("./cursor-pencil.svg") 0 20, pointer`
-        : "auto",
-    [mouseMode],
-  )
-
   return {
     selection,
     transform,
     selectionRect,
     beats,
-    cursor,
     get selectedEventIds() {
       return useMobxGetter(tempoEditorStore, "selectedEventIds")
     },
