@@ -4,6 +4,7 @@ import { FC, ReactNode } from "react"
 import { useAutoFocus } from "../../hooks/useAutoFocus"
 import { PianoRollScope, usePianoRoll } from "../../hooks/usePianoRoll"
 import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
+import { useTrackList } from "../../hooks/useTrackList"
 import EventList from "../EventEditor/EventList"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
 import { TrackList } from "../TrackList/TrackList"
@@ -37,7 +38,8 @@ const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
 }
 
 const PianoRollPanes: FC = () => {
-  const { showTrackList, showEventList } = usePianoRoll()
+  const { isOpen: showTrackList } = useTrackList()
+  const { showEventList } = usePianoRoll()
 
   return (
     <div style={{ display: "flex", flexGrow: 1, position: "relative" }}>

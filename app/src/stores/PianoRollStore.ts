@@ -69,7 +69,6 @@ export default class PianoRollStore {
     programNumber: 0,
   }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
-  showTrackList = false
   showEventList = false
   openTransposeDialog = false
   openVelocityDialog = false
@@ -101,7 +100,6 @@ export default class PianoRollStore {
       openInstrumentBrowser: observable,
       instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
-      showTrackList: observable,
       showEventList: observable,
       openTransposeDialog: observable,
       openVelocityDialog: observable,
