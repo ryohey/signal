@@ -8,13 +8,7 @@ import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
-import Track, {
-  NoteEvent,
-  TrackEvent,
-  TrackId,
-  UNASSIGNED_TRACK_ID,
-  isNoteEvent,
-} from "../track"
+import Track, { TrackEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollStore } from "./KeyScrollStore"
 import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
@@ -99,8 +93,6 @@ export default class PianoRollStore {
       previewingNoteNumbers: observable.ref,
       transform: computed,
       windowedEvents: computed,
-      allNoteBounds: computed,
-      notes: computed,
       selectedTrackIndex: computed,
       ghostTrackIds: computed,
       currentVolume: computed,
@@ -171,46 +163,6 @@ export default class PianoRollStore {
         ),
       ),
     )
-  }
-
-  get allNoteBounds(): { bounds: Rect; note: NoteEvent }[] {
-    const { transform, selectedTrack: track } = this
-    if (track === undefined) {
-      return []
-    }
-    const noteEvents = track.events.filter(isNoteEvent)
-    const getRect = track.isRhythmTrack
-      ? (e: NoteEvent) => transform.getDrumRect(e)
-      : (e: NoteEvent) => transform.getRect(e)
-
-    return noteEvents.map((e) => {
-      const bounds = getRect(e)
-      return {
-        bounds,
-        note: e,
-      }
-    })
-  }
-
-  get notes(): PianoNoteItem[] {
-    const { allNoteBounds, selectedNoteIds } = this
-    const { canvasWidth, scrollLeft } = this.tickScrollStore
-
-    const range = Range.fromLength(scrollLeft, canvasWidth)
-    return allNoteBounds
-      .filter((n) =>
-        Range.intersects(Range.fromLength(n.bounds.x, n.bounds.width), range),
-      )
-      .map((n) => {
-        const isSelected = selectedNoteIds.includes(n.note.id)
-        return {
-          ...n.bounds,
-          id: n.note.id,
-          velocity: n.note.velocity,
-          noteNumber: n.note.noteNumber,
-          isSelected,
-        }
-      })
   }
 
   get ghostTrackIds(): TrackId[] {

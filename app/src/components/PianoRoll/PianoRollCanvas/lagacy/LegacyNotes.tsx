@@ -7,8 +7,11 @@ import { PianoNoteItem } from "../../../../stores/PianoRollStore"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 
-export const LegacyNotes: FC<{ zIndex: number }> = ({ zIndex }) => {
-  const { notes, selectedTrackId } = usePianoRoll()
+export const LegacyNotes: FC<{ zIndex: number; notes: PianoNoteItem[] }> = ({
+  zIndex,
+  notes,
+}) => {
+  const { selectedTrackId } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const { borderColor, selectedColor, baseColor, backgroundColor } =
     useNoteColor()

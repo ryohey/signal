@@ -1,6 +1,7 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
 import React, { FC, useCallback, useMemo } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
+import { useNotes } from "../../../hooks/useNotes"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useSettings } from "../../../hooks/useSettings"
 import { useTrack } from "../../../hooks/useTrack"
@@ -12,7 +13,6 @@ import {
   useDragNoteRightGesture,
 } from "../MouseHandler/gestures/useDragNoteEdgeGesture"
 import { useRemoveNoteFromSelectionGesture } from "../MouseHandler/gestures/useRemoveNoteFromSelectionGesture"
-import { useRemoveNoteGesture } from "../MouseHandler/gestures/useRemoveNoteGesture"
 import { LegacyNotes } from "./lagacy/LegacyNotes"
 import { NoteCircles } from "./NoteCircles"
 import { NoteLabels } from "./NoteLabels"
@@ -24,21 +24,28 @@ export interface NotesProps {
 
 export const Notes: FC<NotesProps> = (props) => {
   const { mouseMode } = usePianoRoll()
+  const notes = useNotes()
 
   return (
     <>
-      <NotesContent {...props} />
-      {mouseMode === "pencil" && <NoteHitAreas zIndex={props.zIndex} />}
+      <NotesContent notes={notes} {...props} />
+      {mouseMode === "pencil" && (
+        <NoteHitAreas notes={notes} zIndex={props.zIndex} />
+      )}
     </>
   )
 }
 
-export const NotesContent: FC<NotesProps> = (props) => {
+interface NotesContentProps extends NotesProps {
+  notes: PianoNoteItem[]
+}
+
+export const NotesContent: FC<NotesContentProps> = (props) => {
   return <GLFallback component={_Notes} fallback={LegacyNotes} {...props} />
 }
 
-const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
-  const { notes, selectedTrackId } = usePianoRoll()
+const _Notes: FC<NotesContentProps> = ({ zIndex, notes }) => {
+  const { selectedTrackId } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const { borderColor, inactiveColor, activeColor, selectedColor } =
     useNoteColor()
@@ -73,9 +80,7 @@ const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
   )
 }
 
-const NoteHitAreas = ({ zIndex }: { zIndex: number }) => {
-  const { notes, selectedNoteIds } = usePianoRoll()
-  const removeNoteGesture = useRemoveNoteGesture()
+const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
   const { selectedNoteIds, selectedTrackId } = usePianoRoll()
   const { removeEvent } = useTrack(selectedTrackId)
   const dragNoteCenterGesture = useDragNoteCenterGesture()

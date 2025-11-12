@@ -16,6 +16,7 @@ import PianoRollStore, {
   SerializedPianoRollStore,
 } from "../stores/PianoRollStore"
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
+import { EventViewProvider } from "./useEventView"
 import { KeyScrollProvider, useKeyScroll } from "./useKeyScroll"
 import { useMobxGetter } from "./useMobxSelector"
 import { QuantizerProvider, useQuantizer } from "./useQuantizer"
@@ -99,17 +100,24 @@ export function PianoRollProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, keyScrollStore, rulerStore, quantizerStore } =
-    useContext(PianoRollStoreContext)
+  const {
+    tickScrollStore,
+    keyScrollStore,
+    rulerStore,
+    quantizerStore,
+    selectedTrackId,
+  } = useContext(PianoRollStoreContext)
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <KeyScrollProvider value={keyScrollStore}>
-        <RulerProvider value={rulerStore}>
-          <QuantizerProvider value={quantizerStore}>
-            {children}
-          </QuantizerProvider>
-        </RulerProvider>
+        <EventViewProvider trackId={selectedTrackId}>
+          <RulerProvider value={rulerStore}>
+            <QuantizerProvider value={quantizerStore}>
+              {children}
+            </QuantizerProvider>
+          </RulerProvider>
+        </EventViewProvider>
       </KeyScrollProvider>
     </TickScrollProvider>
   )
@@ -129,9 +137,6 @@ export function usePianoRoll() {
     },
     get currentVolume() {
       return useMobxGetter(pianoRollStore, "currentVolume")
-    },
-    get notes() {
-      return useMobxGetter(pianoRollStore, "notes")
     },
     get notGhostTrackIds() {
       return useMobxGetter(pianoRollStore, "notGhostTrackIds")
