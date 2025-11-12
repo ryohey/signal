@@ -126,6 +126,7 @@ const hasRedoAtom = atom((get) => get(redoHistoryAtom).length > 0)
 // actions
 const pushHistoryAtom = atom(null, (_get, set, state: SerializedRootStore) => {
   set(undoHistoryAtom, (prev) => [...prev, state])
+  set(redoHistoryAtom, [])
 })
 const undoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   const undoHistory = [...get(undoHistoryAtom)]
