@@ -1,11 +1,5 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
@@ -39,10 +33,6 @@ export function TempoEditorProvider({
     const quantizerStore = new QuantizerStore(songStore)
     return { rulerStore, tickScrollStore, quantizerStore }
   }, [player, songStore])
-
-  useEffect(() => {
-    tempoEditorStore.tickScrollStore.setUpAutoScroll()
-  }, [tempoEditorStore])
 
   return (
     <TempoEditorStoreContext.Provider value={tempoEditorStore}>

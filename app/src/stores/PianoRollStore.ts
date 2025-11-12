@@ -124,8 +124,6 @@ export default class PianoRollStore {
   }
 
   setUpAutorun() {
-    this.tickScrollStore.setUpAutoScroll()
-
     // reset selection when change track or mouse mode
     reaction(
       () => ({

@@ -58,10 +58,6 @@ export default class ArrangeViewStore {
     })
   }
 
-  setUpAutorun() {
-    this.tickScrollStore.setUpAutoScroll()
-  }
-
   serialize = (): SerializedArrangeViewStore => {
     return {
       selection: cloneDeep(this.selection),
