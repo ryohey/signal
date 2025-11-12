@@ -1,120 +1,92 @@
-import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
+import { atomEffect } from "jotai-effect"
+import { useAtomCallback } from "jotai/utils"
+import { useCallback, useMemo } from "react"
 import { TrackId } from "../track"
 import { TrackMute } from "../trackMute/TrackMute"
-import { useMobxGetter } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
-class TrackMuteStore {
-  trackMute: TrackMute = {
-    mutes: {},
-    solos: {},
-  }
-
-  constructor() {
-    makeObservable(this, {
-      trackMute: observable.ref,
-    })
-  }
-}
-
-const TrackMuteStoreContext = createContext<TrackMuteStore>(null!)
-
-export function TrackMuteProvider({ children }: { children: React.ReactNode }) {
-  const trackMuteStore = useMemo(() => new TrackMuteStore(), [])
-
-  return (
-    <TrackMuteStoreContext.Provider value={trackMuteStore}>
-      {children}
-    </TrackMuteStoreContext.Provider>
-  )
-}
-
 export function useTrackMute() {
-  const trackMuteStore = useContext(TrackMuteStoreContext)
   const { synthGroup } = useStores()
-  const trackMute = useMobxGetter(trackMuteStore, "trackMute")
-  const { getChannelForTrack } = useSong()
+  const { getTrack } = useSong()
   const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
-  const setTrackMute = useCallback(
-    (trackMute: TrackMute) => {
-      trackMuteStore.trackMute = trackMute
 
-      // sync with synth group
-      synthGroup.trackMute = trackMute
-    },
-    [trackMuteStore, synthGroup],
-  )
-
-  const mute = useCallback(
-    (trackId: TrackId) => setTrackMute(TrackMute.mute(trackMute, trackId)),
-    [setTrackMute, trackMute],
+  // sync with synth group
+  const syncToSynthEffectAtom = useMemo(
+    () =>
+      atomEffect((get) => {
+        synthGroup.trackMute = get(trackMuteAtom)
+      }),
+    [synthGroup],
   )
 
-  const unmute = useCallback(
-    (trackId: TrackId) => setTrackMute(TrackMute.unmute(trackMute, trackId)),
-    [setTrackMute, trackMute],
-  )
-
-  const solo = useCallback(
-    (trackId: TrackId) => setTrackMute(TrackMute.solo(trackMute, trackId)),
-    [setTrackMute, trackMute],
-  )
-  const unsolo = useCallback(
-    (trackId: TrackId) => setTrackMute(TrackMute.unsolo(trackMute, trackId)),
-    [setTrackMute, trackMute],
-  )
+  useAtom(syncToSynthEffectAtom)
 
   return {
-    trackMute,
-    mute,
-    unmute,
-    solo,
-    unsolo,
-    reset: useCallback(() => {
-      setTrackMute({ solos: {}, mutes: {} })
-    }, [setTrackMute]),
-    toggleMute: useCallback(
-      (trackId: TrackId) => {
-        const channel = getChannelForTrack(trackId)
-        if (channel === undefined) {
-          return
-        }
+    get trackMute() {
+      return useAtomValue(trackMuteAtom)
+    },
+    mute: useSetAtom(muteAtom),
+    unmute: useSetAtom(unmuteAtom),
+    solo: useSetAtom(soloAtom),
+    unsolo: useSetAtom(unsoloAtom),
+    reset: useSetAtom(resetAtom),
+    toggleMute: useAtomCallback(
+      useCallback(
+        (get, set, trackId: TrackId) => {
+          const channel = getTrack(trackId)?.channel
+          if (channel === undefined) {
+            return
+          }
 
-        if (TrackMute.isMuted(trackMute, trackId)) {
-          unmute(trackId)
-        } else {
-          mute(trackId)
-          allSoundsOffChannel(channel)
-        }
-      },
-      [trackMute, getChannelForTrack, allSoundsOffChannel, mute, unmute],
+          if (TrackMute.isMuted(trackId)(get(trackMuteAtom))) {
+            set(trackMuteAtom, TrackMute.unmute(trackId))
+          } else {
+            set(trackMuteAtom, TrackMute.mute(trackId))
+            allSoundsOffChannel(channel)
+          }
+        },
+        [getTrack, allSoundsOffChannel],
+      ),
     ),
-    toggleSolo: useCallback(
-      (trackId: TrackId) => {
-        const channel = getChannelForTrack(trackId)
-        if (channel === undefined) {
-          return
-        }
+    toggleSolo: useAtomCallback(
+      useCallback(
+        (get, set, trackId: TrackId) => {
+          const channel = getTrack(trackId)?.channel
+          if (channel === undefined) {
+            return
+          }
 
-        if (TrackMute.isSolo(trackMute, trackId)) {
-          unsolo(trackId)
-          allSoundsOffChannel(channel)
-        } else {
-          solo(trackId)
-          allSoundsOffExclude(channel)
-        }
-      },
-      [
-        trackMute,
-        getChannelForTrack,
-        allSoundsOffChannel,
-        allSoundsOffExclude,
-        solo,
-        unsolo,
-      ],
+          if (TrackMute.isSolo(trackId)(get(trackMuteAtom))) {
+            set(trackMuteAtom, TrackMute.unsolo(trackId))
+            allSoundsOffChannel(channel)
+          } else {
+            set(trackMuteAtom, TrackMute.solo(trackId))
+            allSoundsOffExclude(channel)
+          }
+        },
+        [getTrack, allSoundsOffChannel, allSoundsOffExclude],
+      ),
     ),
   }
 }
+
+// atoms
+const trackMuteAtom = atom<TrackMute>(TrackMute.empty)
+
+// actions
+const muteAtom = atom(null, (_get, set, trackId: TrackId) =>
+  set(trackMuteAtom, TrackMute.mute(trackId)),
+)
+const unmuteAtom = atom(null, (_get, set, trackId: TrackId) =>
+  set(trackMuteAtom, TrackMute.unmute(trackId)),
+)
+const soloAtom = atom(null, (_get, set, trackId: TrackId) =>
+  set(trackMuteAtom, TrackMute.solo(trackId)),
+)
+const unsoloAtom = atom(null, (_get, set, trackId: TrackId) =>
+  set(trackMuteAtom, TrackMute.unsolo(trackId)),
+)
+const resetAtom = atom(null, (_get, set) => set(trackMuteAtom, TrackMute.empty))

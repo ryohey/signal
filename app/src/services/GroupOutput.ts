@@ -30,7 +30,7 @@ export class GroupOutput implements SynthOutput {
       return this.isMetronomeEnabled ? [this.metronomeOutput] : []
     } else if (
       trackId !== undefined &&
-      !TrackMute.shouldPlayTrack(this.trackMute, trackId)
+      !TrackMute.shouldPlayTrack(trackId)(this.trackMute)
     ) {
       return []
     } else {

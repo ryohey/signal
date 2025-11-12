@@ -11,8 +11,8 @@ describe("TrackMute", () => {
       mutes: {},
       solos: {},
     }
-    expect(TrackMute.isMuted(t, getTrackId(getTrackId(0)))).toBeFalsy()
-    expect(TrackMute.isMuted(t, getTrackId(100))).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(0))(t)).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(100))(t)).toBeFalsy()
   })
 
   it("mute", () => {
@@ -20,12 +20,12 @@ describe("TrackMute", () => {
       mutes: {},
       solos: {},
     }
-    expect(TrackMute.isMuted(t, getTrackId(getTrackId(0)))).toBeFalsy()
-    t = TrackMute.mute(t, getTrackId(getTrackId(0)))
-    expect(TrackMute.isMuted(t, getTrackId(getTrackId(0)))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(getTrackId(0)))).toBeFalsy()
-    t = TrackMute.unmute(t, getTrackId(getTrackId(0)))
-    expect(TrackMute.isMuted(t, getTrackId(getTrackId(0)))).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(0))(t)).toBeFalsy()
+    t = TrackMute.mute(getTrackId(0))(t)
+    expect(TrackMute.isMuted(getTrackId(0))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(0))(t)).toBeFalsy()
+    t = TrackMute.unmute(getTrackId(0))(t)
+    expect(TrackMute.isMuted(getTrackId(0))(t)).toBeFalsy()
   })
 
   it("solo", () => {
@@ -33,28 +33,28 @@ describe("TrackMute", () => {
       mutes: {},
       solos: {},
     }
-    expect(TrackMute.isSolo(t, getTrackId(getTrackId(0)))).toBeFalsy()
-    t = TrackMute.solo(t, getTrackId(0))
-    expect(TrackMute.isSolo(t, getTrackId(0))).toBeTruthy()
+    expect(TrackMute.isSolo(getTrackId(0))(t)).toBeFalsy()
+    t = TrackMute.solo(getTrackId(0))(t)
+    expect(TrackMute.isSolo(getTrackId(0))(t)).toBeTruthy()
     expect(TrackMute.isSoloMode(t)).toBeTruthy()
-    expect(TrackMute.isMuted(t, getTrackId(1))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(0))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(1))).toBeFalsy()
-    t = TrackMute.solo(t, getTrackId(1))
-    expect(TrackMute.isSolo(t, getTrackId(0))).toBeTruthy()
-    expect(TrackMute.isSolo(t, getTrackId(1))).toBeTruthy()
+    expect(TrackMute.isMuted(getTrackId(1))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(0))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(1))(t)).toBeFalsy()
+    t = TrackMute.solo(getTrackId(1))(t)
+    expect(TrackMute.isSolo(getTrackId(0))(t)).toBeTruthy()
+    expect(TrackMute.isSolo(getTrackId(1))(t)).toBeTruthy()
     expect(TrackMute.isSoloMode(t)).toBeTruthy()
-    expect(TrackMute.isMuted(t, getTrackId(0))).toBeFalsy()
-    expect(TrackMute.isMuted(t, getTrackId(1))).toBeFalsy()
-    expect(TrackMute.isMuted(t, getTrackId(2))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(0))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(1))).toBeTruthy()
-    expect(TrackMute.shouldPlayTrack(t, getTrackId(2))).toBeFalsy()
-    t = TrackMute.unsolo(t, getTrackId(0))
-    expect(TrackMute.isSolo(t, getTrackId(0))).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(0))(t)).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(1))(t)).toBeFalsy()
+    expect(TrackMute.isMuted(getTrackId(2))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(0))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(1))(t)).toBeTruthy()
+    expect(TrackMute.shouldPlayTrack(getTrackId(2))(t)).toBeFalsy()
+    t = TrackMute.unsolo(getTrackId(0))(t)
+    expect(TrackMute.isSolo(getTrackId(0))(t)).toBeFalsy()
     expect(TrackMute.isSoloMode(t)).toBeTruthy()
-    t = TrackMute.unsolo(t, getTrackId(1))
-    expect(TrackMute.isSolo(t, getTrackId(1))).toBeFalsy()
+    t = TrackMute.unsolo(getTrackId(1))(t)
+    expect(TrackMute.isSolo(getTrackId(1))(t)).toBeFalsy()
     expect(TrackMute.isSoloMode(t)).toBeFalsy()
   })
 })

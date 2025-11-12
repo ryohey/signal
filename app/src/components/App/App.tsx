@@ -15,7 +15,6 @@ import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { RouterProvider } from "../../hooks/useRouter"
 import { StoreContext } from "../../hooks/useStores"
 import { TempoEditorProvider } from "../../hooks/useTempoEditor"
-import { TrackMuteProvider } from "../../hooks/useTrackMute"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
 import { ProgressDialog } from "../Dialog/ProgressDialog"
@@ -44,15 +43,13 @@ export function App() {
                           <PianoRollProvider>
                             <ArrangeViewProvider>
                               <TempoEditorProvider>
-                                <TrackMuteProvider>
-                                  <HistoryProvider>
-                                    <GlobalCSS />
-                                    {isRunningInElectron() && (
-                                      <ElectronCallbackHandler />
-                                    )}
-                                    <RootView />
-                                  </HistoryProvider>
-                                </TrackMuteProvider>
+                                <HistoryProvider>
+                                  <GlobalCSS />
+                                  {isRunningInElectron() && (
+                                    <ElectronCallbackHandler />
+                                  )}
+                                  <RootView />
+                                </HistoryProvider>
                               </TempoEditorProvider>
                             </ArrangeViewProvider>
                           </PianoRollProvider>
