@@ -2,22 +2,22 @@ import { TrackId } from "../track/Track"
 
 /**
 
-  操作によって二つのモードが切り替わる
+  Two modes are switched by user operations
 
-  ## mute モード
+  ## Mute Mode
 
-  単に mute/unmute でトラックの出力を OFF/ON にする
-  solo とは独立してミュート設定を保持する
+  Simply mute/unmute to turn track output OFF/ON
+  Mute settings are maintained independently from solo
 
-  ## solo モード
+  ## Solo Mode
 
-  何かのトラックを solo にした時にこのモードに遷移する
-  指定トラック以外の全てのトラックを mute するが、
-  追加で他のトラックを solo にしたときは
-  そのトラックの mute を解除する (mute モードのミュート設定とは独立)
+  Transitions to this mode when any track is soloed
+  Mutes all tracks except the specified one, but
+  when additionally soloing other tracks,
+  unmutes those tracks (independent from mute mode settings)
 
-  すべてのトラックの solo が解除された時に
-  mute モードに遷移する
+  Transitions back to mute mode when
+  all tracks' solo states are cleared
 
 */
 export interface TrackMute {
@@ -31,80 +31,68 @@ export namespace TrackMute {
     solos: {},
   }
 
-  function setMute(
-    trackMute: TrackMute,
-    trackId: TrackId,
-    isMute: boolean,
-  ): TrackMute {
-    if (isSoloMode(trackMute)) {
-      return trackMute // do nothing
+  const setMute =
+    (trackId: TrackId, isMute: boolean) =>
+    (trackMute: TrackMute): TrackMute => {
+      if (isSoloMode(trackMute)) {
+        return trackMute // do nothing
+      }
+      return {
+        ...trackMute,
+        mutes: {
+          ...trackMute.mutes,
+          [trackId]: isMute,
+        },
+      }
     }
-    return {
-      ...trackMute,
-      mutes: {
-        ...trackMute.mutes,
-        [trackId]: isMute,
-      },
-    }
-  }
 
-  function getMute(trackMute: TrackMute, trackId: TrackId) {
+  const getMute = (trackId: TrackId) => (trackMute: TrackMute) => {
     return trackMute.mutes[trackId] || false
   }
 
-  function setSolo(
-    trackMute: TrackMute,
-    trackId: TrackId,
-    isSolo: boolean,
-  ): TrackMute {
-    return {
-      ...trackMute,
-      solos: {
-        ...trackMute.solos,
-        [trackId]: isSolo,
-      },
+  const setSolo =
+    (trackId: TrackId, isSolo: boolean) =>
+    (trackMute: TrackMute): TrackMute => {
+      return {
+        ...trackMute,
+        solos: {
+          ...trackMute.solos,
+          [trackId]: isSolo,
+        },
+      }
     }
-  }
 
-  function getSolo(trackMute: TrackMute, trackId: TrackId) {
+  const getSolo = (trackId: TrackId) => (trackMute: TrackMute) => {
     return trackMute.solos[trackId] || false
   }
 
   export function isSoloMode(trackMute: TrackMute): boolean {
-    // どれかひとつでも solo なら solo モード
-    // Any one or Solo mode Solo mode
+    // If any track is solo, it's solo mode
     return Object.values(trackMute.solos).some((s) => s)
   }
 
-  export function isSolo(trackMute: TrackMute, trackId: TrackId) {
+  export const isSolo = (trackId: TrackId) => (trackMute: TrackMute) => {
     return isSoloMode(trackMute) && trackMute.solos[trackId]
   }
 
-  export function isMuted(trackMute: TrackMute, trackId: TrackId) {
-    return !shouldPlayTrack(trackMute, trackId)
+  export const isMuted = (trackId: TrackId) => (trackMute: TrackMute) => {
+    return !shouldPlayTrack(trackId)(trackMute)
   }
 
-  export function mute(trackMute: TrackMute, trackId: TrackId): TrackMute {
-    return setMute(trackMute, trackId, true)
-  }
+  export const mute = (trackId: TrackId) => setMute(trackId, true)
 
-  export function unmute(trackMute: TrackMute, trackId: TrackId): TrackMute {
-    return setMute(trackMute, trackId, false)
-  }
+  export const unmute = (trackId: TrackId) => setMute(trackId, false)
 
-  export function solo(trackMute: TrackMute, trackId: TrackId): TrackMute {
-    return setSolo(trackMute, trackId, true)
-  }
+  export const solo = (trackId: TrackId) => setSolo(trackId, true)
 
-  export function unsolo(trackMute: TrackMute, trackId: TrackId): TrackMute {
-    return setSolo(trackMute, trackId, false)
-  }
+  export const unsolo = (trackId: TrackId) => setSolo(trackId, false)
 
-  export function shouldPlayTrack(trackMute: TrackMute, trackId: TrackId) {
-    if (isSoloMode(trackMute)) {
-      return getSolo(trackMute, trackId)
-    } else {
-      return !getMute(trackMute, trackId)
+  export const shouldPlayTrack =
+    (trackId: TrackId) => (trackMute: TrackMute) => {
+      if (isSoloMode(trackMute)) {
+        return getSolo(trackId)(trackMute)
+      } else {
+        return !getMute(trackId)(trackMute)
+      }
     }
-  }
 }

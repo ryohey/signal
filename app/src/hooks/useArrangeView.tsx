@@ -1,13 +1,15 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { cloneDeep } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
+import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import ArrangeViewStore from "../stores/ArrangeViewStore"
-import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
 import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 import { TrackScrollProvider, useTrackScroll } from "./useTrackScroll"
 export type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-export type { SerializedArrangeViewStore } from "../stores/ArrangeViewStore"
 
 const ArrangeViewStoreContext = createContext<ArrangeViewStore>(null!)
 
@@ -49,6 +51,7 @@ export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
 export function useArrangeView() {
   const arrangeViewStore = useContext(ArrangeViewStoreContext)
   const { tickScrollStore, trackScrollStore } = arrangeViewStore
+  const { songStore } = useStores()
   const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
   const { setScrollTop } = useTrackScroll(trackScrollStore)
 
@@ -60,25 +63,29 @@ export function useArrangeView() {
       return useMobxGetter(arrangeViewStore, "transform")
     },
     get selectedTrackIndex() {
-      return useMobxGetter(arrangeViewStore, "selectedTrackIndex")
+      return useAtomValue(selectedTrackIndexAtom)
     },
     get selectedTrackId() {
-      return useMobxGetter(arrangeViewStore, "selectedTrackId")
+      const selectedTrackIndex = useAtomValue(selectedTrackIndexAtom)
+      return useMobxSelector(
+        () => songStore.song.tracks[selectedTrackIndex]?.id,
+        [songStore, selectedTrackIndex],
+      )
     },
     get selection() {
-      return useMobxGetter(arrangeViewStore, "selection")
+      return useAtomValue(selectionAtom)
     },
     get selectedEventIds() {
-      return useMobxGetter(arrangeViewStore, "selectedEventIds")
+      return useAtomValue(selectedEventIdsAtom)
     },
     get trackTransform() {
       return useMobxGetter(arrangeViewStore, "trackTransform")
     },
     get openTransposeDialog() {
-      return useMobxGetter(arrangeViewStore, "openTransposeDialog")
+      return useAtomValue(openTransposeDialogAtom)
     },
     get openVelocityDialog() {
-      return useMobxGetter(arrangeViewStore, "openVelocityDialog")
+      return useAtomValue(openVelocityDialogAtom)
     },
     rulerStore: arrangeViewStore.rulerStore,
     scrollBy: useCallback(
@@ -88,25 +95,47 @@ export function useArrangeView() {
       },
       [setScrollLeftInPixels, setScrollTop, tickScrollStore, trackScrollStore],
     ),
-    setSelectedTrackIndex: useMobxSetter(
-      arrangeViewStore,
-      "selectedTrackIndex",
-    ),
-    setSelection: useMobxSetter(arrangeViewStore, "selection"),
-    setSelectedEventIds: useMobxSetter(arrangeViewStore, "selectedEventIds"),
-    resetSelection: useCallback(() => {
-      arrangeViewStore.selection = null
-      arrangeViewStore.selectedEventIds = {}
-    }, [arrangeViewStore]),
-    setOpenTransposeDialog: useMobxSetter(
-      arrangeViewStore,
-      "openTransposeDialog",
-    ),
-    setOpenVelocityDialog: useMobxSetter(
-      arrangeViewStore,
-      "openVelocityDialog",
-    ),
-    serializeState: arrangeViewStore.serialize,
-    restoreState: arrangeViewStore.restore,
+    setSelectedTrackIndex: useSetAtom(selectedTrackIndexAtom),
+    setSelection: useSetAtom(selectionAtom),
+    setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
+    resetSelection: useSetAtom(resetSelectionAtom),
+    setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
+    setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
+    serializeState: useSetAtom(serializeAtom),
+    restoreState: useSetAtom(restoreAtom),
   }
 }
+
+// atoms
+const selectionAtom = atom<ArrangeSelection | null>(null)
+const selectedEventIdsAtom = atom<{ [trackIndex: number]: number[] }>({})
+const selectedTrackIndexAtom = atom(0)
+const openTransposeDialogAtom = atom(false)
+const openVelocityDialogAtom = atom(false)
+
+// actions
+const resetSelectionAtom = atom(null, (_get, set) => {
+  set(selectionAtom, null)
+  set(selectedEventIdsAtom, {})
+})
+const serializeAtom = atom(null, (get) => ({
+  selection: cloneDeep(get(selectionAtom)),
+  selectedEventIds: cloneDeep(get(selectedEventIdsAtom)),
+}))
+const restoreAtom = atom(
+  null,
+  (
+    _get,
+    set,
+    {
+      selection,
+      selectedEventIds,
+    }: {
+      selection: ArrangeSelection | null
+      selectedEventIds: { [trackIndex: number]: number[] }
+    },
+  ) => {
+    set(selectionAtom, selection)
+    set(selectedEventIdsAtom, selectedEventIds)
+  },
+)

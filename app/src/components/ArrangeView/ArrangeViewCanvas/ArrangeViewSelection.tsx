@@ -30,7 +30,7 @@ export const ArrangeViewSelection = ({ zIndex }: { zIndex: number }) => {
 
   const onMouseDown = useCallback(
     (e: MouseEvent) => {
-      if (selectionRect === null) {
+      if (selectionRect === null || e.button !== 0) {
         return
       }
       e.stopPropagation()

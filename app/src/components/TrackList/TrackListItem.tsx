@@ -18,7 +18,6 @@ import { useTrackMute } from "../../hooks/useTrackMute"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { TrackId } from "../../track/Track"
 import { trackColorToCSSColor } from "../../track/TrackColor"
-import { TrackMute } from "../../trackMute/TrackMute"
 import { InstrumentName } from "./InstrumentName"
 import { TrackDialog } from "./TrackDialog"
 import { TrackListContextMenu } from "./TrackListContextMenu"
@@ -159,8 +158,9 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
     programNumber,
     isRhythmTrack,
     color: trackColor,
+    isMuted,
+    isSolo,
   } = useTrack(trackId)
-  const { trackMute } = useTrackMute()
   const { setPath } = useRouter()
   const { setSetting, setOpen } = useInstrumentBrowser()
   const { toggleMute: toggleMuteTrack, toggleSolo: toggleSoloTrack } =
@@ -170,8 +170,6 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
   const selectTrack = useSelectTrack()
 
   const selected = trackId === selectedTrackId
-  const mute = TrackMute.isMuted(trackMute, trackId)
-  const solo = TrackMute.isSolo(trackMute, trackId)
   const ghostTrack = !notGhostTrackIds.has(trackId)
   const { onContextMenu, menuProps } = useContextMenu()
   const [isDialogOpened, setDialogOpened] = useState(false)
@@ -262,18 +260,18 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
           </Label>
           <Controls>
             <ControlButton
-              data-active={solo}
+              data-active={isSolo}
               onMouseDown={onClickSolo}
               tabIndex={-1}
             >
               <Headset />
             </ControlButton>
             <ControlButton
-              data-active={mute}
+              data-active={isMuted}
               onMouseDown={onClickMute}
               tabIndex={-1}
             >
-              {mute ? <VolumeOff /> : <VolumeUp />}
+              {isMuted ? <VolumeOff /> : <VolumeUp />}
             </ControlButton>
             <ControlButton
               data-active={ghostTrack}

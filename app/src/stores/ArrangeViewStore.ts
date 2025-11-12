@@ -1,15 +1,13 @@
 import { Player } from "@signal-app/player"
-import { cloneDeep } from "lodash"
-import { computed, makeObservable, observable } from "mobx"
+import { computed, makeObservable } from "mobx"
 import { MaxNoteNumber } from "../Constants"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
-import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransform"
 import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { isEventOverlapRange } from "../helpers/filterEvents"
-import { isNoteEvent, TrackId } from "../track"
+import { isNoteEvent } from "../track"
 import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
@@ -18,22 +16,11 @@ import { TrackScrollStore } from "./TrackScrollStore"
 
 const NOTE_RECT_HEIGHT = 1
 
-export type SerializedArrangeViewStore = Pick<
-  ArrangeViewStore,
-  "selection" | "selectedEventIds"
->
-
 export default class ArrangeViewStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
   readonly trackScrollStore: TrackScrollStore
   readonly quantizerStore: QuantizerStore
-
-  selection: ArrangeSelection | null = null
-  selectedEventIds: { [key: number]: number[] } = {} // { trackIndex: [eventId] }
-  selectedTrackIndex = 0
-  openTransposeDialog = false
-  openVelocityDialog = false
 
   constructor(
     private readonly songStore: SongStore,
@@ -45,28 +32,10 @@ export default class ArrangeViewStore {
     this.quantizerStore = new QuantizerStore(this.songStore, 1)
 
     makeObservable(this, {
-      selection: observable.shallow,
-      selectedEventIds: observable,
-      selectedTrackIndex: observable,
-      openTransposeDialog: observable,
-      openVelocityDialog: observable,
       transform: computed,
       trackTransform: computed,
       notes: computed,
-      selectedTrackId: computed,
     })
-  }
-
-  serialize = (): SerializedArrangeViewStore => {
-    return {
-      selection: cloneDeep(this.selection),
-      selectedEventIds: cloneDeep(this.selectedEventIds),
-    }
-  }
-
-  restore = (state: SerializedArrangeViewStore) => {
-    this.selection = state.selection
-    this.selectedEventIds = state.selectedEventIds
   }
 
   get transform(): NoteCoordTransform {
@@ -110,9 +79,5 @@ export default class ArrangeViewStore {
           }),
       )
       .flat()
-  }
-
-  get selectedTrackId(): TrackId | undefined {
-    return this.songStore.song.tracks[this.selectedTrackIndex]?.id
   }
 }

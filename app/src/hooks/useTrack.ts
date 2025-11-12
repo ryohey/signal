@@ -2,8 +2,10 @@ import { useCallback } from "react"
 import Track, { TrackId } from "../track"
 import { TrackColor } from "../track/TrackColor"
 import { TrackEvent } from "../track/TrackEvent"
+import { TrackMute } from "../trackMute/TrackMute"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { useSong } from "./useSong"
+import { useTrackMute } from "./useTrackMute"
 
 export function useTrack(id: TrackId) {
   const song = useSong()
@@ -33,6 +35,16 @@ export function useTrack(id: TrackId) {
     },
     get color() {
       return useMobxGetter(track, "color")
+    },
+    get isMuted() {
+      const { trackMute } = useTrackMute()
+      const isMuted = TrackMute.isMuted(id)(trackMute)
+      return isMuted
+    },
+    get isSolo() {
+      const { trackMute } = useTrackMute()
+      const isSolo = TrackMute.isSolo(id)(trackMute)
+      return isSolo
     },
     setColor: useCallback(
       (color: TrackColor | null) => {
