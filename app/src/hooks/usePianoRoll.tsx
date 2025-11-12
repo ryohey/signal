@@ -198,9 +198,6 @@ export function usePianoRoll() {
     get currentMBTTime() {
       return useMobxGetter(pianoRollStore, "currentMBTTime")
     },
-    get controlCursor() {
-      return useMobxGetter(pianoRollStore, "controlCursor")
-    },
     get activePane() {
       return useMobxGetter(pianoRollStore, "activePane")
     },

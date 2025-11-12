@@ -2,13 +2,14 @@ import { makeObservable, observable } from "mobx"
 import { createContext, useCallback, useContext } from "react"
 import { deserialize } from "serializr"
 import Song from "../song"
-import { SerializedRootStore } from "../stores/RootStore"
 import { useArrangeView } from "./useArrangeView"
 import { useControlPane } from "./useControlPane"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
+
+type SerializedRootStore = ReturnType<ReturnType<typeof useSerializeState>>
 
 class HistoryStore {
   undoHistory: readonly SerializedRootStore[] = []
@@ -70,13 +71,12 @@ function useSerializeState() {
   const { serializeState: serializeArrangeView } = useArrangeView()
 
   return useCallback(
-    () =>
-      ({
-        song: songStore.serialize(),
-        pianoRollStore: serializePianoRoll(),
-        controlStore: serializeControlPane(),
-        arrangeViewStore: serializeArrangeView(),
-      }) as SerializedRootStore,
+    () => ({
+      song: songStore.serialize(),
+      pianoRollStore: serializePianoRoll(),
+      controlStore: serializeControlPane(),
+      arrangeViewStore: serializeArrangeView(),
+    }),
     [songStore, serializePianoRoll, serializeControlPane, serializeArrangeView],
   )
 }

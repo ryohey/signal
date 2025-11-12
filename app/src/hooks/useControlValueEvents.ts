@@ -13,8 +13,8 @@ import { useTickScroll } from "./useTickScroll"
 import { useTrack } from "./useTrack"
 
 export function useControlValueEvents() {
-  const { controlMode, transform } = useControlPane()
-  const { scrollLeft } = useTickScroll()
+  const { controlMode } = useControlPane()
+  const { transform, scrollLeft } = useTickScroll()
   const { windowedEvents, selectedTrackId } = usePianoRoll()
   const { events: selectedTrackEvents } = useTrack(selectedTrackId)
 

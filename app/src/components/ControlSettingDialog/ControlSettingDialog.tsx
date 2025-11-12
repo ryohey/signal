@@ -4,15 +4,15 @@ import { range } from "lodash"
 import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
 import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
 import { useCallback, useState } from "react"
-import { useControlPane } from "../../hooks/useControlPane"
-import { useRootView } from "../../hooks/useRootView"
-import { Localized } from "../../localize/useLocalization"
 import {
   ControlMode,
   controlModeKey,
   defaultControlModes,
   isEqualControlMode,
-} from "../../stores/ControlStore"
+} from "../../entities/control/ControlMode"
+import { useControlPane } from "../../hooks/useControlPane"
+import { useRootView } from "../../hooks/useRootView"
+import { Localized } from "../../localize/useLocalization"
 import { ControlName } from "../ControlPane/ControlName"
 import {
   Dialog,

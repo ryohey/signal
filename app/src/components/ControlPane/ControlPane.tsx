@@ -2,11 +2,14 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
 import React, { FC, useCallback, useRef } from "react"
+import {
+  ControlMode,
+  isEqualControlMode,
+} from "../../entities/control/ControlMode"
 import { useControlPane } from "../../hooks/useControlPane"
 import { useControlPaneKeyboardShortcut } from "../../hooks/useControlPaneKeyboardShortcut"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
-import { ControlMode, isEqualControlMode } from "../../stores/ControlStore"
 import { ControlName } from "./ControlName"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
 import PianoVelocityControl from "./VelocityControl/VelocityControl"

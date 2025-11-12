@@ -119,7 +119,6 @@ export default class PianoRollStore {
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
-      controlCursor: computed,
       selectedTrack: computed,
     })
   }
@@ -261,11 +260,5 @@ export default class PianoRollStore {
       this.player.position,
       this.songStore.song.timebase,
     )
-  }
-
-  get controlCursor(): string {
-    return this.mouseMode === "pencil"
-      ? `url("./cursor-pencil.svg") 0 20, pointer`
-      : "auto"
   }
 }

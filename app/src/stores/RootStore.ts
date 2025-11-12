@@ -6,23 +6,10 @@ import { GroupOutput } from "../services/GroupOutput"
 import { MIDIInput } from "../services/MIDIInput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
-import { SerializedArrangeViewStore } from "./ArrangeViewStore"
-import { SerializedControlStore } from "./ControlStore"
 import { MIDIDeviceStore } from "./MIDIDeviceStore"
-import { SerializedPianoRollStore } from "./PianoRollStore"
 import { registerReactions } from "./reactions"
 import { SongStore } from "./SongStore"
 import { SoundFontStore } from "./SoundFontStore"
-
-// we use any for now. related: https://github.com/Microsoft/TypeScript/issues/1897
-type Json = any
-
-export interface SerializedRootStore {
-  song: Json
-  pianoRollStore: SerializedPianoRollStore
-  controlStore: SerializedControlStore
-  arrangeViewStore: SerializedArrangeViewStore
-}
 
 export default class RootStore {
   readonly songStore = new SongStore()

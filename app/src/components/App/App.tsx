@@ -10,7 +10,6 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
-import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { RouterProvider } from "../../hooks/useRouter"
@@ -45,21 +44,19 @@ export function App() {
                         <RouterProvider>
                           <AuthProvider>
                             <PianoRollProvider>
-                              <ControlPaneProvider>
-                                <ArrangeViewProvider>
-                                  <TempoEditorProvider>
-                                    <TrackMuteProvider>
-                                      <HistoryProvider>
-                                        <GlobalCSS />
-                                        {isRunningInElectron() && (
-                                          <ElectronCallbackHandler />
-                                        )}
-                                        <RootView />
-                                      </HistoryProvider>
-                                    </TrackMuteProvider>
-                                  </TempoEditorProvider>
-                                </ArrangeViewProvider>
-                              </ControlPaneProvider>
+                              <ArrangeViewProvider>
+                                <TempoEditorProvider>
+                                  <TrackMuteProvider>
+                                    <HistoryProvider>
+                                      <GlobalCSS />
+                                      {isRunningInElectron() && (
+                                        <ElectronCallbackHandler />
+                                      )}
+                                      <RootView />
+                                    </HistoryProvider>
+                                  </TrackMuteProvider>
+                                </TempoEditorProvider>
+                              </ArrangeViewProvider>
                             </PianoRollProvider>
                           </AuthProvider>
                         </RouterProvider>

@@ -3,6 +3,7 @@ import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { useControlPane } from "../../../hooks/useControlPane"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { useDragSelectionGesture } from "../Graph/MouseHandler/useDragSelectionGesture"
 import { LineGraphItems } from "./LineGraphItems"
@@ -26,7 +27,8 @@ export const ControlLineGraphItems = ({
   circleRadius: number
   controlTransform: ControlCoordTransform
 }) => {
-  const { selectedEventIds, mouseMode } = useControlPane()
+  const { selectedEventIds } = useControlPane()
+  const { mouseMode } = usePianoRoll()
   const { scrollLeft } = useTickScroll()
   const dragSelectionGesture = useDragSelectionGesture()
 
