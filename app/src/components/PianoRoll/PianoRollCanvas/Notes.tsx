@@ -76,6 +76,8 @@ const _Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
 const NoteHitAreas = ({ zIndex }: { zIndex: number }) => {
   const { notes, selectedNoteIds } = usePianoRoll()
   const removeNoteGesture = useRemoveNoteGesture()
+  const { selectedNoteIds, selectedTrackId } = usePianoRoll()
+  const { removeEvent } = useTrack(selectedTrackId)
   const dragNoteCenterGesture = useDragNoteCenterGesture()
   const dragNoteLeftGesture = useDragNoteLeftGesture()
   const dragNoteRightGesture = useDragNoteRightGesture()
@@ -108,20 +110,32 @@ const NoteHitAreas = ({ zIndex }: { zIndex: number }) => {
           break
         }
         case 2:
-          return removeNoteGesture.onMouseDown(e)
+          removeEvent(item.id)
+          break
         default:
           return null
       }
     },
     [
       selectedNoteIds,
-      removeNoteGesture,
+      removeEvent,
       dragNoteCenterGesture,
       dragNoteLeftGesture,
       dragNoteRightGesture,
       removeNoteFromSelectionGesture,
       addNoteToSelectionGesture,
     ],
+  )
+
+  const onMouseMove = useCallback(
+    (e: MouseEvent, item: PianoNoteItem) => {
+      // Right click to remove note while dragging
+      if (e.buttons === 2) {
+        e.stopPropagation()
+        removeEvent(item.id)
+      }
+    },
+    [removeEvent],
   )
 
   return (
@@ -132,6 +146,7 @@ const NoteHitAreas = ({ zIndex }: { zIndex: number }) => {
           note={note}
           zIndex={zIndex}
           onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
         />
       ))}
     </>
@@ -143,6 +158,7 @@ const NoteHitArea = React.memo(
     note,
     zIndex,
     onMouseDown,
+    onMouseMove,
   }: {
     note: PianoNoteItem
     zIndex: number
@@ -151,6 +167,7 @@ const NoteHitArea = React.memo(
       item: PianoNoteItem,
       position: MousePositionType,
     ) => void
+    onMouseMove?: (e: MouseEvent, item: PianoNoteItem) => void
   }) => {
     const edgeSize = Math.min(note.width / 3, 8)
     const leftEdgeBounds = useMemo(
@@ -192,6 +209,12 @@ const NoteHitArea = React.memo(
       (e: MouseEvent) => onMouseDown(e, note, "right"),
       [onMouseDown, note],
     )
+    const onMouseMoveAll = useCallback(
+      (e: MouseEvent) => {
+        onMouseMove?.(e, note)
+      },
+      [onMouseMove, note],
+    )
     return (
       <>
         {/* left edge */}
@@ -201,6 +224,7 @@ const NoteHitArea = React.memo(
           cursor="w-resize"
           zIndex={zIndex}
           onMouseDown={onMouseDownLeft}
+          onMouseMove={onMouseMoveAll}
         />
         {/* center */}
         <HitArea
@@ -209,6 +233,7 @@ const NoteHitArea = React.memo(
           cursor="move"
           zIndex={zIndex}
           onMouseDown={onMouseDownCenter}
+          onMouseMove={onMouseMoveAll}
         />
         {/* right edge */}
         <HitArea
@@ -217,6 +242,7 @@ const NoteHitArea = React.memo(
           cursor="e-resize"
           zIndex={zIndex}
           onMouseDown={onMouseDownRight}
+          onMouseMove={onMouseMoveAll}
         />
       </>
     )

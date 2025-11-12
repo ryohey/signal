@@ -8,12 +8,10 @@ import {
   useMemo,
 } from "react"
 import { Point } from "../entities/geometry/Point"
-import { Rect } from "../entities/geometry/Rect"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { addedSet, deletedSet } from "../helpers/set"
 import PianoRollStore, {
-  PianoNoteItem,
   PianoRollMouseMode,
   SerializedPianoRollStore,
 } from "../stores/PianoRollStore"
@@ -274,11 +272,6 @@ export function usePianoRoll() {
         y: e.offsetY + keyScrollStore.scrollTop,
       }),
       [keyScrollStore, tickScrollStore],
-    ),
-    getNotes: useCallback(
-      (local: Point): PianoNoteItem[] =>
-        pianoRollStore.notes.filter((n) => Rect.containsPoint(n, local)),
-      [pianoRollStore],
     ),
     getSelection: useCallback(() => pianoRollStore.selection, [pianoRollStore]),
     getSelectedTrack: useCallback(
