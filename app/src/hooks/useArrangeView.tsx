@@ -68,9 +68,6 @@ export function useArrangeView() {
     get selection() {
       return useMobxGetter(arrangeViewStore, "selection")
     },
-    get selectionRect() {
-      return useMobxGetter(arrangeViewStore, "selectionRect")
-    },
     get selectedEventIds() {
       return useMobxGetter(arrangeViewStore, "selectedEventIds")
     },
