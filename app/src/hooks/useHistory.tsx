@@ -1,53 +1,23 @@
-import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext } from "react"
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomCallback } from "jotai/utils"
+import { useCallback } from "react"
 import { deserialize } from "serializr"
 import Song from "../song"
 import { useArrangeView } from "./useArrangeView"
 import { useControlPane } from "./useControlPane"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 type SerializedRootStore = ReturnType<ReturnType<typeof useSerializeState>>
 
-class HistoryStore {
-  undoHistory: readonly SerializedRootStore[] = []
-  redoHistory: readonly SerializedRootStore[] = []
-
-  constructor() {
-    makeObservable(this, {
-      undoHistory: observable.ref,
-      redoHistory: observable.ref,
-    })
-  }
-}
-
-const HistoryStoreContext = createContext(new HistoryStore())
-
-export function HistoryProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <HistoryStoreContext.Provider value={new HistoryStore()}>
-      {children}
-    </HistoryStoreContext.Provider>
-  )
-}
-
 export function useHistory() {
-  const historyStore = useContext(HistoryStoreContext)
-
   return {
     get hasUndo() {
-      return useMobxSelector(
-        () => historyStore.undoHistory.length > 0,
-        [historyStore],
-      )
+      return useAtomValue(hasUndoAtom)
     },
     get hasRedo() {
-      return useMobxSelector(
-        () => historyStore.redoHistory.length > 0,
-        [historyStore],
-      )
+      return useAtomValue(hasRedoAtom)
     },
     get pushHistory() {
       return usePushHistory()
@@ -58,9 +28,7 @@ export function useHistory() {
     get redo() {
       return useRedo()
     },
-    get clear() {
-      return useClearHistory()
-    },
+    clear: useSetAtom(clearHistoryAtom),
   }
 }
 
@@ -100,51 +68,84 @@ function useRestoreState() {
 }
 
 function usePushHistory() {
-  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
 
-  return useCallback(() => {
-    historyStore.undoHistory = [...historyStore.undoHistory, serializeState()]
-  }, [historyStore, serializeState])
+  return useAtomCallback(
+    useCallback(
+      (_get, set) => {
+        const state = serializeState()
+        set(pushHistoryAtom, state)
+      },
+      [serializeState],
+    ),
+  )
 }
 
 function useUndo() {
-  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
-  return useCallback(() => {
-    const undoHistory = [...historyStore.undoHistory]
-    const state = undoHistory.pop()
-    if (state) {
-      historyStore.undoHistory = undoHistory
-      historyStore.redoHistory = [...historyStore.redoHistory, serializeState()]
-      restoreState(state)
-    }
-  }, [historyStore, serializeState, restoreState])
+  return useAtomCallback(
+    useCallback(
+      (_get, set) => {
+        const state = set(undoAtom, serializeState())
+        if (state) {
+          restoreState(state)
+        }
+      },
+      [restoreState, serializeState],
+    ),
+  )
 }
 
 function useRedo() {
-  const historyStore = useContext(HistoryStoreContext)
   const serializeState = useSerializeState()
   const restoreState = useRestoreState()
 
-  return useCallback(() => {
-    const redoHistory = [...historyStore.redoHistory]
-    const state = redoHistory.pop()
-    if (state) {
-      historyStore.redoHistory = redoHistory
-      historyStore.undoHistory = [...historyStore.undoHistory, serializeState()]
-      restoreState(state)
-    }
-  }, [historyStore, serializeState, restoreState])
+  return useAtomCallback(
+    useCallback(
+      (_get, set) => {
+        const state = set(redoAtom, serializeState())
+        if (state) {
+          restoreState(state)
+        }
+      },
+      [serializeState, restoreState],
+    ),
+  )
 }
 
-function useClearHistory() {
-  const historyStore = useContext(HistoryStoreContext)
+// atoms
+const undoHistoryAtom = atom<readonly SerializedRootStore[]>([])
+const redoHistoryAtom = atom<readonly SerializedRootStore[]>([])
 
-  return useCallback(() => {
-    historyStore.undoHistory = []
-    historyStore.redoHistory = []
-  }, [historyStore])
-}
+// derived atoms
+const hasUndoAtom = atom((get) => get(undoHistoryAtom).length > 0)
+const hasRedoAtom = atom((get) => get(redoHistoryAtom).length > 0)
+
+// actions
+const pushHistoryAtom = atom(null, (_get, set, state: SerializedRootStore) => {
+  set(undoHistoryAtom, (prev) => [...prev, state])
+})
+const undoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
+  const undoHistory = [...get(undoHistoryAtom)]
+  const state = undoHistory.pop()
+  if (state) {
+    set(undoHistoryAtom, undoHistory)
+    set(redoHistoryAtom, (prev) => [...prev, currentState])
+  }
+  return state
+})
+const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
+  const redoHistory = [...get(redoHistoryAtom)]
+  const state = redoHistory.pop()
+  if (state) {
+    set(redoHistoryAtom, redoHistory)
+    set(undoHistoryAtom, (prev) => [...prev, currentState])
+  }
+  return state
+})
+const clearHistoryAtom = atom(null, (get, set) => {
+  set(undoHistoryAtom, [])
+  set(redoHistoryAtom, [])
+})

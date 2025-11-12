@@ -10,7 +10,6 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
-import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { RouterProvider } from "../../hooks/useRouter"
 import { StoreContext } from "../../hooks/useStores"
@@ -43,13 +42,11 @@ export function App() {
                           <PianoRollProvider>
                             <ArrangeViewProvider>
                               <TempoEditorProvider>
-                                <HistoryProvider>
-                                  <GlobalCSS />
-                                  {isRunningInElectron() && (
-                                    <ElectronCallbackHandler />
-                                  )}
-                                  <RootView />
-                                </HistoryProvider>
+                                <GlobalCSS />
+                                {isRunningInElectron() && (
+                                  <ElectronCallbackHandler />
+                                )}
+                                <RootView />
                               </TempoEditorProvider>
                             </ArrangeViewProvider>
                           </PianoRollProvider>
