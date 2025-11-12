@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import ArrangeViewStore from "../stores/ArrangeViewStore"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
@@ -27,10 +21,6 @@ export function ArrangeViewProvider({
     () => new ArrangeViewStore(songStore, player),
     [songStore, player],
   )
-
-  useEffect(() => {
-    arrangeViewStore.setUpAutorun()
-  }, [arrangeViewStore])
 
   return (
     <ArrangeViewStoreContext.Provider value={arrangeViewStore}>
@@ -77,9 +67,6 @@ export function useArrangeView() {
     },
     get selection() {
       return useMobxGetter(arrangeViewStore, "selection")
-    },
-    get selectionRect() {
-      return useMobxGetter(arrangeViewStore, "selectionRect")
     },
     get selectedEventIds() {
       return useMobxGetter(arrangeViewStore, "selectedEventIds")

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import ArrowLeft from "mdi-react/MenuLeftIcon"
 import { FC, useCallback, useRef } from "react"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useTrackList } from "../../hooks/useTrackList"
 
 const NavBackButton = styled.button`
   -webkit-appearance: none;
@@ -32,13 +32,8 @@ const ArrowIcon: FC<ArrowIconProps> = ({ isOpen }) => (
 )
 
 export const TrackListMenuButton: FC = () => {
-  const { showTrackList, setShowTrackList } = usePianoRoll()
-  const open = showTrackList
-  const onClickNavBack = useCallback(
-    () => setShowTrackList(!showTrackList),
-    [showTrackList, setShowTrackList],
-  )
-
+  const { isOpen, setOpen } = useTrackList()
+  const onClickNavBack = useCallback(() => setOpen((prev) => !prev), [setOpen])
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
@@ -51,7 +46,7 @@ export const TrackListMenuButton: FC = () => {
           onClickNavBack()
         }}
       >
-        <ArrowIcon isOpen={open} />
+        <ArrowIcon isOpen={isOpen} />
       </NavBackButton>
     </>
   )

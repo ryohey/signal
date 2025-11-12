@@ -1,3 +1,4 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
 import { TrackId } from "../track"
 import { useSong } from "./useSong"
@@ -9,6 +10,10 @@ export function useTrackList() {
     .map((track) => track.id)
 
   return {
+    get isOpen() {
+      return useAtomValue(isOpenAtom)
+    },
+    setOpen: useSetAtom(isOpenAtom),
     trackIds,
     moveTrack: useCallback(
       (id: TrackId, overId: TrackId) => {
@@ -25,3 +30,6 @@ export function useTrackList() {
     ),
   }
 }
+
+// atoms
+const isOpenAtom = atom(false)

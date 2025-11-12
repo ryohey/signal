@@ -1,10 +1,27 @@
 import { clamp } from "lodash"
-import { createContext, useCallback, useContext } from "react"
+import { createContext, useCallback, useContext, useEffect } from "react"
 import { TickScrollStore } from "../stores/TickScrollStore"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 
 const TickScrollContext = createContext<TickScrollStore>(null!)
-export const TickScrollProvider = TickScrollContext.Provider
+
+export function TickScrollProvider({
+  children,
+  value,
+}: {
+  children: React.ReactNode
+  value: TickScrollStore
+}) {
+  useEffect(() => {
+    value.setUpAutoScroll()
+  }, [value])
+
+  return (
+    <TickScrollContext.Provider value={value}>
+      {children}
+    </TickScrollContext.Provider>
+  )
+}
 
 export function useTickScroll(
   tickScrollStore: TickScrollStore = useContext(TickScrollContext),

@@ -6,10 +6,10 @@ import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { Selection } from "../../GLNodes/Selection"
 import { useCreateSelectionGesture } from "../MouseHandler/useCreateSelectionGesture"
 import { usePencilGesture } from "../MouseHandler/usePencilGesture"
 import { Lines } from "./Lines"
+import { TempoGraphSelection } from "./TempoGraphSelection"
 import { TempoItems } from "./TempoItems"
 
 export interface TempoGraphCanvasProps {
@@ -25,7 +25,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   style,
   className,
 }) => {
-  const { selectionRect, transform, mouseMode, cursor } = useTempoEditor()
+  const { transform, mouseMode } = useTempoEditor()
   const { beats } = useRuler()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const pencilGesture = usePencilGesture()
@@ -61,12 +61,12 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     [scrollLeft],
   )
 
-  const computedStyle = useMemo(
-    () => ({
-      ...style,
-      cursor,
-    }),
-    [style, cursor],
+  const cursor = useMemo(
+    () =>
+      mouseMode === "pencil"
+        ? `url("./cursor-pencil.svg") 0 20, pointer`
+        : "auto",
+    [mouseMode],
   )
 
   return (
@@ -74,14 +74,15 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       width={width}
       height={height}
       onMouseDown={onMouseDownGraph}
-      style={computedStyle}
+      style={style}
       className={className}
+      cursor={cursor}
     >
       <Lines width={width} zIndex={0} />
       <Transform matrix={scrollXMatrix}>
         <Beats height={height} beats={beats} zIndex={1} />
         <TempoItems width={width} zIndex={2} />
-        <Selection rect={selectionRect} zIndex={3} />
+        <TempoGraphSelection zIndex={3} />
         <Cursor x={cursorX} height={height} zIndex={4} />
       </Transform>
     </GLCanvas>

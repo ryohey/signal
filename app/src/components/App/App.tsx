@@ -10,11 +10,9 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
-import { ControlPaneProvider } from "../../hooks/useControlPane"
 import { HistoryProvider } from "../../hooks/useHistory"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { RouterProvider } from "../../hooks/useRouter"
-import { SettingProvider } from "../../hooks/useSettings"
 import { StoreContext } from "../../hooks/useStores"
 import { TempoEditorProvider } from "../../hooks/useTempoEditor"
 import { TrackMuteProvider } from "../../hooks/useTrackMute"
@@ -34,43 +32,39 @@ export function App() {
   return (
     <React.StrictMode>
       <StoreContext.Provider value={rootStore}>
-        <SettingProvider>
-          <ThemeProvider>
-            <HelmetProvider>
-              <ToastProvider component={Toast}>
-                <PromptProvider component={PromptDialog}>
-                  <DialogProvider component={ActionDialog}>
-                    <ProgressProvider component={ProgressDialog}>
-                      <LocalizationProvider>
-                        <RouterProvider>
-                          <AuthProvider>
-                            <PianoRollProvider>
-                              <ControlPaneProvider>
-                                <ArrangeViewProvider>
-                                  <TempoEditorProvider>
-                                    <TrackMuteProvider>
-                                      <HistoryProvider>
-                                        <GlobalCSS />
-                                        {isRunningInElectron() && (
-                                          <ElectronCallbackHandler />
-                                        )}
-                                        <RootView />
-                                      </HistoryProvider>
-                                    </TrackMuteProvider>
-                                  </TempoEditorProvider>
-                                </ArrangeViewProvider>
-                              </ControlPaneProvider>
-                            </PianoRollProvider>
-                          </AuthProvider>
-                        </RouterProvider>
-                      </LocalizationProvider>
-                    </ProgressProvider>
-                  </DialogProvider>
-                </PromptProvider>
-              </ToastProvider>
-            </HelmetProvider>
-          </ThemeProvider>
-        </SettingProvider>
+        <ThemeProvider>
+          <HelmetProvider>
+            <ToastProvider component={Toast}>
+              <PromptProvider component={PromptDialog}>
+                <DialogProvider component={ActionDialog}>
+                  <ProgressProvider component={ProgressDialog}>
+                    <LocalizationProvider>
+                      <RouterProvider>
+                        <AuthProvider>
+                          <PianoRollProvider>
+                            <ArrangeViewProvider>
+                              <TempoEditorProvider>
+                                <TrackMuteProvider>
+                                  <HistoryProvider>
+                                    <GlobalCSS />
+                                    {isRunningInElectron() && (
+                                      <ElectronCallbackHandler />
+                                    )}
+                                    <RootView />
+                                  </HistoryProvider>
+                                </TrackMuteProvider>
+                              </TempoEditorProvider>
+                            </ArrangeViewProvider>
+                          </PianoRollProvider>
+                        </AuthProvider>
+                      </RouterProvider>
+                    </LocalizationProvider>
+                  </ProgressProvider>
+                </DialogProvider>
+              </PromptProvider>
+            </ToastProvider>
+          </HelmetProvider>
+        </ThemeProvider>
       </StoreContext.Provider>
     </React.StrictMode>
   )

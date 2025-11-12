@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { useSettings } from "../../hooks/useSettings"
 import {
   Language,
@@ -68,11 +68,17 @@ const ThemeSelect: FC = () => {
 
 const ShowNoteLabelCheckbox: FC = () => {
   const { showNoteLabels, setShowNoteLabels } = useSettings()
+  const onCheckedChange = useCallback(
+    (checked: boolean) => {
+      setShowNoteLabels(checked)
+    },
+    [setShowNoteLabels],
+  )
 
   return (
     <Checkbox
       checked={showNoteLabels}
-      onCheckedChange={setShowNoteLabels}
+      onCheckedChange={onCheckedChange}
       label={<Localized name="show-note-labels" />}
     />
   )

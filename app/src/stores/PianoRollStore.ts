@@ -1,7 +1,6 @@
 import { Player } from "@signal-app/player"
 import { cloneDeep } from "lodash"
 import { computed, makeObservable, observable, reaction } from "mobx"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { Measure } from "../entities/measure/Measure"
@@ -63,14 +62,7 @@ export default class PianoRollStore {
   selection: Selection | null = null
   selectedNoteIds: number[] = []
   lastNoteDuration: number | null = null
-  openInstrumentBrowser = false
-  instrumentBrowserSetting: InstrumentSetting = {
-    isRhythmTrack: false,
-    programNumber: 0,
-  }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
-  showTrackList = false
-  showEventList = false
   openTransposeDialog = false
   openVelocityDialog = false
   newNoteVelocity = 100
@@ -98,11 +90,7 @@ export default class PianoRollStore {
       selection: observable.shallow,
       selectedNoteIds: observable,
       lastNoteDuration: observable,
-      openInstrumentBrowser: observable,
-      instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
-      showTrackList: observable,
-      showEventList: observable,
       openTransposeDialog: observable,
       openVelocityDialog: observable,
       newNoteVelocity: observable,
@@ -115,18 +103,14 @@ export default class PianoRollStore {
       notes: computed,
       selectedTrackIndex: computed,
       ghostTrackIds: computed,
-      selectionBounds: computed,
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
-      controlCursor: computed,
       selectedTrack: computed,
     })
   }
 
   setUpAutorun() {
-    this.tickScrollStore.setUpAutoScroll()
-
     // reset selection when change track or mouse mode
     reaction(
       () => ({
@@ -240,13 +224,6 @@ export default class PianoRollStore {
       .map((track) => track.id)
   }
 
-  get selectionBounds(): Rect | null {
-    if (this.selection !== null) {
-      return Selection.getBounds(this.selection, this.transform)
-    }
-    return null
-  }
-
   get currentVolume(): number | undefined {
     return this.selectedTrack?.getVolume(this.player.position)
   }
@@ -261,11 +238,5 @@ export default class PianoRollStore {
       this.player.position,
       this.songStore.song.timebase,
     )
-  }
-
-  get controlCursor(): string {
-    return this.mouseMode === "pencil"
-      ? `url("./cursor-pencil.svg") 0 20, pointer`
-      : "auto"
   }
 }

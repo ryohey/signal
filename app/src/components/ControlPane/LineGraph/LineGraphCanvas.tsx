@@ -9,7 +9,7 @@ import { ControlCoordTransform } from "../../../entities/transform/ControlCoordT
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useContextMenu } from "../../../hooks/useContextMenu"
-import { useControlPane } from "../../../hooks/useControlPane"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { TrackEventOf } from "../../../track"
@@ -42,13 +42,16 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   lineWidth = 2,
   circleRadius = 4,
 }: LineGraphCanvasProps<T>) => {
-  const { cursor, mouseMode } = useControlPane()
+  const { mouseMode } = usePianoRoll()
   const { beats } = useRuler()
   const theme = useTheme()
   const { cursorX, transform: tickTransform, scrollLeft } = useTickScroll()
   const handlePencilMouseDown = usePencilGesture(eventType)
   const createSelectionGesture = useCreateSelectionGesture()
   const { onContextMenu, menuProps } = useContextMenu()
+
+  const cursor =
+    mouseMode === "pencil" ? `url("./cursor-pencil.svg") 0 20, pointer` : "auto"
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),
@@ -103,8 +106,8 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
     mouseMode === "pencil" ? pencilMouseDown : selectionMouseDown
 
   const style = useMemo(
-    () => ({ cursor, backgroundColor: theme.editorBackgroundColor }),
-    [cursor, theme],
+    () => ({ backgroundColor: theme.editorBackgroundColor }),
+    [theme],
   )
 
   return (
@@ -115,6 +118,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
         onMouseDown={onMouseDown}
         onContextMenu={onContextMenu}
         style={style}
+        cursor={cursor}
       >
         <Transform matrix={scrollXMatrix}>
           <Beats height={height} beats={beats} zIndex={0} />

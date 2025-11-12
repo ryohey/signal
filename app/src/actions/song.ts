@@ -5,6 +5,7 @@ import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
+import { useTrackList } from "../hooks/useTrackList"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/midiConversion"
 import Song, { emptySong } from "../song"
@@ -25,10 +26,10 @@ export const useSetSong = () => {
   const { clear: clearHistory } = useHistory()
   const { reset: resetTrackMute } = useTrackMute()
   const { stop, reset, setPosition } = usePlayer()
+  const { setOpen: setShowTrackList } = useTrackList()
   const {
     setNotGhostTrackIds,
     setScrollLeftInPixels,
-    setShowTrackList,
     setSelection,
     setSelectedNoteIds,
     setSelectedTrackId,

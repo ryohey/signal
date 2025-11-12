@@ -1,13 +1,30 @@
 import { HitArea } from "@ryohey/webgl-react"
 import { FC, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
+import { Selection as SelectionEntity } from "../../../entities/selection/Selection"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { Selection } from "../../GLNodes/Selection"
 import { useDragSelectionLeftEdgeGesture } from "../MouseHandler/gestures/useDragSelectionLeftEdgeGesture"
 import { useDragSelectionRightEdgeGesture } from "../MouseHandler/gestures/useDragSelectionRightEdgeGesture"
 import { useMoveSelectionGesture } from "../MouseHandler/gestures/useMoveSelectionGesture"
 
-export const NoteSelection: FC<{ rect: Rect; zIndex: number }> = ({
+export const NoteSelection: FC<{ zIndex: number }> = ({ zIndex }) => {
+  const { selection, transform } = usePianoRoll()
+  const selectionBounds = useMemo(() => {
+    if (selection === null) {
+      return null
+    }
+    return SelectionEntity.getBounds(selection, transform)
+  }, [selection, transform])
+
+  if (selectionBounds === null) {
+    return <></>
+  }
+
+  return <NoteSelectionContent rect={selectionBounds} zIndex={zIndex} />
+}
+
+const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
   rect,
   zIndex,
 }) => {

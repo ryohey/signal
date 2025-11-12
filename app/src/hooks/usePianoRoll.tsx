@@ -168,15 +168,6 @@ export function usePianoRoll() {
     get windowedEvents() {
       return useMobxGetter(pianoRollStore, "windowedEvents")
     },
-    get selectionBounds() {
-      return useMobxGetter(pianoRollStore, "selectionBounds")
-    },
-    get showTrackList() {
-      return useMobxGetter(pianoRollStore, "showTrackList")
-    },
-    get showEventList() {
-      return useMobxGetter(pianoRollStore, "showEventList")
-    },
     get ghostTrackIds() {
       return useMobxGetter(pianoRollStore, "ghostTrackIds")
     },
@@ -197,9 +188,6 @@ export function usePianoRoll() {
     },
     get currentMBTTime() {
       return useMobxGetter(pianoRollStore, "currentMBTTime")
-    },
-    get controlCursor() {
-      return useMobxGetter(pianoRollStore, "controlCursor")
     },
     get activePane() {
       return useMobxGetter(pianoRollStore, "activePane")
@@ -262,14 +250,6 @@ export function usePianoRoll() {
     ),
     setSelection: useCallback(
       (selection: Selection | null) => (pianoRollStore.selection = selection),
-      [pianoRollStore],
-    ),
-    setShowTrackList: useCallback(
-      (show: boolean) => (pianoRollStore.showTrackList = show),
-      [pianoRollStore],
-    ),
-    setShowEventList: useCallback(
-      (show: boolean) => (pianoRollStore.showEventList = show),
       [pianoRollStore],
     ),
     setScrollLeftInTicks,

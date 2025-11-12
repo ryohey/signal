@@ -53,13 +53,8 @@ export default class ArrangeViewStore {
       transform: computed,
       trackTransform: computed,
       notes: computed,
-      selectionRect: computed,
       selectedTrackId: computed,
     })
-  }
-
-  setUpAutorun() {
-    this.tickScrollStore.setUpAutoScroll()
   }
 
   serialize = (): SerializedArrangeViewStore => {
@@ -115,24 +110,6 @@ export default class ArrangeViewStore {
           }),
       )
       .flat()
-  }
-
-  get selectionRect(): Rect | null {
-    const { selection, trackTransform } = this
-    const { transform } = this.tickScrollStore
-    if (selection === null) {
-      return null
-    }
-    const x = transform.getX(selection.fromTick)
-    const right = transform.getX(selection.toTick)
-    const y = trackTransform.getY(selection.fromTrackIndex)
-    const bottom = trackTransform.getY(selection.toTrackIndex)
-    return {
-      x,
-      width: right - x,
-      y,
-      height: bottom - y,
-    }
   }
 
   get selectedTrackId(): TrackId | undefined {
