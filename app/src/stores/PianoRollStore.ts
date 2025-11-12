@@ -7,8 +7,7 @@ import { Measure } from "../entities/measure/Measure"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
-import { isEventOverlapRange } from "../helpers/filterEvents"
-import Track, { TrackEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
+import Track, { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { KeyScrollStore } from "./KeyScrollStore"
 import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
@@ -92,7 +91,6 @@ export default class PianoRollStore {
       activePane: observable,
       previewingNoteNumbers: observable.ref,
       transform: computed,
-      windowedEvents: computed,
       selectedTrackIndex: computed,
       ghostTrackIds: computed,
       currentVolume: computed,
@@ -144,24 +142,6 @@ export default class PianoRollStore {
     return new NoteCoordTransform(
       this.tickScrollStore.transform,
       this.keyScrollStore.transform,
-    )
-  }
-
-  get windowedEvents(): TrackEvent[] {
-    const { transform, selectedTrack: track } = this
-    const { canvasWidth, scrollLeft } = this.tickScrollStore
-
-    if (track === undefined) {
-      return []
-    }
-
-    return track.events.filter(
-      isEventOverlapRange(
-        Range.fromLength(
-          transform.getTick(scrollLeft),
-          transform.getTick(canvasWidth),
-        ),
-      ),
     )
   }
 

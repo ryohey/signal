@@ -168,9 +168,6 @@ export function usePianoRoll() {
     get transform() {
       return useMobxGetter(pianoRollStore, "transform")
     },
-    get windowedEvents() {
-      return useMobxGetter(pianoRollStore, "windowedEvents")
-    },
     get ghostTrackIds() {
       return useMobxGetter(pianoRollStore, "ghostTrackIds")
     },
