@@ -1,7 +1,6 @@
 import { Player } from "@signal-app/player"
 import { cloneDeep } from "lodash"
 import { computed, makeObservable, observable, reaction } from "mobx"
-import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
 import { Measure } from "../entities/measure/Measure"
@@ -63,11 +62,6 @@ export default class PianoRollStore {
   selection: Selection | null = null
   selectedNoteIds: number[] = []
   lastNoteDuration: number | null = null
-  openInstrumentBrowser = false
-  instrumentBrowserSetting: InstrumentSetting = {
-    isRhythmTrack: false,
-    programNumber: 0,
-  }
   notGhostTrackIds: ReadonlySet<TrackId> = new Set()
   openTransposeDialog = false
   openVelocityDialog = false
@@ -96,8 +90,6 @@ export default class PianoRollStore {
       selection: observable.shallow,
       selectedNoteIds: observable,
       lastNoteDuration: observable,
-      openInstrumentBrowser: observable,
-      instrumentBrowserSetting: observable,
       notGhostTrackIds: observable,
       openTransposeDialog: observable,
       openVelocityDialog: observable,
