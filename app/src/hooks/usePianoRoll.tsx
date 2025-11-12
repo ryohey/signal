@@ -168,9 +168,6 @@ export function usePianoRoll() {
     get windowedEvents() {
       return useMobxGetter(pianoRollStore, "windowedEvents")
     },
-    get showEventList() {
-      return useMobxGetter(pianoRollStore, "showEventList")
-    },
     get ghostTrackIds() {
       return useMobxGetter(pianoRollStore, "ghostTrackIds")
     },
@@ -253,10 +250,6 @@ export function usePianoRoll() {
     ),
     setSelection: useCallback(
       (selection: Selection | null) => (pianoRollStore.selection = selection),
-      [pianoRollStore],
-    ),
-    setShowEventList: useCallback(
-      (show: boolean) => (pianoRollStore.showEventList = show),
       [pianoRollStore],
     ),
     setScrollLeftInTicks,

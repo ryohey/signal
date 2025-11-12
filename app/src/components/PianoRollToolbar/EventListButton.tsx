@@ -1,23 +1,23 @@
 import FormatListBulleted from "mdi-react/FormatListBulletedIcon"
 import { FC, MouseEvent, useCallback } from "react"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
 import { Tooltip } from "../ui/Tooltip"
 
 export const EventListButton: FC = () => {
-  const { showEventList, setShowEventList } = usePianoRoll()
+  const { setOpen, isOpen } = useEventList()
 
   return (
     <Tooltip title={<Localized name="event-list" />}>
       <ToolbarButton
-        selected={showEventList}
+        selected={isOpen}
         onMouseDown={useCallback(
           (e: MouseEvent) => {
             e.preventDefault()
-            setShowEventList(!showEventList)
+            setOpen((prev) => !prev)
           },
-          [showEventList, setShowEventList],
+          [setOpen],
         )}
       >
         <FormatListBulleted

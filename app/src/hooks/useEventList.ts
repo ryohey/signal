@@ -1,3 +1,4 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import { isEqual } from "lodash"
 import { toJS } from "mobx"
 import { useMobxSelector } from "./useMobxSelector"
@@ -22,5 +23,12 @@ export function useEventList() {
         isEqual,
       )
     },
+    get isOpen() {
+      return useAtomValue(showEventListAtom)
+    },
+    setOpen: useSetAtom(showEventListAtom),
   }
 }
+
+// atoms
+const showEventListAtom = atom<boolean>(false)
