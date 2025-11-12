@@ -168,9 +168,6 @@ export function usePianoRoll() {
     get windowedEvents() {
       return useMobxGetter(pianoRollStore, "windowedEvents")
     },
-    get selectionBounds() {
-      return useMobxGetter(pianoRollStore, "selectionBounds")
-    },
     get showTrackList() {
       return useMobxGetter(pianoRollStore, "showTrackList")
     },

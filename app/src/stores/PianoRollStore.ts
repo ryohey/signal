@@ -115,7 +115,6 @@ export default class PianoRollStore {
       notes: computed,
       selectedTrackIndex: computed,
       ghostTrackIds: computed,
-      selectionBounds: computed,
       currentVolume: computed,
       currentPan: computed,
       currentMBTTime: computed,
@@ -235,13 +234,6 @@ export default class PianoRollStore {
           track.id !== selectedTrackId && !notGhostTrackIds.has(track.id),
       )
       .map((track) => track.id)
-  }
-
-  get selectionBounds(): Rect | null {
-    if (this.selection !== null) {
-      return Selection.getBounds(this.selection, this.transform)
-    }
-    return null
   }
 
   get currentVolume(): number | undefined {
