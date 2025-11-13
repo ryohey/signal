@@ -3,6 +3,27 @@ const common = require("./webpack.common.js")
 const CopyPlugin = require("copy-webpack-plugin")
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin")
 const WorkboxPlugin = require("workbox-webpack-plugin")
+const fs = require("fs")
+const path = require("path")
+
+// Custom plugin to generate version.json
+class GenerateVersionJsonPlugin {
+  apply(compiler) {
+    compiler.hooks.emit.tap("GenerateVersionJsonPlugin", (compilation) => {
+      const version = {
+        commitSha: process.env.VERCEL_GIT_COMMIT_SHA || "development",
+        buildTime: new Date().toISOString(),
+        version: require("./package.json").version,
+      }
+
+      const versionJson = JSON.stringify(version, null, 2)
+      compilation.assets["version.json"] = {
+        source: () => versionJson,
+        size: () => versionJson.length,
+      }
+    })
+  }
+}
 
 module.exports = merge(common, {
   mode: "production",
@@ -24,6 +45,7 @@ module.exports = merge(common, {
     ],
   },
   plugins: [
+    new GenerateVersionJsonPlugin(),
     new WorkboxPlugin.GenerateSW({
       maximumFileSizeToCacheInBytes: 50000000,
       clientsClaim: true,

@@ -22,6 +22,7 @@ import { GlobalCSS } from "../Theme/GlobalCSS"
 import { Toast } from "../ui/Toast"
 import { ElectronCallbackHandler } from "./ElectronCallbackHandler"
 import { LocalizationProvider } from "./LocalizationProvider"
+import { VersionCheckHandler } from "./VersionCheckHandler"
 
 const rootStore = new RootStore()
 
@@ -44,6 +45,7 @@ export function App() {
                               {isRunningInElectron() && (
                                 <ElectronCallbackHandler />
                               )}
+                              <VersionCheckHandler />
                               <RootView />
                             </TempoEditorProvider>
                           </ArrangeViewProvider>
