@@ -151,7 +151,9 @@ export default class PianoRollStore {
     return song.tracks
       .filter(
         (track) =>
-          track.id !== selectedTrackId && !notGhostTrackIds.has(track.id),
+          track.id !== selectedTrackId &&
+          !notGhostTrackIds.has(track.id) &&
+          !track.isConductorTrack,
       )
       .map((track) => track.id)
   }

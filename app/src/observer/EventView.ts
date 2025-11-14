@@ -1,4 +1,4 @@
-import { reaction } from "mobx"
+import { computed, makeObservable, observable, observe } from "mobx"
 import { Range } from "../entities/geometry/Range"
 import { Unsubscribe } from "../types"
 
@@ -9,28 +9,40 @@ interface TrackEvent {
 export class EventView<T extends TrackEvent> {
   private startTick: number = 0
   private endTick: number = 0
-  private events: readonly T[] = []
-  private windowedEvents: readonly T[] = []
   private listeners: Set<() => void> = new Set()
   private unregisterReaction: Unsubscribe | null = null
 
   constructor(private readonly loadEvents: () => readonly T[]) {
-    this.events = loadEvents()
-    this.registerReaction()
+    makeObservable<EventView<T>, "startTick" | "endTick">(this, {
+      startTick: observable,
+      endTick: observable,
+      windowedEvents: computed({ keepAlive: false }),
+    })
+  }
+
+  dispose() {
+    this.unregisterReaction?.()
+    this.unregisterReaction = null
+    this.listeners.clear()
+  }
+
+  [Symbol.dispose]() {
+    this.dispose()
   }
 
   private registerReaction = () => {
     this.unregisterReaction?.()
-    this.unregisterReaction = reaction(this.loadEvents, (events) => {
-      this.events = events
-      this.updateEvents()
-    })
+    this.unregisterReaction = observe(
+      this,
+      "windowedEvents",
+      this.notifyListeners,
+    )
   }
 
-  private updateEvents = () => {
+  get windowedEvents(): readonly T[] {
     const range = Range.create(this.startTick, this.endTick)
 
-    this.windowedEvents = this.events.filter((e) => {
+    return this.loadEvents().filter((e) => {
       if ("duration" in e && typeof e.duration === "number") {
         return Range.intersects(
           range,
@@ -39,8 +51,6 @@ export class EventView<T extends TrackEvent> {
       }
       return Range.contains(range, e.tick)
     })
-
-    this.notifyListeners()
   }
 
   setRange = (startTick: number, endTick: number) => {
@@ -49,7 +59,6 @@ export class EventView<T extends TrackEvent> {
     }
     this.startTick = startTick
     this.endTick = endTick
-    this.updateEvents()
   }
 
   getEvents = (): readonly T[] => {
