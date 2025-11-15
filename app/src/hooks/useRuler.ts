@@ -5,7 +5,6 @@ import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
 import { RulerStore } from "../stores/RulerStore"
 import { useMobxGetter } from "./useMobxSelector"
-import { usePlayer } from "./usePlayer"
 import { useQuantizer } from "./useQuantizer"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
@@ -37,18 +36,6 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
     rulerStore,
     "selectedTimeSignatureEventIds",
   )
-  const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
-
-  const timeSignatureHitTest = useCallback(
-    (tick: number) => {
-      const widthTick = transform.getTick(TIME_SIGNATURE_HIT_WIDTH)
-      return findLast(
-        timeSignatures,
-        (e) => e.tick < tick && e.tick + widthTick >= tick,
-      )
-    },
-    [timeSignatures, transform],
-  )
 
   const rulerBeats = useMemo(() => {
     const result: RulerBeat[] = []
@@ -58,7 +45,6 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
 
     for (let i = 0; i < beats.length; i++) {
       const beat = beats[i]
-      const x = transform.getX(beat.tick)
       if (beat.beat === 0 || !shouldOmit) {
         result.push({
           // 小節番号
@@ -67,13 +53,13 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
             beat.beat === 0 && (!shouldOmit || beat.measure % 2 === 0)
               ? `${beat.measure + 1}`
               : null,
-          x,
+          x: beat.x,
           beat: beat.beat,
         })
       }
     }
     return result
-  }, [beats, transform])
+  }, [beats])
 
   const rulerTimeSignatures = useMemo(() => {
     return timeSignatures
@@ -91,6 +77,7 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
           x,
           label: `${e.numerator}/${e.denominator}`,
           isSelected: selectedTimeSignatureEventIds.includes(e.id),
+          event: e,
         }
       })
   }, [
@@ -100,6 +87,16 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
     selectedTimeSignatureEventIds,
     timeSignatures,
   ])
+
+  const timeSignatureHitTest = useCallback(
+    (x: number) => {
+      return findLast(
+        rulerTimeSignatures,
+        (e) => e.x < x && e.x + TIME_SIGNATURE_HIT_WIDTH >= x,
+      )
+    },
+    [rulerTimeSignatures],
+  )
 
   const getTick = useCallback(
     (offsetX: number) => transform.getTick(offsetX + scrollLeft),
@@ -114,15 +111,11 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   return {
     beats,
     rulerBeats,
-    loop,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {
       return useMobxGetter(rulerStore, "selectedTimeSignatureEventIds")
     },
     timeSignatureHitTest,
-    setLoopBegin,
-    setLoopEnd,
-    seek: setPosition,
     selectTimeSignature: useCallback(
       (id: number) => {
         rulerStore.selectedTimeSignatureEventIds = [id]
