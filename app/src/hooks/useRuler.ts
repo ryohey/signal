@@ -86,13 +86,14 @@ export function useRuler() {
   ])
 
   const timeSignatureHitTest = useCallback(
-    (x: number) => {
+    (offsetX: number) => {
+      const x = offsetX + scrollLeft
       return findLast(
         rulerTimeSignatures,
         (e) => e.x < x && e.x + TIME_SIGNATURE_HIT_WIDTH >= x,
       )
     },
-    [rulerTimeSignatures],
+    [rulerTimeSignatures, scrollLeft],
   )
 
   const getTick = useCallback(
