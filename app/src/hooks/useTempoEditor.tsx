@@ -5,10 +5,8 @@ import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
-import QuantizerStore from "../stores/QuantizerStore"
-import { BeatsProvider } from "./useBeats"
-import { QuantizerProvider } from "./useQuantizer"
-import { useStores } from "./useStores"
+import { BeatsProvider, createBeatsScope } from "./useBeats"
+import { createQuantizerScope, QuantizerProvider } from "./useQuantizer"
 import {
   createTickScrollScope,
   TickScrollProvider,
@@ -16,8 +14,9 @@ import {
 } from "./useTickScroll"
 
 type TempoEditorStore = {
-  quantizerStore: QuantizerStore
+  quantizerScope: Store
   tickScrollScope: Store
+  beatsScope: Store
 }
 
 const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
@@ -27,14 +26,19 @@ export function TempoEditorProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { songStore } = useStores()
   const store = useStore()
 
   const tempoEditorStore = useMemo(() => {
-    const quantizerStore = new QuantizerStore(songStore)
+    // should match the order in TempoEditorScope
     const tickScrollScope = createTickScrollScope(store)
-    return { quantizerStore, tickScrollScope }
-  }, [songStore, store])
+    const quantizerScope = createQuantizerScope(tickScrollScope)
+    const beatsScope = createBeatsScope(quantizerScope)
+    return {
+      tickScrollScope,
+      quantizerScope,
+      beatsScope,
+    }
+  }, [store])
 
   return (
     <TempoEditorStoreContext.Provider value={tempoEditorStore}>
@@ -44,15 +48,15 @@ export function TempoEditorProvider({
 }
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollScope, quantizerStore } = useContext(
+  const { tickScrollScope, quantizerScope, beatsScope } = useContext(
     TempoEditorStoreContext,
   )
 
   return (
     <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
-      <BeatsProvider>
-        <QuantizerProvider value={quantizerStore}>{children}</QuantizerProvider>
-      </BeatsProvider>
+      <QuantizerProvider scope={quantizerScope} quantize={4}>
+        <BeatsProvider scope={beatsScope}>{children}</BeatsProvider>
+      </QuantizerProvider>
     </TickScrollProvider>
   )
 }

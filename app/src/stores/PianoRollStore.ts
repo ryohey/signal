@@ -1,8 +1,5 @@
-import { Player } from "@signal-app/player"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
-import QuantizerStore from "./QuantizerStore"
-import { SongStore } from "./SongStore"
 
 export type PianoRollMouseMode = "pencil" | "selection"
 
@@ -27,15 +24,4 @@ export type PianoRollDraggable =
 export type DraggableArea = {
   tickRange?: Range
   noteNumberRange?: Range
-}
-
-export default class PianoRollStore {
-  readonly quantizerStore: QuantizerStore
-
-  constructor(
-    private readonly songStore: SongStore,
-    private readonly player: Player,
-  ) {
-    this.quantizerStore = new QuantizerStore(this.songStore, 8)
-  }
 }

@@ -7,10 +7,9 @@ import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransform"
 import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
-import QuantizerStore from "../stores/QuantizerStore"
-import { BeatsProvider } from "./useBeats"
+import { BeatsProvider, createBeatsScope } from "./useBeats"
 import { useMobxSelector } from "./useMobxSelector"
-import { QuantizerProvider } from "./useQuantizer"
+import { createQuantizerScope, QuantizerProvider } from "./useQuantizer"
 import { useStores } from "./useStores"
 import {
   createTickScrollScope,
@@ -25,9 +24,10 @@ import {
 export type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 
 type ArrangeViewStore = {
-  quantizerStore: QuantizerStore
+  quantizerScope: Store
   tickScrollScope: Store
   trackScrollScope: Store
+  beatsScope: Store
 }
 
 const ArrangeViewStoreContext = createContext<ArrangeViewStore>(null!)
@@ -37,17 +37,21 @@ export function ArrangeViewProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { songStore } = useStores()
   const store = useStore()
 
-  const arrangeViewStore = useMemo(
-    () => ({
-      quantizerStore: new QuantizerStore(songStore, 1),
-      tickScrollScope: createTickScrollScope(store),
-      trackScrollScope: createTrackScrollScope(store),
-    }),
-    [songStore, store],
-  )
+  const arrangeViewStore = useMemo(() => {
+    // should match the order in ArrangeViewScope
+    const tickScrollScope = createTickScrollScope(store)
+    const trackScrollScope = createTrackScrollScope(tickScrollScope)
+    const quantizerScope = createQuantizerScope(trackScrollScope)
+    const beatsScope = createBeatsScope(quantizerScope)
+    return {
+      quantizerScope,
+      tickScrollScope,
+      trackScrollScope,
+      beatsScope,
+    }
+  }, [store])
 
   return (
     <ArrangeViewStoreContext.Provider value={arrangeViewStore}>
@@ -57,19 +61,15 @@ export function ArrangeViewProvider({
 }
 
 export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
-  const { quantizerStore } = useContext(ArrangeViewStoreContext)
-  const { tickScrollScope, trackScrollScope } = useContext(
-    ArrangeViewStoreContext,
-  )
+  const { tickScrollScope, trackScrollScope, quantizerScope, beatsScope } =
+    useContext(ArrangeViewStoreContext)
 
   return (
     <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
       <TrackScrollProvider scope={trackScrollScope}>
-        <BeatsProvider>
-          <QuantizerProvider value={quantizerStore}>
-            {children}
-          </QuantizerProvider>
-        </BeatsProvider>
+        <QuantizerProvider scope={quantizerScope} quantize={1}>
+          <BeatsProvider scope={beatsScope}>{children}</BeatsProvider>
+        </QuantizerProvider>
       </TrackScrollProvider>
     </TickScrollProvider>
   )
