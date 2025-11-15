@@ -1,4 +1,4 @@
-import { atom, useAtomValue, useSetAtom } from "jotai"
+import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
 import { createScope } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
 import { clamp } from "lodash"
@@ -97,14 +97,19 @@ const contentHeightAtom = atom((get) => {
 })
 
 // actions
-const setScrollTopAtom = atom(null, (get, set, value: number) => {
-  const maxOffset =
-    get(contentHeightAtom) +
-    Layout.rulerHeight +
-    BAR_WIDTH -
-    get(canvasHeightAtom)
-  set(scrollTopAtom, clamp(value, 0, maxOffset))
-})
+const setScrollTopAtom = atom(
+  null,
+  (get, set, value: SetStateAction<number>) => {
+    const scrollTop =
+      typeof value === "function" ? value(get(scrollTopAtom)) : value
+    const maxOffset =
+      get(contentHeightAtom) +
+      Layout.rulerHeight +
+      BAR_WIDTH -
+      get(canvasHeightAtom)
+    set(scrollTopAtom, clamp(scrollTop, 0, maxOffset))
+  },
+)
 const setScaleYAtom = atom(null, (get, set, scaleY: number) => {
   set(scaleYAtom, clamp(scaleY, SCALE_Y_MIN, SCALE_Y_MAX))
   set(setScrollTopAtom, get(scrollTopAtom))

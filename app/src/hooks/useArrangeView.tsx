@@ -130,13 +130,13 @@ export function useArrangeView() {
     },
     get scrollBy() {
       const { setScrollLeftInPixels } = useTickScroll(tickScrollScope)
-      const { setScrollTop, scrollTop } = useTrackScroll(trackScrollScope)
+      const { setScrollTop } = useTrackScroll(trackScrollScope)
       return useCallback(
         (x: number, y: number) => {
           setScrollLeftInPixels((prev) => prev - x)
-          setScrollTop(scrollTop - y)
+          setScrollTop((prev) => prev - y)
         },
-        [setScrollLeftInPixels, setScrollTop, scrollTop],
+        [setScrollLeftInPixels, setScrollTop],
       )
     },
     setSelectedTrackIndex: useSetAtom(selectedTrackIndexAtom),
