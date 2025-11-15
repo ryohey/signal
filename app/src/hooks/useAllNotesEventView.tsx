@@ -1,28 +1,30 @@
 import { toJS } from "mobx"
 import { useCallback, useSyncExternalStore } from "react"
-import Song from "../song"
+import { EventView } from "../observer/EventView"
 import { isNoteEvent } from "../track"
-import {
-  useEventViewInternal,
-  useSyncEventViewWithScroll,
-} from "./useEventView"
+import { useDisposable } from "./useDisposable"
+import { useSyncEventViewWithScroll } from "./useEventView"
+import { useStores } from "./useStores"
 
 export function useEventViewForAllTracks() {
-  const fetchEvents = useCallback(
-    (song: Song) =>
-      song.tracks.flatMap((track, index) =>
-        toJS(
-          track.events.filter(isNoteEvent).map((event) => ({
-            tick: event.tick,
-            event,
-            trackId: track.id,
-            trackIndex: index,
-          })),
+  const { songStore } = useStores()
+  const createEventView = useCallback(
+    () =>
+      new EventView(() =>
+        songStore.song.tracks.flatMap((track, index) =>
+          toJS(
+            track.events.filter(isNoteEvent).map((event) => ({
+              tick: event.tick,
+              event,
+              trackId: track.id,
+              trackIndex: index,
+            })),
+          ),
         ),
       ),
-    [],
+    [songStore],
   )
-  return useEventViewInternal(fetchEvents)
+  return useDisposable(createEventView)
 }
 
 // Hook to get all note events across all tracks, synchronized with scroll
