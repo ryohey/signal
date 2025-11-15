@@ -48,9 +48,6 @@ export function useQuantizer(store = useStore()) {
     get isQuantizeEnabled() {
       return useAtomValue(isEnabledAtom, { store })
     },
-    get quantizer() {
-      return quantizer
-    },
     get quantizeRound() {
       return useCallback((tick: number) => quantizer.round(tick), [])
     },

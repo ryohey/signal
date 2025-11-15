@@ -23,13 +23,18 @@ export const useCreateSelectionGesture = (): MouseGesture<
     setSelection,
     setSelectedEventIds,
   } = useArrangeView()
-  const { quantizer, quantizeRound } = useQuantizer()
+  const { quantizeRound, quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
 
   const selectionFromPoints = useCallback(
     (start: ArrangePoint, end: ArrangePoint) =>
-      ArrangeSelection.fromPoints(start, end, quantizer, tracks.length),
-    [quantizer, tracks.length],
+      ArrangeSelection.fromPoints(
+        start,
+        end,
+        { quantizeFloor, quantizeCeil },
+        tracks.length,
+      ),
+    [quantizeFloor, quantizeCeil, tracks.length],
   )
 
   return {
