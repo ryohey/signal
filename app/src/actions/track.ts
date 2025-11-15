@@ -67,7 +67,7 @@ export const useChangeNotesVelocity = () => {
 
 export const useCreateEvent = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   const { createOrUpdate } = useTrack(selectedTrackId)
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
@@ -77,7 +77,7 @@ export const useCreateEvent = () => {
       pushHistory()
       const id = createOrUpdate({
         ...e,
-        tick: quantizer.round(tick ?? position),
+        tick: quantizeRound(tick ?? position),
       })?.id
 
       // 即座に反映する
@@ -88,7 +88,7 @@ export const useCreateEvent = () => {
 
       return id
     },
-    [pushHistory, createOrUpdate, quantizer, position, sendEvent],
+    [pushHistory, createOrUpdate, quantizeRound, position, sendEvent],
   )
 }
 

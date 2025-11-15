@@ -13,7 +13,7 @@ export const useCreateSelectionGesture = () => {
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds, setSelection } = useControlPane()
   let { selection } = useControlPane()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
 
   return {
     onMouseDown(
@@ -26,7 +26,7 @@ export const useCreateSelectionGesture = () => {
     ) {
       setSelectedEventIds([])
 
-      const startTick = quantizer.round(controlTransform.getTick(startPoint.x))
+      const startTick = quantizeRound(controlTransform.getTick(startPoint.x))
 
       setPianoRollSelection(null)
       setSelectedNoteIds([])
@@ -44,7 +44,7 @@ export const useCreateSelectionGesture = () => {
       observeDrag2(e, {
         onMouseMove: (_e, delta) => {
           const local = Point.add(startPoint, delta)
-          const endTick = quantizer.round(controlTransform.getTick(local.x))
+          const endTick = quantizeRound(controlTransform.getTick(local.x))
           selection = {
             fromTick: Math.min(startTick, endTick),
             toTick: Math.max(startTick, endTick),

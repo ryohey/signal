@@ -15,7 +15,7 @@ export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]
 > => {
   const { pushHistory } = useHistory()
-  const { quantizer } = useQuantizer()
+  const { quantizer, quantizeRound } = useQuantizer()
   const { id: conductorTrackId, createOrUpdate } = useConductorTrack()
   const updateEventsInRange = useUpdateEventsInRange(
     conductorTrackId,
@@ -34,7 +34,7 @@ export const usePencilGesture = (): MouseGesture<
 
       const event = {
         ...setTempoMidiEvent(0, Math.round(bpm)),
-        tick: quantizer.round(pos.tick),
+        tick: quantizeRound(pos.tick),
       }
       createOrUpdate(event)
 

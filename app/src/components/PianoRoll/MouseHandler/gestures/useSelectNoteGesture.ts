@@ -17,7 +17,7 @@ export const useSelectNoteGesture = (): MouseGesture => {
     selectedTrackId,
     setSelectedNoteIds,
   } = usePianoRoll()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   let { selection } = usePianoRoll()
   const { getEvents } = useTrack(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()
@@ -30,7 +30,7 @@ export const useSelectNoteGesture = (): MouseGesture => {
       const startPos = local
 
       if (!isPlaying) {
-        setPosition(quantizer.round(start.tick))
+        setPosition(quantizeRound(start.tick))
       }
 
       setSelectedEventIds([])

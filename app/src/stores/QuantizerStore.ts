@@ -18,15 +18,10 @@ export default class QuantizerStore {
       quantize: observable,
       isQuantizeEnabled: observable,
       quantizer: computed,
-      enabledQuantizer: computed,
     })
   }
 
   get quantizer(): Quantizer {
     return new Quantizer(this.songStore, this.quantize, this.isQuantizeEnabled)
-  }
-
-  get enabledQuantizer(): Quantizer {
-    return new Quantizer(this.songStore, this.quantize, true)
   }
 }

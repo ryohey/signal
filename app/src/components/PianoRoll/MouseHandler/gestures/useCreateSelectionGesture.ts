@@ -19,7 +19,7 @@ export const useCreateSelectionGesture = (): MouseGesture => {
     setSelection,
     setSelectedNoteIds,
   } = usePianoRoll()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   const { selection: _selection } = usePianoRoll()
   const { getEvents } = useTrack(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()
@@ -35,7 +35,7 @@ export const useCreateSelectionGesture = (): MouseGesture => {
         const startPos = local
 
         if (!isPlaying) {
-          setPosition(quantizer.round(start.tick))
+          setPosition(quantizeRound(start.tick))
         }
 
         setSelectedEventIds([])
@@ -47,8 +47,8 @@ export const useCreateSelectionGesture = (): MouseGesture => {
             const offsetPos = Point.add(startPos, delta)
             const end = transform.getNotePointFractional(offsetPos)
             selection = Selection.fromPoints(
-              { ...start, tick: quantizer.round(start.tick) },
-              { ...end, tick: quantizer.round(end.tick) },
+              { ...start, tick: quantizeRound(start.tick) },
+              { ...end, tick: quantizeRound(end.tick) },
             )
             setSelection(selection)
           },
@@ -80,7 +80,7 @@ export const useCreateSelectionGesture = (): MouseGesture => {
         isPlaying,
         setPosition,
         transform,
-        quantizer,
+        quantizeRound,
         setSelectedEventIds,
       ],
     ),

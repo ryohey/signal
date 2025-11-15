@@ -1,6 +1,10 @@
 import { Measure } from "../entities/measure/Measure"
 import { SongStore } from "../stores/SongStore"
 
+export interface QuantizeOption {
+  force: true
+}
+
 export default class Quantizer {
   private denominator: number
   private songStore: SongStore
@@ -20,8 +24,12 @@ export default class Quantizer {
     return this.songStore.song.timebase
   }
 
-  private calc(tick: number, fn: (tick: number) => number) {
-    if (!this.isEnabled) {
+  private calc(
+    tick: number,
+    fn: (tick: number) => number,
+    option?: QuantizeOption,
+  ) {
+    if (option?.force !== true && !this.isEnabled) {
       return Math.round(tick)
     }
     const measureStart = Measure.getMeasureStart(
@@ -35,16 +43,16 @@ export default class Quantizer {
     return fn((tick - offset) / u) * u + offset
   }
 
-  round(tick: number) {
-    return this.calc(tick, Math.round)
+  round(tick: number, option?: QuantizeOption) {
+    return this.calc(tick, Math.round, option)
   }
 
-  ceil(tick: number) {
-    return this.calc(tick, Math.ceil)
+  ceil(tick: number, option?: QuantizeOption) {
+    return this.calc(tick, Math.ceil, option)
   }
 
-  floor(tick: number) {
-    return this.calc(tick, Math.floor)
+  floor(tick: number, option?: QuantizeOption) {
+    return this.calc(tick, Math.floor, option)
   }
 
   get unit() {

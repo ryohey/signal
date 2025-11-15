@@ -29,7 +29,7 @@ export function useRuler() {
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { timeSignatures } = useSong()
   const beats = useBeats()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   const selectedTimeSignatureEventIds = useAtomValue(
     selectedTimeSignatureEventIdsAtom,
   )
@@ -102,8 +102,8 @@ export function useRuler() {
   )
 
   const getQuantizedTick = useCallback(
-    (offsetX: number) => quantizer.round(getTick(offsetX)),
-    [quantizer, getTick],
+    (offsetX: number) => quantizeRound(getTick(offsetX)),
+    [quantizeRound, getTick],
   )
 
   return {

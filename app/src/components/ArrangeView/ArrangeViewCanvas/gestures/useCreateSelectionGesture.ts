@@ -23,9 +23,8 @@ export const useCreateSelectionGesture = (): MouseGesture<
     setSelection,
     setSelectedEventIds,
   } = useArrangeView()
-  const { quantizer } = useQuantizer()
+  const { quantizer, quantizeRound } = useQuantizer()
   const { tracks } = useSong()
-  let selection: ArrangeSelection | null = null
 
   const selectionFromPoints = useCallback(
     (start: ArrangePoint, end: ArrangePoint) =>
@@ -34,30 +33,46 @@ export const useCreateSelectionGesture = (): MouseGesture<
   )
 
   return {
-    onMouseDown(_e, startClientPos, startPosPx) {
-      const startPos = trackTransform.getArrangePoint(startPosPx)
-      resetSelection()
+    onMouseDown: useCallback(
+      (_e, startClientPos, startPosPx) => {
+        const startPos = trackTransform.getArrangePoint(startPosPx)
+        resetSelection()
 
-      if (!isPlaying) {
-        setPosition(quantizer.round(startPos.tick))
-      }
+        if (!isPlaying) {
+          setPosition(quantizeRound(startPos.tick))
+        }
 
-      setSelectedTrackIndex(Math.floor(startPos.trackIndex))
+        setSelectedTrackIndex(Math.floor(startPos.trackIndex))
 
-      observeDrag({
-        onMouseMove: (e) => {
-          const deltaPx = Point.sub(getClientPos(e), startClientPos)
-          const selectionToPx = Point.add(startPosPx, deltaPx)
-          const endPos = trackTransform.getArrangePoint(selectionToPx)
-          selection = selectionFromPoints(startPos, endPos)
-          setSelection(selection)
-        },
-        onMouseUp: () => {
-          if (selection !== null) {
-            setSelectedEventIds(getEventsInSelection(tracks, selection))
-          }
-        },
-      })
-    },
+        let selection: ArrangeSelection | null = null
+
+        observeDrag({
+          onMouseMove: (e) => {
+            const deltaPx = Point.sub(getClientPos(e), startClientPos)
+            const selectionToPx = Point.add(startPosPx, deltaPx)
+            const endPos = trackTransform.getArrangePoint(selectionToPx)
+            selection = selectionFromPoints(startPos, endPos)
+            setSelection(selection)
+          },
+          onMouseUp: () => {
+            if (selection !== null) {
+              setSelectedEventIds(getEventsInSelection(tracks, selection))
+            }
+          },
+        })
+      },
+      [
+        isPlaying,
+        setPosition,
+        quantizeRound,
+        trackTransform,
+        resetSelection,
+        setSelectedTrackIndex,
+        selectionFromPoints,
+        setSelection,
+        setSelectedEventIds,
+        tracks,
+      ],
+    ),
   }
 }
