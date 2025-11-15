@@ -7,7 +7,9 @@ import { Rect } from "../../../entities/geometry/Rect"
 import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useEventView } from "../../../hooks/useEventView"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 import { isNoteEvent } from "../../../track"
 import { LegacyVelocityItems } from "../../GLNodes/legacy/LegacyVelocityItems"
 import { IVelocityData, VelocityShader } from "./VelocityShader"
@@ -21,13 +23,15 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
   velocityTransform,
   ...props
 }) => {
-  const { transform, windowedEvents, selectedNoteIds } = usePianoRoll()
+  const { selectedNoteIds } = usePianoRoll()
+  const { transform } = useTickScroll()
+  const windowedEvents = useEventView()
   const changeNotesVelocity = useChangeNotesVelocity()
 
   const items = useMemo(
     () =>
       windowedEvents.filter(isNoteEvent).map((note) => {
-        const { x } = transform.getRect(note)
+        const x = transform.getX(note.tick)
         const itemWidth = 5
         return {
           id: note.id,

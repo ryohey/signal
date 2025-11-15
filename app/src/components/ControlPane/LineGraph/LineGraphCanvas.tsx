@@ -8,9 +8,9 @@ import { Range } from "../../../entities/geometry/Range"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { isEventInRange } from "../../../helpers/filterEvents"
 import { matrixFromTranslation } from "../../../helpers/matrix"
+import { useBeats } from "../../../hooks/useBeats"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
-import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { TrackEventOf } from "../../../track"
 import { Beats } from "../../GLNodes/Beats"
@@ -43,7 +43,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   circleRadius = 4,
 }: LineGraphCanvasProps<T>) => {
   const { mouseMode } = usePianoRoll()
-  const { beats } = useRuler()
+  const beats = useBeats()
   const theme = useTheme()
   const { cursorX, transform: tickTransform, scrollLeft } = useTickScroll()
   const handlePencilMouseDown = usePencilGesture(eventType)

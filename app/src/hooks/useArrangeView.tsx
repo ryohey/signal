@@ -3,9 +3,9 @@ import { cloneDeep } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import ArrangeViewStore from "../stores/ArrangeViewStore"
+import { BeatsProvider } from "./useBeats"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { QuantizerProvider } from "./useQuantizer"
-import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 import { TrackScrollProvider, useTrackScroll } from "./useTrackScroll"
@@ -32,17 +32,18 @@ export function ArrangeViewProvider({
 }
 
 export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, trackScrollStore, rulerStore, quantizerStore } =
-    useContext(ArrangeViewStoreContext)
+  const { tickScrollStore, trackScrollStore, quantizerStore } = useContext(
+    ArrangeViewStoreContext,
+  )
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <TrackScrollProvider value={trackScrollStore}>
-        <RulerProvider value={rulerStore}>
+        <BeatsProvider>
           <QuantizerProvider value={quantizerStore}>
             {children}
           </QuantizerProvider>
-        </RulerProvider>
+        </BeatsProvider>
       </TrackScrollProvider>
     </TickScrollProvider>
   )
@@ -56,9 +57,6 @@ export function useArrangeView() {
   const { setScrollTop } = useTrackScroll(trackScrollStore)
 
   return {
-    get notes() {
-      return useMobxGetter(arrangeViewStore, "notes")
-    },
     get transform() {
       return useMobxGetter(arrangeViewStore, "transform")
     },
@@ -87,7 +85,6 @@ export function useArrangeView() {
     get openVelocityDialog() {
       return useAtomValue(openVelocityDialogAtom)
     },
-    rulerStore: arrangeViewStore.rulerStore,
     scrollBy: useCallback(
       (x: number, y: number) => {
         setScrollLeftInPixels(tickScrollStore.scrollLeft - x)

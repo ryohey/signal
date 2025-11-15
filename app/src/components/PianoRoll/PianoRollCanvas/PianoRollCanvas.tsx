@@ -2,10 +2,10 @@ import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { FC, MouseEventHandler, useCallback, useEffect, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
+import { useBeats } from "../../../hooks/useBeats"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useKeyScroll } from "../../../hooks/useKeyScroll"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
-import { useRuler } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -26,7 +26,7 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
   height,
 }) => {
   const { ghostTrackIds, mouseMode } = usePianoRoll()
-  const { beats } = useRuler()
+  const beats = useBeats()
   const { cursorX, setCanvasWidth, scrollLeft } = useTickScroll()
   const { scrollTop, setCanvasHeight } = useKeyScroll()
 

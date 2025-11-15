@@ -1,7 +1,7 @@
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { CSSProperties, FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
-import { useRuler } from "../../../hooks/useRuler"
+import { useBeats } from "../../../hooks/useBeats"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
@@ -26,7 +26,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   className,
 }) => {
   const { transform, mouseMode } = useTempoEditor()
-  const { beats } = useRuler()
+  const beats = useBeats()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const pencilGesture = usePencilGesture()
   const createSelectionGesture = useCreateSelectionGesture()

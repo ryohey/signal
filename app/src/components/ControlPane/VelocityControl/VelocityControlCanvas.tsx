@@ -3,7 +3,7 @@ import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { FC, useMemo } from "react"
 import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { matrixFromTranslation } from "../../../helpers/matrix"
-import { useRuler } from "../../../hooks/useRuler"
+import { useBeats } from "../../../hooks/useBeats"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -14,7 +14,7 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
   width,
   height,
 }) => {
-  const { beats } = useRuler()
+  const beats = useBeats()
   const { cursorX, scrollLeft } = useTickScroll()
   const theme = useTheme()
   const velocityTransform = useMemo(

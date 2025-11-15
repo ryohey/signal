@@ -285,9 +285,9 @@ export const useToggleGhostTrack = () => {
     (trackId: TrackId) => {
       pushHistory()
       if (notGhostTrackIds.has(trackId)) {
-        setNotGhostTrackIds(deletedSet(notGhostTrackIds, trackId))
+        setNotGhostTrackIds(deletedSet(trackId))
       } else {
-        setNotGhostTrackIds(addedSet(notGhostTrackIds, trackId))
+        setNotGhostTrackIds(addedSet(trackId))
       }
     },
     [pushHistory, notGhostTrackIds, setNotGhostTrackIds],

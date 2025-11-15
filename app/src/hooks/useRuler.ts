@@ -1,11 +1,11 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomCallback } from "jotai/utils"
 import { findLast } from "lodash"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useUpdateTimeSignature } from "../actions"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
-import { RulerStore } from "../stores/RulerStore"
-import { useMobxGetter } from "./useMobxSelector"
-import { usePlayer } from "./usePlayer"
+import { useBeats } from "./useBeats"
 import { useQuantizer } from "./useQuantizer"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
@@ -24,30 +24,14 @@ export interface RulerTimeSignature {
   isSelected: boolean
 }
 
-const RulerContext = createContext<RulerStore>(null!)
-export const RulerProvider = RulerContext.Provider
-
-export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
+export function useRuler() {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { timeSignatures } = useSong()
-  const beats = useMobxGetter(rulerStore, "beats")
+  const beats = useBeats()
   const { quantizer } = useQuantizer()
-  const selectedTimeSignatureEventIds = useMobxGetter(
-    rulerStore,
-    "selectedTimeSignatureEventIds",
-  )
-  const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
-
-  const timeSignatureHitTest = useCallback(
-    (tick: number) => {
-      const widthTick = transform.getTick(TIME_SIGNATURE_HIT_WIDTH)
-      return findLast(
-        timeSignatures,
-        (e) => e.tick < tick && e.tick + widthTick >= tick,
-      )
-    },
-    [timeSignatures, transform],
+  const selectedTimeSignatureEventIds = useAtomValue(
+    selectedTimeSignatureEventIdsAtom,
   )
 
   const rulerBeats = useMemo(() => {
@@ -58,7 +42,6 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
 
     for (let i = 0; i < beats.length; i++) {
       const beat = beats[i]
-      const x = transform.getX(beat.tick)
       if (beat.beat === 0 || !shouldOmit) {
         result.push({
           // 小節番号
@@ -67,13 +50,13 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
             beat.beat === 0 && (!shouldOmit || beat.measure % 2 === 0)
               ? `${beat.measure + 1}`
               : null,
-          x,
+          x: beat.x,
           beat: beat.beat,
         })
       }
     }
     return result
-  }, [beats, transform])
+  }, [beats])
 
   const rulerTimeSignatures = useMemo(() => {
     return timeSignatures
@@ -90,7 +73,8 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
         return {
           x,
           label: `${e.numerator}/${e.denominator}`,
-          isSelected: selectedTimeSignatureEventIds.includes(e.id),
+          isSelected: selectedTimeSignatureEventIds.has(e.id),
+          event: e,
         }
       })
   }, [
@@ -100,6 +84,17 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
     selectedTimeSignatureEventIds,
     timeSignatures,
   ])
+
+  const timeSignatureHitTest = useCallback(
+    (offsetX: number) => {
+      const x = offsetX + scrollLeft
+      return findLast(
+        rulerTimeSignatures,
+        (e) => e.x < x && e.x + TIME_SIGNATURE_HIT_WIDTH >= x,
+      )
+    },
+    [rulerTimeSignatures, scrollLeft],
+  )
 
   const getTick = useCallback(
     (offsetX: number) => transform.getTick(offsetX + scrollLeft),
@@ -112,34 +107,35 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   )
 
   return {
-    beats,
     rulerBeats,
-    loop,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {
-      return useMobxGetter(rulerStore, "selectedTimeSignatureEventIds")
+      return useAtomValue(selectedTimeSignatureEventIdsAtom)
     },
     timeSignatureHitTest,
-    setLoopBegin,
-    setLoopEnd,
-    seek: setPosition,
-    selectTimeSignature: useCallback(
-      (id: number) => {
-        rulerStore.selectedTimeSignatureEventIds = [id]
-      },
-      [rulerStore],
-    ),
-    clearSelectedTimeSignature: useCallback(() => {
-      rulerStore.selectedTimeSignatureEventIds = []
-    }, [rulerStore]),
-    updateTimeSignature: useCallback(
-      (numerator: number, denominator: number) => {
-        rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
-          updateTimeSignature(id, numerator, denominator)
-        })
-      },
-      [rulerStore, updateTimeSignature],
+    selectTimeSignature: useSetAtom(selectTimeSignatureAtom),
+    clearSelectedTimeSignature: useSetAtom(clearSelectedTimeSignatureAtom),
+    updateTimeSignature: useAtomCallback(
+      useCallback(
+        (get, _set, numerator: number, denominator: number) => {
+          get(selectedTimeSignatureEventIdsAtom).forEach((id) => {
+            updateTimeSignature(id, numerator, denominator)
+          })
+        },
+        [updateTimeSignature],
+      ),
     ),
     getQuantizedTick,
   }
 }
+
+// atoms
+const selectedTimeSignatureEventIdsAtom = atom(new Set<number>())
+
+// actions
+const selectTimeSignatureAtom = atom(null, (_get, set, id: number) => {
+  set(selectedTimeSignatureEventIdsAtom, new Set([id]))
+})
+const clearSelectedTimeSignatureAtom = atom(null, (_get, set) => {
+  set(selectedTimeSignatureEventIdsAtom, new Set())
+})

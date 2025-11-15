@@ -3,10 +3,10 @@ import { Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { FC } from "react"
 import { colorToVec4 } from "../../../gl/color"
-import { useArrangeView } from "../../../hooks/useArrangeView"
+import { useArrangeNotes } from "../../../hooks/useArrangeNotes"
 
 export const Notes: FC<{ zIndex: number }> = ({ zIndex }) => {
-  const { notes } = useArrangeView()
+  const notes = useArrangeNotes()
   const theme = useTheme()
 
   return (

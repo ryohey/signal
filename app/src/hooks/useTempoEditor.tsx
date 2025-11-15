@@ -5,15 +5,13 @@ import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import QuantizerStore from "../stores/QuantizerStore"
-import { RulerStore } from "../stores/RulerStore"
 import { TickScrollStore } from "../stores/TickScrollStore"
+import { BeatsProvider } from "./useBeats"
 import { QuantizerProvider } from "./useQuantizer"
-import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 
 type TempoEditorStore = {
-  rulerStore: RulerStore
   tickScrollStore: TickScrollStore
   quantizerStore: QuantizerStore
 }
@@ -29,9 +27,8 @@ export function TempoEditorProvider({
 
   const tempoEditorStore = useMemo(() => {
     const tickScrollStore = new TickScrollStore(songStore, player, 0.15, 15)
-    const rulerStore = new RulerStore(tickScrollStore, songStore)
     const quantizerStore = new QuantizerStore(songStore)
-    return { rulerStore, tickScrollStore, quantizerStore }
+    return { tickScrollStore, quantizerStore }
   }, [player, songStore])
 
   return (
@@ -42,15 +39,15 @@ export function TempoEditorProvider({
 }
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, rulerStore, quantizerStore } = useContext(
+  const { tickScrollStore, quantizerStore } = useContext(
     TempoEditorStoreContext,
   )
 
   return (
     <TickScrollProvider value={tickScrollStore}>
-      <RulerProvider value={rulerStore}>
+      <BeatsProvider>
         <QuantizerProvider value={quantizerStore}>{children}</QuantizerProvider>
-      </RulerProvider>
+      </BeatsProvider>
     </TickScrollProvider>
   )
 }

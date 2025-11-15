@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useAutoSave } from "../hooks/useAutoSave"
 import { useHistory } from "../hooks/useHistory"
-import { usePianoRoll } from "../hooks/usePianoRoll"
+import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useTrackList } from "../hooks/useTrackList"
@@ -29,11 +29,11 @@ export const useSetSong = () => {
   const { setOpen: setShowTrackList } = useTrackList()
   const {
     setNotGhostTrackIds,
-    setScrollLeftInPixels,
     setSelection,
     setSelectedNoteIds,
     setSelectedTrackId,
   } = usePianoRoll()
+  const { setScrollLeftInPixels } = usePianoRollTickScroll()
 
   const {
     setSelection: setArrangeSelection,

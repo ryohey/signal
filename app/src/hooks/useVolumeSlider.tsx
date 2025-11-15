@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react"
 import { volumeMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
+import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { useTrack } from "./useTrack"
@@ -8,11 +9,15 @@ import { useTrack } from "./useTrack"
 const DEFAULT_VOLUME = 100
 
 export function useVolumeSlider() {
-  const { currentVolume, selectedTrackId: trackId } = usePianoRoll()
+  const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { setVolume, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
+
+  const currentVolume = useMobxSelector(() => {
+    selectedTrack?.getVolume(position)
+  }, [selectedTrack, position])
 
   const setTrackVolume = useCallback(
     (pan: number) => {

@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react"
 import { panMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
+import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { useTrack } from "./useTrack"
@@ -8,11 +9,15 @@ import { useTrack } from "./useTrack"
 const PAN_CENTER = 64
 
 export function usePanSlider() {
-  const { currentPan, selectedTrackId: trackId } = usePianoRoll()
+  const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { setPan, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
+
+  const currentPan = useMobxSelector(() => {
+    selectedTrack?.getPan(position)
+  }, [selectedTrack, position])
 
   const setTrackPan = useCallback(
     (pan: number) => {

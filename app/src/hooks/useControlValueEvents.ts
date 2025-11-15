@@ -8,6 +8,7 @@ import {
   isPitchBendEvent,
 } from "../track"
 import { useControlPane } from "./useControlPane"
+import { useEventView } from "./useEventView"
 import { usePianoRoll } from "./usePianoRoll"
 import { useTickScroll } from "./useTickScroll"
 import { useTrack } from "./useTrack"
@@ -15,7 +16,8 @@ import { useTrack } from "./useTrack"
 export function useControlValueEvents() {
   const { controlMode } = useControlPane()
   const { transform, scrollLeft } = useTickScroll()
-  const { windowedEvents, selectedTrackId } = usePianoRoll()
+  const { selectedTrackId } = usePianoRoll()
+  const windowedEvents = useEventView()
   const { events: selectedTrackEvents } = useTrack(selectedTrackId)
 
   const filter = useMemo(() => {

@@ -3,7 +3,6 @@ import { useUpdateVelocitiesInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { observeDrag2 } from "../../../helpers/observeDrag"
-import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 
 export const useVelocityPaintGesture = ({
@@ -11,7 +10,7 @@ export const useVelocityPaintGesture = ({
 }: {
   velocityTransform: VelocityTransform
 }) => {
-  const { transform } = usePianoRoll()
+  const { transform } = useTickScroll()
   const { scrollLeft } = useTickScroll()
   const updateVelocitiesInRange = useUpdateVelocitiesInRange()
 

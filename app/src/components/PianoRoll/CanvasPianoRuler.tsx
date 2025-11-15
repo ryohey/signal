@@ -5,6 +5,7 @@ import React, { FC, useCallback, useState } from "react"
 import { Layout } from "../../Constants"
 import { TickTransform } from "../../entities/transform/TickTransform"
 import { useContextMenu } from "../../hooks/useContextMenu"
+import { usePlayer } from "../../hooks/usePlayer"
 import { RulerBeat, RulerTimeSignature, useRuler } from "../../hooks/useRuler"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { Theme } from "../../theme/Theme"
@@ -155,22 +156,20 @@ const PianoRuler: FC<PianoRulerProps> = ({
   const [timeSignatureDialogState, setTimeSignatureDialogState] =
     useState<TimeSignatureDialogState | null>(null)
   const [rightClickTick, setRightClickTick] = useState(0)
+  const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
   const height = Layout.rulerHeight
 
   const {
     rulerBeats,
-    loop,
     timeSignatures,
     timeSignatureHitTest,
-    setLoopBegin,
-    setLoopEnd,
-    seek,
     selectTimeSignature,
     clearSelectedTimeSignature,
     updateTimeSignature,
     getQuantizedTick,
   } = useRuler()
-  const { canvasWidth: width, scrollLeft, transform, getTick } = useTickScroll()
+
+  const { canvasWidth: width, scrollLeft, transform } = useTickScroll()
 
   const onClickTimeSignature = useCallback(
     (timeSignature: TrackEventOf<TimeSignatureEvent>, e: React.MouseEvent) => {
@@ -200,19 +199,18 @@ const PianoRuler: FC<PianoRulerProps> = ({
       } else if (e.nativeEvent.altKey) {
         setLoopEnd(quantizedTick)
       } else {
-        seek(quantizedTick)
+        setPosition(quantizedTick)
       }
     },
-    [getQuantizedTick, setLoopBegin, setLoopEnd, seek],
+    [getQuantizedTick, setLoopBegin, setLoopEnd, setPosition],
   )
 
   const onMouseDown: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
     (e) => {
-      const tick = getTick(e.nativeEvent.offsetX)
-      const timeSignature = timeSignatureHitTest(tick)
+      const timeSignature = timeSignatureHitTest(e.nativeEvent.offsetX)
 
       if (timeSignature !== undefined) {
-        onClickTimeSignature(timeSignature, e)
+        onClickTimeSignature(timeSignature.event, e)
         onClickRuler(e)
       } else {
         if (e.button == 2) {
@@ -227,7 +225,6 @@ const PianoRuler: FC<PianoRulerProps> = ({
       _onMouseDown?.(e)
     },
     [
-      getTick,
       getQuantizedTick,
       timeSignatureHitTest,
       clearSelectedTimeSignature,
