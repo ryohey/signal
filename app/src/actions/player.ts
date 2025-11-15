@@ -9,7 +9,7 @@ import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 import { useToggleGhostTrack } from "./track"
 
 export const useStop = () => {
-  const { setScrollLeftInTicks } = usePianoRoll()
+  const { setScrollLeftInTicks } = usePianoRollTickScroll()
   const { stop, setPosition } = usePlayer()
 
   return useCallback(() => {

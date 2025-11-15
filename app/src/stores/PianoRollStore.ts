@@ -1,7 +1,6 @@
 import { Player } from "@signal-app/player"
 import { Range } from "../entities/geometry/Range"
 import { Rect } from "../entities/geometry/Rect"
-import { KeyScrollStore } from "./KeyScrollStore"
 import QuantizerStore from "./QuantizerStore"
 import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
@@ -35,7 +34,6 @@ export type DraggableArea = {
 export default class PianoRollStore {
   readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
-  readonly keyScrollStore: KeyScrollStore
   readonly quantizerStore: QuantizerStore
 
   constructor(
@@ -48,7 +46,6 @@ export default class PianoRollStore {
       0.15,
       15,
     )
-    this.keyScrollStore = new KeyScrollStore()
     this.rulerStore = new RulerStore(this.tickScrollStore, this.songStore)
     this.quantizerStore = new QuantizerStore(this.songStore, 8)
   }
