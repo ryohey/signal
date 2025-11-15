@@ -3,7 +3,7 @@ import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { AbstractMouseEvent } from "../../../hooks/useContextMenu"
-import { useRuler } from "../../../hooks/useRuler"
+import { useBeats } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { useTrackScroll } from "../../../hooks/useTrackScroll"
 import { Beats } from "../../GLNodes/Beats"
@@ -23,7 +23,7 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
   width,
   onContextMenu,
 }) => {
-  const { beats } = useRuler()
+  const beats = useBeats()
   const { scrollTop, contentHeight: height } = useTrackScroll()
   const { cursorX, scrollLeft } = useTickScroll()
   const theme = useTheme()

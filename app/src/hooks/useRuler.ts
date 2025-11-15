@@ -26,11 +26,15 @@ export interface RulerTimeSignature {
 const RulerContext = createContext<RulerStore>(null!)
 export const RulerProvider = RulerContext.Provider
 
+export function useBeats(rulerStore: RulerStore = useContext(RulerContext)) {
+  return useMobxGetter(rulerStore, "beats")
+}
+
 export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { timeSignatures } = useSong()
-  const beats = useMobxGetter(rulerStore, "beats")
+  const beats = useBeats(rulerStore)
   const { quantizer } = useQuantizer()
   const selectedTimeSignatureEventIds = useMobxGetter(
     rulerStore,
@@ -109,7 +113,6 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   )
 
   return {
-    beats,
     rulerBeats,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {
