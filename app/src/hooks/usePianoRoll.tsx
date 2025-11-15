@@ -16,7 +16,6 @@ import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { addedSet, deletedSet } from "../helpers/set"
-import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
 import { BeatsProvider, createBeatsScope } from "./useBeats"
 import { EventViewProvider } from "./useEventView"
@@ -293,7 +292,7 @@ export function usePianoRollQuantizer() {
 }
 
 // atoms
-const mouseModeAtom = atom<PianoRollMouseMode>("pencil")
+const mouseModeAtom = atom<"pencil" | "selection">("pencil")
 const selectedTrackIdAtom = atom<TrackId>(UNASSIGNED_TRACK_ID)
 const selectionAtom = atom<Selection | null>(null)
 const selectedNoteIdsAtom = atom<number[]>([])

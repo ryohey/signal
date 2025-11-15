@@ -1,9 +1,9 @@
 import { FC } from "react"
 import { colorToVec4 } from "../../../../gl/color"
 import { useNoteColor } from "../../../../hooks/useNoteColor"
+import { PianoNoteItem } from "../../../../hooks/useNotes"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useTrack } from "../../../../hooks/useTrack"
-import { PianoNoteItem } from "../../../../stores/PianoRollStore"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 

@@ -4,7 +4,6 @@ import { createContext, useCallback, useContext, useMemo } from "react"
 import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
-import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { BeatsProvider, createBeatsScope } from "./useBeats"
 import { createQuantizerScope, QuantizerProvider } from "./useQuantizer"
 import {
@@ -103,6 +102,6 @@ export function useTempoEditor() {
 
 // atoms
 const canvasHeightAtom = atom(0)
-const mouseModeAtom = atom<PianoRollMouseMode>("pencil")
+const mouseModeAtom = atom<"pencil" | "selection">("pencil")
 const selectionAtom = atom<TempoSelection | null>(null)
 const selectedEventIdsAtom = atom<number[]>([])

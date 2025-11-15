@@ -6,12 +6,12 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
-import { usePianoRollDraggable } from "../../../../hooks/usePianoRollDraggable"
-import { useQuantizer } from "../../../../hooks/useQuantizer"
 import {
   DraggableArea,
   PianoRollDraggable,
-} from "../../../../stores/PianoRollStore"
+  usePianoRollDraggable,
+} from "../../../../hooks/usePianoRollDraggable"
+import { useQuantizer } from "../../../../hooks/useQuantizer"
 
 const MIN_LENGTH = 10
 

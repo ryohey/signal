@@ -5,9 +5,24 @@ import { Range } from "../entities/geometry/Range"
 import { Selection } from "../entities/selection/Selection"
 import { NotePoint } from "../entities/transform/NotePoint"
 import { isNotUndefined } from "../helpers/array"
-import { DraggableArea, PianoRollDraggable } from "../stores/PianoRollStore"
 import { isNoteEvent } from "../track"
 import { usePianoRoll } from "./usePianoRoll"
+
+export type DraggableArea = {
+  tickRange?: Range
+  noteNumberRange?: Range
+}
+
+export type PianoRollDraggable =
+  | {
+      type: "selection"
+      position: "center" | "left" | "right"
+    }
+  | {
+      type: "note"
+      position: "center" | "left" | "right"
+      noteId: number
+    }
 
 export function usePianoRollDraggable() {
   const { getSelection, getSelectedTrack, getSelectedNoteIds, setSelection } =

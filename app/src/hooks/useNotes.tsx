@@ -1,8 +1,15 @@
 import { useCallback, useMemo } from "react"
-import { PianoNoteItem } from "../stores/PianoRollStore"
+import { Rect } from "../entities/geometry/Rect"
 import { isNoteEvent, NoteEvent } from "../track"
 import { useEventView } from "./useEventView"
 import { usePianoRoll } from "./usePianoRoll"
+
+export type PianoNoteItem = Rect & {
+  id: number
+  velocity: number
+  noteNumber: number
+  isSelected: boolean
+}
 
 export function useNotes(): PianoNoteItem[] {
   const { transform, selectedTrack, selectedNoteIds } = usePianoRoll()

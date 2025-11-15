@@ -1,11 +1,10 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
 import React, { FC, useCallback, useMemo } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
-import { useNotes } from "../../../hooks/useNotes"
+import { PianoNoteItem, useNotes } from "../../../hooks/useNotes"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useSettings } from "../../../hooks/useSettings"
 import { useTrack } from "../../../hooks/useTrack"
-import { PianoNoteItem } from "../../../stores/PianoRollStore"
 import { useAddNoteToSelectionGesture } from "../MouseHandler/gestures/useAddNoteToSelectionGesture"
 import {
   useDragNoteCenterGesture,
