@@ -3,7 +3,7 @@ import { isNoteEvent, NoteEvent, TrackId } from "../track"
 import {
   useEventView,
   useEventViewForTrack,
-  useSycnEventViewWithScroll,
+  useSyncEventViewWithScroll,
 } from "./useEventView"
 import { usePianoRoll } from "./usePianoRoll"
 import { useTrack } from "./useTrack"
@@ -14,7 +14,7 @@ export function useGhostNotes(trackId: TrackId) {
   const eventView = useEventViewForTrack(trackId)
   const windowedEvents = useEventView(eventView)
 
-  useSycnEventViewWithScroll(eventView)
+  useSyncEventViewWithScroll(eventView)
 
   const noteEvents = useMemo(
     () => windowedEvents.filter(isNoteEvent),

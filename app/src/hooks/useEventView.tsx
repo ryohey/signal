@@ -1,6 +1,7 @@
 import { toJS } from "mobx"
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -8,13 +9,16 @@ import {
   useSyncExternalStore,
 } from "react"
 import { EventView } from "../observer/EventView"
+import Song from "../song"
 import { TrackEvent, TrackId } from "../track"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
 
 const EventViewContext = createContext<EventView<TrackEvent>>(null!)
 
-export function useSycnEventViewWithScroll(eventView: EventView<TrackEvent>) {
+export function useSyncEventViewWithScroll<T extends { tick: number }>(
+  eventView: EventView<T>,
+) {
   const { canvasWidth, scrollLeft, transform: tickTransform } = useTickScroll()
   const startTick = tickTransform.getTick(scrollLeft)
   const endTick = tickTransform.getTick(scrollLeft + canvasWidth)
@@ -25,17 +29,27 @@ export function useSycnEventViewWithScroll(eventView: EventView<TrackEvent>) {
 }
 
 export function useEventViewForTrack(trackId: TrackId) {
+  const fetchEvents = useCallback(
+    (song: Song) => toJS(song.getTrack(trackId)?.events) ?? [],
+    [trackId],
+  )
+  return useEventViewInternal(fetchEvents)
+}
+
+export function useEventViewInternal<
+  T extends {
+    tick: number
+  },
+>(fetchEvents: (song: Song) => readonly T[]) {
   const { songStore } = useStores()
-  const eventViewRef = useRef<EventView<TrackEvent> | null>(null)
+  const eventViewRef = useRef<EventView<T> | null>(null)
 
   const eventView = useMemo(() => {
     eventViewRef.current?.dispose()
-    const newEventView = new EventView<TrackEvent>(
-      () => toJS(songStore.song.getTrack(trackId)?.events) ?? [],
-    )
+    const newEventView = new EventView<T>(() => fetchEvents(songStore.song))
     eventViewRef.current = newEventView
     return newEventView
-  }, [songStore, trackId])
+  }, [songStore, fetchEvents])
 
   useEffect(() => {
     return () => {
@@ -44,7 +58,7 @@ export function useEventViewForTrack(trackId: TrackId) {
         eventViewRef.current = null
       }
     }
-  }, [trackId])
+  }, [fetchEvents])
 
   return eventView
 }
@@ -58,7 +72,7 @@ export function EventViewProvider({
 }) {
   const eventView = useEventViewForTrack(trackId)
 
-  useSycnEventViewWithScroll(eventView)
+  useSyncEventViewWithScroll(eventView)
 
   return (
     <EventViewContext.Provider value={eventView}>

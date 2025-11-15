@@ -56,9 +56,6 @@ export function useArrangeView() {
   const { setScrollTop } = useTrackScroll(trackScrollStore)
 
   return {
-    get notes() {
-      return useMobxGetter(arrangeViewStore, "notes")
-    },
     get transform() {
       return useMobxGetter(arrangeViewStore, "transform")
     },
