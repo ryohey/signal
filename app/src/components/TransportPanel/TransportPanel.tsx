@@ -6,7 +6,6 @@ import Loop from "mdi-react/LoopIcon"
 import MetronomeIcon from "mdi-react/MetronomeIcon"
 import Stop from "mdi-react/StopIcon"
 import { FC } from "react"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { useTransportPanel } from "../../hooks/useTransportPanel"
 import { Localized } from "../../localize/useLocalization"
@@ -54,7 +53,7 @@ const TimestampText = styled.div`
 `
 
 const Timestamp: FC = () => {
-  const { currentMBTTime } = usePianoRoll()
+  const { currentMBTTime } = useTransportPanel()
   return <TimestampText>{currentMBTTime}</TimestampText>
 }
 

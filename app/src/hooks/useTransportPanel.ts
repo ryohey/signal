@@ -5,13 +5,14 @@ import {
   useStop,
   useToggleRecording,
 } from "../actions"
+import { Measure } from "../entities/measure/Measure"
 import { useCanRecord } from "./useMIDIDevice"
-import { useMobxGetter } from "./useMobxSelector"
+import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useStores } from "./useStores"
 
 export function useTransportPanel() {
-  const { synthGroup, midiRecorder } = useStores()
+  const { songStore, player, synthGroup, midiRecorder } = useStores()
   const canRecording = useCanRecord()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
@@ -34,6 +35,17 @@ export function useTransportPanel() {
     },
     get isMetronomeEnabled() {
       return useMobxGetter(synthGroup, "isMetronomeEnabled")
+    },
+    get currentMBTTime() {
+      return useMobxSelector(
+        () =>
+          Measure.getMBTString(
+            songStore.song.measures,
+            player.position,
+            songStore.song.timebase,
+          ),
+        [songStore, player],
+      )
     },
   }
 }
