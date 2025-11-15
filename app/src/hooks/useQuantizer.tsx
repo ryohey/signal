@@ -2,7 +2,7 @@ import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
 import { useCallback, useEffect, useMemo } from "react"
-import Quantizer from "../quantizer"
+import { Measure } from "../entities/measure/Measure"
 import { useStores } from "./useStores"
 
 export function QuantizerProvider({
@@ -29,39 +29,59 @@ export const createQuantizerScope = (parentStore: Store) =>
     parentStore,
   })
 
-export function useQuantizer(store = useStore()) {
+function useQuantizeCalc(store: Store, fn: (tick: number) => number) {
   const { songStore } = useStores()
   const quantize = useAtomValue(quantizeAtom, { store })
-  const isEnabled = useAtomValue(isEnabledAtom, { store })
-  const quantizer = useMemo(
-    () => new Quantizer(songStore, quantize, isEnabled),
-    [songStore, quantize, isEnabled],
-  )
 
+  return useCallback(
+    (tick: number) => {
+      const measureStart = Measure.getMeasureStart(
+        songStore.song.measures,
+        tick,
+        songStore.song.timebase,
+      )
+      const beats = quantize === 1 ? (measureStart.numerator ?? 4) : 4
+      const u = (songStore.song.timebase * beats) / quantize
+      const offset = measureStart?.tick ?? 0
+      return fn((tick - offset) / u) * u + offset
+    },
+    [songStore, quantize, fn],
+  )
+}
+
+export function useQuantizer(store = useStore()) {
   return {
     get quantize() {
       return useAtomValue(quantizeAtom, { store })
     },
     get quantizeUnit() {
-      return quantizer.unit
+      const { songStore } = useStores()
+      const quantize = useAtomValue(quantizeAtom, { store })
+      return useMemo(
+        () => (songStore.song.timebase * 4) / quantize,
+        [songStore, quantize],
+      )
     },
     get isQuantizeEnabled() {
       return useAtomValue(isEnabledAtom, { store })
     },
     get quantizeRound() {
-      return useCallback((tick: number) => quantizer.round(tick), [])
+      const isEnabled = useAtomValue(isEnabledAtom, { store })
+      const calc = useQuantizeCalc(store, Math.round)
+      return isEnabled ? calc : Math.round
     },
     get quantizeFloor() {
-      return useCallback((tick: number) => quantizer.floor(tick), [])
+      const isEnabled = useAtomValue(isEnabledAtom, { store })
+      const calc = useQuantizeCalc(store, Math.floor)
+      return isEnabled ? calc : Math.floor
     },
     get quantizeCeil() {
-      return useCallback((tick: number) => quantizer.ceil(tick), [])
+      const isEnabled = useAtomValue(isEnabledAtom, { store })
+      const calc = useQuantizeCalc(store, Math.ceil)
+      return isEnabled ? calc : Math.ceil
     },
     get forceQuantizeRound() {
-      return useCallback(
-        (tick: number) => quantizer.round(tick, { force: true }),
-        [],
-      )
+      return useQuantizeCalc(store, Math.round)
     },
     setQuantize: useSetAtom(quantizeAtom, { store }),
     setIsQuantizeEnabled: useSetAtom(isEnabledAtom, { store }),
