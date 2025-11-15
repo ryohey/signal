@@ -1,3 +1,5 @@
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomCallback } from "jotai/utils"
 import { findLast } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { useUpdateTimeSignature } from "../actions"
@@ -36,9 +38,8 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
   const { timeSignatures } = useSong()
   const beats = useBeats(rulerStore)
   const { quantizer } = useQuantizer()
-  const selectedTimeSignatureEventIds = useMobxGetter(
-    rulerStore,
-    "selectedTimeSignatureEventIds",
+  const selectedTimeSignatureEventIds = useAtomValue(
+    selectedTimeSignatureEventIdsAtom,
   )
 
   const rulerBeats = useMemo(() => {
@@ -80,7 +81,7 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
         return {
           x,
           label: `${e.numerator}/${e.denominator}`,
-          isSelected: selectedTimeSignatureEventIds.includes(e.id),
+          isSelected: selectedTimeSignatureEventIds.has(e.id),
           event: e,
         }
       })
@@ -116,26 +117,32 @@ export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
     rulerBeats,
     timeSignatures: rulerTimeSignatures,
     get selectedTimeSignatureEventIds() {
-      return useMobxGetter(rulerStore, "selectedTimeSignatureEventIds")
+      return useAtomValue(selectedTimeSignatureEventIdsAtom)
     },
     timeSignatureHitTest,
-    selectTimeSignature: useCallback(
-      (id: number) => {
-        rulerStore.selectedTimeSignatureEventIds = [id]
-      },
-      [rulerStore],
-    ),
-    clearSelectedTimeSignature: useCallback(() => {
-      rulerStore.selectedTimeSignatureEventIds = []
-    }, [rulerStore]),
-    updateTimeSignature: useCallback(
-      (numerator: number, denominator: number) => {
-        rulerStore.selectedTimeSignatureEventIds.forEach((id) => {
-          updateTimeSignature(id, numerator, denominator)
-        })
-      },
-      [rulerStore, updateTimeSignature],
+    selectTimeSignature: useSetAtom(selectTimeSignatureAtom),
+    clearSelectedTimeSignature: useSetAtom(clearSelectedTimeSignatureAtom),
+    updateTimeSignature: useAtomCallback(
+      useCallback(
+        (get, _set, numerator: number, denominator: number) => {
+          get(selectedTimeSignatureEventIdsAtom).forEach((id) => {
+            updateTimeSignature(id, numerator, denominator)
+          })
+        },
+        [updateTimeSignature],
+      ),
     ),
     getQuantizedTick,
   }
 }
+
+// atoms
+const selectedTimeSignatureEventIdsAtom = atom(new Set<number>())
+
+// actions
+const selectTimeSignatureAtom = atom(null, (_get, set, id: number) => {
+  set(selectedTimeSignatureEventIdsAtom, new Set([id]))
+})
+const clearSelectedTimeSignatureAtom = atom(null, (_get, set) => {
+  set(selectedTimeSignatureEventIdsAtom, new Set())
+})

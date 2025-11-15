@@ -29,7 +29,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   const [isOpenTimeSignatureDialog, setOpenTimeSignatureDialog] =
     useState(false)
 
-  const isTimeSignatureSelected = selectedTimeSignatureEventIds.length > 0
+  const isTimeSignatureSelected = selectedTimeSignatureEventIds.size > 0
 
   const onClickAddTimeSignature = useCallback(() => {
     setOpenTimeSignatureDialog(true)
@@ -37,7 +37,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
   }, [handleClose])
 
   const onClickRemoveTimeSignature = useCallback(() => {
-    removeEvents(selectedTimeSignatureEventIds)
+    removeEvents(Array.from(selectedTimeSignatureEventIds))
     handleClose()
   }, [removeEvents, selectedTimeSignatureEventIds, handleClose])
 
