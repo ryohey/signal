@@ -1,7 +1,7 @@
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { CSSProperties, FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
-import { useBeats } from "../../../hooks/useRuler"
+import { useBeats } from "../../../hooks/useBeats"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"

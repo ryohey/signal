@@ -55,6 +55,7 @@
     "jotai": "^2.15.1",
     "jotai-effect": "^2.1.3",
     "jotai-optics": "^0.4.0",
+    "jotai-scope": "^0.9.7",
     "lodash": "^4.17.21",
     "mdi-react": "^9.4.0",
     "midifile-ts": "1.5.1",

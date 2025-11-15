@@ -1,12 +1,11 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { findLast } from "lodash"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useUpdateTimeSignature } from "../actions"
 import { Range } from "../entities/geometry/Range"
 import { isEventInRange } from "../helpers/filterEvents"
-import { RulerStore } from "../stores/RulerStore"
-import { useMobxGetter } from "./useMobxSelector"
+import { useBeats } from "./useBeats"
 import { useQuantizer } from "./useQuantizer"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
@@ -25,18 +24,11 @@ export interface RulerTimeSignature {
   isSelected: boolean
 }
 
-const RulerContext = createContext<RulerStore>(null!)
-export const RulerProvider = RulerContext.Provider
-
-export function useBeats(rulerStore: RulerStore = useContext(RulerContext)) {
-  return useMobxGetter(rulerStore, "beats")
-}
-
-export function useRuler(rulerStore: RulerStore = useContext(RulerContext)) {
+export function useRuler() {
   const updateTimeSignature = useUpdateTimeSignature()
   const { transform, canvasWidth, scrollLeft } = useTickScroll()
   const { timeSignatures } = useSong()
-  const beats = useBeats(rulerStore)
+  const beats = useBeats()
   const { quantizer } = useQuantizer()
   const selectedTimeSignatureEventIds = useAtomValue(
     selectedTimeSignatureEventIdsAtom,

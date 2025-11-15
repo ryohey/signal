@@ -5,13 +5,11 @@ import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransfo
 import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import QuantizerStore from "./QuantizerStore"
-import { RulerStore } from "./RulerStore"
 import { SongStore } from "./SongStore"
 import { TickScrollStore } from "./TickScrollStore"
 import { TrackScrollStore } from "./TrackScrollStore"
 
 export default class ArrangeViewStore {
-  readonly rulerStore: RulerStore
   readonly tickScrollStore: TickScrollStore
   readonly trackScrollStore: TrackScrollStore
   readonly quantizerStore: QuantizerStore
@@ -22,7 +20,6 @@ export default class ArrangeViewStore {
   ) {
     this.tickScrollStore = new TickScrollStore(this.songStore, player, 0.15, 15)
     this.trackScrollStore = new TrackScrollStore(this.songStore)
-    this.rulerStore = new RulerStore(this.tickScrollStore, this.songStore)
     this.quantizerStore = new QuantizerStore(this.songStore, 1)
 
     makeObservable(this, {

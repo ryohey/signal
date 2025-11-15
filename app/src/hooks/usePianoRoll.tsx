@@ -17,11 +17,11 @@ import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { addedSet, deletedSet } from "../helpers/set"
 import PianoRollStore, { PianoRollMouseMode } from "../stores/PianoRollStore"
 import { TrackId, UNASSIGNED_TRACK_ID } from "../track"
+import { BeatsProvider } from "./useBeats"
 import { EventViewProvider } from "./useEventView"
 import { useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
 import { QuantizerProvider, useQuantizer } from "./useQuantizer"
-import { RulerProvider } from "./useRuler"
 import { useStores } from "./useStores"
 import { TickScrollProvider, useTickScroll } from "./useTickScroll"
 
@@ -97,19 +97,17 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
 }
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, rulerStore, quantizerStore } = useContext(
-    PianoRollStoreContext,
-  )
+  const { tickScrollStore, quantizerStore } = useContext(PianoRollStoreContext)
   const { selectedTrackId } = usePianoRoll()
 
   return (
     <TickScrollProvider value={tickScrollStore}>
       <EventViewProvider trackId={selectedTrackId}>
-        <RulerProvider value={rulerStore}>
+        <BeatsProvider>
           <QuantizerProvider value={quantizerStore}>
             {children}
           </QuantizerProvider>
-        </RulerProvider>
+        </BeatsProvider>
       </EventViewProvider>
     </TickScrollProvider>
   )
