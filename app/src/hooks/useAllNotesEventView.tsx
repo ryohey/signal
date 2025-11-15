@@ -15,6 +15,7 @@ export function useEventViewForAllTracks() {
           toJS(
             track.events.filter(isNoteEvent).map((event) => ({
               tick: event.tick,
+              duration: event.duration,
               event,
               trackId: track.id,
               trackIndex: index,
