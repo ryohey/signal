@@ -35,6 +35,9 @@ export const useSong = () => {
     get cloudSongId() {
       return useMobxGetter(song, "cloudSongId")
     },
+    get endOfSong() {
+      return useMobxGetter(song, "endOfSong")
+    },
     setName: useMobxSetter(song, "name"),
     getSong: useCallback(() => songStore.song, [songStore]),
     setSong: useMobxSetter(songStore, "song"),

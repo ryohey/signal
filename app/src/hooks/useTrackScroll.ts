@@ -25,6 +25,9 @@ export function useTrackScroll(
     get trackHeight() {
       return useMobxGetter(trackScrollStore, "trackHeight")
     },
+    get transform() {
+      return useMobxGetter(trackScrollStore, "transform")
+    },
     setCanvasHeight: useMobxSetter(trackScrollStore, "canvasHeight"),
     setScaleY: trackScrollStore.setScaleY,
     setScrollTop: trackScrollStore.setScrollTop,

@@ -1,6 +1,7 @@
 import { atom, useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { atomEffect } from "jotai-effect"
 import { useAtomCallback } from "jotai/utils"
+import { Store } from "jotai/vanilla/store"
 import { cloneDeep, isEqual } from "lodash"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import {
@@ -23,21 +24,31 @@ import { useKeyScroll } from "./useKeyScroll"
 import { useMobxSelector } from "./useMobxSelector"
 import { QuantizerProvider, useQuantizer } from "./useQuantizer"
 import { useStores } from "./useStores"
-import { TickScrollProvider, useTickScroll } from "./useTickScroll"
+import {
+  createTickScrollScope,
+  TickScrollProvider,
+  useTickScroll,
+} from "./useTickScroll"
 
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
+const PianoRollTickScrollScopeContext = createContext<Store>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {
   const { songStore, player } = useStores()
+  const store = useStore()
 
   const pianoRollStore = useMemo(
     () => new PianoRollStore(songStore, player),
     [songStore, player],
   )
 
+  const tickScrollScope = useMemo(() => createTickScrollScope(store), [store])
+
   return (
     <PianoRollStoreContext.Provider value={pianoRollStore}>
-      <PianoRollProviderInner>{children}</PianoRollProviderInner>
+      <PianoRollTickScrollScopeContext.Provider value={tickScrollScope}>
+        <PianoRollProviderInner>{children}</PianoRollProviderInner>
+      </PianoRollTickScrollScopeContext.Provider>
     </PianoRollStoreContext.Provider>
   )
 }
@@ -97,11 +108,12 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
 }
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, quantizerStore } = useContext(PianoRollStoreContext)
+  const { quantizerStore } = useContext(PianoRollStoreContext)
+  const tickScrollScope = useContext(PianoRollTickScrollScopeContext)
   const { selectedTrackId } = usePianoRoll()
 
   return (
-    <TickScrollProvider value={tickScrollStore}>
+    <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
       <EventViewProvider trackId={selectedTrackId}>
         <BeatsProvider>
           <QuantizerProvider value={quantizerStore}>
@@ -115,7 +127,7 @@ export function PianoRollScope({ children }: { children: React.ReactNode }) {
 
 export function usePianoRoll() {
   const { songStore } = useStores()
-  const { tickScrollStore } = useContext(PianoRollStoreContext)
+  const tickScrollScope = useContext(PianoRollTickScrollScopeContext)
   const store = useStore()
 
   return {
@@ -152,7 +164,7 @@ export function usePianoRoll() {
       return useAtomValue(selectedNoteIdsAtom, { store })
     },
     get transform() {
-      const { transform: tickTransform } = useTickScroll()
+      const { transform: tickTransform } = useTickScroll(tickScrollScope)
       const { transform: keyTransform } = useKeyScroll()
       return useMemo(
         () => new NoteCoordTransform(tickTransform, keyTransform),
@@ -195,11 +207,11 @@ export function usePianoRoll() {
     },
     resetSelection: useSetAtom(resetSelectionAtom, { store }),
     get scrollBy() {
-      const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
+      const { setScrollLeftInPixels } = useTickScroll(tickScrollScope)
       const { setScrollTopInPixels } = useKeyScroll()
       return useCallback(
         (dx: number, dy: number) => {
-          setScrollLeftInPixels(tickScrollStore.scrollLeft - dx)
+          setScrollLeftInPixels((prev) => prev - dx)
           setScrollTopInPixels((prev) => prev - dy)
         },
         [setScrollLeftInPixels, setScrollTopInPixels],
@@ -261,8 +273,8 @@ export function usePianoRoll() {
 }
 
 export function usePianoRollTickScroll() {
-  const { tickScrollStore } = useContext(PianoRollStoreContext)
-  return useTickScroll(tickScrollStore)
+  const tickScrollScope = useContext(PianoRollTickScrollScopeContext)
+  return useTickScroll(tickScrollScope)
 }
 
 export function usePianoRollQuantizer() {

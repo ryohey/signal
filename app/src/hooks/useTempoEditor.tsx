@@ -1,19 +1,23 @@
-import { atom, useAtomValue, useSetAtom } from "jotai"
+import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { Store } from "jotai/vanilla/store"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { Point } from "../entities/geometry/Point"
 import { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { PianoRollMouseMode } from "../stores/PianoRollStore"
 import QuantizerStore from "../stores/QuantizerStore"
-import { TickScrollStore } from "../stores/TickScrollStore"
 import { BeatsProvider } from "./useBeats"
 import { QuantizerProvider } from "./useQuantizer"
 import { useStores } from "./useStores"
-import { TickScrollProvider, useTickScroll } from "./useTickScroll"
+import {
+  createTickScrollScope,
+  TickScrollProvider,
+  useTickScroll,
+} from "./useTickScroll"
 
 type TempoEditorStore = {
-  tickScrollStore: TickScrollStore
   quantizerStore: QuantizerStore
+  tickScrollScope: Store
 }
 
 const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
@@ -23,13 +27,14 @@ export function TempoEditorProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { songStore, player } = useStores()
+  const { songStore } = useStores()
+  const store = useStore()
 
   const tempoEditorStore = useMemo(() => {
-    const tickScrollStore = new TickScrollStore(songStore, player, 0.15, 15)
     const quantizerStore = new QuantizerStore(songStore)
-    return { tickScrollStore, quantizerStore }
-  }, [player, songStore])
+    const tickScrollScope = createTickScrollScope(store)
+    return { quantizerStore, tickScrollScope }
+  }, [songStore, store])
 
   return (
     <TempoEditorStoreContext.Provider value={tempoEditorStore}>
@@ -39,12 +44,12 @@ export function TempoEditorProvider({
 }
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, quantizerStore } = useContext(
+  const { tickScrollScope, quantizerStore } = useContext(
     TempoEditorStoreContext,
   )
 
   return (
-    <TickScrollProvider value={tickScrollStore}>
+    <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
       <BeatsProvider>
         <QuantizerProvider value={quantizerStore}>{children}</QuantizerProvider>
       </BeatsProvider>
@@ -53,7 +58,7 @@ export function TempoEditorScope({ children }: { children: React.ReactNode }) {
 }
 
 export function useTempoEditor() {
-  const { tickScrollStore } = useContext(TempoEditorStoreContext)
+  const { tickScrollScope } = useContext(TempoEditorStoreContext)
 
   return {
     get selection() {
@@ -75,13 +80,16 @@ export function useTempoEditor() {
       return useAtomValue(mouseModeAtom)
     },
     // convert mouse position to the local coordinate on the canvas
-    getLocal: useCallback(
-      (e: { offsetX: number; offsetY: number }): Point => ({
-        x: e.offsetX + tickScrollStore.scrollLeft,
-        y: e.offsetY,
-      }),
-      [tickScrollStore],
-    ),
+    get getLocal() {
+      const { scrollLeft } = useTickScroll(tickScrollScope)
+      return useCallback(
+        (e: { offsetX: number; offsetY: number }): Point => ({
+          x: e.offsetX + scrollLeft,
+          y: e.offsetY,
+        }),
+        [scrollLeft],
+      )
+    },
     setSelection: useSetAtom(selectionAtom),
     setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
     setMouseMode: useSetAtom(mouseModeAtom),
