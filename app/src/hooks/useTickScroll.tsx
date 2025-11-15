@@ -24,6 +24,7 @@ export const createTickScrollScope = (parentStore: Store) =>
       autoScrollAtom,
       minScaleXAtom,
       maxScaleXAtom,
+      endTickAtom,
     ]),
     parentStore,
   })
