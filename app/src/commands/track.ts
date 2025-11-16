@@ -1,4 +1,5 @@
-import { clamp } from "lodash"
+import { clamp, maxBy, minBy } from "lodash"
+import { transaction } from "mobx"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { isNotNull, isNotUndefined } from "../helpers/array"
 import { SongStore } from "../stores/SongStore"
@@ -63,6 +64,32 @@ export class TrackCommandService {
           }
         })
         .filter(isNotNull),
+    )
+  }
+
+  duplicateEvents = (trackId: TrackId, eventIds: number[]) => {
+    const track = this.songStore.song.getTrack(trackId)
+
+    if (!track) {
+      return []
+    }
+
+    const selectedEvents = eventIds
+      .map((id) => track.getEventById(id))
+      .filter(isNotUndefined)
+
+    // move to the end of selection
+    const deltaTick =
+      (maxBy(selectedEvents, (e) => e.tick)?.tick ?? 0) -
+      (minBy(selectedEvents, (e) => e.tick)?.tick ?? 0)
+
+    const events = selectedEvents.map((note) => ({
+      ...note,
+      tick: note.tick + deltaTick,
+    }))
+
+    return transaction(() => events.map((e) => track.createOrUpdate(e))).filter(
+      isNotUndefined,
     )
   }
 }

@@ -1,4 +1,4 @@
-import { maxBy, min, minBy } from "lodash"
+import { min } from "lodash"
 import { transaction } from "mobx"
 import { useCallback } from "react"
 import {
@@ -6,6 +6,7 @@ import {
   TempoEventsClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
+import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
@@ -116,9 +117,9 @@ export const useCutTempoSelection = () => {
 }
 
 export const useDuplicateTempoSelection = () => {
-  const { getEventById, createOrUpdate } = useConductorTrack()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
+  const commands = useCommands()
 
   return () => {
     if (selectedEventIds.length === 0) {
@@ -127,23 +128,8 @@ export const useDuplicateTempoSelection = () => {
 
     pushHistory()
 
-    const selectedEvents = selectedEventIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
-
-    // move to the end of selection
-    const deltaTick =
-      (maxBy(selectedEvents, (e) => e.tick)?.tick ?? 0) -
-      (minBy(selectedEvents, (e) => e.tick)?.tick ?? 0)
-
-    const events = selectedEvents.map((note) => ({
-      ...note,
-      tick: note.tick + deltaTick,
-    }))
-
-    const addedEvents = transaction(() => events.map(createOrUpdate)).filter(
-      isNotUndefined,
-    )
+    const addedEvents =
+      commands.conductorTrack.duplicateEvents(selectedEventIds)
 
     // select the created events
     setSelectedEventIds(addedEvents.map((e) => e.id))
