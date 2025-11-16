@@ -125,14 +125,6 @@ export function useTrackEvents(track: Track | undefined) {
       },
       [track],
     ),
-    removeRedundantEvents: useCallback(
-      (event: TrackEvent) => {
-        if (track) {
-          track.removeRedundantEvents(event)
-        }
-      },
-      [track],
-    ),
     createOrUpdate: useCallback(
       <T extends TrackEvent>(
         newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },

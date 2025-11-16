@@ -1,11 +1,13 @@
 import { clamp, maxBy, minBy } from "lodash"
 import { transaction } from "mobx"
+import { TrackEvents } from "../entities/event/TrackEvents"
 import { Range } from "../entities/geometry/Range"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { SongStore } from "../stores/SongStore"
 import { isNoteEvent, NoteEvent, TrackId } from "../track"
+import { TrackEvent } from "../track/TrackEvent"
 
 export interface BatchUpdateOperation {
   readonly type: "set" | "add" | "multiply"
@@ -142,6 +144,33 @@ export class TrackCommandService {
         })),
       )
     })
+  }
+
+  removeRedundantEvents = <T extends TrackEvent>(
+    trackId: TrackId,
+    event: T & { subtype?: string; controllerType?: number },
+  ) => {
+    const track = this.songStore.song.getTrack(trackId)
+    if (!track) {
+      return
+    }
+    const eventsIdsToRemove = TrackEvents.getRedundantEvents(event)(
+      track.events,
+    )
+      .filter((e) => e.id !== event.id)
+      .map((e) => e.id)
+    track.removeEvents(eventsIdsToRemove)
+  }
+
+  removeRedundantEventsForEventIds = (trackId: TrackId, eventIds: number[]) => {
+    const track = this.songStore.song.getTrack(trackId)
+    if (!track) {
+      return
+    }
+    const controllerEvents = track.events.filter((e) => eventIds.includes(e.id))
+    transaction(() =>
+      controllerEvents.forEach((e) => this.removeRedundantEvents(trackId, e)),
+    )
   }
 }
 
