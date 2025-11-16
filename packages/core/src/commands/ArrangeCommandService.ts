@@ -1,18 +1,23 @@
-import { Range } from "@signal-app/core"
+import { Range, TrackEvent } from "../entities"
+import { ArrangePoint } from "../entities/transform/ArrangePoint"
+import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { mapValues } from "lodash"
 import { transaction } from "mobx"
-import { ArrangeNotesClipboardData } from "../clipboard/clipboardTypes"
-import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
-import { ArrangeSelection } from "../hooks/useArrangeView"
-import { SongStore } from "../stores/SongStore"
-import { BatchUpdateOperation, TrackCommandService } from "./track"
+import { ISongStore } from "./interfaces"
+import { BatchUpdateOperation, TrackCommandService } from "./TrackCommandService"
+
+export interface ArrangeNotesClipboardData {
+  readonly type: "arrange_notes"
+  readonly notes: Record<string, readonly TrackEvent[]>
+  readonly selectedTrackIndex: number
+}
 
 export class ArrangeCommandService {
   private readonly trackCommands: TrackCommandService
 
-  constructor(private readonly songStore: SongStore) {
+  constructor(private readonly songStore: ISongStore) {
     this.trackCommands = new TrackCommandService(songStore)
   }
 
@@ -56,7 +61,7 @@ export class ArrangeCommandService {
         for (const u of updates) {
           tracks[u.sourceTrackIndex].removeEvents(u.events.map((e) => e.id))
           const events = tracks[u.destinationTrackIndex].addEvents(u.events)
-          ids[u.destinationTrackIndex] = events.map((e) => e.id)
+          ids[u.destinationTrackIndex] = events.map((e: TrackEvent) => e.id)
         }
         return ids
       }
@@ -210,7 +215,7 @@ export class ArrangeCommandService {
       const events = track.events.filter(
         isEventInRange(Range.create(selection.fromTick, selection.toTick)),
       )
-      ids[trackIndex] = events.map((e) => e.id)
+      ids[trackIndex] = events.map((e: TrackEvent) => e.id)
     }
     return ids
   }

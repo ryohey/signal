@@ -1,4 +1,5 @@
 import {
+  BatchUpdateOperation,
   Measure,
   programChangeMidiEvent,
   timeSignatureMidiEvent,
@@ -9,7 +10,6 @@ import {
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import { useCallback } from "react"
-import { BatchUpdateOperation } from "../commands/track"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { closedRange } from "../helpers/array"
 import { addedSet, deletedSet } from "../helpers/set"

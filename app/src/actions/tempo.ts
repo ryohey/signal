@@ -83,10 +83,10 @@ export const useDuplicateTempoSelection = () => {
 
     pushHistory()
 
-    const addedEvents =
+    const addedEventIds =
       commands.conductorTrack.duplicateEvents(selectedEventIds)
 
     // select the created events
-    setSelectedEventIds(addedEvents.map((e) => e.id))
+    setSelectedEventIds(addedEventIds)
   }
 }

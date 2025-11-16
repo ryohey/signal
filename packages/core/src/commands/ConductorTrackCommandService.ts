@@ -1,21 +1,24 @@
 import {
-  bpmToUSecPerBeat,
   isSetTempoEvent,
   TrackEventOf,
-  uSecPerBeatToBPM,
-} from "@signal-app/core"
+} from "../entities"
+import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers"
 import { clamp, min } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
-import { TempoEventsClipboardData } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
-import { SongStore } from "../stores/SongStore"
-import { TrackCommandService } from "./track"
+import { ISongStore } from "./interfaces"
+import { TrackCommandService } from "./TrackCommandService"
+
+export interface TempoEventsClipboardData {
+  readonly type: "tempo_events"
+  readonly events: readonly TrackEventOf<SetTempoEvent>[]
+}
 
 export class ConductorTrackCommandService {
   private readonly trackCommands: TrackCommandService
 
-  constructor(private readonly songStore: SongStore) {
+  constructor(private readonly songStore: ISongStore) {
     this.trackCommands = new TrackCommandService(songStore)
   }
 

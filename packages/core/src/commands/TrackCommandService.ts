@@ -1,3 +1,5 @@
+import { clamp, max, maxBy, min, minBy } from "lodash"
+import { transaction } from "mobx"
 import {
   isNoteEvent,
   NoteEvent,
@@ -5,13 +7,11 @@ import {
   TrackEvent,
   TrackEvents,
   TrackId,
-} from "@signal-app/core"
-import { clamp, max, maxBy, min, minBy } from "lodash"
-import { transaction } from "mobx"
+} from "../entities"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
-import { SongStore } from "../stores/SongStore"
+import { ISongStore } from "./interfaces"
 
 export interface BatchUpdateOperation {
   readonly type: "set" | "add" | "multiply"
@@ -19,7 +19,7 @@ export interface BatchUpdateOperation {
 }
 
 export class TrackCommandService {
-  constructor(private readonly songStore: SongStore) {}
+  constructor(private readonly songStore: ISongStore) {}
 
   batchUpdateNotesVelocity = (
     trackId: TrackId,
@@ -96,9 +96,9 @@ export class TrackCommandService {
       tick: note.tick + deltaTick,
     }))
 
-    return transaction(() => events.map((e) => track.createOrUpdate(e))).filter(
-      isNotUndefined,
-    )
+    return transaction(() => events.map((e) => track.createOrUpdate(e)))
+      .filter(isNotUndefined)
+      .map((e) => e.id)
   }
 
   // duplicate notes with an optional deltaTick
@@ -127,7 +127,7 @@ export class TrackCommandService {
     }))
 
     // select the created notes
-    const addedNoteIds = track.addEvents(notes).map((n) => n.id)
+    const addedNoteIds = track.addEvents(notes).map((n: TrackEvent) => n.id)
 
     return {
       addedNoteIds,
@@ -176,7 +176,7 @@ export class TrackCommandService {
 
     transaction(() => {
       track.updateEvents(
-        events.map((e) => ({
+        events.map((e: TrackEvent) => ({
           id: e.id,
           velocity: getValue(e.tick),
         })),
@@ -205,9 +205,13 @@ export class TrackCommandService {
     if (!track) {
       return
     }
-    const controllerEvents = track.events.filter((e) => eventIds.includes(e.id))
+    const controllerEvents = track.events.filter((e: TrackEvent) =>
+      eventIds.includes(e.id),
+    )
     transaction(() =>
-      controllerEvents.forEach((e) => this.removeRedundantEvents(trackId, e)),
+      controllerEvents.forEach((e: TrackEvent) =>
+        this.removeRedundantEvents(trackId, e),
+      ),
     )
   }
 

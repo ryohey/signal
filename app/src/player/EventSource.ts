@@ -3,10 +3,10 @@ import {
   Range,
   TrackId,
   getStatusEvents,
+  isEventInRange,
   noteOnMidiEvent,
 } from "@signal-app/core"
 import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
-import { isEventInRange } from "../helpers/filterEvents"
 import { SongStore } from "../stores/SongStore"
 import { convertTrackEvents } from "./collectAllEvents"
 

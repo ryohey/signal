@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import { Range } from "../entities"
 
 export const isEventInRange =
   <T extends { tick: number }>(range: Range) =>

@@ -1,4 +1,7 @@
 export * from "./beat/Beat"
 export * from "./geometry"
 export * from "./measure/Measure"
+export * from "./selection"
 export * from "./track"
+export * from "./transform"
+export * from "./unit"

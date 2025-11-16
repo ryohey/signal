@@ -162,11 +162,11 @@ export const useDuplicateControlSelection = () => {
     pushHistory()
 
     // select the created events
-    const addedEvents = commands.track.duplicateEvents(
+    const addedEventIds = commands.track.duplicateEvents(
       selectedTrackId,
       selectedEventIds,
     )
-    setSelectedEventIds(addedEvents.map((e) => e.id))
+    setSelectedEventIds(addedEventIds)
   }, [
     selectedEventIds,
     pushHistory,

@@ -1,7 +1,6 @@
+import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
 import { MouseEvent, useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
-import { ArrangeSelection } from "../../../../entities/selection/ArrangeSelection"
-import { ArrangePoint } from "../../../../entities/transform/ArrangePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"

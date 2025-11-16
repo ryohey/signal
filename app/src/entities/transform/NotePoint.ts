@@ -1,4 +1,4 @@
-import { NoteNumber } from "../unit/NoteNumber"
+import { NoteNumber } from "@signal-app/core"
 
 export interface NotePoint {
   readonly tick: number

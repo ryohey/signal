@@ -1,4 +1,4 @@
-import { MaxNoteNumber } from "../../Constants"
+import { MaxNoteNumber } from "../../helpers/constants"
 
 export type NoteNumber = number
 

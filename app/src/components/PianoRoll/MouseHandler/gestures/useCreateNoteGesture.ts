@@ -1,6 +1,5 @@
-import { NoteEvent } from "@signal-app/core"
+import { NoteEvent, NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
-import { NoteNumber } from "../../../../entities/unit/NoteNumber"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
