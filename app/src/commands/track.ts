@@ -1,4 +1,4 @@
-import { clamp, maxBy, minBy } from "lodash"
+import { clamp, max, maxBy, min, minBy } from "lodash"
 import { transaction } from "mobx"
 import { TrackEvents } from "../entities/event/TrackEvents"
 import { Range } from "../entities/geometry/Range"
@@ -97,6 +97,40 @@ export class TrackCommandService {
     )
   }
 
+  // duplicate notes with an optional deltaTick
+  // if deltaTick is 0, duplicate to the right of the selected notes
+  duplicateNotes = (trackId: TrackId, noteIds: number[], deltaTick: number) => {
+    const track = this.songStore.song.getTrack(trackId)
+
+    if (!track) {
+      return { addedNoteIds: [], deltaTick: 0 }
+    }
+
+    const selectedNotes = noteIds
+      .map((id) => track.getEventById(id))
+      .filter(isNotUndefined)
+      .filter(isNoteEvent)
+
+    if (deltaTick === 0) {
+      const left = min(selectedNotes.map((n) => n.tick)) ?? 0
+      const right = max(selectedNotes.map((n) => n.tick + n.duration)) ?? 0
+      deltaTick = right - left
+    }
+
+    const notes = selectedNotes.map((note) => ({
+      ...note,
+      tick: note.tick + deltaTick,
+    }))
+
+    // select the created notes
+    const addedNoteIds = track.addEvents(notes).map((n) => n.id)
+
+    return {
+      addedNoteIds,
+      deltaTick,
+    }
+  }
+
   // update velocities of notes in the specified range using linear interpolation
   updateVelocitiesInRange = (
     trackId: TrackId,
@@ -171,6 +205,27 @@ export class TrackCommandService {
     transaction(() =>
       controllerEvents.forEach((e) => this.removeRedundantEvents(trackId, e)),
     )
+  }
+
+  quantizeNotes = (
+    trackId: TrackId,
+    noteIds: number[],
+    quantizeRound: (tick: number) => number,
+  ) => {
+    const track = this.songStore.song.getTrack(trackId)
+    if (!track) {
+      return
+    }
+    const notes = noteIds
+      .map((id) => track.getEventById(id))
+      .filter(isNotUndefined)
+      .filter(isNoteEvent)
+      .map((e) => ({
+        ...e,
+        tick: quantizeRound(e.tick),
+      }))
+
+    track.updateEvents(notes)
   }
 }
 

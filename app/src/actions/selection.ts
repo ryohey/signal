@@ -1,4 +1,4 @@
-import { max, min } from "lodash"
+import { min } from "lodash"
 import { useCallback } from "react"
 import {
   PianoNotesClipboardData,
@@ -210,45 +210,31 @@ export const useDuplicateSelection = () => {
     setSelection,
     setSelectedNoteIds,
   } = usePianoRoll()
-  const { getEventById, addEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(() => {
-    if (selection === null || selectedNoteIds.length === 0) {
+    if (selection === null && selectedNoteIds.length === 0) {
       return
     }
 
     pushHistory()
 
     // move to the end of selection
-    let deltaTick = selection.toTick - selection.fromTick
+    const deltaTick = selection ? selection.toTick - selection.fromTick : 0
+    const { addedNoteIds, deltaTick: newDeltaTick } =
+      commands.track.duplicateNotes(selectedTrackId, selectedNoteIds, deltaTick)
 
-    const selectedNotes = selectedNoteIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
-      .filter(isNoteEvent)
-
-    if (deltaTick === 0) {
-      const left = min(selectedNotes.map((n) => n.tick)) ?? 0
-      const right = max(selectedNotes.map((n) => n.tick + n.duration)) ?? 0
-      deltaTick = right - left
+    if (selection) {
+      setSelection(Selection.moved(selection, newDeltaTick, 0))
     }
-
-    const notes = selectedNotes.map((note) => ({
-      ...note,
-      tick: note.tick + deltaTick,
-    }))
-
-    // select the created notes
-    const addedNotes = addEvents(notes)
-    setSelection(Selection.moved(selection, deltaTick, 0))
-    setSelectedNoteIds(addedNotes?.map((n) => n.id) ?? [])
+    setSelectedNoteIds(addedNoteIds)
   }, [
     selection,
     selectedNoteIds,
-    getEventById,
-    addEvents,
     pushHistory,
+    commands,
+    selectedTrackId,
     setSelection,
     setSelectedNoteIds,
   ])
@@ -325,32 +311,25 @@ export const useSelectPreviousNote = () => {
 export const useQuantizeSelectedNotes = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
   const { forceQuantizeRound } = usePianoRollQuantizer()
-  const { getEventById, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(() => {
     if (selectedNoteIds.length === 0) {
       return
     }
-
     pushHistory()
-
-    const notes = selectedNoteIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
-      .filter(isNoteEvent)
-      .map((e) => ({
-        ...e,
-        tick: forceQuantizeRound(e.tick),
-      }))
-
-    updateEvents(notes)
+    commands.track.quantizeNotes(
+      selectedTrackId,
+      selectedNoteIds,
+      forceQuantizeRound,
+    )
   }, [
     selectedNoteIds,
-    forceQuantizeRound,
-    getEventById,
-    updateEvents,
     pushHistory,
+    commands.track,
+    selectedTrackId,
+    forceQuantizeRound,
   ])
 }
 
