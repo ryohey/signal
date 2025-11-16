@@ -30,15 +30,6 @@ export const useDeleteTempoSelection = () => {
   }
 }
 
-export const useResetTempoSelection = () => {
-  const { setSelection, setSelectedEventIds } = useTempoEditor()
-
-  return () => {
-    setSelection(null)
-    setSelectedEventIds([])
-  }
-}
-
 export const useCopyTempoSelection = () => {
   const { selectedEventIds } = useTempoEditor()
   const commands = useCommands()
