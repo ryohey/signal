@@ -3,10 +3,8 @@ import { transaction } from "mobx"
 import { useCallback } from "react"
 import { BatchUpdateOperation } from "../commands/track"
 import { ValueEventType } from "../entities/event/ValueEventType"
-import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
 import { closedRange } from "../helpers/array"
-import { isEventInRange } from "../helpers/filterEvents"
 import { addedSet, deletedSet } from "../helpers/set"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
@@ -20,13 +18,7 @@ import {
   programChangeMidiEvent,
   timeSignatureMidiEvent,
 } from "../midi/MidiEvent"
-import {
-  NoteEvent,
-  TrackEvent,
-  TrackEventOf,
-  TrackId,
-  isNoteEvent,
-} from "../track"
+import { TrackEvent, TrackEventOf, TrackId } from "../track"
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {
@@ -89,56 +81,6 @@ export const useCreateEvent = () => {
       return id
     },
     [pushHistory, createOrUpdate, quantizeRound, position, sendEvent],
-  )
-}
-
-export const useUpdateVelocitiesInRange = () => {
-  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const { getEventById, getEvents, updateEvents } = useTrack(selectedTrackId)
-
-  return useCallback(
-    (
-      startTick: number,
-      startValue: number,
-      endTick: number,
-      endValue: number,
-    ) => {
-      const minTick = Math.min(startTick, endTick)
-      const maxTick = Math.max(startTick, endTick)
-      const minValue = Math.min(startValue, endValue)
-      const maxValue = Math.max(startValue, endValue)
-      const getValue = (tick: number) =>
-        Math.floor(
-          Math.min(
-            maxValue,
-            Math.max(
-              minValue,
-              ((tick - startTick) / (endTick - startTick)) *
-                (endValue - startValue) +
-                startValue,
-            ),
-          ),
-        )
-
-      const notes =
-        selectedNoteIds.length > 0
-          ? selectedNoteIds.map((id) => getEventById(id) as NoteEvent)
-          : getEvents().filter(isNoteEvent)
-
-      const events = notes.filter(
-        isEventInRange(Range.create(minTick, maxTick)),
-      )
-
-      transaction(() => {
-        updateEvents(
-          events.map((e) => ({
-            id: e.id,
-            velocity: getValue(e.tick),
-          })),
-        )
-      })
-    },
-    [selectedNoteIds, getEventById, getEvents, updateEvents],
   )
 }
 
