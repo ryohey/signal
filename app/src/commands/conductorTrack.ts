@@ -1,9 +1,11 @@
-import { clamp } from "lodash"
+import { clamp, min } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
+import { transaction } from "mobx"
+import { TempoEventsClipboardData } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers/bpm"
 import { SongStore } from "../stores/SongStore"
-import { TrackEventOf } from "../track"
+import { isSetTempoEvent, TrackEventOf } from "../track"
 import { TrackCommandService } from "./track"
 
 export class ConductorTrackCommandService {
@@ -66,5 +68,48 @@ export class ConductorTrackCommandService {
       conductorTrack.id,
       eventIds,
     )
+  }
+
+  copyTempoEvents = (eventIds: number[]): TempoEventsClipboardData | null => {
+    const conductorTrack = this.songStore.song.conductorTrack
+    if (!conductorTrack) {
+      return null
+    }
+
+    // Copy selected events
+    const events = eventIds
+      .map((id) => conductorTrack.getEventById(id))
+      .filter(isNotUndefined)
+      .filter(isSetTempoEvent)
+
+    const minTick = min(events.map((e) => e.tick))
+
+    if (minTick === undefined) {
+      return null
+    }
+
+    const relativePositionedEvents = events.map((note) => ({
+      ...note,
+      tick: note.tick - minTick,
+    }))
+
+    return {
+      type: "tempo_events",
+      events: relativePositionedEvents,
+    }
+  }
+
+  pasteTempoEventsAt = (data: TempoEventsClipboardData, tick: number) => {
+    const conductorTrack = this.songStore.song.conductorTrack
+    if (!conductorTrack) {
+      return []
+    }
+    const events = data.events.map((e) => ({
+      ...e,
+      tick: e.tick + tick,
+    }))
+    transaction(() => {
+      events.forEach((e) => conductorTrack.createOrUpdate(e))
+    })
   }
 }

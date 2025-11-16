@@ -1,11 +1,5 @@
-import { min } from "lodash"
-import { transaction } from "mobx"
 import { useCallback } from "react"
-import {
-  TempoEventsClipboardData,
-  TempoEventsClipboardDataSchema,
-} from "../clipboard/clipboardTypes"
-import { isNotUndefined } from "../helpers/array"
+import { TempoEventsClipboardDataSchema } from "../clipboard/clipboardTypes"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
@@ -16,7 +10,6 @@ import {
   readJSONFromClipboard,
   writeClipboardData,
 } from "../services/Clipboard"
-import { isSetTempoEvent } from "../track"
 
 export const useDeleteTempoSelection = () => {
   const { removeEvents } = useConductorTrack()
@@ -48,42 +41,20 @@ export const useResetTempoSelection = () => {
 
 export const useCopyTempoSelection = () => {
   const { selectedEventIds } = useTempoEditor()
-  const { getEventById } = useConductorTrack()
+  const commands = useCommands()
 
   return async () => {
-    if (selectedEventIds.length === 0) {
+    const data = commands.conductorTrack.copyTempoEvents(selectedEventIds)
+    if (!data) {
       return
     }
-
-    // Copy selected events
-    const events = selectedEventIds
-      .map(getEventById)
-      .filter(isNotUndefined)
-      .filter(isSetTempoEvent)
-
-    const minTick = min(events.map((e) => e.tick))
-
-    if (minTick === undefined) {
-      return
-    }
-
-    const relativePositionedEvents = events.map((note) => ({
-      ...note,
-      tick: note.tick - minTick,
-    }))
-
-    const data: TempoEventsClipboardData = {
-      type: "tempo_events",
-      events: relativePositionedEvents,
-    }
-
     await writeClipboardData(data)
   }
 }
 
 export const usePasteTempoSelection = () => {
   const { position } = usePlayer()
-  const { createOrUpdate } = useConductorTrack()
+  const commands = useCommands()
   const { pushHistory } = useHistory()
 
   return async (e?: ClipboardEvent) => {
@@ -95,14 +66,7 @@ export const usePasteTempoSelection = () => {
     }
 
     pushHistory()
-
-    const events = data.events.map((e) => ({
-      ...e,
-      tick: e.tick + position,
-    }))
-    transaction(() => {
-      events.forEach(createOrUpdate)
-    })
+    commands.conductorTrack.pasteTempoEventsAt(data, position)
   }
 }
 
