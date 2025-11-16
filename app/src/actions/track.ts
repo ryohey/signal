@@ -1,13 +1,14 @@
-import { clamp } from "lodash"
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import { useCallback } from "react"
+import { BatchUpdateOperation } from "../commands/track"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { Range } from "../entities/geometry/Range"
 import { Measure } from "../entities/measure/Measure"
-import { closedRange, isNotUndefined } from "../helpers/array"
+import { closedRange } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { addedSet, deletedSet } from "../helpers/set"
+import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
@@ -19,7 +20,7 @@ import {
   programChangeMidiEvent,
   timeSignatureMidiEvent,
 } from "../midi/MidiEvent"
-import Track, {
+import {
   NoteEvent,
   TrackEvent,
   TrackEventOf,
@@ -359,55 +360,20 @@ export const useUpdateTimeSignature = () => {
   )
 }
 
-export interface BatchUpdateOperation {
-  readonly type: "set" | "add" | "multiply"
-  readonly value: number
-}
-
-export const batchUpdateNotesVelocity = (
-  track: Track,
-  noteIds: number[],
-  operation: BatchUpdateOperation,
-) => {
-  const selectedNotes = noteIds
-    .map((id) => track.getEventById(id))
-    .filter(isNotUndefined)
-    .filter(isNoteEvent)
-  track.updateEvents(
-    selectedNotes.map((note) => ({
-      id: note.id,
-      velocity: clamp(
-        Math.floor(applyOperation(operation, note.velocity)),
-        1,
-        127,
-      ),
-    })),
-  )
-}
-
 export const useBatchUpdateSelectedNotesVelocity = () => {
-  const { selectedTrack, selectedNoteIds } = usePianoRoll()
+  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(
     (operation: BatchUpdateOperation) => {
-      if (selectedTrack === undefined) {
-        return
-      }
       pushHistory()
-      batchUpdateNotesVelocity(selectedTrack, selectedNoteIds, operation)
+      commands.track.batchUpdateNotesVelocity(
+        selectedTrackId,
+        selectedNoteIds,
+        operation,
+      )
     },
-    [selectedTrack, selectedNoteIds, pushHistory],
+    [selectedTrackId, selectedNoteIds, pushHistory, commands],
   )
-}
-
-const applyOperation = (operation: BatchUpdateOperation, value: number) => {
-  switch (operation.type) {
-    case "set":
-      return operation.value
-    case "add":
-      return value + operation.value
-    case "multiply":
-      return value * operation.value
-  }
 }

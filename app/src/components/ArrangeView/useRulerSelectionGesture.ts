@@ -1,10 +1,10 @@
 import { MouseEvent, useCallback } from "react"
-import { getEventsInSelection } from "../../actions/arrangeView"
 import { Range } from "../../entities/geometry/Range"
 import { ArrangeSelection } from "../../entities/selection/ArrangeSelection"
 import { MouseGesture } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
+import { useCommands } from "../../hooks/useCommands"
 import { useQuantizer } from "../../hooks/useQuantizer"
 import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
@@ -15,6 +15,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
   const { quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
+  const commands = useCommands()
 
   const selectionFromTickRange = useCallback(
     (range: Range) =>
@@ -58,7 +59,9 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
         },
         onMouseUp: () => {
           if (selection !== null) {
-            setSelectedEventIds(getEventsInSelection(tracks, selection))
+            setSelectedEventIds(
+              commands.arrange.getEventsInSelection(selection),
+            )
           }
         },
       })
@@ -70,6 +73,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
       selectionFromTickRange,
       tracks,
       resetSelection,
+      commands,
     ],
   )
 

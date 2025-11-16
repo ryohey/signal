@@ -1,10 +1,18 @@
 import { transaction } from "mobx"
+import { Range } from "../entities/geometry/Range"
 import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
+import { isEventInRange } from "../helpers/filterEvents"
+import { ArrangeSelection } from "../hooks/useArrangeView"
 import { SongStore } from "../stores/SongStore"
+import { BatchUpdateOperation, TrackCommandService } from "./track"
 
 export class ArrangeCommandService {
-  constructor(private readonly songStore: SongStore) {}
+  private readonly trackCommands: TrackCommandService
+
+  constructor(private readonly songStore: SongStore) {
+    this.trackCommands = new TrackCommandService(songStore)
+  }
 
   // returns moved event ids
   moveEventsBetweenTracks = (
@@ -53,5 +61,100 @@ export class ArrangeCommandService {
 
       return eventIdForTrackIndex
     })
+  }
+
+  batchUpdateNotesVelocity = (
+    eventIdForTrackIndex: { [trackIndex: number]: number[] },
+    operation: BatchUpdateOperation,
+  ) => {
+    const { tracks } = this.songStore.song
+    transaction(() => {
+      for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
+        eventIdForTrackIndex,
+      )) {
+        const trackIndex = parseInt(trackIndexStr, 10)
+        const track = tracks[trackIndex]
+        this.trackCommands.batchUpdateNotesVelocity(
+          track.id,
+          selectedEventIdsValue,
+          operation,
+        )
+      }
+    })
+  }
+
+  duplicateSelection = (selection: ArrangeSelection) => {
+    const { tracks } = this.songStore.song
+
+    const deltaTick = selection.toTick - selection.fromTick
+    const addedEventIds: { [key: number]: number[] } = {}
+    const selectedEventIds = this.getEventsInSelection(selection)
+
+    transaction(() => {
+      for (const [trackIndexStr, eventIds] of Object.entries(
+        selectedEventIds,
+      )) {
+        const trackIndex = parseInt(trackIndexStr, 10)
+        const track = tracks[trackIndex]
+        const events = eventIds
+          .map((id) => track.getEventById(id))
+          .filter(isNotUndefined)
+
+        const newEvent = track.addEvents(
+          events.map((e) => ({
+            ...e,
+            tick: e.tick + deltaTick,
+          })),
+        )
+
+        addedEventIds[trackIndex] = newEvent.map((e) => e.id)
+      }
+    })
+
+    const newSelection: ArrangeSelection = {
+      fromTick: selection.fromTick + deltaTick,
+      fromTrackIndex: selection.fromTrackIndex,
+      toTick: selection.toTick + deltaTick,
+      toTrackIndex: selection.toTrackIndex,
+    }
+
+    return {
+      selection: newSelection,
+      selectedEventIds: addedEventIds,
+    }
+  }
+
+  deleteSelection = (selection: ArrangeSelection) => {
+    const selectedEventIds = this.getEventsInSelection(selection)
+    const { tracks } = this.songStore.song
+    transaction(() => {
+      for (const trackIndex in selectedEventIds) {
+        tracks[trackIndex].removeEvents(selectedEventIds[trackIndex])
+      }
+    })
+  }
+
+  transposeSelection = (selection: ArrangeSelection, deltaPitch: number) => {
+    const selectedEventIds = this.getEventsInSelection(selection)
+    const { song } = this.songStore
+    song.transposeNotes(deltaPitch, selectedEventIds)
+  }
+
+  // returns { trackIndex: [eventId] }
+  getEventsInSelection = (selection: ArrangeSelection) => {
+    const { tracks } = this.songStore.song
+    const ids: { [key: number]: number[] } = {}
+    for (
+      let trackIndex = selection.fromTrackIndex;
+      trackIndex < selection.toTrackIndex;
+      trackIndex++
+    ) {
+      const track = tracks[trackIndex]
+      const events = track.events.filter(
+        isEventInRange(Range.create(selection.fromTick, selection.toTick)),
+      )
+      ids[trackIndex] = events.map((e) => e.id)
+    }
+    return ids
   }
 }
