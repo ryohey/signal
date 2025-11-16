@@ -1,4 +1,5 @@
 import { clamp, max, maxBy, min, minBy } from "lodash"
+import { AnyEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import {
   isNoteEvent,
@@ -9,7 +10,7 @@ import {
   TrackId,
 } from "../entities"
 import { NoteNumber } from "../entities/unit/NoteNumber"
-import { isNotNull, isNotUndefined } from "../helpers/array"
+import { closedRange, isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { ISongStore } from "./interfaces"
 
@@ -234,6 +235,72 @@ export class TrackCommandService {
       }))
 
     track.updateEvents(notes)
+  }
+
+  // Update  events in the range with linear interpolation values
+  updateEventsInRange = (
+    trackId: TrackId,
+    filterEvent: (e: TrackEvent) => boolean,
+    createEvent: (value: number) => AnyEvent,
+    quantizeFloor: (tick: number) => number,
+    quantizeUnit: number,
+    startValue: number,
+    endValue: number,
+    startTick: number,
+    endTick: number,
+  ) => {
+    const track = this.songStore.song.getTrack(trackId)
+
+    if (!track) {
+      return
+    }
+
+    const minTick = Math.min(startTick, endTick)
+    const maxTick = Math.max(startTick, endTick)
+    const _startTick = quantizeFloor(Math.max(0, minTick))
+    const _endTick = quantizeFloor(Math.max(0, maxTick))
+
+    const minValue = Math.min(startValue, endValue)
+    const maxValue = Math.max(startValue, endValue)
+
+    // linear interpolate
+    const getValue =
+      endTick === startTick
+        ? () => endValue
+        : (tick: number) =>
+            Math.floor(
+              Math.min(
+                maxValue,
+                Math.max(
+                  minValue,
+                  ((tick - startTick) / (endTick - startTick)) *
+                    (endValue - startValue) +
+                    startValue,
+                ),
+              ),
+            )
+
+    // Delete events in the dragged area
+    const events = track.events.filter(filterEvent).filter(
+      (e) =>
+        // to prevent remove the event created previously, do not remove the event placed at startTick
+        e.tick !== startTick &&
+        e.tick >= Math.min(minTick, _startTick) &&
+        e.tick <= Math.max(maxTick, _endTick),
+    )
+
+    transaction(() => {
+      track.removeEvents(events.map((e) => e.id))
+
+      const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(
+        (tick) => ({
+          ...createEvent(getValue(tick)),
+          tick,
+        }),
+      )
+
+      track.addEvents(newEvents)
+    })
   }
 }
 
