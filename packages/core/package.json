@@ -17,11 +17,11 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "serializr": "^3.0.5"
   },
   "peerDependencies": {
     "midifile-ts": "^1.5.1",
-    "mobx": "^6.0.0",
-    "serializr": "^3.0.5"
+    "mobx": "^6.0.0"
   }
 }
