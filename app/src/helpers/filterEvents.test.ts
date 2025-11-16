@@ -1,4 +1,4 @@
-import { Range } from "../entities/geometry/Range"
+import { Range } from "@signal-app/core"
 import { isEventInRange, isEventOverlapRange } from "./filterEvents"
 
 describe("filterEvents", () => {

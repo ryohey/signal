@@ -1,5 +1,5 @@
+import { Range } from "@signal-app/core"
 import { Point } from "../../../entities/geometry/Point"
-import { Range } from "../../../entities/geometry/Range"
 import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
 import { MouseGesture } from "../../../gesture/MouseGesture"

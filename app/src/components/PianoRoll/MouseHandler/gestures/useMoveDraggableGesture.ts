@@ -1,6 +1,6 @@
+import { Range } from "@signal-app/core"
 import { transaction } from "mobx"
 import { Point } from "../../../../entities/geometry/Point"
-import { Range } from "../../../../entities/geometry/Range"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"

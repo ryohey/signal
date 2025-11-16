@@ -1,5 +1,5 @@
+import { Range } from "@signal-app/core"
 import { Beat } from "../beat/Beat"
-import { Range } from "../geometry/Range"
 
 interface TimeSignature {
   readonly tick: number

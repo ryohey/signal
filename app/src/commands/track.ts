@@ -1,7 +1,7 @@
+import { Range } from "@signal-app/core"
 import { clamp, max, maxBy, min, minBy } from "lodash"
 import { transaction } from "mobx"
 import { TrackEvents } from "../entities/event/TrackEvents"
-import { Range } from "../entities/geometry/Range"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"

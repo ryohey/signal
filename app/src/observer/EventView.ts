@@ -1,5 +1,5 @@
+import { Range } from "@signal-app/core"
 import { computed, makeObservable, observable, observe } from "mobx"
-import { Range } from "../entities/geometry/Range"
 import { Unsubscribe } from "../types"
 
 interface TrackEvent {

@@ -1,4 +1,4 @@
-import { Range } from "../geometry/Range"
+import { Range } from "@signal-app/core"
 import { Measure } from "../measure/Measure"
 import { Beat } from "./Beat"
 

@@ -1,7 +1,7 @@
+import { Range } from "@signal-app/core"
 import { mapValues } from "lodash"
 import { transaction } from "mobx"
 import { ArrangeNotesClipboardData } from "../clipboard/clipboardTypes"
-import { Range } from "../entities/geometry/Range"
 import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
