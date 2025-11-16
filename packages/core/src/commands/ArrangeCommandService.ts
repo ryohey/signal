@@ -1,18 +1,15 @@
-import { Range, TrackEvent } from "../entities"
-import { ArrangePoint } from "../entities/transform/ArrangePoint"
-import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { mapValues } from "lodash"
 import { transaction } from "mobx"
+import { ArrangeNotesClipboardData, Range, TrackEvent } from "../entities"
+import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
+import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { ISongStore } from "./interfaces"
-import { BatchUpdateOperation, TrackCommandService } from "./TrackCommandService"
-
-export interface ArrangeNotesClipboardData {
-  readonly type: "arrange_notes"
-  readonly notes: Record<string, readonly TrackEvent[]>
-  readonly selectedTrackIndex: number
-}
+import {
+  BatchUpdateOperation,
+  TrackCommandService,
+} from "./TrackCommandService"
 
 export class ArrangeCommandService {
   private readonly trackCommands: TrackCommandService

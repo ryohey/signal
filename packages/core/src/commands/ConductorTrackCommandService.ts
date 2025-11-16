@@ -1,19 +1,15 @@
-import {
-  isSetTempoEvent,
-  TrackEventOf,
-} from "../entities"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers"
 import { clamp, min } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
+import {
+  isSetTempoEvent,
+  TempoEventsClipboardData,
+  TrackEventOf,
+} from "../entities"
+import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers"
 import { isNotUndefined } from "../helpers/array"
 import { ISongStore } from "./interfaces"
 import { TrackCommandService } from "./TrackCommandService"
-
-export interface TempoEventsClipboardData {
-  readonly type: "tempo_events"
-  readonly events: readonly TrackEventOf<SetTempoEvent>[]
-}
 
 export class ConductorTrackCommandService {
   private readonly trackCommands: TrackCommandService

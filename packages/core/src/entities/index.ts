@@ -1,4 +1,5 @@
 export * from "./beat/Beat"
+export * from "./clipboard/clipboardTypes"
 export * from "./geometry"
 export * from "./measure/Measure"
 export * from "./selection"

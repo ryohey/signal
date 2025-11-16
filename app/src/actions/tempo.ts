@@ -1,5 +1,5 @@
+import { TempoEventsClipboardDataSchema } from "@signal-app/core"
 import { useCallback } from "react"
-import { TempoEventsClipboardDataSchema } from "../clipboard/clipboardTypes"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
