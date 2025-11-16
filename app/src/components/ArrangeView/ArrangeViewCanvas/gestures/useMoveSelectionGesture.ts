@@ -7,29 +7,34 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
+import { useCommands } from "../../../../hooks/useCommands"
 import { useHistory } from "../../../../hooks/useHistory"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
-import { useStores } from "../../../../hooks/useStores"
 
 export const useMoveSelectionGesture = (): MouseGesture<
   [Point, Rect],
   MouseEvent
 > => {
-  const { commands } = useStores()
+  const commands = useCommands()
   const { pushHistory } = useHistory()
-  const { trackTransform, setSelection, setSelectedEventIds } = useArrangeView()
+  const {
+    selection: _selection,
+    trackTransform,
+    setSelection,
+  } = useArrangeView()
   const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
-  const { selection: _selection, selectedEventIds: _selectedEventIds } =
-    useArrangeView()
 
   return {
     onMouseDown: useCallback(
       (_e, startClientPos, selectionRect) => {
+        if (_selection === null) {
+          return
+        }
         let isMoved = false
         let selection = _selection
-        let selectedEventIds = _selectedEventIds
+        let selectedEventIds = commands.arrange.getEventsInSelection(selection)
 
         observeDrag({
           onMouseMove: (e) => {
@@ -78,7 +83,6 @@ export const useMoveSelectionGesture = (): MouseGesture<
             )
 
             setSelection(selection)
-            setSelectedEventIds(selectedEventIds)
           },
         })
       },
@@ -88,9 +92,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
         trackTransform,
         tracks,
         setSelection,
-        setSelectedEventIds,
         _selection,
-        _selectedEventIds,
         commands,
       ],
     ),

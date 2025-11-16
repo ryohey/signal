@@ -1,5 +1,6 @@
 import { clamp } from "lodash"
-import { isNotUndefined } from "../helpers/array"
+import { NoteNumber } from "../entities/unit/NoteNumber"
+import { isNotNull, isNotUndefined } from "../helpers/array"
 import { SongStore } from "../stores/SongStore"
 import { isNoteEvent, TrackId } from "../track"
 
@@ -35,6 +36,33 @@ export class TrackCommandService {
           127,
         ),
       })),
+    )
+  }
+
+  transposeNotes = (
+    trackId: TrackId,
+    noteIds: number[],
+    deltaPitch: number,
+  ) => {
+    const track = this.songStore.song.getTrack(trackId)
+
+    if (!track) {
+      return
+    }
+
+    track.updateEvents(
+      noteIds
+        .map((id) => {
+          const n = track.getEventById(id)
+          if (n == undefined || !isNoteEvent(n)) {
+            return null
+          }
+          return {
+            id,
+            noteNumber: NoteNumber.clamp(n.noteNumber + deltaPitch),
+          }
+        })
+        .filter(isNotNull),
     )
   }
 }

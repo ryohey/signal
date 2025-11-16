@@ -6,7 +6,6 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
-import { useCommands } from "../../../../hooks/useCommands"
 import { usePlayer } from "../../../../hooks/usePlayer"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
@@ -21,11 +20,9 @@ export const useCreateSelectionGesture = (): MouseGesture<
     setSelectedTrackIndex,
     resetSelection,
     setSelection,
-    setSelectedEventIds,
   } = useArrangeView()
   const { quantizeRound, quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
-  const commands = useCommands()
 
   const selectionFromPoints = useCallback(
     (start: ArrangePoint, end: ArrangePoint) =>
@@ -60,13 +57,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
             selection = selectionFromPoints(startPos, endPos)
             setSelection(selection)
           },
-          onMouseUp: () => {
-            if (selection !== null) {
-              setSelectedEventIds(
-                commands.arrange.getEventsInSelection(selection),
-              )
-            }
-          },
         })
       },
       [
@@ -78,8 +68,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
         setSelectedTrackIndex,
         selectionFromPoints,
         setSelection,
-        setSelectedEventIds,
-        commands,
       ],
     ),
   }

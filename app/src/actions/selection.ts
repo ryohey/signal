@@ -7,12 +7,12 @@ import {
 import { Rect } from "../entities/geometry/Rect"
 import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
+import { useCommands } from "../hooks/useCommands"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll, usePianoRollQuantizer } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
-import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
 import {
   readClipboardData,
@@ -45,8 +45,8 @@ export function eventsInSelection(
 }
 
 export const useTransposeSelection = () => {
-  const { transposeNotes } = useSong()
-  const { selectedTrackIndex, selection, selectedNoteIds, setSelection } =
+  const commands = useCommands()
+  const { selectedTrackId, selection, selectedNoteIds, setSelection } =
     usePianoRoll()
   const { pushHistory } = useHistory()
 
@@ -59,16 +59,18 @@ export const useTransposeSelection = () => {
         setSelection(s)
       }
 
-      transposeNotes(deltaPitch, {
-        [selectedTrackIndex]: selectedNoteIds,
-      })
+      commands.track.transposeNotes(
+        selectedTrackId,
+        selectedNoteIds,
+        deltaPitch,
+      )
     },
     [
       pushHistory,
       selection,
       setSelection,
-      transposeNotes,
-      selectedTrackIndex,
+      commands,
+      selectedTrackId,
       selectedNoteIds,
     ],
   )
