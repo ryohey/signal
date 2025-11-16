@@ -1,13 +1,17 @@
-import { Range } from "@signal-app/core"
+import {
+  isNoteEvent,
+  NoteEvent,
+  Range,
+  TrackEvent,
+  TrackEvents,
+  TrackId,
+} from "@signal-app/core"
 import { clamp, max, maxBy, min, minBy } from "lodash"
 import { transaction } from "mobx"
-import { TrackEvents } from "../entities/event/TrackEvents"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
 import { SongStore } from "../stores/SongStore"
-import { isNoteEvent, NoteEvent, TrackId } from "../track"
-import { TrackEvent } from "../track/TrackEvent"
 
 export interface BatchUpdateOperation {
   readonly type: "set" | "add" | "multiply"

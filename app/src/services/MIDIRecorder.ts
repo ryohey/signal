@@ -1,8 +1,13 @@
+import {
+  NoteEvent,
+  TrackEvent,
+  TrackId,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { Player } from "@signal-app/player"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { makeObservable, observable, observe } from "mobx"
 import { SongStore } from "../stores/SongStore"
-import { NoteEvent, TrackEvent, TrackId, UNASSIGNED_TRACK_ID } from "../track"
 
 export class MIDIRecorder {
   private recordedNotes: NoteEvent[] = []

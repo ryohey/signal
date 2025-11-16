@@ -1,8 +1,8 @@
+import { emptyTrack } from "@signal-app/core"
 import * as fs from "fs"
 import * as path from "path"
 import { deserialize, serialize } from "serializr"
 import { songFromMidi } from "../midi/midiConversion"
-import { emptyTrack } from "../track/TrackFactory"
 import Song from "./Song"
 import { emptySong } from "./SongFactory"
 

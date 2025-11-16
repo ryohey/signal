@@ -1,4 +1,4 @@
-import { Measure } from "@signal-app/core"
+import { isTimeSignatureEvent, Measure, Track, TrackId } from "@signal-app/core"
 import { PlayerEvent } from "@signal-app/player"
 import {
   action,
@@ -10,7 +10,6 @@ import {
 } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
 import { collectAllEvents } from "../player/collectAllEvents"
-import Track, { isTimeSignatureEvent, TrackId } from "../track"
 
 const END_MARGIN = 480 * 30
 const DEFAULT_TIME_BASE = 480

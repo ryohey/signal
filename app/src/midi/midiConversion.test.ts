@@ -1,16 +1,16 @@
+import {
+  NoteEvent,
+  noteOffMidiEvent,
+  noteOnMidiEvent,
+  setTempoMidiEvent,
+  timeSignatureMidiEvent,
+  Track,
+} from "@signal-app/core"
 import * as fs from "fs"
 import { AnyEvent } from "midifile-ts"
 import * as path from "path"
 import { serialize } from "serializr"
 import { emptySong } from "../song/SongFactory"
-import { NoteEvent } from "../track"
-import Track from "../track/Track"
-import {
-  noteOffMidiEvent,
-  noteOnMidiEvent,
-  setTempoMidiEvent,
-  timeSignatureMidiEvent,
-} from "./MidiEvent"
 import {
   createConductorTrackIfNeeded,
   songFromMidi,

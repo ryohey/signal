@@ -1,6 +1,6 @@
+import { isNoteEvent, NoteEvent } from "@signal-app/core"
 import { useCallback, useMemo } from "react"
 import { Rect } from "../entities/geometry/Rect"
-import { isNoteEvent, NoteEvent } from "../track"
 import { useEventView } from "./useEventView"
 import { usePianoRoll } from "./usePianoRoll"
 

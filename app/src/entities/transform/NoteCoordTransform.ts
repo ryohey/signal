@@ -1,5 +1,5 @@
+import { NoteEvent } from "@signal-app/core"
 import { Point } from "../../entities/geometry/Point"
-import { NoteEvent } from "../../track"
 import { KeyTransform } from "./KeyTransform"
 import { NotePoint } from "./NotePoint"
 import { TickTransform } from "./TickTransform"

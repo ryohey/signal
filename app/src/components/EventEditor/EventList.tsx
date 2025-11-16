@@ -1,11 +1,11 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
+import { TrackEvent } from "@signal-app/core"
 import React, { FC, useCallback, useRef } from "react"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import { Layout } from "../../Constants"
 import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
-import { TrackEvent } from "../../track"
 import { EventListItem } from "./EventListItem"
 
 const Container = styled.div`

@@ -1,15 +1,17 @@
+import {
+  bpmToUSecPerBeat,
+  isSetTempoEvent,
+  setTempoMidiEvent,
+} from "@signal-app/core"
 import { useUpdateEventsInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
 import { MouseGesture } from "../../../gesture/MouseGesture"
-import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { setTempoMidiEvent } from "../../../midi/MidiEvent"
-import { isSetTempoEvent } from "../../../track"
 
 export const usePencilGesture = (): MouseGesture<
   [Point, TempoCoordTransform]

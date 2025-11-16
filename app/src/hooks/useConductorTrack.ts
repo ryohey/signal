@@ -1,11 +1,11 @@
-import { Measure } from "@signal-app/core"
-import { isEqual } from "lodash"
-import { useCallback, useMemo } from "react"
 import {
   isSetTempoEvent,
   isTimeSignatureEvent,
+  Measure,
   UNASSIGNED_TRACK_ID,
-} from "../track"
+} from "@signal-app/core"
+import { isEqual } from "lodash"
+import { useCallback, useMemo } from "react"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"

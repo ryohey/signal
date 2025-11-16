@@ -1,3 +1,4 @@
+import { NoteEvent, TrackEvent, isNoteEvent } from "@signal-app/core"
 import { min } from "lodash"
 import { useCallback } from "react"
 import {
@@ -19,7 +20,6 @@ import {
   readJSONFromClipboard,
   writeClipboardData,
 } from "../services/Clipboard"
-import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
 
 export function eventsInSelection(
   events: readonly TrackEvent[],

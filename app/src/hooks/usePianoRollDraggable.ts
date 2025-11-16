@@ -1,11 +1,10 @@
-import { Range } from "@signal-app/core"
+import { isNoteEvent, Range } from "@signal-app/core"
 import { max, min } from "lodash"
 import { useCallback } from "react"
 import { MaxNoteNumber } from "../Constants"
 import { Selection } from "../entities/selection/Selection"
 import { NotePoint } from "../entities/transform/NotePoint"
 import { isNotUndefined } from "../helpers/array"
-import { isNoteEvent } from "../track"
 import { usePianoRoll } from "./usePianoRoll"
 
 export type DraggableArea = {

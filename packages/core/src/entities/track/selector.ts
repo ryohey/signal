@@ -1,6 +1,6 @@
 import { maxBy } from "lodash"
 import uniq from "lodash/uniq"
-import { isNotUndefined } from "../helpers/array"
+import { isNotUndefined } from "../../helpers/array"
 import { TrackEvent } from "./TrackEvent"
 import {
   isControllerEvent,

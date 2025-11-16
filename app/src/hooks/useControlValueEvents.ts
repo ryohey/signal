@@ -1,12 +1,12 @@
-import { maxBy } from "lodash"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { useMemo } from "react"
-import { isNotUndefined } from "../helpers/array"
 import {
   TrackEventOf,
   isControllerEventWithType,
   isPitchBendEvent,
-} from "../track"
+} from "@signal-app/core"
+import { maxBy } from "lodash"
+import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import { useMemo } from "react"
+import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "./useControlPane"
 import { useEventView } from "./useEventView"
 import { usePianoRoll } from "./usePianoRoll"

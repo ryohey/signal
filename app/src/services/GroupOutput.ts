@@ -1,7 +1,7 @@
+import { TrackId } from "@signal-app/core"
 import { SendableEvent, SynthOutput } from "@signal-app/player"
 import { makeObservable, observable } from "mobx"
 import { METRONOME_TRACK_ID } from "../player/EventSource"
-import { TrackId } from "../track"
 import { TrackMute } from "../trackMute/TrackMute"
 
 export interface SynthEntry {

@@ -1,11 +1,10 @@
-import { Measure } from "@signal-app/core"
+import { Measure, noteOffMidiEvent, noteOnMidiEvent } from "@signal-app/core"
 import { useCallback } from "react"
 import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useStores } from "../hooks/useStores"
 import { useTrackMute } from "../hooks/useTrackMute"
-import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 import { useToggleGhostTrack } from "./track"
 
 export const useStop = () => {

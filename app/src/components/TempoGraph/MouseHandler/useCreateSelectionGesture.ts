@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import { isSetTempoEvent, Range } from "@signal-app/core"
 import { Point } from "../../../entities/geometry/Point"
 import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
@@ -8,7 +8,6 @@ import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
-import { isSetTempoEvent } from "../../../track"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, TempoCoordTransform]

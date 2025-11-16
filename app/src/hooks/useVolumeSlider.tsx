@@ -1,5 +1,5 @@
+import { volumeMidiEvent } from "@signal-app/core"
 import { useCallback, useState } from "react"
-import { volumeMidiEvent } from "../midi/MidiEvent"
 import { useHistory } from "./useHistory"
 import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"

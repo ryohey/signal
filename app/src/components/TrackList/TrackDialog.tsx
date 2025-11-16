@@ -1,8 +1,8 @@
+import { TrackId } from "@signal-app/core"
 import { range } from "lodash"
 import { FC, useEffect, useState } from "react"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import { TrackId } from "../../track"
 import {
   Dialog,
   DialogActions,

@@ -1,10 +1,13 @@
-import { Beat, Range } from "@signal-app/core"
+import {
+  Beat,
+  Range,
+  TrackId,
+  getStatusEvents,
+  noteOnMidiEvent,
+} from "@signal-app/core"
 import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
 import { isEventInRange } from "../helpers/filterEvents"
-import { noteOnMidiEvent } from "../midi/MidiEvent"
 import { SongStore } from "../stores/SongStore"
-import { TrackId } from "../track"
-import { getStatusEvents } from "../track/selector"
 import { convertTrackEvents } from "./collectAllEvents"
 
 export const METRONOME_TRACK_ID = 99999 as TrackId

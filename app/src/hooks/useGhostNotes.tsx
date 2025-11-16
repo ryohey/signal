@@ -1,5 +1,5 @@
+import { isNoteEvent, NoteEvent, TrackId } from "@signal-app/core"
 import { useCallback, useMemo } from "react"
-import { isNoteEvent, NoteEvent, TrackId } from "../track"
 import {
   useEventView,
   useEventViewForTrack,

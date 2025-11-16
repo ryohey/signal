@@ -1,7 +1,7 @@
+import { isNoteEvent } from "@signal-app/core"
 import { toJS } from "mobx"
 import { useCallback, useSyncExternalStore } from "react"
 import { EventView } from "../observer/EventView"
-import { isNoteEvent } from "../track"
 import { useDisposable } from "./useDisposable"
 import { useSyncEventViewWithScroll } from "./useEventView"
 import { useStores } from "./useStores"

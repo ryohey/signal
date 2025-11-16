@@ -1,4 +1,4 @@
-import { TrackId } from "../track/Track"
+import { TrackId } from "@signal-app/core"
 
 /**
 

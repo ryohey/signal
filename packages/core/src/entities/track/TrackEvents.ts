@@ -6,32 +6,25 @@ import {
   TrackNameEvent,
 } from "midifile-ts"
 import { transaction } from "mobx"
+import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
 import { bpmToUSecPerBeat } from "../../helpers/bpm"
-import { TickOrderedArray } from "../../helpers/TickOrderedArray"
 import {
   programChangeMidiEvent,
   setTempoMidiEvent,
   trackNameMidiEvent,
 } from "../../midi/MidiEvent"
-import {
-  isControllerEventWithType,
-  isNoteEvent,
-  TrackEvent,
-  TrackEventOf,
-} from "../../track"
+import { isControllerEventWithType, isNoteEvent } from "./identify"
 import {
   getLast,
   getProgramNumberEvent,
   getTempoEvent,
   getTrackNameEvent,
   isTickBefore,
-} from "../../track/selector"
-import {
-  isSignalTrackColorEvent,
-  SignalTrackColorEvent,
-} from "../../track/signalEvents"
-import { TrackColor } from "../../track/TrackColor"
-import { validateMidiEvent } from "../../track/validate"
+} from "./selector"
+import { isSignalTrackColorEvent, SignalTrackColorEvent } from "./signalEvents"
+import { TrackColor } from "./TrackColor"
+import { TrackEvent, TrackEventOf } from "./TrackEvent"
+import { validateMidiEvent } from "./validate"
 
 export namespace TrackEvents {
   // array mutation

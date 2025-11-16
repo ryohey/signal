@@ -1,6 +1,6 @@
 import { makeObservable, observable } from "mobx"
 import { createModelSchema, list, mapAsArray, primitive } from "serializr"
-import { pojo } from "./pojo"
+import { pojo } from "../pojo"
 
 /**
  * A class that efficiently maintains array order using a key extractor

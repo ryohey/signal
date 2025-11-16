@@ -1,7 +1,5 @@
+import { Track, TrackColor, TrackEvent, TrackId } from "@signal-app/core"
 import { useCallback } from "react"
-import Track, { TrackId } from "../track"
-import { TrackColor } from "../track/TrackColor"
-import { TrackEvent } from "../track/TrackEvent"
 import { TrackMute } from "../trackMute/TrackMute"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { useSong } from "./useSong"

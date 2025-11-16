@@ -1,7 +1,11 @@
+import {
+  deassemble as deassembleNote,
+  Track,
+  TrackEvent,
+  TrackId,
+} from "@signal-app/core"
 import { PlayerEvent, PlayerEventOf } from "@signal-app/player"
 import { AnyChannelEvent } from "midifile-ts"
-import { deassemble as deassembleNote } from "../helpers/noteAssembler"
-import Track, { TrackEvent, TrackId } from "../track"
 
 export const convertTrackEvents = (
   events: readonly TrackEvent[],

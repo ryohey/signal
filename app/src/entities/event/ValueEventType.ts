@@ -1,7 +1,11 @@
 // abstraction layer for pitch-bend and controller events
 
-import { controllerMidiEvent, pitchBendMidiEvent } from "../../midi/MidiEvent"
-import { isControllerEventWithType, isPitchBendEvent } from "../../track"
+import {
+  controllerMidiEvent,
+  isControllerEventWithType,
+  isPitchBendEvent,
+  pitchBendMidiEvent,
+} from "@signal-app/core"
 
 export type ValueEventType =
   | { type: "pitchBend" }

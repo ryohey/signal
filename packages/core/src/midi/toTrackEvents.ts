@@ -4,8 +4,8 @@ import {
   DeltaTimeProvider,
   isSequencerSpecificEvent,
   TickProvider,
-} from "../track"
-import { mapToSignalEvent } from "../track/signalEvents"
+} from "../entities/track"
+import { mapToSignalEvent } from "../entities/track/signalEvents"
 import { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 

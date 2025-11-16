@@ -1,7 +1,10 @@
 import flatten from "lodash/flatten"
 import { AnyEvent } from "midifile-ts"
-import { DeltaTimeProvider, TickProvider, TrackEvent } from "../track"
-import { isSignalEvent, mapFromSignalEvent } from "../track/signalEvents"
+import { DeltaTimeProvider, TickProvider, TrackEvent } from "../entities/track"
+import {
+  isSignalEvent,
+  mapFromSignalEvent,
+} from "../entities/track/signalEvents"
 import { deassemble as deassembleNote } from "./noteAssembler"
 
 // events in each tracks

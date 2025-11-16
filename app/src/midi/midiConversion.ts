@@ -1,3 +1,12 @@
+import {
+  addDeltaTime,
+  addTick,
+  AnyEventFeature,
+  tickedEventsToTrackEvents,
+  toRawEvents,
+  toTrackEvents,
+  Track,
+} from "@signal-app/core"
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
@@ -10,14 +19,7 @@ import {
 } from "midifile-ts"
 import { isNotNull } from "../helpers/array"
 import { downloadBlob } from "../helpers/Downloader"
-import { addDeltaTime, toRawEvents } from "../helpers/toRawEvents"
-import {
-  addTick,
-  tickedEventsToTrackEvents,
-  toTrackEvents,
-} from "../helpers/toTrackEvents"
 import Song from "../song"
-import Track, { AnyEventFeature } from "../track"
 
 const trackFromMidiEvents = (events: AnyEvent[]): Track => {
   const track = new Track()
@@ -151,9 +153,9 @@ export function songToMidiEvents(song: Song): AnyEvent[][] {
     }
     const rawEvents = [...toRawEvents(t.events), endOfTrack]
     if (t.channel !== undefined) {
-      return rawEvents.map(setChannel(t.channel))
+      return rawEvents.map(setChannel(t.channel) as any) as AnyEvent[] // temporary fix for midifile-ts typing issue
     }
-    return rawEvents
+    return rawEvents as AnyEvent[]
   })
 }
 

@@ -1,4 +1,3 @@
-import { toTrackEvents } from "../helpers/toTrackEvents"
 import {
   endOfTrackMidiEvent,
   expressionMidiEvent,
@@ -14,8 +13,9 @@ import {
   timeSignatureMidiEvent,
   trackNameMidiEvent,
   volumeMidiEvent,
-} from "../midi/MidiEvent"
-import Track from "./Track"
+} from "../../midi/MidiEvent"
+import { toTrackEvents } from "../../midi/toTrackEvents"
+import { Track } from "./Track"
 
 export function conductorTrack(name = "") {
   const track = new Track()

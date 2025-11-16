@@ -1,4 +1,11 @@
-import { Measure } from "@signal-app/core"
+import {
+  Measure,
+  programChangeMidiEvent,
+  timeSignatureMidiEvent,
+  TrackEvent,
+  TrackEventOf,
+  TrackId,
+} from "@signal-app/core"
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import { useCallback } from "react"
@@ -14,11 +21,6 @@ import { usePlayer } from "../hooks/usePlayer"
 import { useQuantizer } from "../hooks/useQuantizer"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
-import {
-  programChangeMidiEvent,
-  timeSignatureMidiEvent,
-} from "../midi/MidiEvent"
-import { TrackEvent, TrackEventOf, TrackId } from "../track"
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {

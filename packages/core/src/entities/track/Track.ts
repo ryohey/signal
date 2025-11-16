@@ -1,8 +1,7 @@
 import { action, computed, makeObservable, observable, transaction } from "mobx"
 import { createModelSchema, object, primitive } from "serializr"
-import { TrackEvents } from "../entities/event/TrackEvents"
-import { TickOrderedArray } from "../helpers/TickOrderedArray"
-import { Branded } from "../types"
+import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
+import { Branded } from "../../types"
 import { isNoteEvent } from "./identify"
 import {
   getPan,
@@ -15,11 +14,12 @@ import {
 import { SignalTrackColorEvent } from "./signalEvents"
 import { TrackColor } from "./TrackColor"
 import { TrackEvent } from "./TrackEvent"
+import { TrackEvents } from "./TrackEvents"
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
 
-export default class Track {
+export class Track {
   id: TrackId = UNASSIGNED_TRACK_ID
   private readonly _events = new TickOrderedArray<TrackEvent>()
   endOfTrack: number = 0

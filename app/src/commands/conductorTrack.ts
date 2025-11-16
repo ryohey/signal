@@ -1,11 +1,15 @@
+import {
+  bpmToUSecPerBeat,
+  isSetTempoEvent,
+  TrackEventOf,
+  uSecPerBeatToBPM,
+} from "@signal-app/core"
 import { clamp, min } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import { TempoEventsClipboardData } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers/bpm"
 import { SongStore } from "../stores/SongStore"
-import { isSetTempoEvent, TrackEventOf } from "../track"
 import { TrackCommandService } from "./track"
 
 export class ConductorTrackCommandService {
