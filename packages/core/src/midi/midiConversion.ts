@@ -1,6 +1,3 @@
-import { AnyEventFeature, Song, Track } from "../entities"
-import { addDeltaTime, toRawEvents } from "./toRawEvents"
-import { addTick, tickedEventsToTrackEvents, toTrackEvents } from "./toTrackEvents"
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
@@ -11,7 +8,14 @@ import {
   StreamSource,
   write as writeMidiFile,
 } from "midifile-ts"
+import { AnyEventFeature, Song, Track } from "../entities"
 import { isNotNull } from "../helpers/array"
+import { addDeltaTime, toRawEvents } from "./toRawEvents"
+import {
+  addTick,
+  tickedEventsToTrackEvents,
+  toTrackEvents,
+} from "./toTrackEvents"
 
 const trackFromMidiEvents = (events: AnyEvent[]): Track => {
   const track = new Track()
@@ -93,7 +97,7 @@ export const createConductorTrackIfNeeded = (
       .filter(isNotNull),
   )
 
-  return [conductorTrack, ...newTracks].map(addDeltaTime) as AnyEvent[][]
+  return [conductorTrack, ...newTracks].map(addDeltaTime)
 }
 
 const getTracks = (midi: MidiFile): Track[] => {
@@ -145,9 +149,9 @@ export function songToMidiEvents(song: Song): AnyEvent[][] {
     }
     const rawEvents = [...toRawEvents(t.events), endOfTrack]
     if (t.channel !== undefined) {
-      return rawEvents.map(setChannel(t.channel) as any) as AnyEvent[] // temporary fix for midifile-ts typing issue
+      return rawEvents.map(setChannel(t.channel))
     }
-    return rawEvents as AnyEvent[]
+    return rawEvents
   })
 }
 
