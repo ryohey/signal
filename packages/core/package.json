@@ -20,7 +20,8 @@
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
+    "midifile-ts": "^1.5.1",
     "mobx": "^6.0.0",
-    "midifile-ts": "^1.5.1"
+    "serializr": "^3.0.5"
   }
 }

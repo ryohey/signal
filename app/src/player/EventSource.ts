@@ -29,7 +29,9 @@ export class EventSource implements IEventSource {
     const beatEvents = Beat.createInRange(song.measures, song.timebase, range)
       .filter(isEventInRange(range))
       .flatMap((b) => beatToEvents(b))
-    return song.allEvents.filter(isEventInRange(range)).concat(beatEvents)
+    return (song.allEvents as PlayerEvent[])
+      .filter(isEventInRange(range))
+      .concat(beatEvents)
   }
 
   getCurrentStateEvents(tick: number): SendableEvent[] {

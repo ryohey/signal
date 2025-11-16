@@ -1,4 +1,10 @@
-import { emptyTrack, TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import {
+  emptySong,
+  emptyTrack,
+  Song,
+  TrackId,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useAutoSave } from "../hooks/useAutoSave"
@@ -9,7 +15,6 @@ import { useSong } from "../hooks/useSong"
 import { useTrackList } from "../hooks/useTrackList"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/midiConversion"
-import Song, { emptySong } from "../song"
 import { songFromFile } from "./file"
 
 const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {

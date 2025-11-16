@@ -1,4 +1,5 @@
 import {
+  emptySong,
   NoteEvent,
   noteOffMidiEvent,
   noteOnMidiEvent,
@@ -10,7 +11,6 @@ import * as fs from "fs"
 import { AnyEvent } from "midifile-ts"
 import * as path from "path"
 import { serialize } from "serializr"
-import { emptySong } from "../song/SongFactory"
 import {
   createConductorTrackIfNeeded,
   songFromMidi,

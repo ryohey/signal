@@ -1,6 +1,6 @@
+import { Song, emptySong } from "@signal-app/core"
 import { makeObservable, observable } from "mobx"
 import { serialize } from "serializr"
-import Song, { emptySong } from "../song"
 
 export class SongStore {
   song: Song = emptySong()

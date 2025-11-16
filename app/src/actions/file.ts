@@ -1,7 +1,7 @@
+import { Song } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { songFromMidi, songToMidi } from "../midi/midiConversion"
 import { writeFile } from "../services/fs-helper"
-import Song from "../song"
 import { useSetSong } from "./song"
 
 // URL parameter for automation purposes used in scripts/perf/index.js

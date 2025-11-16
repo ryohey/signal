@@ -1,5 +1,3 @@
-import { isTimeSignatureEvent, Measure, Track, TrackId } from "@signal-app/core"
-import { PlayerEvent } from "@signal-app/player"
 import {
   action,
   computed,
@@ -9,7 +7,14 @@ import {
   toJS,
 } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
-import { collectAllEvents } from "../player/collectAllEvents"
+import { deassemble as deassembleNote } from "../../midi"
+import {
+  isTimeSignatureEvent,
+  Measure,
+  Track,
+  TrackEvent,
+  TrackId,
+} from "../index"
 
 const END_MARGIN = 480 * 30
 const DEFAULT_TIME_BASE = 480
@@ -120,8 +125,26 @@ export default class Song {
     this.tracks.forEach((t) => t.updateEndOfTrack())
   }
 
-  get allEvents(): PlayerEvent[] {
-    return collectAllEvents(this.tracks)
+  private convertTrackEvents = (
+    events: readonly TrackEvent[],
+    channel: number | undefined,
+    trackId: TrackId,
+  ) =>
+    events
+      .filter((e) => !(e.isRecording === true))
+      .flatMap((originalEvent) => {
+        const deassembledEvents = deassembleNote(originalEvent)
+        return deassembledEvents.map((e) => ({
+          ...e,
+          channel,
+          trackId: trackId as number,
+        }))
+      })
+
+  get allEvents() {
+    return this.tracks.flatMap((t) =>
+      this.convertTrackEvents(t.events, t.channel, t.id),
+    )
   }
 }
 

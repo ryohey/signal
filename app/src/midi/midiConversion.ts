@@ -2,6 +2,7 @@ import {
   addDeltaTime,
   addTick,
   AnyEventFeature,
+  Song,
   tickedEventsToTrackEvents,
   toRawEvents,
   toTrackEvents,
@@ -19,7 +20,6 @@ import {
 } from "midifile-ts"
 import { isNotNull } from "../helpers/array"
 import { downloadBlob } from "../helpers/Downloader"
-import Song from "../song"
 
 const trackFromMidiEvents = (events: AnyEvent[]): Track => {
   const track = new Track()

@@ -1,11 +1,5 @@
-import { Track, TrackId } from "../entities"
-
-export interface ISong {
-  readonly tracks: readonly Track[]
-  readonly conductorTrack: Track | undefined
-  getTrack(trackId: TrackId): Track | undefined
-}
+import { Song } from "../entities"
 
 export interface ISongStore {
-  readonly song: ISong
+  readonly song: Song
 }

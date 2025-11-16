@@ -1,4 +1,5 @@
 import { CloudSong } from "@signal-app/api"
+import { Song } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { useAutoSave } from "../hooks/useAutoSave"
 import { songFromMidi, songToMidi } from "../midi/midiConversion"
@@ -8,7 +9,6 @@ import {
   cloudSongRepository,
   userRepository,
 } from "../services/repositories"
-import Song from "../song"
 
 export const useLoadSong = () => {
   return async (cloudSong: CloudSong) => {

@@ -1,4 +1,4 @@
-import { conductorTrack, emptyTrack } from "@signal-app/core"
+import { conductorTrack, emptyTrack } from "../track"
 import Song from "./Song"
 
 export function emptySong() {
