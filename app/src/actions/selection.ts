@@ -322,7 +322,7 @@ export const useSelectPreviousNote = () => {
 
 export const useQuantizeSelectedNotes = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const { enabledQuantizer: quantizer } = usePianoRollQuantizer()
+  const { forceQuantizeRound } = usePianoRollQuantizer()
   const { getEventById, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
@@ -339,11 +339,17 @@ export const useQuantizeSelectedNotes = () => {
       .filter(isNoteEvent)
       .map((e) => ({
         ...e,
-        tick: quantizer.round(e.tick),
+        tick: forceQuantizeRound(e.tick),
       }))
 
     updateEvents(notes)
-  }, [selectedNoteIds, quantizer, getEventById, updateEvents, pushHistory])
+  }, [
+    selectedNoteIds,
+    forceQuantizeRound,
+    getEventById,
+    updateEvents,
+    pushHistory,
+  ])
 }
 
 export const useSelectAllNotes = () => {

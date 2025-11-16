@@ -3,7 +3,6 @@ import { FC, useCallback } from "react"
 import PencilIcon from "../../images/icons/pencil.svg"
 import SelectionIcon from "../../images/icons/selection.svg"
 import { Localized } from "../../localize/useLocalization"
-import { PianoRollMouseMode } from "../../stores/PianoRollStore"
 import { Tooltip } from "../ui/Tooltip"
 import {
   ToolbarButtonGroup,
@@ -16,8 +15,8 @@ const ButtonGroup = styled(ToolbarButtonGroup)`
 `
 
 export interface ToolSelectorProps {
-  mouseMode: PianoRollMouseMode
-  onSelect: (mouseMode: PianoRollMouseMode) => void
+  mouseMode: "pencil" | "selection"
+  onSelect: (mouseMode: "pencil" | "selection") => void
 }
 
 const IconWrapper = styled.div`

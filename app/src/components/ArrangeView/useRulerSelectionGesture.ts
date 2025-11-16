@@ -12,7 +12,7 @@ import { useTickScroll } from "../../hooks/useTickScroll"
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
   const { trackTransform, resetSelection, setSelection, setSelectedEventIds } =
     useArrangeView()
-  const { quantizer } = useQuantizer()
+  const { quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
 
@@ -27,10 +27,10 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           tick: range[1],
           trackIndex: tracks.length,
         },
-        quantizer,
+        { quantizeFloor, quantizeCeil },
         tracks.length,
       ),
-    [quantizer, tracks.length],
+    [quantizeFloor, quantizeCeil, tracks.length],
   )
 
   let selection: ArrangeSelection | null = null

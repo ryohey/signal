@@ -18,7 +18,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
 > => {
   const { pushHistory } = useHistory()
   const { trackTransform, setSelection, setSelectedEventIds } = useArrangeView()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
   const { selection: _selection, selectedEventIds: _selectedEventIds } =
     useArrangeView()
@@ -48,7 +48,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
 
             // quantize
             point = {
-              tick: quantizer.round(point.tick),
+              tick: quantizeRound(point.tick),
               trackIndex: Math.round(point.trackIndex),
             }
 
@@ -84,7 +84,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
       },
       [
         pushHistory,
-        quantizer,
+        quantizeRound,
         trackTransform,
         tracks,
         setSelection,

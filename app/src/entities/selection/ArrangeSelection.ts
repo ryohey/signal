@@ -1,4 +1,3 @@
-import Quantizer from "../../quantizer"
 import { ArrangePoint } from "../transform/ArrangePoint"
 
 export interface ArrangeSelection {
@@ -12,7 +11,10 @@ export namespace ArrangeSelection {
   export function fromPoints(
     start: ArrangePoint,
     end: ArrangePoint,
-    quantizer: Quantizer,
+    quantizer: {
+      quantizeFloor(tick: number): number
+      quantizeCeil(tick: number): number
+    },
     maxTrackIndex: number,
   ): ArrangeSelection {
     const startSelection = fromPoint(start, quantizer)
@@ -22,10 +24,16 @@ export namespace ArrangeSelection {
 
   export const fromPoint = (
     point: ArrangePoint,
-    quantizer: Quantizer,
+    {
+      quantizeFloor,
+      quantizeCeil,
+    }: {
+      quantizeFloor(tick: number): number
+      quantizeCeil(tick: number): number
+    },
   ): ArrangeSelection => {
-    const fromTick = quantizer.floor(point.tick)
-    const toTick = quantizer.ceil(point.tick)
+    const fromTick = quantizeFloor(point.tick)
+    const toTick = quantizeCeil(point.tick)
     return {
       fromTick,
       toTick,

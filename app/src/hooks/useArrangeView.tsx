@@ -1,15 +1,34 @@
-import { atom, useAtomValue, useSetAtom } from "jotai"
+import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { Store } from "jotai/vanilla/store"
 import { cloneDeep } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
+import { MaxNoteNumber } from "../Constants"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-import ArrangeViewStore from "../stores/ArrangeViewStore"
-import { BeatsProvider } from "./useBeats"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
-import { QuantizerProvider } from "./useQuantizer"
+import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransform"
+import { KeyTransform } from "../entities/transform/KeyTransform"
+import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
+import { BeatsProvider, createBeatsScope } from "./useBeats"
+import { useMobxSelector } from "./useMobxSelector"
+import { createQuantizerScope, QuantizerProvider } from "./useQuantizer"
 import { useStores } from "./useStores"
-import { TickScrollProvider, useTickScroll } from "./useTickScroll"
-import { TrackScrollProvider, useTrackScroll } from "./useTrackScroll"
+import {
+  createTickScrollScope,
+  TickScrollProvider,
+  useTickScroll,
+} from "./useTickScroll"
+import {
+  createTrackScrollScope,
+  TrackScrollProvider,
+  useTrackScroll,
+} from "./useTrackScroll"
 export type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
+
+type ArrangeViewStore = {
+  quantizerScope: Store
+  tickScrollScope: Store
+  trackScrollScope: Store
+  beatsScope: Store
+}
 
 const ArrangeViewStoreContext = createContext<ArrangeViewStore>(null!)
 
@@ -18,11 +37,21 @@ export function ArrangeViewProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { songStore, player } = useStores()
-  const arrangeViewStore = useMemo(
-    () => new ArrangeViewStore(songStore, player),
-    [songStore, player],
-  )
+  const store = useStore()
+
+  const arrangeViewStore = useMemo(() => {
+    // should match the order in ArrangeViewScope
+    const tickScrollScope = createTickScrollScope(store)
+    const trackScrollScope = createTrackScrollScope(tickScrollScope)
+    const quantizerScope = createQuantizerScope(trackScrollScope)
+    const beatsScope = createBeatsScope(quantizerScope)
+    return {
+      quantizerScope,
+      tickScrollScope,
+      trackScrollScope,
+      beatsScope,
+    }
+  }, [store])
 
   return (
     <ArrangeViewStoreContext.Provider value={arrangeViewStore}>
@@ -32,38 +61,47 @@ export function ArrangeViewProvider({
 }
 
 export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
-  const { tickScrollStore, trackScrollStore, quantizerStore } = useContext(
-    ArrangeViewStoreContext,
-  )
+  const { tickScrollScope, trackScrollScope, quantizerScope, beatsScope } =
+    useContext(ArrangeViewStoreContext)
 
   return (
-    <TickScrollProvider value={tickScrollStore}>
-      <TrackScrollProvider value={trackScrollStore}>
-        <BeatsProvider>
-          <QuantizerProvider value={quantizerStore}>
-            {children}
-          </QuantizerProvider>
-        </BeatsProvider>
+    <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
+      <TrackScrollProvider scope={trackScrollScope}>
+        <QuantizerProvider scope={quantizerScope} quantize={1}>
+          <BeatsProvider scope={beatsScope}>{children}</BeatsProvider>
+        </QuantizerProvider>
       </TrackScrollProvider>
     </TickScrollProvider>
   )
 }
 
 export function useArrangeView() {
-  const arrangeViewStore = useContext(ArrangeViewStoreContext)
-  const { tickScrollStore, trackScrollStore } = arrangeViewStore
-  const { songStore } = useStores()
-  const { setScrollLeftInPixels } = useTickScroll(tickScrollStore)
-  const { setScrollTop } = useTrackScroll(trackScrollStore)
-
+  const { tickScrollScope, trackScrollScope } = useContext(
+    ArrangeViewStoreContext,
+  )
   return {
     get transform() {
-      return useMobxGetter(arrangeViewStore, "transform")
+      const { transform: tickTransform } = useTickScroll(tickScrollScope)
+      const { trackHeight } = useTrackScroll(trackScrollScope)
+      const bottomBorderWidth = 1
+      const keyTransform = useMemo(
+        () =>
+          new KeyTransform(
+            (trackHeight - bottomBorderWidth) / MaxNoteNumber,
+            MaxNoteNumber,
+          ),
+        [trackHeight],
+      )
+      return useMemo(
+        () => new NoteCoordTransform(tickTransform, keyTransform),
+        [tickTransform, keyTransform],
+      )
     },
     get selectedTrackIndex() {
       return useAtomValue(selectedTrackIndexAtom)
     },
     get selectedTrackId() {
+      const { songStore } = useStores()
       const selectedTrackIndex = useAtomValue(selectedTrackIndexAtom)
       return useMobxSelector(
         () => songStore.song.tracks[selectedTrackIndex]?.id,
@@ -77,7 +115,12 @@ export function useArrangeView() {
       return useAtomValue(selectedEventIdsAtom)
     },
     get trackTransform() {
-      return useMobxGetter(arrangeViewStore, "trackTransform")
+      const { transform: tickTransform } = useTickScroll(tickScrollScope)
+      const { transform: trackTransform } = useTrackScroll(trackScrollScope)
+      return useMemo(
+        () => new ArrangeCoordTransform(tickTransform, trackTransform),
+        [tickTransform, trackTransform],
+      )
     },
     get openTransposeDialog() {
       return useAtomValue(openTransposeDialogAtom)
@@ -85,13 +128,17 @@ export function useArrangeView() {
     get openVelocityDialog() {
       return useAtomValue(openVelocityDialogAtom)
     },
-    scrollBy: useCallback(
-      (x: number, y: number) => {
-        setScrollLeftInPixels(tickScrollStore.scrollLeft - x)
-        setScrollTop(trackScrollStore.scrollTop - y)
-      },
-      [setScrollLeftInPixels, setScrollTop, tickScrollStore, trackScrollStore],
-    ),
+    get scrollBy() {
+      const { setScrollLeftInPixels } = useTickScroll(tickScrollScope)
+      const { setScrollTop } = useTrackScroll(trackScrollScope)
+      return useCallback(
+        (x: number, y: number) => {
+          setScrollLeftInPixels((prev) => prev - x)
+          setScrollTop((prev) => prev - y)
+        },
+        [setScrollLeftInPixels, setScrollTop],
+      )
+    },
     setSelectedTrackIndex: useSetAtom(selectedTrackIndexAtom),
     setSelection: useSetAtom(selectionAtom),
     setSelectedEventIds: useSetAtom(selectedEventIdsAtom),

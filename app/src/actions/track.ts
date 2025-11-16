@@ -19,7 +19,6 @@ import {
   programChangeMidiEvent,
   timeSignatureMidiEvent,
 } from "../midi/MidiEvent"
-import Quantizer from "../quantizer"
 import Track, {
   NoteEvent,
   TrackEvent,
@@ -67,7 +66,7 @@ export const useChangeNotesVelocity = () => {
 
 export const useCreateEvent = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { quantizer } = useQuantizer()
+  const { quantizeRound } = useQuantizer()
   const { createOrUpdate } = useTrack(selectedTrackId)
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
@@ -77,7 +76,7 @@ export const useCreateEvent = () => {
       pushHistory()
       const id = createOrUpdate({
         ...e,
-        tick: quantizer.round(tick ?? position),
+        tick: quantizeRound(tick ?? position),
       })?.id
 
       // 即座に反映する
@@ -88,7 +87,7 @@ export const useCreateEvent = () => {
 
       return id
     },
-    [pushHistory, createOrUpdate, quantizer, position, sendEvent],
+    [pushHistory, createOrUpdate, quantizeRound, position, sendEvent],
   )
 }
 
@@ -145,11 +144,11 @@ export const useUpdateVelocitiesInRange = () => {
 // Update controller events in the range with linear interpolation values
 export const useUpdateEventsInRange = (
   trackId: TrackId,
-  quantizer: Quantizer,
   filterEvent: (e: TrackEvent) => boolean,
   createEvent: (value: number) => AnyEvent,
 ) => {
   const { getEvents, removeEvents, addEvents } = useTrack(trackId)
+  const { quantizeFloor, quantizeUnit } = useQuantizer()
 
   return useCallback(
     (
@@ -160,8 +159,8 @@ export const useUpdateEventsInRange = (
     ) => {
       const minTick = Math.min(startTick, endTick)
       const maxTick = Math.max(startTick, endTick)
-      const _startTick = quantizer.floor(Math.max(0, minTick))
-      const _endTick = quantizer.floor(Math.max(0, maxTick))
+      const _startTick = quantizeFloor(Math.max(0, minTick))
+      const _endTick = quantizeFloor(Math.max(0, maxTick))
 
       const minValue = Math.min(startValue, endValue)
       const maxValue = Math.max(startValue, endValue)
@@ -197,7 +196,7 @@ export const useUpdateEventsInRange = (
       transaction(() => {
         removeEvents(events.map((e) => e.id))
 
-        const newEvents = closedRange(_startTick, _endTick, quantizer.unit).map(
+        const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(
           (tick) => ({
             ...createEvent(getValue(tick)),
             tick,
@@ -207,17 +206,23 @@ export const useUpdateEventsInRange = (
         addEvents(newEvents)
       })
     },
-    [quantizer, filterEvent, createEvent, getEvents, removeEvents, addEvents],
+    [
+      quantizeFloor,
+      quantizeUnit,
+      filterEvent,
+      createEvent,
+      getEvents,
+      removeEvents,
+      addEvents,
+    ],
   )
 }
 
 export const useUpdateValueEvents = (type: ValueEventType) => {
   const { selectedTrackId } = usePianoRoll()
-  const { quantizer } = useQuantizer()
 
   return useUpdateEventsInRange(
     selectedTrackId,
-    quantizer,
     ValueEventType.getEventPredicate(type),
     ValueEventType.getEventFactory(type),
   )

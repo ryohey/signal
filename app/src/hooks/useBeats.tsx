@@ -1,20 +1,24 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
-import { useEffect, useMemo } from "react"
+import { useEffect } from "react"
 import { BeatWithX } from "../entities/beat/BeatWithX"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
 
-const createBeatsScope = (parentStore: Store) =>
+export const createBeatsScope = (parentStore: Store) =>
   createScope({
     atoms: [beatsAtom],
     parentStore,
   })
 
-export function BeatsProvider({ children }: { children: React.ReactNode }) {
-  const store = useStore()
-  const scope = useMemo(() => createBeatsScope(store), [store])
+export function BeatsProvider({
+  scope,
+  children,
+}: {
+  scope: Store
+  children: React.ReactNode
+}) {
   const { scrollLeft, transform, canvasWidth } = useTickScroll()
   const { measures, timebase } = useSong()
 
