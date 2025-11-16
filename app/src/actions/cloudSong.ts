@@ -1,8 +1,7 @@
 import { CloudSong } from "@signal-app/api"
-import { Song } from "@signal-app/core"
+import { Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { useAutoSave } from "../hooks/useAutoSave"
-import { songFromMidi, songToMidi } from "../midi/midiConversion"
 import {
   cloudMidiRepository,
   cloudSongDataRepository,

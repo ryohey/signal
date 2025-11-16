@@ -1,6 +1,5 @@
-import { Song } from "@signal-app/core"
+import { Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { base64ToUint8Array, uint8ArrayToBase64 } from "../helpers/base64"
-import { songFromMidi, songToMidi } from "../midi/midiConversion"
 import { SongStore } from "../stores/SongStore"
 
 const AUTO_SAVE_KEY = "signal_autosave"

@@ -2,13 +2,17 @@ import { emptyTrack } from "@signal-app/core"
 import * as fs from "fs"
 import * as path from "path"
 import { deserialize, serialize } from "serializr"
-import { songFromMidi } from "../midi/midiConversion"
-import Song from "./Song"
+import { songFromMidi } from "../../midi"
+import { Song } from "./Song"
 import { emptySong } from "./SongFactory"
 
 describe("Song", () => {
   const song = songFromMidi(
-    fs.readFileSync(path.join(__dirname, "../../testdata/tracks.mid")).buffer,
+    new DataView(
+      fs.readFileSync(
+        path.join(__dirname, "../../../testdata/tracks.mid"),
+      ).buffer,
+    ),
   )
 
   it("fromMidi", () => {

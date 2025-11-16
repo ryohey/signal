@@ -14,7 +14,7 @@ import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
 import { useTrackList } from "../hooks/useTrackList"
 import { useTrackMute } from "../hooks/useTrackMute"
-import { downloadSongAsMidi } from "../midi/midiConversion"
+import { downloadSongAsMidi } from "../midi/downloadSongAsMidi"
 import { songFromFile } from "./file"
 
 const openSongFile = async (input: HTMLInputElement): Promise<Song | null> => {

@@ -1,5 +1,5 @@
 import { conductorTrack, emptyTrack } from "../track"
-import Song from "./Song"
+import { Song } from "./Song"
 
 export function emptySong() {
   const song = new Song()

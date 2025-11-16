@@ -5,10 +5,10 @@ import {
   getStatusEvents,
   isEventInRange,
   noteOnMidiEvent,
+  convertTrackEvents,
 } from "@signal-app/core"
 import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
 import { SongStore } from "../stores/SongStore"
-import { convertTrackEvents } from "./collectAllEvents"
 
 export const METRONOME_TRACK_ID = 99999 as TrackId
 
@@ -37,7 +37,7 @@ export class EventSource implements IEventSource {
   getCurrentStateEvents(tick: number): SendableEvent[] {
     return this.songStore.song.tracks.flatMap((t) => {
       const statusEvents = getStatusEvents(t.events, tick)
-      return convertTrackEvents(statusEvents, t.channel, t.id)
+      return convertTrackEvents(statusEvents, t.channel, t.id) as SendableEvent[]
     })
   }
 }

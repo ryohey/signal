@@ -90,7 +90,7 @@ const useExportSong = () => {
       const encoder = getEncoder(format)
       const audioData = await encoder.encode(audioBuffer)
 
-      const blob = new Blob([audioData], { type: encoder.mimeType })
+      const blob = new Blob([audioData as any], { type: encoder.mimeType })
       setOpenDialog(false)
       downloadBlob(blob, "song." + encoder.ext)
     } catch (e) {

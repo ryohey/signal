@@ -1,6 +1,5 @@
-import { Song } from "@signal-app/core"
+import { Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
-import { songFromMidi, songToMidi } from "../midi/midiConversion"
 import { writeFile } from "../services/fs-helper"
 import { useSetSong } from "./song"
 
@@ -82,7 +81,7 @@ export const saveFile = async (song: Song) => {
     return
   }
 
-  const data = songToMidi(song).buffer
+  const data = songToMidi(song).buffer as ArrayBuffer
   try {
     await writeFile(fileHandle, data)
     song.isSaved = true
@@ -113,7 +112,7 @@ export const saveFileAs = async (song: Song) => {
     return
   }
   try {
-    const data = songToMidi(song).buffer
+    const data = songToMidi(song).buffer as ArrayBuffer
     await writeFile(fileHandle, data)
     song.fileHandle = fileHandle
     song.name = getNameFromPathOrName(fileHandle.name)

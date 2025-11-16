@@ -1,2 +1,3 @@
-export { default as Song } from "./Song"
+export * from "./collectAllEvents"
+export * from "./Song"
 export * from "./SongFactory"

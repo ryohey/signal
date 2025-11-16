@@ -1,13 +1,6 @@
-import {
-  addDeltaTime,
-  addTick,
-  AnyEventFeature,
-  Song,
-  tickedEventsToTrackEvents,
-  toRawEvents,
-  toTrackEvents,
-  Track,
-} from "@signal-app/core"
+import { AnyEventFeature, Song, Track } from "../entities"
+import { addDeltaTime, toRawEvents } from "./toRawEvents"
+import { addTick, tickedEventsToTrackEvents, toTrackEvents } from "./toTrackEvents"
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
@@ -19,7 +12,6 @@ import {
   write as writeMidiFile,
 } from "midifile-ts"
 import { isNotNull } from "../helpers/array"
-import { downloadBlob } from "../helpers/Downloader"
 
 const trackFromMidiEvents = (events: AnyEvent[]): Track => {
   const track = new Track()
@@ -101,7 +93,7 @@ export const createConductorTrackIfNeeded = (
       .filter(isNotNull),
   )
 
-  return [conductorTrack, ...newTracks].map(addDeltaTime)
+  return [conductorTrack, ...newTracks].map(addDeltaTime) as AnyEvent[][]
 }
 
 const getTracks = (midi: MidiFile): Track[] => {
@@ -162,10 +154,4 @@ export function songToMidiEvents(song: Song): AnyEvent[][] {
 export function songToMidi(song: Song) {
   const rawTracks = songToMidiEvents(song)
   return writeMidiFile(rawTracks, song.timebase)
-}
-
-export function downloadSongAsMidi(song: Song) {
-  const bytes = songToMidi(song)
-  const blob = new Blob([bytes], { type: "application/octet-stream" })
-  downloadBlob(blob, song.filepath.length > 0 ? song.filepath : "no name.mid")
 }

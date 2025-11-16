@@ -6,7 +6,7 @@ import {
   setTempoMidiEvent,
   timeSignatureMidiEvent,
   Track,
-} from "@signal-app/core"
+} from "../entities"
 import * as fs from "fs"
 import { AnyEvent } from "midifile-ts"
 import * as path from "path"
@@ -55,7 +55,7 @@ describe("SongFile", () => {
 
     const openFile = (fileName: string): AnyEvent[][] => {
       const song = songFromMidi(
-        fs.readFileSync(path.join(__dirname, "../../testdata/", fileName))
+        fs.readFileSync(path.join(__dirname, "../../../app/testdata/", fileName))
           .buffer,
       )
       return songToMidiEvents(song)
