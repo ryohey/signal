@@ -1,8 +1,9 @@
 import { useCallback } from "react"
-import { useUpdateVelocitiesInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { observeDrag2 } from "../../../helpers/observeDrag"
+import { useCommands } from "../../../hooks/useCommands"
+import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 
 export const useVelocityPaintGesture = ({
@@ -12,7 +13,8 @@ export const useVelocityPaintGesture = ({
 }) => {
   const { transform } = useTickScroll()
   const { scrollLeft } = useTickScroll()
-  const updateVelocitiesInRange = useUpdateVelocitiesInRange()
+  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
+  const commands = useCommands()
 
   return {
     onMouseDown: useCallback(
@@ -38,13 +40,27 @@ export const useVelocityPaintGesture = ({
             const tick = transform.getTick(local.x)
             const value = calcValue(e)
 
-            updateVelocitiesInRange(lastTick, lastValue, tick, value)
+            commands.track.updateVelocitiesInRange(
+              selectedTrackId,
+              selectedNoteIds,
+              lastTick,
+              lastValue,
+              tick,
+              value,
+            )
             lastTick = tick
             lastValue = value
           },
         })
       },
-      [scrollLeft, updateVelocitiesInRange, transform, velocityTransform],
+      [
+        scrollLeft,
+        commands,
+        selectedTrackId,
+        selectedNoteIds,
+        transform,
+        velocityTransform,
+      ],
     ),
   }
 }

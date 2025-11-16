@@ -1,4 +1,4 @@
-import { maxBy, min, minBy } from "lodash"
+import { min } from "lodash"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import { useCallback } from "react"
@@ -7,6 +7,7 @@ import {
   ControlEventsClipboardDataSchema,
 } from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
+import { useCommands } from "../hooks/useCommands"
 import { useControlPane } from "../hooks/useControlPane"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll } from "../hooks/usePianoRoll"
@@ -149,9 +150,9 @@ export const useCutControlSelection = () => {
 
 export const useDuplicateControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { getEventById, createOrUpdate } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
+  const commands = useCommands()
 
   return useCallback(() => {
     if (selectedEventIds.length === 0) {
@@ -160,30 +161,17 @@ export const useDuplicateControlSelection = () => {
 
     pushHistory()
 
-    const selectedEvents = selectedEventIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
-
-    // move to the end of selection
-    const deltaTick =
-      (maxBy(selectedEvents, (e) => e.tick)?.tick ?? 0) -
-      (minBy(selectedEvents, (e) => e.tick)?.tick ?? 0)
-
-    const notes = selectedEvents.map((note) => ({
-      ...note,
-      tick: note.tick + deltaTick,
-    }))
-
     // select the created events
-    const addedEvents = transaction(() => notes.map(createOrUpdate)).filter(
-      isNotUndefined,
+    const addedEvents = commands.track.duplicateEvents(
+      selectedTrackId,
+      selectedEventIds,
     )
     setSelectedEventIds(addedEvents.map((e) => e.id))
   }, [
     selectedEventIds,
-    getEventById,
-    createOrUpdate,
     pushHistory,
     setSelectedEventIds,
+    commands,
+    selectedTrackId,
   ])
 }

@@ -1,9 +1,9 @@
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { transaction } from "mobx"
 import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
+import { useCommands } from "../../../../hooks/useCommands"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
@@ -15,12 +15,12 @@ type ControlGraphEvent = ControllerEvent | PitchBendEvent
 
 export const useDragSelectionGesture = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { getEvents, updateEvents, removeRedundantEvents } =
-    useTrack(selectedTrackId)
+  const { getEvents, updateEvents } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds: _selectedEventIds, setSelectedEventIds } =
     useControlPane()
   const { quantizeRound } = useQuantizer()
+  const commands = useCommands()
 
   return {
     onMouseDown: useCallback(
@@ -76,23 +76,21 @@ export const useDragSelectionGesture = () => {
 
           onMouseUp: () => {
             // Find events with the same tick and remove it
-            const controllerEvents = getEvents().filter((e) =>
-              selectedEventIds.includes(e.id),
-            )
-
-            transaction(() =>
-              controllerEvents.forEach((e) => removeRedundantEvents(e)),
+            commands.track.removeRedundantEventsForEventIds(
+              selectedTrackId,
+              selectedEventIds,
             )
           },
         })
       },
       [
         pushHistory,
+        selectedTrackId,
         _selectedEventIds,
         setSelectedEventIds,
         getEvents,
         updateEvents,
-        removeRedundantEvents,
+        commands,
         quantizeRound,
       ],
     ),

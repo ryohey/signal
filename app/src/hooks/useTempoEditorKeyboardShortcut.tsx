@@ -5,14 +5,13 @@ import {
   useDeleteTempoSelection,
   useDuplicateTempoSelection,
   usePasteTempoSelection,
-  useResetTempoSelection,
 } from "../actions/tempo"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { useTempoEditor } from "./useTempoEditor"
 
 export const useTempoEditorKeyboardShortcut = () => {
   const { setMouseMode } = useTempoEditor()
-  const resetTempoSelection = useResetTempoSelection()
+  const { resetSelection } = useTempoEditor()
   const deleteTempoSelection = useDeleteTempoSelection()
   const copyTempoSelection = useCopyTempoSelection()
   const cutTempoSelection = useCutTempoSelection()
@@ -29,7 +28,7 @@ export const useTempoEditorKeyboardShortcut = () => {
         code: "Digit2",
         run: () => setMouseMode("selection"),
       },
-      { code: "Escape", run: resetTempoSelection },
+      { code: "Escape", run: resetSelection },
       { code: "Backspace", run: deleteTempoSelection },
       { code: "Delete", run: deleteTempoSelection },
       {
@@ -55,7 +54,7 @@ export const useTempoEditorKeyboardShortcut = () => {
     ],
     [
       setMouseMode,
-      resetTempoSelection,
+      resetSelection,
       deleteTempoSelection,
       copyTempoSelection,
       duplicateTempoSelection,

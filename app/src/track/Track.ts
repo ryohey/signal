@@ -109,12 +109,6 @@ export default class Track {
     return TrackEvents.createOrUpdate(newEvent)(this._events)
   }
 
-  removeRedundantEvents<T extends TrackEvent>(
-    event: T & { subtype?: string; controllerType?: number },
-  ) {
-    TrackEvents.removeRedundantEvents(event)(this._events)
-  }
-
   updateEndOfTrack() {
     this.endOfTrack = TrackEvents.getMaxTick(this.events)
   }

@@ -1,4 +1,5 @@
 import { Player, SoundFont, SoundFontSynth } from "@signal-app/player"
+import { CommandService } from "../commands/CommandService"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { AutoSaveService } from "../services/AutoSaveService"
@@ -23,6 +24,7 @@ export default class RootStore {
   readonly midiMonitor: MIDIMonitor
   readonly soundFontStore: SoundFontStore
   readonly autoSaveService: AutoSaveService
+  readonly commands = new CommandService(this.songStore)
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()

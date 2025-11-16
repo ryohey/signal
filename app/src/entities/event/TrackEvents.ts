@@ -71,7 +71,7 @@ export namespace TrackEvents {
       } as T) as T
     }
 
-  const getRedundantEvents =
+  export const getRedundantEvents =
     <T extends TrackEvent>(
       event: Omit<T, "id"> & { subtype?: string; controllerType?: number },
     ) =>
@@ -87,19 +87,6 @@ export namespace TrackEvents {
             ? e.controllerType === event.controllerType
             : true),
       )
-    }
-
-  export const removeRedundantEvents =
-    <T extends TrackEvent>(
-      event: T & { subtype?: string; controllerType?: number },
-    ) =>
-    (events: TickOrderedArray<TrackEvent>) => {
-      getRedundantEvents(event)(events.getArray())
-        .filter((e) => e.id !== event.id)
-        .map((e) => e.id)
-        .forEach((id) => {
-          events.remove(id)
-        })
     }
 
   export const createOrUpdate =

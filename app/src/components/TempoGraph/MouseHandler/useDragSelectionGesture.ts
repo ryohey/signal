@@ -1,12 +1,11 @@
-import { clamp } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isNotUndefined } from "../../../helpers/array"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../../helpers/bpm"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useCommands } from "../../../hooks/useCommands"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
@@ -14,7 +13,7 @@ import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { TrackEventOf } from "../../../track"
 
 export const useDragSelectionGesture = (): MouseGesture<[number]> => {
-  const { getEventById, updateEvents } = useConductorTrack()
+  const { getEventById } = useConductorTrack()
   const { pushHistory } = useHistory()
   const {
     setSelectedEventIds,
@@ -23,6 +22,7 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
     selectedEventIds: _selectedEventIds,
   } = useTempoEditor()
   const { quantizeRound } = useQuantizer()
+  const commands = useCommands()
 
   return {
     onMouseDown: useCallback(
@@ -50,6 +50,8 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
 
         const start = transform.fromPosition(startPoint)
         const startClientPos = getClientPos(e)
+        let lastDeltaTick = 0
+        let lastDeltaValue = 0
 
         observeDrag({
           onMouseMove: (e) => {
@@ -66,33 +68,33 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
 
             const deltaValue = pos.bpm - start.bpm
 
-            updateEvents(
-              events.map((ev) => ({
-                id: ev.id,
-                tick: Math.max(0, Math.floor(ev.tick + quantizedDeltaTick)),
-                microsecondsPerBeat: Math.floor(
-                  bpmToUSecPerBeat(
-                    clamp(
-                      uSecPerBeatToBPM(ev.microsecondsPerBeat) + deltaValue,
-                      0,
-                      transform.maxBPM,
-                    ),
-                  ),
-                ),
-              })),
+            commands.conductorTrack.moveTempoEvents(
+              selectedEventIds,
+              quantizedDeltaTick - lastDeltaTick,
+              deltaValue - lastDeltaValue,
+              transform.maxBPM,
+            )
+
+            lastDeltaTick = quantizedDeltaTick
+            lastDeltaValue = deltaValue
+          },
+          onMouseUp: () => {
+            // Find events with the same tick and remove it
+            commands.conductorTrack.removeRedundantEventsForEventIds(
+              selectedEventIds,
             )
           },
         })
       },
       [
         pushHistory,
+        getLocal,
         _selectedEventIds,
+        transform,
         setSelectedEventIds,
         getEventById,
-        updateEvents,
-        transform,
-        getLocal,
         quantizeRound,
+        commands.conductorTrack,
       ],
     ),
   }

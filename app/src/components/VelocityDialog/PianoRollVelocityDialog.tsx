@@ -1,8 +1,6 @@
 import { useCallback } from "react"
-import {
-  BatchUpdateOperation,
-  useBatchUpdateSelectedNotesVelocity,
-} from "../../actions"
+import { useBatchUpdateSelectedNotesVelocity } from "../../actions"
+import { BatchUpdateOperation } from "../../commands/track"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { VelocityDialog } from "./VelocityDialog"
 

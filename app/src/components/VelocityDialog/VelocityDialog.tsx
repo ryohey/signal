@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useState } from "react"
-import { BatchUpdateOperation } from "../../actions"
+import { BatchUpdateOperation } from "../../commands/track"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,

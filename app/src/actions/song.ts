@@ -35,10 +35,7 @@ export const useSetSong = () => {
   } = usePianoRoll()
   const { setScrollLeftInPixels } = usePianoRollTickScroll()
 
-  const {
-    setSelection: setArrangeSelection,
-    setSelectedEventIds: setArrangeSelectedEventIds,
-  } = useArrangeView()
+  const { setSelection: setArrangeSelection } = useArrangeView()
 
   return useCallback(
     (newSong: Song) => {
@@ -56,7 +53,6 @@ export const useSetSong = () => {
       )
 
       setArrangeSelection(null)
-      setArrangeSelectedEventIds({})
 
       clearHistory()
 
@@ -78,7 +74,6 @@ export const useSetSong = () => {
       setSelectedNoteIds,
       setSelectedTrackId,
       setArrangeSelection,
-      setArrangeSelectedEventIds,
     ],
   )
 }
