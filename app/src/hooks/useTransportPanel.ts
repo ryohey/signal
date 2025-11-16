@@ -1,3 +1,4 @@
+import { Measure } from "@signal-app/core"
 import { useCallback } from "react"
 import {
   useFastForwardOneBar,
@@ -5,7 +6,6 @@ import {
   useStop,
   useToggleRecording,
 } from "../actions"
-import { Measure } from "../entities/measure/Measure"
 import { useCanRecord } from "./useMIDIDevice"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"

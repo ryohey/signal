@@ -1,8 +1,8 @@
+import { Measure } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
 import { useCallback, useEffect, useMemo } from "react"
-import { Measure } from "../entities/measure/Measure"
 import { useStores } from "./useStores"
 
 export function QuantizerProvider({

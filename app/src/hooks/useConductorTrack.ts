@@ -1,6 +1,6 @@
+import { Measure } from "@signal-app/core"
 import { isEqual } from "lodash"
 import { useCallback, useMemo } from "react"
-import { Measure } from "../entities/measure/Measure"
 import {
   isSetTempoEvent,
   isTimeSignatureEvent,

@@ -1,5 +1,5 @@
+import { Measure } from "@signal-app/core"
 import { useCallback } from "react"
-import { Measure } from "../entities/measure/Measure"
 import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"

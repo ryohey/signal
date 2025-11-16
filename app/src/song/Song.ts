@@ -1,3 +1,4 @@
+import { Measure } from "@signal-app/core"
 import { PlayerEvent } from "@signal-app/player"
 import {
   action,
@@ -8,7 +9,6 @@ import {
   toJS,
 } from "mobx"
 import { createModelSchema, list, object, primitive } from "serializr"
-import { Measure } from "../entities/measure/Measure"
 import { collectAllEvents } from "../player/collectAllEvents"
 import Track, { isTimeSignatureEvent, TrackId } from "../track"
 

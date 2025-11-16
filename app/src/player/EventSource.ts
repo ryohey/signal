@@ -1,6 +1,5 @@
-import { Range } from "@signal-app/core"
+import { Beat, Range } from "@signal-app/core"
 import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
-import { Beat } from "../entities/beat/Beat"
 import { isEventInRange } from "../helpers/filterEvents"
 import { noteOnMidiEvent } from "../midi/MidiEvent"
 import { SongStore } from "../stores/SongStore"
