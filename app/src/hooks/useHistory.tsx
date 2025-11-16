@@ -2,7 +2,6 @@ import { Song } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { useCallback } from "react"
-import { deserialize } from "serializr"
 import { useArrangeView } from "./useArrangeView"
 import { useControlPane } from "./useControlPane"
 import { usePianoRoll } from "./usePianoRoll"
@@ -57,7 +56,7 @@ function useRestoreState() {
 
   return useCallback(
     (serializedState: SerializedRootStore) => {
-      const song = deserialize(Song, serializedState.song)
+      const song = Song.deserialize(serializedState.song)
       setSong(song)
       restorePianoRoll(serializedState.pianoRollStore)
       restoreControlPane(serializedState.controlStore)

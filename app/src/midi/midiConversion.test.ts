@@ -10,7 +10,6 @@ import {
 import * as fs from "fs"
 import { AnyEvent } from "midifile-ts"
 import * as path from "path"
-import { serialize } from "serializr"
 import {
   createConductorTrackIfNeeded,
   songFromMidi,
@@ -41,7 +40,7 @@ describe("SongFile", () => {
     const bytes = songToMidi(song)
     const song2 = songFromMidi(bytes)
     song2.filepath = song.filepath // filepath will not be serialized
-    expect(serialize(song2)).toStrictEqual(serialize(song))
+    expect(song2.serialize()).toStrictEqual(song.serialize())
   })
   describe("songToMidiEvents", () => {
     const expectEveryTrackHaveEndOfTrackEvent = (tracks: AnyEvent[][]) => {

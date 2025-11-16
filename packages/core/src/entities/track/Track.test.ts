@@ -1,5 +1,5 @@
 import { deserialize, serialize } from "serializr"
-import Track from "./Track"
+import { Track } from "./Track"
 import { NoteEvent } from "./TrackEvent"
 import { emptyTrack } from "./TrackFactory"
 

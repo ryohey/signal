@@ -6,15 +6,17 @@ import {
   reaction,
   toJS,
 } from "mobx"
-import { createModelSchema, list, object, primitive } from "serializr"
-import { deassemble as deassembleNote } from "../../midi"
 import {
-  isTimeSignatureEvent,
-  Measure,
-  Track,
-  TrackEvent,
-  TrackId,
-} from "../index"
+  createModelSchema,
+  deserialize,
+  list,
+  object,
+  primitive,
+  serialize,
+} from "serializr"
+import { deassemble as deassembleNote } from "../../midi"
+import { Measure } from "../measure/Measure"
+import { isTimeSignatureEvent, Track, TrackEvent, TrackId } from "../track"
 
 const END_MARGIN = 480 * 30
 const DEFAULT_TIME_BASE = 480
@@ -145,6 +147,14 @@ export default class Song {
     return this.tracks.flatMap((t) =>
       this.convertTrackEvents(t.events, t.channel, t.id),
     )
+  }
+
+  serialize() {
+    return serialize(this)
+  }
+
+  static deserialize(json: any): Song {
+    return deserialize(Song, json)
   }
 }
 
