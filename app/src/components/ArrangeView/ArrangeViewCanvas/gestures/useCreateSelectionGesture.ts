@@ -1,5 +1,4 @@
 import { MouseEvent, useCallback } from "react"
-import { getEventsInSelection } from "../../../../actions"
 import { Point } from "../../../../entities/geometry/Point"
 import { ArrangeSelection } from "../../../../entities/selection/ArrangeSelection"
 import { ArrangePoint } from "../../../../entities/transform/ArrangePoint"
@@ -21,7 +20,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
     setSelectedTrackIndex,
     resetSelection,
     setSelection,
-    setSelectedEventIds,
   } = useArrangeView()
   const { quantizeRound, quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
@@ -59,11 +57,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
             selection = selectionFromPoints(startPos, endPos)
             setSelection(selection)
           },
-          onMouseUp: () => {
-            if (selection !== null) {
-              setSelectedEventIds(getEventsInSelection(tracks, selection))
-            }
-          },
         })
       },
       [
@@ -75,8 +68,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
         setSelectedTrackIndex,
         selectionFromPoints,
         setSelection,
-        setSelectedEventIds,
-        tracks,
       ],
     ),
   }

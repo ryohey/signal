@@ -111,9 +111,6 @@ export function useArrangeView() {
     get selection() {
       return useAtomValue(selectionAtom)
     },
-    get selectedEventIds() {
-      return useAtomValue(selectedEventIdsAtom)
-    },
     get trackTransform() {
       const { transform: tickTransform } = useTickScroll(tickScrollScope)
       const { transform: trackTransform } = useTrackScroll(trackScrollScope)
@@ -141,7 +138,6 @@ export function useArrangeView() {
     },
     setSelectedTrackIndex: useSetAtom(selectedTrackIndexAtom),
     setSelection: useSetAtom(selectionAtom),
-    setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
     resetSelection: useSetAtom(resetSelectionAtom),
     setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
     setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
@@ -152,7 +148,6 @@ export function useArrangeView() {
 
 // atoms
 const selectionAtom = atom<ArrangeSelection | null>(null)
-const selectedEventIdsAtom = atom<{ [trackIndex: number]: number[] }>({})
 const selectedTrackIndexAtom = atom(0)
 const openTransposeDialogAtom = atom(false)
 const openVelocityDialogAtom = atom(false)
@@ -160,11 +155,9 @@ const openVelocityDialogAtom = atom(false)
 // actions
 const resetSelectionAtom = atom(null, (_get, set) => {
   set(selectionAtom, null)
-  set(selectedEventIdsAtom, {})
 })
 const serializeAtom = atom(null, (get) => ({
   selection: cloneDeep(get(selectionAtom)),
-  selectedEventIds: cloneDeep(get(selectedEventIdsAtom)),
 }))
 const restoreAtom = atom(
   null,
@@ -173,13 +166,10 @@ const restoreAtom = atom(
     set,
     {
       selection,
-      selectedEventIds,
     }: {
       selection: ArrangeSelection | null
-      selectedEventIds: { [trackIndex: number]: number[] }
     },
   ) => {
     set(selectionAtom, selection)
-    set(selectedEventIdsAtom, selectedEventIds)
   },
 )

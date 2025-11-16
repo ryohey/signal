@@ -1,5 +1,4 @@
 import { useCallback } from "react"
-import { moveEventsBetweenTracks } from "../../../../actions/arrangeView"
 import { Point } from "../../../../entities/geometry/Point"
 import { Rect } from "../../../../entities/geometry/Rect"
 import { ArrangeSelection } from "../../../../entities/selection/ArrangeSelection"
@@ -8,6 +7,7 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
+import { useCommands } from "../../../../hooks/useCommands"
 import { useHistory } from "../../../../hooks/useHistory"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
@@ -16,19 +16,25 @@ export const useMoveSelectionGesture = (): MouseGesture<
   [Point, Rect],
   MouseEvent
 > => {
+  const commands = useCommands()
   const { pushHistory } = useHistory()
-  const { trackTransform, setSelection, setSelectedEventIds } = useArrangeView()
+  const {
+    selection: _selection,
+    trackTransform,
+    setSelection,
+  } = useArrangeView()
   const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
-  const { selection: _selection, selectedEventIds: _selectedEventIds } =
-    useArrangeView()
 
   return {
     onMouseDown: useCallback(
       (_e, startClientPos, selectionRect) => {
+        if (_selection === null) {
+          return
+        }
         let isMoved = false
         let selection = _selection
-        let selectedEventIds = _selectedEventIds
+        let selectedEventIds = commands.arrange.getEventsInSelection(selection)
 
         observeDrag({
           onMouseMove: (e) => {
@@ -71,14 +77,12 @@ export const useMoveSelectionGesture = (): MouseGesture<
             // Move selection range
             selection = ArrangeSelection.moved(selection, delta)
 
-            selectedEventIds = moveEventsBetweenTracks(
-              tracks,
+            selectedEventIds = commands.arrange.moveEventsBetweenTracks(
               selectedEventIds,
               delta,
             )
 
             setSelection(selection)
-            setSelectedEventIds(selectedEventIds)
           },
         })
       },
@@ -88,9 +92,8 @@ export const useMoveSelectionGesture = (): MouseGesture<
         trackTransform,
         tracks,
         setSelection,
-        setSelectedEventIds,
         _selection,
-        _selectedEventIds,
+        commands,
       ],
     ),
   }

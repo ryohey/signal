@@ -79,17 +79,6 @@ export const useSong = () => {
       },
       [song],
     ),
-    transposeNotes: useCallback(
-      (
-        deltaPitch: number,
-        selectedEventIds: {
-          [key: number]: number[] // trackIndex: eventId
-        },
-      ) => {
-        song.transposeNotes(deltaPitch, selectedEventIds)
-      },
-      [song],
-    ),
     updateEndOfSong: useCallback(() => {
       song.updateEndOfSong()
     }, [song]),

@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { FC, useCallback, useMemo } from "react"
 import {
   useArrangeCopySelection,
   useArrangeDeleteSelection,
@@ -7,6 +7,7 @@ import {
   useArrangeTransposeSelection,
 } from "../../actions"
 import { useArrangeView } from "../../hooks/useArrangeView"
+import { useCommands } from "../../hooks/useCommands"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -18,7 +19,8 @@ import { MenuDivider, MenuItem } from "../ui/Menu"
 
 export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props
-  const { selectedEventIds, setOpenVelocityDialog, setOpenTransposeDialog } =
+  const commands = useCommands()
+  const { selection, setOpenVelocityDialog, setOpenTransposeDialog } =
     useArrangeView()
 
   const arrangeCopySelection = useArrangeCopySelection()
@@ -27,8 +29,9 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
   const arrangeDuplicateSelection = useArrangeDuplicateSelection()
   const arrangeTransposeSelection = useArrangeTransposeSelection()
 
-  const isNoteSelected = Object.values(selectedEventIds).some(
-    (e) => e.length > 0,
+  const isNoteSelected = useMemo(
+    () => selection !== null && commands.arrange.hasSelectionNotes(selection),
+    [selection, commands],
   )
 
   const onClickVelocity = useCallback(() => {
