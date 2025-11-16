@@ -1,5 +1,4 @@
 import { useCallback } from "react"
-import { moveEventsBetweenTracks } from "../../../../actions/arrangeView"
 import { Point } from "../../../../entities/geometry/Point"
 import { Rect } from "../../../../entities/geometry/Rect"
 import { ArrangeSelection } from "../../../../entities/selection/ArrangeSelection"
@@ -11,11 +10,13 @@ import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { useHistory } from "../../../../hooks/useHistory"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
+import { useStores } from "../../../../hooks/useStores"
 
 export const useMoveSelectionGesture = (): MouseGesture<
   [Point, Rect],
   MouseEvent
 > => {
+  const { commands } = useStores()
   const { pushHistory } = useHistory()
   const { trackTransform, setSelection, setSelectedEventIds } = useArrangeView()
   const { quantizeRound } = useQuantizer()
@@ -71,8 +72,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
             // Move selection range
             selection = ArrangeSelection.moved(selection, delta)
 
-            selectedEventIds = moveEventsBetweenTracks(
-              tracks,
+            selectedEventIds = commands.arrange.moveEventsBetweenTracks(
               selectedEventIds,
               delta,
             )
@@ -91,6 +91,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
         setSelectedEventIds,
         _selection,
         _selectedEventIds,
+        commands,
       ],
     ),
   }
