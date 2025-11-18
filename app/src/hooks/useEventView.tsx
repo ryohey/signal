@@ -1,3 +1,4 @@
+import { TrackEvent, TrackId } from "@signal-app/core"
 import { toJS } from "mobx"
 import {
   createContext,
@@ -7,7 +8,6 @@ import {
   useSyncExternalStore,
 } from "react"
 import { EventView } from "../observer/EventView"
-import { TrackEvent, TrackId } from "../track"
 import { useDisposable } from "./useDisposable"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"

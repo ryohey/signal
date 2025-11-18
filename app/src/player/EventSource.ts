@@ -1,12 +1,14 @@
+import {
+  Beat,
+  Range,
+  TrackId,
+  getStatusEvents,
+  isEventInRange,
+  noteOnMidiEvent,
+  convertTrackEvents,
+} from "@signal-app/core"
 import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
-import { Beat } from "../entities/beat/Beat"
-import { Range } from "../entities/geometry/Range"
-import { isEventInRange } from "../helpers/filterEvents"
-import { noteOnMidiEvent } from "../midi/MidiEvent"
 import { SongStore } from "../stores/SongStore"
-import { TrackId } from "../track"
-import { getStatusEvents } from "../track/selector"
-import { convertTrackEvents } from "./collectAllEvents"
 
 export const METRONOME_TRACK_ID = 99999 as TrackId
 
@@ -27,13 +29,19 @@ export class EventSource implements IEventSource {
     const beatEvents = Beat.createInRange(song.measures, song.timebase, range)
       .filter(isEventInRange(range))
       .flatMap((b) => beatToEvents(b))
-    return song.allEvents.filter(isEventInRange(range)).concat(beatEvents)
+    return (song.allEvents as PlayerEvent[])
+      .filter(isEventInRange(range))
+      .concat(beatEvents)
   }
 
   getCurrentStateEvents(tick: number): SendableEvent[] {
     return this.songStore.song.tracks.flatMap((t) => {
       const statusEvents = getStatusEvents(t.events, tick)
-      return convertTrackEvents(statusEvents, t.channel, t.id)
+      return convertTrackEvents(
+        statusEvents,
+        t.channel,
+        t.id,
+      ) as SendableEvent[]
     })
   }
 }

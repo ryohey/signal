@@ -1,9 +1,8 @@
 import { useTheme } from "@emotion/react"
+import { trackColorToVec4, TrackId } from "@signal-app/core"
 import Color from "color"
 import { vec4 } from "gl-matrix"
 import { colorToVec4 } from "../gl/color"
-import { TrackId } from "../track"
-import { trackColorToVec4 } from "../track/TrackColor"
 import { useTrack } from "./useTrack"
 
 interface NoteStyle {

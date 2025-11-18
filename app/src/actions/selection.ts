@@ -1,9 +1,12 @@
-import { min } from "lodash"
-import { useCallback } from "react"
 import {
+  NoteEvent,
   PianoNotesClipboardData,
   PianoNotesClipboardDataSchema,
-} from "../clipboard/clipboardTypes"
+  TrackEvent,
+  isNoteEvent,
+} from "@signal-app/core"
+import { min } from "lodash"
+import { useCallback } from "react"
 import { Rect } from "../entities/geometry/Rect"
 import { Selection } from "../entities/selection/Selection"
 import { isNotUndefined } from "../helpers/array"
@@ -19,7 +22,6 @@ import {
   readJSONFromClipboard,
   writeClipboardData,
 } from "../services/Clipboard"
-import { NoteEvent, TrackEvent, isNoteEvent } from "../track"
 
 export function eventsInSelection(
   events: readonly TrackEvent[],

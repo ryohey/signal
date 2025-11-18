@@ -1,9 +1,9 @@
+import { ArrangeSelection } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { Store } from "jotai/vanilla/store"
 import { cloneDeep } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { MaxNoteNumber } from "../Constants"
-import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangeCoordTransform } from "../entities/transform/ArrangeCoordTransform"
 import { KeyTransform } from "../entities/transform/KeyTransform"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
@@ -21,7 +21,7 @@ import {
   TrackScrollProvider,
   useTrackScroll,
 } from "./useTrackScroll"
-export type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
+export type { ArrangeSelection } from "@signal-app/core"
 
 type ArrangeViewStore = {
   quantizerScope: Store

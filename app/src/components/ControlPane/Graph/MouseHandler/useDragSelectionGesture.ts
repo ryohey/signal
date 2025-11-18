@@ -1,3 +1,4 @@
+import { TrackEventOf } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
@@ -9,7 +10,6 @@ import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useTrack } from "../../../../hooks/useTrack"
-import { TrackEventOf } from "../../../../track"
 
 type ControlGraphEvent = ControllerEvent | PitchBendEvent
 

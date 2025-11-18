@@ -1,7 +1,7 @@
 import { useTheme } from "@emotion/react"
+import { trackColorToCSSColor } from "@signal-app/core"
 import Color from "color"
 import { colorToVec4, enhanceContrast } from "../gl/color"
-import { trackColorToCSSColor } from "../track/TrackColor"
 import { usePianoRoll } from "./usePianoRoll"
 import { useTrack } from "./useTrack"
 

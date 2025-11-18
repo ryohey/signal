@@ -1,9 +1,9 @@
+import { isNoteEvent } from "@signal-app/core"
 import { useSelectNote } from "../../../../actions"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
-import { isNoteEvent } from "../../../../track"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 const useDragNoteEdgeGesture =

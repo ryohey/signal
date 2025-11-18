@@ -1,5 +1,5 @@
+import { Track, TrackId } from "@signal-app/core"
 import { useCallback } from "react"
-import Track, { TrackId } from "../track"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
 

@@ -1,3 +1,4 @@
+import { songToMidi } from "@signal-app/core"
 import { useToast } from "dialog-hooks"
 import {
   GithubAuthProvider,
@@ -33,7 +34,6 @@ import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { useLocalization } from "../../localize/useLocalization"
-import { songToMidi } from "../../midi/midiConversion"
 import { ElectronCallback } from "./ElectronCallback"
 
 export const ElectronCallbackHandler: FC = () => {
@@ -66,7 +66,7 @@ export const ElectronCallbackHandler: FC = () => {
         return // canceled
       }
       const { path } = res
-      const data = songToMidi(getSong()).buffer
+      const data = songToMidi(getSong()).buffer as ArrayBuffer
       setFilepath(path)
       setSaved(true)
       await window.electronAPI.saveFile(path, data)
@@ -123,7 +123,7 @@ export const ElectronCallbackHandler: FC = () => {
         } else {
           try {
             if (filepath) {
-              const data = songToMidi(getSong()).buffer
+              const data = songToMidi(getSong()).buffer as ArrayBuffer
               await window.electronAPI.saveFile(filepath, data)
               setSaved(true)
             } else {

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { TrackEvent } from "@signal-app/core"
 import { FC } from "react"
 import { TickTransform } from "../../entities/transform/TickTransform"
-import { TrackEvent } from "../../track"
 import { ControlMark, DisplayEvent } from "./ControlMark"
 
 /// 重なって表示されないようにひとつのイベントとしてまとめる

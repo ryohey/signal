@@ -1,8 +1,8 @@
+import { TrackEventOf } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import React, { useCallback } from "react"
 import { useCreateOrUpdateControlEventsValue } from "../../../actions/control"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
-import { TrackEventOf } from "../../../track"
 import { GraphAxis } from "./GraphAxis"
 import { LineGraphCanvas } from "./LineGraphCanvas"
 

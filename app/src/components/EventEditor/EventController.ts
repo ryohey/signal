@@ -1,7 +1,10 @@
+import {
+  TrackEvent,
+  bpmToUSecPerBeat,
+  uSecPerBeatToBPM,
+} from "@signal-app/core"
 import { clamp, flow } from "lodash"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../../helpers/bpm"
 import { controllerTypeString } from "../../helpers/noteNumberString"
-import { TrackEvent } from "../../track"
 
 export interface EventInputProp {
   type: "text" | "number"
@@ -113,6 +116,8 @@ export function getEventController<T extends TrackEvent>(
     case "dividedSysEx":
     case "sysEx":
       return { name: e.type }
+    default:
+      return { name: "Unknown" }
   }
 }
 

@@ -1,4 +1,4 @@
-import { TrackId } from "../track/Track"
+import { TrackId } from "@signal-app/core"
 import { TrackMute } from "./TrackMute"
 
 function getTrackId(value: number): TrackId {

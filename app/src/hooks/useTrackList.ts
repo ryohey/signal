@@ -1,6 +1,6 @@
+import { TrackId } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
-import { TrackId } from "../track"
 import { useSong } from "./useSong"
 
 export function useTrackList() {

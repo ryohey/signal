@@ -1,4 +1,5 @@
 import { CloudSong } from "@signal-app/api"
+import { emptySong } from "@signal-app/core"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { orderBy } from "lodash"
@@ -11,7 +12,6 @@ import {
   cloudSongDataRepository,
   cloudSongRepository,
 } from "../services/repositories"
-import { emptySong } from "../song"
 import { useAutoSave } from "./useAutoSave"
 import { useRootView } from "./useRootView"
 import { useSong } from "./useSong"

@@ -1,14 +1,12 @@
+import { isEventInRange, isSetTempoEvent, Range } from "@signal-app/core"
 import { Point } from "../../../entities/geometry/Point"
-import { Range } from "../../../entities/geometry/Range"
 import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
 import { MouseGesture } from "../../../gesture/MouseGesture"
-import { isEventInRange } from "../../../helpers/filterEvents"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
-import { isSetTempoEvent } from "../../../track"
 
 export const useCreateSelectionGesture = (): MouseGesture<
   [Point, TempoCoordTransform]

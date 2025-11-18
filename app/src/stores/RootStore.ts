@@ -1,5 +1,5 @@
 import { Player, SoundFont, SoundFontSynth } from "@signal-app/player"
-import { CommandService } from "../commands/CommandService"
+import { CommandService } from "@signal-app/core"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { AutoSaveService } from "../services/AutoSaveService"

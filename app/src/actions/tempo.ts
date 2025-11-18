@@ -1,5 +1,5 @@
+import { TempoEventsClipboardDataSchema } from "@signal-app/core"
 import { useCallback } from "react"
-import { TempoEventsClipboardDataSchema } from "../clipboard/clipboardTypes"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
@@ -83,10 +83,10 @@ export const useDuplicateTempoSelection = () => {
 
     pushHistory()
 
-    const addedEvents =
+    const addedEventIds =
       commands.conductorTrack.duplicateEvents(selectedEventIds)
 
     // select the created events
-    setSelectedEventIds(addedEvents.map((e) => e.id))
+    setSelectedEventIds(addedEventIds)
   }
 }

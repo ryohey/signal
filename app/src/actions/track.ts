@@ -1,10 +1,15 @@
+import {
+  BatchUpdateOperation,
+  Measure,
+  programChangeMidiEvent,
+  timeSignatureMidiEvent,
+  TrackEvent,
+  TrackEventOf,
+  TrackId,
+} from "@signal-app/core"
 import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
-import { transaction } from "mobx"
 import { useCallback } from "react"
-import { BatchUpdateOperation } from "../commands/track"
 import { ValueEventType } from "../entities/event/ValueEventType"
-import { Measure } from "../entities/measure/Measure"
-import { closedRange } from "../helpers/array"
 import { addedSet, deletedSet } from "../helpers/set"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
@@ -14,11 +19,6 @@ import { usePlayer } from "../hooks/usePlayer"
 import { useQuantizer } from "../hooks/useQuantizer"
 import { useSong } from "../hooks/useSong"
 import { useTrack } from "../hooks/useTrack"
-import {
-  programChangeMidiEvent,
-  timeSignatureMidiEvent,
-} from "../midi/MidiEvent"
-import { TrackEvent, TrackEventOf, TrackId } from "../track"
 import { useStopNote } from "./player"
 
 export const useChangeTempo = () => {
@@ -90,8 +90,8 @@ export const useUpdateEventsInRange = (
   filterEvent: (e: TrackEvent) => boolean,
   createEvent: (value: number) => AnyEvent,
 ) => {
-  const { getEvents, removeEvents, addEvents } = useTrack(trackId)
   const { quantizeFloor, quantizeUnit } = useQuantizer()
+  const commands = useCommands()
 
   return useCallback(
     (
@@ -100,64 +100,19 @@ export const useUpdateEventsInRange = (
       startTick: number,
       endTick: number,
     ) => {
-      const minTick = Math.min(startTick, endTick)
-      const maxTick = Math.max(startTick, endTick)
-      const _startTick = quantizeFloor(Math.max(0, minTick))
-      const _endTick = quantizeFloor(Math.max(0, maxTick))
-
-      const minValue = Math.min(startValue, endValue)
-      const maxValue = Math.max(startValue, endValue)
-
-      // linear interpolate
-      const getValue =
-        endTick === startTick
-          ? () => endValue
-          : (tick: number) =>
-              Math.floor(
-                Math.min(
-                  maxValue,
-                  Math.max(
-                    minValue,
-                    ((tick - startTick) / (endTick - startTick)) *
-                      (endValue - startValue) +
-                      startValue,
-                  ),
-                ),
-              )
-
-      // Delete events in the dragged area
-      const events = getEvents()
-        .filter(filterEvent)
-        .filter(
-          (e) =>
-            // to prevent remove the event created previously, do not remove the event placed at startTick
-            e.tick !== startTick &&
-            e.tick >= Math.min(minTick, _startTick) &&
-            e.tick <= Math.max(maxTick, _endTick),
-        )
-
-      transaction(() => {
-        removeEvents(events.map((e) => e.id))
-
-        const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(
-          (tick) => ({
-            ...createEvent(getValue(tick)),
-            tick,
-          }),
-        )
-
-        addEvents(newEvents)
-      })
+      commands.track.updateEventsInRange(
+        trackId,
+        filterEvent,
+        createEvent,
+        quantizeFloor,
+        quantizeUnit,
+        startValue,
+        endValue,
+        startTick,
+        endTick,
+      )
     },
-    [
-      quantizeFloor,
-      quantizeUnit,
-      filterEvent,
-      createEvent,
-      getEvents,
-      removeEvents,
-      addEvents,
-    ],
+    [commands, trackId, filterEvent, createEvent, quantizeFloor, quantizeUnit],
   )
 }
 

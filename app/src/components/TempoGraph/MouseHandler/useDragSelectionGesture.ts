@@ -1,3 +1,4 @@
+import { TrackEventOf } from "@signal-app/core"
 import { SetTempoEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
@@ -10,7 +11,6 @@ import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
-import { TrackEventOf } from "../../../track"
 
 export const useDragSelectionGesture = (): MouseGesture<[number]> => {
   const { getEventById } = useConductorTrack()

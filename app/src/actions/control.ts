@@ -1,11 +1,6 @@
-import { min } from "lodash"
+import { ControlEventsClipboardDataSchema } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { transaction } from "mobx"
 import { useCallback } from "react"
-import {
-  ControlEventsClipboardData,
-  ControlEventsClipboardDataSchema,
-} from "../clipboard/clipboardTypes"
 import { isNotUndefined } from "../helpers/array"
 import { useCommands } from "../hooks/useCommands"
 import { useControlPane } from "../hooks/useControlPane"
@@ -78,44 +73,30 @@ export const useDeleteControlSelection = () => {
 
 export const useCopyControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { getEventById } = useTrack(selectedTrackId)
   const { selectedEventIds } = useControlPane()
+  const commands = useCommands()
 
   return useCallback(async () => {
     if (selectedEventIds.length === 0) {
       return
     }
-
-    // Copy selected events
-    const events = selectedEventIds
-      .map((id) => getEventById(id))
-      .filter(isNotUndefined)
-
-    const minTick = min(events.map((e) => e.tick))
-
-    if (minTick === undefined) {
+    const data = commands.control.getClipboardDataForSelection(
+      selectedTrackId,
+      selectedEventIds,
+    )
+    if (!data) {
       return
     }
 
-    const relativePositionedEvents = events.map((note) => ({
-      ...note,
-      tick: note.tick - minTick,
-    }))
-
-    const data: ControlEventsClipboardData = {
-      type: "control_events",
-      events: relativePositionedEvents,
-    }
-
     await writeClipboardData(data)
-  }, [selectedEventIds, getEventById])
+  }, [selectedEventIds, commands, selectedTrackId])
 }
 
 export const usePasteControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { createOrUpdate } = useTrack(selectedTrackId)
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(
     async (e?: ClipboardEvent) => {
@@ -127,14 +108,13 @@ export const usePasteControlSelection = () => {
       }
 
       pushHistory()
-
-      const events = data.events.map((e) => ({
-        ...e,
-        tick: e.tick + position,
-      }))
-      transaction(() => events.forEach(createOrUpdate))
+      commands.control.pasteClipboardDataAtPosition(
+        selectedTrackId,
+        data,
+        position,
+      )
     },
-    [createOrUpdate, position, pushHistory],
+    [commands, position, pushHistory, selectedTrackId],
   )
 }
 
@@ -162,11 +142,11 @@ export const useDuplicateControlSelection = () => {
     pushHistory()
 
     // select the created events
-    const addedEvents = commands.track.duplicateEvents(
+    const addedEventIds = commands.track.duplicateEvents(
       selectedTrackId,
       selectedEventIds,
     )
-    setSelectedEventIds(addedEvents.map((e) => e.id))
+    setSelectedEventIds(addedEventIds)
   }, [
     selectedEventIds,
     pushHistory,
