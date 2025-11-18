@@ -1,4 +1,5 @@
-import { EventScheduler } from "./EventScheduler.js"
+import { describe, expect, it } from "vitest"
+import { EventScheduler } from "./EventScheduler"
 
 describe("EventScheduler", () => {
   it("readNextEvents", () => {

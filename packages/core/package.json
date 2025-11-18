@@ -4,7 +4,9 @@
   "description": "Signal music domain core entities and logic",
   "type": "module",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "prettier --check src",
+    "format": "prettier --write src"
   },
   "exports": {
     ".": {
