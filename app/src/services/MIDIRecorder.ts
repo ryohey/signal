@@ -67,8 +67,15 @@ export class MIDIRecorder {
       return
     }
 
-    const stream = new Stream(e.data)
-    const message = deserializeSingleEvent(stream)
+    let message
+    
+    try {
+      const stream = new Stream(e.data)
+      message = deserializeSingleEvent(stream)
+    } catch {
+      // Ignore unrecognized MIDI messages (e.g., MIDI Clock, Active Sensing)
+      return
+    }
 
     if (message.type !== "channel") {
       return
