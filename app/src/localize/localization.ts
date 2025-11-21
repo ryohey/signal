@@ -1819,10 +1819,8 @@ export default {
     reset: "Resetovať",
     triplet: "Triola",
     dotted: "S bodkou",
-    "confirm-new":
-      "Vaše úpravy neboli uložené. Naozaj chcete pokračovať?",
-    "confirm-open":
-      "Vaše úpravy neboli uložené. Naozaj chcete pokračovať?",
+    "confirm-new": "Vaše úpravy neboli uložené. Naozaj chcete pokračovať?",
+    "confirm-open": "Vaše úpravy neboli uložené. Naozaj chcete pokračovať?",
     "confirm-close":
       "Vaše úpravy neboli uložené. Pred zatvorením si ich nezabudnite stiahnuť. Naozaj chcete zatvoriť?",
     "auto-scroll": "Automatické posúvanie",
