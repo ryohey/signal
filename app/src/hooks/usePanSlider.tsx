@@ -15,9 +15,10 @@ export function usePanSlider() {
   const { setPan, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
 
-  const currentPan = useMobxSelector(() => {
-    selectedTrack?.getPan(position)
-  }, [selectedTrack, position])
+  const currentPan = useMobxSelector(
+    () => selectedTrack?.getPan(position),
+    [selectedTrack, position],
+  )
 
   const setTrackPan = useCallback(
     (pan: number) => {
