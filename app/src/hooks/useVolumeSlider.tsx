@@ -15,9 +15,10 @@ export function useVolumeSlider() {
   const { setVolume, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
 
-  const currentVolume = useMobxSelector(() => {
-    selectedTrack?.getVolume(position)
-  }, [selectedTrack, position])
+  const currentVolume = useMobxSelector(
+    () => selectedTrack?.getVolume(position),
+    [selectedTrack, position],
+  )
 
   const setTrackVolume = useCallback(
     (pan: number) => {
