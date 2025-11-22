@@ -88,8 +88,15 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
   useEffect(
     () =>
       midiInput.on("midiMessage", (e) => {
-        const stream = new Stream(e.data)
-        const event = deserializeSingleEvent(stream)
+        let event
+
+        try {
+          const stream = new Stream(e.data)
+          event = deserializeSingleEvent(stream)
+        } catch {
+          // Ignore unrecognized MIDI messages (e.g., MIDI Clock, Active Sensing)
+          return
+        }
 
         if (event.type !== "channel") {
           return
@@ -104,10 +111,29 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
     [midiInput, addPreviewingNoteNumbers, removePreviewingNoteNumbers],
   )
 
-  // sync MIDIMonitor channel with selected track
+  // Sync MIDIMonitor channel and program with selected track
+  // Use MobX selector to ensure reactive updates when channel/program changes
+  const currentChannel = useMobxSelector(
+    () => selectedTrack?.channel,
+    [selectedTrack],
+  )
+  const currentProgram = useMobxSelector(
+    () => selectedTrack?.programNumber,
+    [selectedTrack],
+  )
+
   useEffect(() => {
-    midiMonitor.channel = selectedTrack?.channel ?? 0
-  }, [midiMonitor, selectedTrack])
+    if (currentChannel !== undefined) {
+      const program = currentProgram ?? 0
+
+      // Set program first, then channel (channel setter triggers initialization)
+      midiMonitor.programNumber = program
+      midiMonitor.channel = currentChannel
+    } else {
+      midiMonitor.programNumber = 0
+      midiMonitor.channel = 0
+    }
+  }, [midiMonitor, currentChannel, currentProgram])
 
   // sync MIDIRecorder channel with selected track
   useEffect(() => {
