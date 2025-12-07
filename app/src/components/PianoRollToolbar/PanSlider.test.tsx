@@ -1,16 +1,12 @@
-/**
- * @jest-environment jsdom
- */
-
-import "@testing-library/jest-dom"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 import { LocalizationContext } from "../../localize/useLocalization"
 import { PanSlider } from "./PanSlider"
 
-const setTrackPanMock = jest.fn()
-jest.mock("../../hooks/usePanSlider", () => ({
-  usePanSlider: jest.fn(() => ({
+const setTrackPanMock = vi.fn()
+vi.mock("../../hooks/usePanSlider", () => ({
+  usePanSlider: vi.fn(() => ({
     value: 42,
     setValue: setTrackPanMock,
     defaultValue: 64,
@@ -19,7 +15,7 @@ jest.mock("../../hooks/usePanSlider", () => ({
 
 describe("PanSlider", () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
   beforeAll(() => {
     global.ResizeObserver = class ResizeObserver {
@@ -27,9 +23,9 @@ describe("PanSlider", () => {
       unobserve() {}
       disconnect() {}
     }
-    window.HTMLElement.prototype.hasPointerCapture = jest.fn()
-    window.HTMLElement.prototype.releasePointerCapture = jest.fn()
-    window.HTMLElement.prototype.setPointerCapture = jest.fn()
+    window.HTMLElement.prototype.hasPointerCapture = vi.fn()
+    window.HTMLElement.prototype.releasePointerCapture = vi.fn()
+    window.HTMLElement.prototype.setPointerCapture = vi.fn()
   })
 
   it("renders the slider with the correct initial value", () => {

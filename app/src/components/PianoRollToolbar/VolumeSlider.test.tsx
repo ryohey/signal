@@ -1,15 +1,11 @@
-/**
- * @jest-environment jsdom
- */
-
-import "@testing-library/jest-dom"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 import { VolumeSlider } from "./VolumeSlider"
 
-const setTrackVolumeMock = jest.fn()
-jest.mock("../../hooks/useVolumeSlider", () => ({
-  useVolumeSlider: jest.fn(() => ({
+const setTrackVolumeMock = vi.fn()
+vi.mock("../../hooks/useVolumeSlider", () => ({
+  useVolumeSlider: vi.fn(() => ({
     value: 42,
     setValue: setTrackVolumeMock,
   })),
@@ -17,7 +13,7 @@ jest.mock("../../hooks/useVolumeSlider", () => ({
 
 describe("VolumeSlider", () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
   beforeAll(() => {
     global.ResizeObserver = class ResizeObserver {
@@ -25,9 +21,9 @@ describe("VolumeSlider", () => {
       unobserve() {}
       disconnect() {}
     }
-    window.HTMLElement.prototype.hasPointerCapture = jest.fn()
-    window.HTMLElement.prototype.releasePointerCapture = jest.fn()
-    window.HTMLElement.prototype.setPointerCapture = jest.fn()
+    window.HTMLElement.prototype.hasPointerCapture = vi.fn()
+    window.HTMLElement.prototype.releasePointerCapture = vi.fn()
+    window.HTMLElement.prototype.setPointerCapture = vi.fn()
   })
 
   it("renders the slider with the correct initial value", () => {

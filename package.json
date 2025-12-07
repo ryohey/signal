@@ -12,7 +12,7 @@
     "format": "turbo format",
     "firebase": "npm --prefix functions run build && firebase emulators:start",
     "firebase:deploy": "firebase deploy",
-    "dev:electron": "concurrently \"npm run dev:electron -w app\" \"npm run dev --prefix electron\"",
+    "dev:electron": "concurrently \"npm run dev -w app\" \"npm run dev --prefix electron\"",
     "build:electron": "npm run build:electron -w app && rimraf electron/dist_renderer && cpx \"app/dist/**/*\" electron/dist_renderer",
     "package:electron:darwin": "npm run build:electron && npm run package:darwin --prefix electron",
     "package:electron": "npm run build:electron && npm run package --prefix electron",

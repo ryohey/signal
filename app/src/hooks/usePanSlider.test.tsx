@@ -1,24 +1,20 @@
-/**
- * @jest-environment jsdom
- */
-
-import "@testing-library/jest-dom"
 import { act, renderHook } from "@testing-library/react"
 import { ReactNode } from "react"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import RootStore from "../stores/RootStore"
 import { SongStore } from "../stores/SongStore"
 import { usePanSlider } from "./usePanSlider"
 import { StoreContext } from "./useStores"
 
 // Mock dependencies that don't need real implementation
-jest.mock("./useHistory", () => ({
+vi.mock("./useHistory", () => ({
   useHistory: () => ({
-    pushHistory: jest.fn(),
+    pushHistory: vi.fn(),
   }),
 }))
 
-const sendEventMock = jest.fn()
-jest.mock("./usePlayer", () => ({
+const sendEventMock = vi.fn()
+vi.mock("./usePlayer", () => ({
   usePlayer: () => ({
     position: 0,
     sendEvent: sendEventMock,
@@ -41,7 +37,7 @@ const createMockRootStore = () => {
 let mockStore: ReturnType<typeof createMockRootStore> | null = null
 
 // Mock usePianoRoll to return the track from the shared mock store
-jest.mock("./usePianoRoll", () => ({
+vi.mock("./usePianoRoll", () => ({
   usePianoRoll: () => ({
     get selectedTrack() {
       return mockStore?.songStore?.song?.tracks?.find(
@@ -63,7 +59,7 @@ const StoreProvider = ({ children }: { children: ReactNode }) => {
 
 describe("usePanSlider", () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("returns correct default value", () => {
