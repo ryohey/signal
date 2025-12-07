@@ -1,4 +1,5 @@
 import { TrackId } from "@signal-app/core"
+import { describe, expect, it } from "vitest"
 import { TrackMute } from "./TrackMute"
 
 function getTrackId(value: number): TrackId {

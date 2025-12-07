@@ -9,7 +9,8 @@
     "serve": "npx http-server dist",
     "test": "vitest run",
     "format": "prettier --write src",
-    "lint": "prettier --check src && eslint"
+    "lint": "prettier --check src && eslint",
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -80,9 +81,11 @@
     "@emotion/babel-plugin": "^11.13.5",
     "@eslint/js": "^9.25.1",
     "@svgr/plugin-svgo": "^8.1.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/color": "4.2.0",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.2",
     "@types/react": "^18.3.20",

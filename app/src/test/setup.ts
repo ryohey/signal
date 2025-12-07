@@ -1,7 +1,5 @@
-import * as matchers from "@testing-library/jest-dom/matchers"
-import { beforeAll, expect } from "vitest"
-
-expect.extend(matchers)
+import "@testing-library/jest-dom"
+import { beforeAll } from "vitest"
 
 beforeAll(() => {
   // Mock navigator.language
