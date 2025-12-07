@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint"
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    ignores: ["webpack.config.js", "webpack.*.js", "dist", "*.config.js"],
+    ignores: ["dist", "*.config.js"],
   },
   { files: ["src/**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
   { languageOptions: { globals: globals.browser } },
