@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run dev -w app` - Start dev server for the main app
 - `npm run build -w app` - Build the main React application
-- `npm run test -w app` - Run Jest tests for the app
+- `npm run test -w app` - Run tests for the app
 
 ### Electron Commands
 
@@ -96,7 +96,7 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - **Frontend:** React 18, TypeScript, MobX, Emotion CSS-in-JS
 - **Audio:** Web Audio API, SoundFont synthesis, WebMIDI API
 - **Graphics:** WebGL for performance-critical rendering
-- **Build:** Webpack, Turbo (monorepo), ESLint, Prettier
+- **Build:** Vite, Turbo (monorepo), ESLint, Prettier
 - **Desktop:** Electron with Forge
 - **Cloud:** Firebase (auth, storage), Vercel (hosting)
 
