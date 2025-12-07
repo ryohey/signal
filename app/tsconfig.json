@@ -2,7 +2,6 @@
   "compilerOptions": {
     "types": [
       "node",
-      "jest",
       "webmidi",
       "wicg-file-system-access",
       "vite-plugin-svgr/client"
