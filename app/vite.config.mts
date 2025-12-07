@@ -5,7 +5,7 @@ import checker from "vite-plugin-checker"
 import svgr from "vite-plugin-svgr"
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "")
+  const env = loadEnv(mode, path.join(process.cwd(), ".."), "FIREBASE_")
 
   return {
     plugins: [
