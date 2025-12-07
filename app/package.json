@@ -4,7 +4,7 @@
   "description": "A friendly music sequencer application for OS X and Windows.",
   "scripts": {
     "dev": "vite",
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js && node generate-service-worker.js",
     "build:electron": "webpack --config webpack.electron.prod.js",
     "serve": "npx http-server dist",
     "test": "jest",
@@ -119,6 +119,7 @@
     "typescript-eslint": "^8.31.0",
     "vite": "^5.4.21",
     "vite-plugin-checker": "^0.11.0",
-    "vite-plugin-svgr": "^4.5.0"
+    "vite-plugin-svgr": "^4.5.0",
+    "workbox-build": "^7.4.0"
   }
 }
