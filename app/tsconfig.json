@@ -5,7 +5,8 @@
       "jest",
       "webpack-env",
       "webmidi",
-      "wicg-file-system-access"
+      "wicg-file-system-access",
+      "vite-plugin-svgr/client"
     ],
     "baseUrl": "./src",
     "sourceMap": true,
