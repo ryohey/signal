@@ -2,6 +2,7 @@ import { generateSW } from "workbox-build"
 
 generateSW({
   swDest: "dist/service-worker.js",
+  globDirectory: "dist",
   maximumFileSizeToCacheInBytes: 50000000,
   clientsClaim: true,
   skipWaiting: true,
