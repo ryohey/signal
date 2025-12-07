@@ -20,6 +20,26 @@ export default defineConfig(({ mode }) => {
           exportType: "default",
         },
       }),
+      {
+        name: "rewrite-path",
+        configureServer(server) {
+          server.middlewares.use((req, _res, next) => {
+            if (req.url === "/home") {
+              req.url = "/community"
+            }
+            if (req.url === "/profile") {
+              req.url = "/community"
+            }
+            if (req.url?.startsWith("/users/")) {
+              req.url = "/community"
+            }
+            if (req.url?.startsWith("/songs/")) {
+              req.url = "/community"
+            }
+            next()
+          })
+        },
+      },
     ],
     build: {
       rollupOptions: {
