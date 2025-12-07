@@ -1,4 +1,4 @@
-import { CSSProperties, useMemo } from "react"
+import { type CSSProperties, useMemo } from "react"
 
 // div props and styles for positioned elements
 export type PositionedProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -32,7 +32,7 @@ export const Positioned: React.FC<PositionedProps> = ({
       height,
       ...style,
     }),
-    [top, left, right, bottom, width, height, style],
+    [top, left, right, bottom, width, height, style]
   )
 
   return (

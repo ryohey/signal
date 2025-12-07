@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import ArrowDropUp from "mdi-react/ArrowDropUpIcon"
-import React, { FC, useRef } from "react"
-import { Point } from "../../entities/geometry/Point"
+import React, { type FC, useRef } from "react"
+import type { Point } from "../../entities/geometry/Point"
 import { observeDrag, observeDrag2 } from "../../helpers/observeDrag"
 
 export const BAR_WIDTH = 17
@@ -102,7 +102,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
     onScroll,
     children,
   },
-  ref,
+  ref
 ) => {
   const buttonLength = BUTTON_SIZE
   const maxOffset = contentLength - barLength
@@ -119,7 +119,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
     pageBackwardLength = maxLength
   } else {
     pageForwardLength = Math.floor(
-      (maxLength - thumbLength) * normalize(scrollOffset / maxOffset),
+      (maxLength - thumbLength) * normalize(scrollOffset / maxOffset)
     )
     pageBackwardLength = Math.floor(maxLength - thumbLength - pageForwardLength)
   }
@@ -291,7 +291,7 @@ export type HorizontalScrollBarProps = Omit<HorizontalScrollBar_Props, "size">
 
 const areEqual = (
   props: VerticalScrollBar_Props,
-  nextProps: VerticalScrollBar_Props,
+  nextProps: VerticalScrollBar_Props
 ) =>
   props.scrollOffset === nextProps.scrollOffset &&
   props.contentLength === nextProps.contentLength &&

@@ -1,5 +1,5 @@
-import { DistributiveOmit } from "@emotion/react"
-import { AnyEvent } from "midifile-ts"
+import type { DistributiveOmit } from "@emotion/react"
+import type { AnyEvent } from "midifile-ts"
 import { addTick } from "../helpers/addTick.js"
 import { getEndOfTrack } from "../track/Track.js"
 

@@ -1,14 +1,18 @@
 import {
   Beat,
-  Range,
-  TrackId,
+  convertTrackEvents,
   getStatusEvents,
   isEventInRange,
   noteOnMidiEvent,
-  convertTrackEvents,
+  Range,
+  type TrackId,
 } from "@signal-app/core"
-import { IEventSource, PlayerEvent, SendableEvent } from "@signal-app/player"
-import { SongStore } from "../stores/SongStore"
+import type {
+  IEventSource,
+  PlayerEvent,
+  SendableEvent,
+} from "@signal-app/player"
+import type { SongStore } from "../stores/SongStore"
 
 export const METRONOME_TRACK_ID = 99999 as TrackId
 
@@ -40,7 +44,7 @@ export class EventSource implements IEventSource {
       return convertTrackEvents(
         statusEvents,
         t.channel,
-        t.id,
+        t.id
       ) as SendableEvent[]
     })
   }

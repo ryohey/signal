@@ -1,6 +1,6 @@
-import { ArrangeSelection } from "@signal-app/core"
+import type { ArrangeSelection } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { cloneDeep } from "lodash"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { MaxNoteNumber } from "../Constants"
@@ -21,6 +21,7 @@ import {
   TrackScrollProvider,
   useTrackScroll,
 } from "./useTrackScroll"
+
 export type { ArrangeSelection } from "@signal-app/core"
 
 type ArrangeViewStore = {
@@ -77,7 +78,7 @@ export function ArrangeViewScope({ children }: { children: React.ReactNode }) {
 
 export function useArrangeView() {
   const { tickScrollScope, trackScrollScope } = useContext(
-    ArrangeViewStoreContext,
+    ArrangeViewStoreContext
   )
   return {
     get transform() {
@@ -88,13 +89,13 @@ export function useArrangeView() {
         () =>
           new KeyTransform(
             (trackHeight - bottomBorderWidth) / MaxNoteNumber,
-            MaxNoteNumber,
+            MaxNoteNumber
           ),
-        [trackHeight],
+        [trackHeight]
       )
       return useMemo(
         () => new NoteCoordTransform(tickTransform, keyTransform),
-        [tickTransform, keyTransform],
+        [tickTransform, keyTransform]
       )
     },
     get selectedTrackIndex() {
@@ -105,7 +106,7 @@ export function useArrangeView() {
       const selectedTrackIndex = useAtomValue(selectedTrackIndexAtom)
       return useMobxSelector(
         () => songStore.song.tracks[selectedTrackIndex]?.id,
-        [songStore, selectedTrackIndex],
+        [songStore, selectedTrackIndex]
       )
     },
     get selection() {
@@ -116,7 +117,7 @@ export function useArrangeView() {
       const { transform: trackTransform } = useTrackScroll(trackScrollScope)
       return useMemo(
         () => new ArrangeCoordTransform(tickTransform, trackTransform),
-        [tickTransform, trackTransform],
+        [tickTransform, trackTransform]
       )
     },
     get openTransposeDialog() {
@@ -133,7 +134,7 @@ export function useArrangeView() {
           setScrollLeftInPixels((prev) => prev - x)
           setScrollTop((prev) => prev - y)
         },
-        [setScrollLeftInPixels, setScrollTop],
+        [setScrollLeftInPixels, setScrollTop]
       )
     },
     setSelectedTrackIndex: useSetAtom(selectedTrackIndexAtom),
@@ -168,8 +169,8 @@ const restoreAtom = atom(
       selection,
     }: {
       selection: ArrangeSelection | null
-    },
+    }
   ) => {
     set(selectionAtom, selection)
-  },
+  }
 )

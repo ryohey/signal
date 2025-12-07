@@ -40,7 +40,7 @@ export class MIDIDeviceStore {
     if (navigator.requestMIDIAccess === undefined) {
       this.isLoading = false
       this.requestError = new Error(
-        "Web MIDI API is not supported by your browser",
+        "Web MIDI API is not supported by your browser"
       )
       return
     }

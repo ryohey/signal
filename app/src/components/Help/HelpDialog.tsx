@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
@@ -47,7 +47,7 @@ const HotKey: FC<HotKeyProps> = ({ hotKeys, text }) => {
         .map((c, i1) =>
           c
             .map<ReactNode>((k, i2) => <Key key={i1 * 10000 + i2}>{k}</Key>)
-            .reduce((a, b) => [a, <span key={"plus"}>+</span>, b]),
+            .reduce((a, b) => [a, <span key={"plus"}>+</span>, b])
         )
         .reduce((a, b) => [a, <span key={"slash"}>/</span>, b])}
       <HotKeyText>{text}</HotKeyText>

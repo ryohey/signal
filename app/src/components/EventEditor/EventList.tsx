@@ -1,8 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { TrackEvent } from "@signal-app/core"
-import React, { FC, useCallback, useRef } from "react"
-import { FixedSizeList, ListChildComponentProps } from "react-window"
+import type { TrackEvent } from "@signal-app/core"
+import type React from "react"
+import { type FC, useCallback, useRef } from "react"
+import { FixedSizeList, type ListChildComponentProps } from "react-window"
 import { Layout } from "../../Constants"
 import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
@@ -87,7 +88,7 @@ const ItemRenderer = ({ index, style, data }: ListChildComponentProps) => {
         setSelectedEventIds?.([ev.id])
       }
     },
-    [setSelectedEventIds],
+    [setSelectedEventIds]
   )
 
   return (

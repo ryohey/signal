@@ -17,6 +17,6 @@ fs.writeFileSync(
   envPath,
   Object.keys(env)
     .map((key) => `${key}=${env[key]}`)
-    .join("\n"),
+    .join("\n")
 )
 console.log(`BUILD_VERSION bumped to ${newBuildVersion}`)

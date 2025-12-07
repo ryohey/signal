@@ -1,7 +1,7 @@
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
-import { ContextMenu, ContextMenuProps } from "../ContextMenu/ContextMenu"
+import { ContextMenu, type ContextMenuProps } from "../ContextMenu/ContextMenu"
 import { KeySignatureDialog } from "../KeySignatureDialog/KeySignatureDialog"
 import { MenuItem } from "../ui/Menu"
 

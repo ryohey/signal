@@ -71,7 +71,7 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [getSelectedTrack, getSelection],
+      [getSelectedTrack, getSelection]
     ),
     updateDraggable: useCallback(
       (draggable: PianoRollDraggable, position: Partial<NotePoint>) => {
@@ -124,7 +124,7 @@ export function usePianoRollDraggable() {
                 const defaultedPosition = { ...from, ...position }
                 const delta = NotePoint.sub(defaultedPosition, from)
                 setSelection(
-                  Selection.moved(selection, delta.tick, delta.noteNumber),
+                  Selection.moved(selection, delta.tick, delta.noteNumber)
                 )
                 break
               }
@@ -153,12 +153,12 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [getSelection, getSelectedTrack, setSelection],
+      [getSelection, getSelectedTrack, setSelection]
     ),
     getDraggableArea: useCallback(
       (
         draggable: PianoRollDraggable,
-        minLength: number = 0,
+        minLength: number = 0
       ): DraggableArea | null => {
         const selectedNoteIds = getSelectedNoteIds()
         const selectedTrack = getSelectedTrack()
@@ -189,7 +189,7 @@ export function usePianoRollDraggable() {
                   tickRange: Range.create(tickLowerBound, Infinity),
                   noteNumberRange: Range.create(
                     noteNumberLowerBound,
-                    noteNumberUpperBound,
+                    noteNumberUpperBound
                   ),
                 }
               }
@@ -197,7 +197,7 @@ export function usePianoRollDraggable() {
                 return {
                   tickRange: Range.create(
                     tickLowerBound,
-                    note.tick + note.duration - minLength,
+                    note.tick + note.duration - minLength
                   ),
                   noteNumberRange: Range.point(note.noteNumber), // allow to move only vertically
                 }
@@ -245,7 +245,7 @@ export function usePianoRollDraggable() {
                 return {
                   tickRange: Range.create(
                     tickOffset,
-                    Math.min(selectionSmallestLeft, noteSmallestLeft),
+                    Math.min(selectionSmallestLeft, noteSmallestLeft)
                   ),
                   noteNumberRange: Range.point(selection.fromNoteNumber), // allow to move only vertically
                 }
@@ -264,7 +264,7 @@ export function usePianoRollDraggable() {
                 return {
                   tickRange: Range.create(
                     Math.max(selectionSmallestRight, noteSmallestRight),
-                    Infinity,
+                    Infinity
                   ),
                   noteNumberRange: Range.point(selection.fromNoteNumber), // allow to move only vertically
                 }
@@ -273,7 +273,7 @@ export function usePianoRollDraggable() {
           }
         }
       },
-      [getSelection, getSelectedNoteIds, getSelectedTrack],
+      [getSelection, getSelectedNoteIds, getSelectedTrack]
     ),
   }
 }

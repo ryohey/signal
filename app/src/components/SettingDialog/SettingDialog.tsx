@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, useCallback, useState } from "react"
+import { type FC, useCallback, useState } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -11,7 +11,7 @@ import {
 import { Button } from "../ui/Button"
 import { GeneralSettingsView } from "./GeneralSettingsView"
 import { MIDIDeviceView } from "./MIDIDeviceView/MIDIDeviceView"
-import { SettingNavigation, SettingRoute } from "./SettingNavigation"
+import { SettingNavigation, type SettingRoute } from "./SettingNavigation"
 import { SoundFontSettingsView } from "./SoundFontSettingView"
 
 const RouteContent: FC<{ route: SettingRoute }> = ({ route }) => {
@@ -35,7 +35,7 @@ export const SettingDialog: FC = () => {
 
   const onClose = useCallback(
     () => setOpenSettingDialog(false),
-    [setOpenSettingDialog],
+    [setOpenSettingDialog]
   )
 
   return (

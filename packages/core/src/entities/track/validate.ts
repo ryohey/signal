@@ -1,5 +1,5 @@
 import { isNumber } from "lodash"
-import { TrackEvent } from "./TrackEvent"
+import type { TrackEvent } from "./TrackEvent"
 
 export const validateMidiEvent = (e: TrackEvent) => {
   Object.values(e).forEach((v) => {

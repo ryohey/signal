@@ -2,9 +2,9 @@ import { useTheme } from "@emotion/react"
 import { BorderedCircles, HitArea, Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import { FC, useCallback } from "react"
-import { Point } from "../../../entities/geometry/Point"
-import { Rect } from "../../../entities/geometry/Rect"
+import { type FC, useCallback } from "react"
+import type { Point } from "../../../entities/geometry/Point"
+import type { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
 import { joinObjects } from "../../../helpers/array"
 
@@ -35,7 +35,7 @@ export const LineGraphItems: FC<LineGraphItemsProps> = ({
   const rects = createLineRects(values, lineWidth, right)
   const [highlightedItems, nonHighlightedItems] = partition(
     controlPoints,
-    (i) => selectedEventIds.includes(i.id),
+    (i) => selectedEventIds.includes(i.id)
   )
 
   return (
@@ -73,7 +73,7 @@ export const LineGraphItems: FC<LineGraphItemsProps> = ({
 const createLineRects = (
   values: Point[],
   lineWidth: number,
-  right: number,
+  right: number
 ): Rect[] => {
   const horizontalLineRects = values.map(({ x, y }, i) => {
     const next = values[i + 1]
@@ -109,7 +109,7 @@ const LineGraphItemHitArea: FC<{
     (e: MouseEvent) => {
       onMouseDown?.(e, itemId)
     },
-    [itemId, onMouseDown],
+    [itemId, onMouseDown]
   )
   return (
     <HitArea bounds={bounds} zIndex={zIndex} onMouseDown={handleMouseDown} />

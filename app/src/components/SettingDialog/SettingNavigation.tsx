@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { Button } from "../ui/Button"
 

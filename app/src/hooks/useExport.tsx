@@ -1,4 +1,4 @@
-import { Song } from "@signal-app/core"
+import type { Song } from "@signal-app/core"
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
@@ -82,7 +82,7 @@ const useExportSong = () => {
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>
             setProgress(numFrames / totalFrames),
-        },
+        }
       )
 
       setProgress(1)

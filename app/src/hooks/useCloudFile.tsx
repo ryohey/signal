@@ -1,9 +1,9 @@
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { emptySong } from "@signal-app/core"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { orderBy } from "lodash"
-import { ChangeEvent } from "react"
+import type { ChangeEvent } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
@@ -251,7 +251,7 @@ const sortedFilesAtom = atom((get) => {
           }
       }
     },
-    sortAscending ? "asc" : "desc",
+    sortAscending ? "asc" : "desc"
   )
 })
 

@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { type FC } from "react"
 import {
   useCopySelection,
   useDeleteSelection,
@@ -12,7 +12,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
   ContextMenu,
-  ContextMenuProps,
+  type ContextMenuProps,
   ContextMenuHotKey as HotKey,
 } from "../ContextMenu/ContextMenu"
 import { MenuDivider, MenuItem } from "../ui/Menu"
@@ -127,5 +127,5 @@ export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
         </MenuItem>
       </ContextMenu>
     )
-  },
+  }
 )

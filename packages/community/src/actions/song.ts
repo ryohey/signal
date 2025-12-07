@@ -1,12 +1,12 @@
-import { CloudSong, ICloudSongRepository } from "@signal-app/api"
-import { SoundFont, SoundFontSynth } from "@signal-app/player"
+import type { CloudSong, ICloudSongRepository } from "@signal-app/api"
+import { SoundFont, type SoundFontSynth } from "@signal-app/player"
 import debounce from "lodash/debounce.js"
-import RootStore from "../stores/RootStore.js"
+import type RootStore from "../stores/RootStore.js"
 
 const debouncedIncrementPlayCount = debounce(
   (cloudSongRepository: ICloudSongRepository, songId: string) =>
     cloudSongRepository.incrementPlayCount(songId),
-  5000,
+  5000
 )
 
 export const playSong =
@@ -32,7 +32,7 @@ const playSongAt =
       return
     }
     const index = communitySongStore.songs.findIndex(
-      (s) => s.id === currentSong.metadata.id,
+      (s) => s.id === currentSong.metadata.id
     )
     const nextIndex =
       index + indexDelta < 0
@@ -51,7 +51,7 @@ const setupSynthIfNeeded = async (synth: SoundFontSynth) => {
   }
   await synth.setup()
   const soundFont = await SoundFont.loadFromURL(
-    "https://cdn.jsdelivr.net/gh/ryohey/signal@4569a31/public/A320U.sf2",
+    "https://cdn.jsdelivr.net/gh/ryohey/signal@4569a31/public/A320U.sf2"
   )
   await synth.loadSoundFont(soundFont)
 }

@@ -17,7 +17,7 @@ export function useVolumeSlider() {
 
   const currentVolume = useMobxSelector(
     () => selectedTrack?.getVolume(position),
-    [selectedTrack, position],
+    [selectedTrack, position]
   )
 
   const setTrackVolume = useCallback(
@@ -33,7 +33,7 @@ export function useVolumeSlider() {
         sendEvent(volumeMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, setVolume, position, sendEvent, channel, isDragging],
+    [pushHistory, setVolume, position, sendEvent, channel, isDragging]
   )
 
   return {

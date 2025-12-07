@@ -1,23 +1,23 @@
-import { Auth, deleteUser } from "firebase/auth"
+import { type Auth, deleteUser } from "firebase/auth"
 import {
-  Firestore,
-  FirestoreDataConverter,
-  QueryDocumentSnapshot,
-  Timestamp,
   collection,
   doc,
+  type Firestore,
+  type FirestoreDataConverter,
   getDoc,
   getDocs,
   onSnapshot,
+  type QueryDocumentSnapshot,
   query,
   runTransaction,
+  Timestamp,
   where,
 } from "firebase/firestore"
-import { AuthUser, IUserRepository, User } from "./IUserRepository.js"
+import type { AuthUser, IUserRepository, User } from "./IUserRepository.js"
 
 export const createUserRepository = (
   firestore: Firestore,
-  auth: Auth,
+  auth: Auth
 ): IUserRepository => new UserRepository(firestore, auth)
 
 export interface FirestoreUser {
@@ -30,7 +30,7 @@ export interface FirestoreUser {
 class UserRepository implements IUserRepository {
   constructor(
     private readonly firestore: Firestore,
-    private readonly auth: Auth,
+    private readonly auth: Auth
   ) {}
   private get userCollection() {
     return collection(this.firestore, "users").withConverter(userConverter)

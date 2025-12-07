@@ -1,5 +1,5 @@
 import { ControlEventsClipboardDataSchema } from "@signal-app/core"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import type { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { isNotUndefined } from "../helpers/array"
 import { useCommands } from "../hooks/useCommands"
@@ -32,7 +32,7 @@ export const useCreateOrUpdateControlEventsValue = () => {
 
       if (controllerEvents.length > 0) {
         controllerEvents.forEach((e) =>
-          updateEvent(e.id, { value: event.value }),
+          updateEvent(e.id, { value: event.value })
         )
       } else {
         createOrUpdate({
@@ -48,7 +48,7 @@ export const useCreateOrUpdateControlEventsValue = () => {
       createOrUpdate,
       position,
       pushHistory,
-    ],
+    ]
   )
 }
 
@@ -82,7 +82,7 @@ export const useCopyControlSelection = () => {
     }
     const data = commands.control.getClipboardDataForSelection(
       selectedTrackId,
-      selectedEventIds,
+      selectedEventIds
     )
     if (!data) {
       return
@@ -111,10 +111,10 @@ export const usePasteControlSelection = () => {
       commands.control.pasteClipboardDataAtPosition(
         selectedTrackId,
         data,
-        position,
+        position
       )
     },
-    [commands, position, pushHistory, selectedTrackId],
+    [commands, position, pushHistory, selectedTrackId]
   )
 }
 
@@ -144,7 +144,7 @@ export const useDuplicateControlSelection = () => {
     // select the created events
     const addedEventIds = commands.track.duplicateEvents(
       selectedTrackId,
-      selectedEventIds,
+      selectedEventIds
     )
     setSelectedEventIds(addedEventIds)
   }, [

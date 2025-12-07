@@ -1,12 +1,12 @@
 import styled from "@emotion/styled"
 import {
-  SliderProps as Props,
+  type SliderProps as Props,
   Range,
   Root,
   Thumb,
   Track,
 } from "@radix-ui/react-slider"
-import { FC } from "react"
+import type { FC } from "react"
 
 export type SliderProps = Omit<
   Props,

@@ -1,7 +1,7 @@
-import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
-import { MouseEvent, useCallback } from "react"
+import { type ArrangePoint, ArrangeSelection } from "@signal-app/core"
+import { type MouseEvent, useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
@@ -29,9 +29,9 @@ export const useCreateSelectionGesture = (): MouseGesture<
         start,
         end,
         { quantizeFloor, quantizeCeil },
-        tracks.length,
+        tracks.length
       ),
-    [quantizeFloor, quantizeCeil, tracks.length],
+    [quantizeFloor, quantizeCeil, tracks.length]
   )
 
   return {
@@ -67,7 +67,7 @@ export const useCreateSelectionGesture = (): MouseGesture<
         setSelectedTrackIndex,
         selectionFromPoints,
         setSelection,
-      ],
+      ]
     ),
   }
 }

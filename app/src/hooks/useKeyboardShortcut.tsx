@@ -34,7 +34,7 @@ export function useKeyboardShortcut({
           e.code === action.code &&
           e.altKey === (action.altKey ?? false) &&
           e.shiftKey === (action.shiftKey ?? false) &&
-          (e.ctrlKey || e.metaKey) === (action.metaKey ?? false),
+          (e.ctrlKey || e.metaKey) === (action.metaKey ?? false)
       )
       if (action !== undefined) {
         action.run(e.nativeEvent)
@@ -42,22 +42,22 @@ export function useKeyboardShortcut({
         e.stopPropagation()
       }
     },
-    [actions],
+    [actions]
   )
 
   const onCopy = useCallback(
     (e: React.ClipboardEvent) => _onCopy?.(e.nativeEvent),
-    [_onCopy],
+    [_onCopy]
   )
 
   const onCut = useCallback(
     (e: React.ClipboardEvent) => _onCut?.(e.nativeEvent),
-    [_onCut],
+    [_onCut]
   )
 
   const onPaste = useCallback(
     (e: React.ClipboardEvent) => _onPaste?.(e.nativeEvent),
-    [_onPaste],
+    [_onPaste]
   )
 
   return {

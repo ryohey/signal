@@ -1,11 +1,11 @@
 import { useTheme } from "@emotion/react"
 import { GLNode, useRenderer, useTransform } from "@ryohey/webgl-react"
 import Color from "color"
-import { FC, useEffect, useMemo, useState } from "react"
+import { type FC, useEffect, useMemo, useState } from "react"
 import fontAtlas from "../../../assets/font-atlas.png"
-import { Rect } from "../../../entities/geometry/Rect"
+import type { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
-import { INoteLabelData, NoteLabelShader } from "./shaders/NoteLabelShader"
+import { type INoteLabelData, NoteLabelShader } from "./shaders/NoteLabelShader"
 
 export interface NoteLabelProps {
   rects: (Rect & INoteLabelData)[]
@@ -40,14 +40,14 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
   const theme = useTheme()
   const color = useMemo(
     () => colorToVec4(Color(theme.onSurfaceColor)),
-    [theme.onSurfaceColor],
+    [theme.onSurfaceColor]
   )
   const selectedColor = useMemo(
     () =>
       theme.isLightContent
         ? colorToVec4(Color(theme.backgroundColor))
         : colorToVec4(Color(theme.textColor)),
-    [theme.textColor, theme.backgroundColor, theme.isLightContent],
+    [theme.textColor, theme.backgroundColor, theme.isLightContent]
   )
 
   return (
@@ -81,7 +81,7 @@ async function createTexture(gl: WebGL2RenderingContext, src: string) {
   gl.texParameteri(
     gl.TEXTURE_2D,
     gl.TEXTURE_MIN_FILTER,
-    gl.LINEAR_MIPMAP_LINEAR,
+    gl.LINEAR_MIPMAP_LINEAR
   )
 
   return texture

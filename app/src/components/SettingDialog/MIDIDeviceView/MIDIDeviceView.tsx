@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
-import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
+import type { FC } from "react"
+import { type Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
 import { Alert } from "../../ui/Alert"

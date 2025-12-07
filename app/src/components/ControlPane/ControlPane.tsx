@@ -1,9 +1,9 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import React, { FC, useCallback, useRef } from "react"
+import React, { type FC, useCallback, useRef } from "react"
 import {
-  ControlMode,
+  type ControlMode,
   isEqualControlMode,
 } from "../../entities/control/ControlMode"
 import { useControlPane } from "../../hooks/useControlPane"

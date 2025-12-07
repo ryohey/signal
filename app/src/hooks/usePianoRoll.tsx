@@ -1,8 +1,8 @@
-import { TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import { type TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
 import { atom, useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { atomEffect } from "jotai-effect"
 import { useAtomCallback } from "jotai/utils"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
+import { atomEffect } from "jotai-effect"
 import { cloneDeep, isEqual } from "lodash"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import {
@@ -12,9 +12,9 @@ import {
   useEffect,
   useMemo,
 } from "react"
-import { Point } from "../entities/geometry/Point"
-import { KeySignature } from "../entities/scale/KeySignature"
-import { Selection } from "../entities/selection/Selection"
+import type { Point } from "../entities/geometry/Point"
+import type { KeySignature } from "../entities/scale/KeySignature"
+import type { Selection } from "../entities/selection/Selection"
 import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { addedSet, deletedSet } from "../helpers/set"
 import { BeatsProvider, createBeatsScope } from "./useBeats"
@@ -80,7 +80,7 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setSelectedTrackId(
       songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
-        UNASSIGNED_TRACK_ID,
+        UNASSIGNED_TRACK_ID
     )
   }, [setSelectedTrackId, songStore])
 
@@ -101,7 +101,7 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
           removePreviewingNoteNumbers(event.noteNumber)
         }
       }),
-    [midiInput, addPreviewingNoteNumbers, removePreviewingNoteNumbers],
+    [midiInput, addPreviewingNoteNumbers, removePreviewingNoteNumbers]
   )
 
   // sync MIDIMonitor channel with selected track
@@ -119,7 +119,7 @@ function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
   const { quantizerScope, tickScrollScope, beatsScope } = useContext(
-    PianoRollStoreContext,
+    PianoRollStoreContext
   )
   const { selectedTrackId } = usePianoRoll()
 
@@ -156,7 +156,7 @@ export function usePianoRoll() {
       const selectedTrackId = useAtomValue(selectedTrackIdAtom, { store })
       return useMobxSelector(
         () => songStore.song.getTrack(selectedTrackId),
-        [songStore, selectedTrackId],
+        [songStore, selectedTrackId]
       )
     },
     get selectedTrackId() {
@@ -166,7 +166,7 @@ export function usePianoRoll() {
       const selectedTrackId = useAtomValue(selectedTrackIdAtom, { store })
       return useMobxSelector(
         () => songStore.song.tracks.findIndex((t) => t.id === selectedTrackId),
-        [songStore, selectedTrackId],
+        [songStore, selectedTrackId]
       )
     },
     get selectedNoteIds() {
@@ -177,7 +177,7 @@ export function usePianoRoll() {
       const { transform: keyTransform } = useKeyScroll()
       return useMemo(
         () => new NoteCoordTransform(tickTransform, keyTransform),
-        [tickTransform, keyTransform],
+        [tickTransform, keyTransform]
       )
     },
     get ghostTrackIds() {
@@ -186,14 +186,14 @@ export function usePianoRoll() {
       const allTrackIds = useMobxSelector(
         () => songStore.song.tracks.map((track) => track.id),
         [songStore.song.tracks],
-        isEqual,
+        isEqual
       )
       return useMemo(
         () =>
           allTrackIds.filter(
-            (id) => !notGhostTrackIds.has(id) && id !== selectedTrackId,
+            (id) => !notGhostTrackIds.has(id) && id !== selectedTrackId
           ),
-        [allTrackIds, notGhostTrackIds, selectedTrackId],
+        [allTrackIds, notGhostTrackIds, selectedTrackId]
       )
     },
     get previewingNoteNumbers() {
@@ -223,7 +223,7 @@ export function usePianoRoll() {
           setScrollLeftInPixels((prev) => prev - dx)
           setScrollTopInPixels((prev) => prev - dy)
         },
-        [setScrollLeftInPixels, setScrollTopInPixels],
+        [setScrollLeftInPixels, setScrollTopInPixels]
       )
     },
     setNotGhostTrackIds: useSetAtom(notGhostTrackIdsAtom, { store }),
@@ -243,9 +243,9 @@ export function usePianoRoll() {
       useCallback(
         (_get, set, index: number) =>
           set(selectedTrackIdAtom, songStore.song.tracks[index]?.id),
-        [songStore.song.tracks],
+        [songStore.song.tracks]
       ),
-      { store },
+      { store }
     ),
     setSelectedNoteIds: useSetAtom(selectedNoteIdsAtom, { store }),
     // convert mouse position to the local coordinate on the canvas
@@ -257,7 +257,7 @@ export function usePianoRoll() {
           x: e.offsetX + scrollLeft,
           y: e.offsetY + scrollTop,
         }),
-        [scrollLeft, scrollTop],
+        [scrollLeft, scrollTop]
       )
     },
     getSelection: useSetAtom(getSelectionAtom, { store }),
@@ -267,9 +267,9 @@ export function usePianoRoll() {
           const selectedTrackId = get(selectedTrackIdAtom)
           return songStore.song.getTrack(selectedTrackId)
         },
-        [songStore],
+        [songStore]
       ),
-      { store },
+      { store }
     ),
     getSelectedNoteIds: useSetAtom(getSelectedNoteIdsAtom, { store }),
     setLastNoteDuration: useSetAtom(lastNoteDurationAtom, { store }),
@@ -313,17 +313,17 @@ const resetSelectionAtom = atom(null, (_get, set) => {
 const addPreviewingNoteNumbersAtom = atom(
   null,
   (_get, set, noteNumber: number) =>
-    set(previewingNoteNumbersAtom, addedSet(noteNumber)),
+    set(previewingNoteNumbersAtom, addedSet(noteNumber))
 )
 const removePreviewingNoteNumbersAtom = atom(
   null,
   (_get, set, noteNumber: number) =>
-    set(previewingNoteNumbersAtom, deletedSet(noteNumber)),
+    set(previewingNoteNumbersAtom, deletedSet(noteNumber))
 )
 const getSelectionAtom = atom(null, (get) => get(selectionAtom))
 const getSelectedNoteIdsAtom = atom(null, (get) => get(selectedNoteIdsAtom))
 const toggleToolAtom = atom(null, (get, set) =>
-  set(mouseModeAtom, (prev) => (prev === "pencil" ? "selection" : "pencil")),
+  set(mouseModeAtom, (prev) => (prev === "pencil" ? "selection" : "pencil"))
 )
 const serializeAtom = atom(null, (get) => ({
   selection: cloneDeep(get(selectionAtom)),
@@ -343,12 +343,12 @@ const restoreAtom = atom(
       selection: Selection | null
       selectedNoteIds: number[]
       selectedTrackId: TrackId
-    },
+    }
   ) => {
     set(selectionAtom, selection)
     set(selectedNoteIdsAtom, selectedNoteIds)
     set(selectedTrackIdAtom, selectedTrackId)
-  },
+  }
 )
 
 // effects

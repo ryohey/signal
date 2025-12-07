@@ -1,6 +1,6 @@
 import { Range } from "@signal-app/core"
 import { computed, makeObservable, observable, observe } from "mobx"
-import { Unsubscribe } from "../types"
+import type { Unsubscribe } from "../types"
 
 interface TrackEvent {
   tick: number
@@ -35,7 +35,7 @@ export class EventView<T extends TrackEvent> {
     this.unregisterReaction = observe(
       this,
       "windowedEvents",
-      this.notifyListeners,
+      this.notifyListeners
     )
   }
 
@@ -46,7 +46,7 @@ export class EventView<T extends TrackEvent> {
       if ("duration" in e && typeof e.duration === "number") {
         return Range.intersects(
           range,
-          Range.fromLength(e.tick, e.tick + e.duration),
+          Range.fromLength(e.tick, e.tick + e.duration)
         )
       }
       return Range.contains(range, e.tick)

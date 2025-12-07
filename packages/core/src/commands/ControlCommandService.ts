@@ -1,7 +1,7 @@
 import { min } from "lodash"
 import { transaction } from "mobx"
-import { ControlEventsClipboardData } from "../entities/clipboard/clipboardTypes"
-import { TrackId } from "../entities/track/Track"
+import type { ControlEventsClipboardData } from "../entities/clipboard/clipboardTypes"
+import type { TrackId } from "../entities/track/Track"
 import { isNotUndefined } from "../helpers"
 import type { ISongStore } from "./interfaces"
 
@@ -10,7 +10,7 @@ export class ControlCommandService {
 
   getClipboardDataForSelection = (
     trackId: TrackId,
-    eventIds: number[],
+    eventIds: number[]
   ): ControlEventsClipboardData | null => {
     const track = this.songStore.song.getTrack(trackId)
     if (!track) {
@@ -42,7 +42,7 @@ export class ControlCommandService {
   pasteClipboardDataAtPosition = (
     trackId: TrackId,
     data: ControlEventsClipboardData,
-    position: number,
+    position: number
   ) => {
     const track = this.songStore.song.getTrack(trackId)
     if (!track) {

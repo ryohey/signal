@@ -1,4 +1,4 @@
-import { TrackEvent, TrackId } from "@signal-app/core"
+import type { TrackEvent, TrackId } from "@signal-app/core"
 import { toJS } from "mobx"
 import {
   createContext,
@@ -15,7 +15,7 @@ import { useTickScroll } from "./useTickScroll"
 const EventViewContext = createContext<EventView<TrackEvent>>(null!)
 
 export function useSyncEventViewWithScroll<T extends { tick: number }>(
-  eventView: EventView<T>,
+  eventView: EventView<T>
 ) {
   const { canvasWidth, scrollLeft, transform: tickTransform } = useTickScroll()
   const startTick = tickTransform.getTick(scrollLeft)
@@ -31,7 +31,7 @@ export function useEventViewForTrack(trackId: TrackId) {
   const createEventView = useCallback(
     () =>
       new EventView(() => toJS(songStore.song.getTrack(trackId)?.events) ?? []),
-    [songStore, trackId],
+    [songStore, trackId]
   )
   return useDisposable(createEventView)
 }
@@ -55,7 +55,7 @@ export function EventViewProvider({
 }
 
 export function useEventView(
-  eventView: EventView<TrackEvent> = useContext(EventViewContext),
+  eventView: EventView<TrackEvent> = useContext(EventViewContext)
 ) {
   return useSyncExternalStore(eventView.subscribe, eventView.getEvents)
 }

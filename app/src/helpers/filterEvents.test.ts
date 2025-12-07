@@ -15,7 +15,7 @@ describe("filterEvents", () => {
   describe("isEventInRange", () => {
     it("should contain the event placed at the start tick but the end tick", () => {
       expect(events.filter(isEventInRange(Range.create(10, 50)))).toStrictEqual(
-        [{ tick: 10 }, { tick: 20 }],
+        [{ tick: 10 }, { tick: 20 }]
       )
     })
   })
@@ -23,7 +23,7 @@ describe("filterEvents", () => {
   describe("isEventOverlapRange", () => {
     it("should contain events with duration", () => {
       expect(
-        events.filter(isEventOverlapRange(Range.create(10, 50))),
+        events.filter(isEventOverlapRange(Range.create(10, 50)))
       ).toStrictEqual([
         { tick: 5, duration: 6 },
         { tick: 5, duration: 100 },

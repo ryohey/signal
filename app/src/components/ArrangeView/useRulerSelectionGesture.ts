@@ -1,6 +1,6 @@
-import { ArrangeSelection, Range } from "@signal-app/core"
-import { MouseEvent, useCallback } from "react"
-import { MouseGesture } from "../../gesture/MouseGesture"
+import { ArrangeSelection, type Range } from "@signal-app/core"
+import { type MouseEvent, useCallback } from "react"
+import type { MouseGesture } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useQuantizer } from "../../hooks/useQuantizer"
@@ -25,9 +25,9 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           trackIndex: tracks.length,
         },
         { quantizeFloor, quantizeCeil },
-        tracks.length,
+        tracks.length
       ),
-    [quantizeFloor, quantizeCeil, tracks.length],
+    [quantizeFloor, quantizeCeil, tracks.length]
   )
 
   let selection: ArrangeSelection | null = null
@@ -62,7 +62,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
       selectionFromTickRange,
       tracks,
       resetSelection,
-    ],
+    ]
   )
 
   return {

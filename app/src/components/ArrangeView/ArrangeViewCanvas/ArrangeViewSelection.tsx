@@ -1,6 +1,6 @@
 import { HitArea } from "@ryohey/webgl-react"
 import { useCallback, useMemo } from "react"
-import { Rect } from "../../../entities/geometry/Rect"
+import type { Rect } from "../../../entities/geometry/Rect"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { useArrangeView } from "../../../hooks/useArrangeView"
 import { useTickScroll } from "../../../hooks/useTickScroll"
@@ -37,7 +37,7 @@ export const ArrangeViewSelection = ({ zIndex }: { zIndex: number }) => {
       const startClientPos = getClientPos(e)
       moveSelectionGesture.onMouseDown(e, startClientPos, selectionRect)
     },
-    [moveSelectionGesture, selectionRect],
+    [moveSelectionGesture, selectionRect]
   )
 
   if (selectionRect === null) {

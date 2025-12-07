@@ -1,5 +1,5 @@
-import { NoteOffEvent, NoteOnEvent } from "midifile-ts"
-import { NoteEvent, TickProvider } from "../entities/track"
+import type { NoteOffEvent, NoteOnEvent } from "midifile-ts"
+import type { NoteEvent, TickProvider } from "../entities/track"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
 /**
@@ -8,7 +8,7 @@ import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
  */
 export function assemble<T extends object>(
-  events: (T | TickNoteOffEvent | TickNoteOnEvent)[],
+  events: (T | TickNoteOffEvent | TickNoteOnEvent)[]
 ): (T | NoteEvent)[] {
   const noteOnEvents: TickNoteOnEvent[] = []
 
@@ -64,7 +64,7 @@ export type TickNoteOffEvent = Omit<NoteOffEvent, "channel" | "deltaTime"> &
 
 // separate note to noteOn + noteOff
 export function deassemble<T extends object>(
-  e: T | NoteEvent,
+  e: T | NoteEvent
 ): (T | TickNoteOnEvent | TickNoteOffEvent)[] {
   if ("subtype" in e && e.subtype === "note") {
     const channel = (e as any)["channel"] ?? -1

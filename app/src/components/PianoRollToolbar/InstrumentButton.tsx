@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTrack } from "../../hooks/useTrack"

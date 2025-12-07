@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import Add from "mdi-react/AddIcon"
-import { FC } from "react"
+import type { FC } from "react"
 import { useAddTrack } from "../../actions"
 import { Localized } from "../../localize/useLocalization"
 

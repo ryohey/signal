@@ -1,10 +1,10 @@
-import { ControllerEvent } from "midifile-ts"
+import type { ControllerEvent } from "midifile-ts"
 
 export function controllerMidiEvent(
   deltaTime: number,
   channel: number,
   controllerType: number,
-  value: number,
+  value: number
 ): ControllerEvent {
   return {
     deltaTime,

@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 
 const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({

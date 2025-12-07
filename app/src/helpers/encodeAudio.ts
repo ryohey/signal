@@ -6,7 +6,7 @@ export const encodeMp3 = async (audioBuffer: AudioBuffer) => {
   const mp3Encoder = new Mp3Encoder(
     audioBuffer.numberOfChannels,
     audioBuffer.sampleRate,
-    128,
+    128
   )
   const mp3Data: Uint8Array[] = []
 
@@ -21,7 +21,7 @@ export const encodeMp3 = async (audioBuffer: AudioBuffer) => {
   // Find the maximum amplitude to prevent clipping
   const maxAmplitude = Math.max(
     max(left.map((v) => Math.abs(v))) ?? 0,
-    max(right.map((v) => Math.abs(v))) ?? 0,
+    max(right.map((v) => Math.abs(v))) ?? 0
   )
 
   //Convert to required format
@@ -65,7 +65,7 @@ function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
 }
 
 export const encodeWAV = async (
-  audioBuffer: AudioBuffer,
+  audioBuffer: AudioBuffer
 ): Promise<Uint8Array> => {
   const arrayBuffer = await encode({
     sampleRate: audioBuffer.sampleRate,

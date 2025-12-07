@@ -1,12 +1,12 @@
 import {
-  InstancedBuffer,
+  type InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformMat4,
   uniformVec4,
-  VertexArray,
+  type VertexArray,
 } from "@ryohey/webgl-react"
-import { Rect } from "../../../entities/geometry/Rect"
+import type { Rect } from "../../../entities/geometry/Rect"
 
 export interface IVelocityData {
   isSelected: boolean
@@ -21,11 +21,11 @@ class VelocityBuffer
   private stateBuffer = new Float32Array(0)
 
   constructor(
-    readonly vertexArray: VertexArray<"position" | "bounds" | "state">,
+    readonly vertexArray: VertexArray<"position" | "bounds" | "state">
   ) {
     this.vertexArray.updateBuffer(
       "position",
-      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 })),
+      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 }))
     )
   }
 
@@ -51,11 +51,11 @@ class VelocityBuffer
 
     this.vertexArray.updateBuffer(
       "bounds",
-      this.boundsBuffer.subarray(0, rects.length * 4),
+      this.boundsBuffer.subarray(0, rects.length * 4)
     )
     this.vertexArray.updateBuffer(
       "state",
-      this.stateBuffer.subarray(0, rects.length * 2),
+      this.stateBuffer.subarray(0, rects.length * 2)
     )
 
     this._instanceCount = rects.length
@@ -139,5 +139,5 @@ export const VelocityShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
-    (vertexArray) => new VelocityBuffer(vertexArray),
+    (vertexArray) => new VelocityBuffer(vertexArray)
   )

@@ -1,8 +1,8 @@
 import { useCreateEvent, useUpdateValueEvents } from "../../../../actions"
 import { ValueEventType } from "../../../../entities/event/ValueEventType"
 import { Point } from "../../../../entities/geometry/Point"
-import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
@@ -10,7 +10,7 @@ import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const usePencilGesture = (
-  type: ValueEventType,
+  type: ValueEventType
 ): MouseGesture<[Point, ControlCoordTransform]> => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
@@ -45,7 +45,7 @@ export const usePencilGesture = (
           const local = Point.add(startPoint, deltaPx)
           const value = Math.max(
             0,
-            Math.min(transform.maxValue, transform.fromPosition(local).value),
+            Math.min(transform.maxValue, transform.fromPosition(local).value)
           )
           const tick = transform.getTick(local.x)
 

@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { FC, ReactNode, useCallback, useEffect } from "react"
-import { Point } from "../../entities/geometry/Point"
+import { type FC, type ReactNode, useCallback, useEffect } from "react"
+import type { Point } from "../../entities/geometry/Point"
 import { Positioned } from "../ui/Positioned"
 
 export const ContextMenuHotKey = styled.div`
@@ -52,7 +52,7 @@ export const ContextMenu: FC<ContextMenuProps> = ({
 }) => {
   const onClickContent = useCallback(
     (e: React.MouseEvent) => e.stopPropagation(),
-    [],
+    []
   )
 
   // Menu cannot handle keydown while disabling focus, so we deal with global keydown event

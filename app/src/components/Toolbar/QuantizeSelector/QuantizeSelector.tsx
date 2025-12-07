@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import MusicNote from "mdi-react/MusicNoteIcon"
-import React, { FC, useCallback } from "react"
+import React, { type FC, useCallback } from "react"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { Localized } from "../../../localize/useLocalization"
 import { Tooltip } from "../../ui/Tooltip"
@@ -107,7 +107,7 @@ const QuantizeSelectorContent = React.memo(
                 const delta = e.deltaY < 0 ? 1 : -1
                 const index = Math.min(
                   list.length - 1,
-                  Math.max(0, currentIndex + delta),
+                  Math.max(0, currentIndex + delta)
                 )
                 onSelect(calcQuantize(list[index], dot, triplet))
               }}
@@ -122,7 +122,7 @@ const QuantizeSelectorContent = React.memo(
         />
       </Container>
     )
-  },
+  }
 )
 
 export const QuantizeSelector: FC = () => {

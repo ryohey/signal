@@ -1,13 +1,13 @@
 import styled from "@emotion/styled"
-import { TrackEvent } from "@signal-app/core"
-import { FC } from "react"
-import { TickTransform } from "../../entities/transform/TickTransform"
-import { ControlMark, DisplayEvent } from "./ControlMark"
+import type { TrackEvent } from "@signal-app/core"
+import type { FC } from "react"
+import type { TickTransform } from "../../entities/transform/TickTransform"
+import { ControlMark, type DisplayEvent } from "./ControlMark"
 
 /// 重なって表示されないようにひとつのイベントとしてまとめる
 function groupControlEvents(
   events: DisplayEvent[],
-  tickWindow: number,
+  tickWindow: number
 ): DisplayEvent[][] {
   const groups: DisplayEvent[][] = []
   let group: DisplayEvent[] = []
@@ -83,7 +83,7 @@ const PianoControlEvents: FC<PianoControlEventsProps> = ({
 }) => {
   const eventGroups = groupControlEvents(
     events.filter(isDisplayControlEvent),
-    120,
+    120
   )
 
   return (

@@ -1,11 +1,11 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { TrackId } from "@signal-app/core"
+import type { TrackId } from "@signal-app/core"
 import { clamp } from "lodash"
-import { FC, useCallback, useEffect, useRef } from "react"
-import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
+import { type FC, useCallback, useEffect, useRef } from "react"
 import { useSelectTrack } from "../../actions"
+import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
@@ -13,13 +13,13 @@ import { useRouter } from "../../hooks/useRouter"
 import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { useTrackScroll } from "../../hooks/useTrackScroll"
-import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
-import { TrackName } from "../TrackList/TrackName"
 import {
   HorizontalScaleScrollBar,
   VerticalScaleScrollBar,
 } from "../inputs/ScaleScrollBar"
 import { BAR_WIDTH } from "../inputs/ScrollBar"
+import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
+import { TrackName } from "../TrackList/TrackName"
 import { ArrangeContextMenu } from "./ArrangeContextMenu"
 import { ArrangeTrackContextMenu } from "./ArrangeTrackContextMenu"
 import { ArrangeViewCanvas } from "./ArrangeViewCanvas/ArrangeViewCanvas"
@@ -108,7 +108,7 @@ export const ArrangeView: FC = () => {
       setScrollLeftInPixels(v)
       setAutoScroll(false)
     },
-    [setScrollLeftInPixels, setAutoScroll],
+    [setScrollLeftInPixels, setAutoScroll]
   )
 
   const containerWidth = size.width
@@ -125,24 +125,24 @@ export const ArrangeView: FC = () => {
 
   const onClickScaleUpHorizontal = useCallback(
     () => scaleAroundPointX(0.2, 0),
-    [scaleAroundPointX],
+    [scaleAroundPointX]
   )
   const onClickScaleDownHorizontal = useCallback(
     () => scaleAroundPointX(-0.2, 0),
-    [scaleAroundPointX],
+    [scaleAroundPointX]
   )
   const onClickScaleResetHorizontal = useCallback(
     () => setScaleX(1),
-    [setScaleX],
+    [setScaleX]
   )
 
   const onClickScaleUpVertical = useCallback(
     () => setScaleY(scaleY * (1 + 0.2)),
-    [setScaleY, scaleY],
+    [setScaleY, scaleY]
   )
   const onClickScaleDownVertical = useCallback(
     () => setScaleY(scaleY * (1 - 0.2)),
-    [setScaleY, scaleY],
+    [setScaleY, scaleY]
   )
   const onClickScaleResetVertical = useCallback(() => setScaleY(1), [setScaleY])
 
@@ -172,7 +172,7 @@ export const ArrangeView: FC = () => {
         scrollBy(-e.deltaX, -deltaY)
       }
     },
-    [setScaleY, scaleY, scaleAroundPointX, scrollBy, transform.pixelsPerKey],
+    [setScaleY, scaleY, scaleAroundPointX, scrollBy, transform.pixelsPerKey]
   )
 
   const openTrack = (trackId: TrackId) => {

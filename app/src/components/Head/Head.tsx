@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Helmet } from "react-helmet-async"
 import { useSong } from "../../hooks/useSong"
 

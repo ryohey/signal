@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { BatchUpdateOperation } from "@signal-app/core"
-import { FC, useCallback, useEffect, useState } from "react"
+import type { BatchUpdateOperation } from "@signal-app/core"
+import { type FC, useCallback, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -28,7 +28,7 @@ export interface VelocityDialogProps {
   value: number
   onClickOK: (
     value: number,
-    operationType: BatchUpdateOperation["type"],
+    operationType: BatchUpdateOperation["type"]
   ) => void
   onClose: () => void
 }

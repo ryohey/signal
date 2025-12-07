@@ -1,14 +1,14 @@
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
-  AnyEvent,
-  EndOfTrackEvent,
-  MidiFile,
+  type AnyEvent,
+  type EndOfTrackEvent,
+  type MidiFile,
   read,
-  StreamSource,
+  type StreamSource,
   write as writeMidiFile,
 } from "midifile-ts"
-import { AnyEventFeature, Song, Track } from "../entities"
+import { type AnyEventFeature, Song, Track } from "../entities"
 import { isNotNull } from "../helpers/array"
 import { addDeltaTime, toRawEvents } from "./toRawEvents"
 import {
@@ -69,7 +69,7 @@ const isConductorEvent = (e: AnyEventFeature) =>
   "subtype" in e && (e.subtype === "timeSignature" || e.subtype === "setTempo")
 
 export const createConductorTrackIfNeeded = (
-  tracks: AnyEvent[][],
+  tracks: AnyEvent[][]
 ): AnyEvent[][] => {
   // Find conductor track
   const [conductorTracks, normalTracks] = partition(tracks, isConductorTrack)
@@ -94,7 +94,7 @@ export const createConductorTrackIfNeeded = (
         }
         return e
       })
-      .filter(isNotNull),
+      .filter(isNotNull)
   )
 
   return [conductorTrack, ...newTracks].map(addDeltaTime)

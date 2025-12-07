@@ -32,7 +32,7 @@ describe("OrderedArray", () => {
     const descendingArray = new OrderedArray(
       [...items],
       (item) => item.rowIndex,
-      true,
+      true
     )
     const sorted = descendingArray.getArray()
     expect(sorted[0].rowIndex).toBe(30)
@@ -55,7 +55,7 @@ describe("OrderedArray", () => {
     const descendingArray = new OrderedArray(
       [...items],
       (item) => item.rowIndex,
-      true,
+      true
     )
 
     descendingArray.add({ id: 4, rowIndex: 15, name: "Dave" })
@@ -110,7 +110,7 @@ describe("OrderedArray", () => {
     const descendingArray = new OrderedArray(
       [...items],
       (item) => item.rowIndex,
-      true,
+      true
     )
 
     // Update Bob's rowIndex to 5
@@ -260,7 +260,7 @@ describe("OrderedArray", () => {
 
     const stringKeyArray = new OrderedArray<StringKeyItem, string>(
       stringItems,
-      (item) => item.category,
+      (item) => item.category
     )
 
     const sorted = stringKeyArray.getArray()

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 import { LocalizationContext } from "../localize/useLocalization.js"
 
 export const LocalizationProvider: FC<PropsWithChildren<{}>> = observer(
@@ -13,5 +13,5 @@ export const LocalizationProvider: FC<PropsWithChildren<{}>> = observer(
         {children}
       </LocalizationContext.Provider>
     )
-  },
+  }
 )

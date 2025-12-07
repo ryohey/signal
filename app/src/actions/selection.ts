@@ -1,9 +1,9 @@
 import {
-  NoteEvent,
-  PianoNotesClipboardData,
-  PianoNotesClipboardDataSchema,
-  TrackEvent,
   isNoteEvent,
+  type NoteEvent,
+  type PianoNotesClipboardData,
+  PianoNotesClipboardDataSchema,
+  type TrackEvent,
 } from "@signal-app/core"
 import { min } from "lodash"
 import { useCallback } from "react"
@@ -25,7 +25,7 @@ import {
 
 export function eventsInSelection(
   events: readonly TrackEvent[],
-  selection: Selection,
+  selection: Selection
 ) {
   const selectionRect = {
     x: selection.fromTick,
@@ -41,8 +41,8 @@ export function eventsInSelection(
         y: b.noteNumber - 1, // Subtract 1 since the pitch is the lower end of the rectangle
         height: 1,
       },
-      selectionRect,
-    ),
+      selectionRect
+    )
   )
 }
 
@@ -64,7 +64,7 @@ export const useTransposeSelection = () => {
       commands.track.transposeNotes(
         selectedTrackId,
         selectedNoteIds,
-        deltaPitch,
+        deltaPitch
       )
     },
     [
@@ -74,7 +74,7 @@ export const useTransposeSelection = () => {
       commands,
       selectedTrackId,
       selectedNoteIds,
-    ],
+    ]
   )
 }
 
@@ -191,7 +191,7 @@ export const usePasteSelection = () => {
       }))
       addEvents(notes)
     },
-    [addEvents, position, pushHistory],
+    [addEvents, position, pushHistory]
   )
 }
 
@@ -251,7 +251,7 @@ export const useSelectNote = () => {
       setSelectedEventIds([])
       setSelectedNoteIds([noteId])
     },
-    [setSelectedEventIds, setSelectedNoteIds],
+    [setSelectedEventIds, setSelectedNoteIds]
   )
 }
 
@@ -280,7 +280,7 @@ const useSelectNeighborNote = () => {
       const selectedNotes = sortedNotes(
         selectedNoteIds
           .map((id) => allNotes.find((n) => n.id === id))
-          .filter(isNotUndefined),
+          .filter(isNotUndefined)
       )
       if (selectedNotes.length === 0) {
         return
@@ -296,7 +296,7 @@ const useSelectNeighborNote = () => {
       selectNote(nextNote.id)
       previewNoteOn(nextNote.noteNumber, nextNote.duration)
     },
-    [selectedNoteIds, getEvents, selectNote, previewNoteOn],
+    [selectedNoteIds, getEvents, selectNote, previewNoteOn]
   )
 }
 
@@ -324,7 +324,7 @@ export const useQuantizeSelectedNotes = () => {
     commands.track.quantizeNotes(
       selectedTrackId,
       selectedNoteIds,
-      forceQuantizeRound,
+      forceQuantizeRound
     )
   }, [
     selectedNoteIds,
@@ -344,7 +344,7 @@ export const useSelectAllNotes = () => {
     setSelectedNoteIds(
       getEvents()
         .filter(isNoteEvent)
-        .map((note) => note.id),
+        .map((note) => note.id)
     )
     setSelectedEventIds([])
   }, [getEvents, setSelectedNoteIds, setSelectedEventIds])

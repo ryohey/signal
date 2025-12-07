@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, PropsWithChildren, ReactNode } from "react"
+import type { FC, PropsWithChildren, ReactNode } from "react"
 
 export interface SelectBoxProps<T> {
   items: { label: ReactNode; value: T }[]

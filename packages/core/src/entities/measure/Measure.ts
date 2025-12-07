@@ -1,5 +1,5 @@
-import { Beat } from "../beat/Beat"
-import { Range } from "../geometry/Range"
+import type { Beat } from "../beat/Beat"
+import type { Range } from "../geometry/Range"
 
 interface TimeSignature {
   readonly tick: number
@@ -22,7 +22,7 @@ export namespace Measure {
   const calculateMBT = (
     measure: Measure,
     tick: number,
-    ticksPerBeatBase: number,
+    ticksPerBeatBase: number
   ) => {
     const ticksPerBeat = (ticksPerBeatBase * 4) / measure.denominator
     const ticksPerMeasure = ticksPerBeat * measure.numerator
@@ -44,7 +44,7 @@ export namespace Measure {
 
   export function fromTimeSignatures(
     events: TimeSignature[],
-    timebase: number,
+    timebase: number
   ): Measure[] {
     if (events.length === 0) {
       return [defaultValue]
@@ -56,7 +56,7 @@ export namespace Measure {
           const lastEvent = events[i - 1]
           const ticksPerBeat = (timebase * 4) / lastEvent.denominator
           const measureDelta = Math.floor(
-            (e.tick - lastEvent.tick) / ticksPerBeat / lastEvent.numerator,
+            (e.tick - lastEvent.tick) / ticksPerBeat / lastEvent.numerator
           )
           measure = lastMeasure + measureDelta
           lastMeasure = measure
@@ -75,7 +75,7 @@ export namespace Measure {
     measures: Measure[],
     tick: number,
     ticksPerBeat: number,
-    formatter = defaultMBTFormatter,
+    formatter = defaultMBTFormatter
   ): string => formatter(getMBT(measures, tick, ticksPerBeat))
 
   // Find the measure in the range. The first element also includes those before startTick
@@ -117,19 +117,19 @@ export namespace Measure {
   const getMBT = (
     measures: Measure[],
     tick: number,
-    ticksPerBeat: number,
+    ticksPerBeat: number
   ): Beat => {
     return calculateMBT(
       getLastSorted(measures, tick) ?? defaultValue,
       tick,
-      ticksPerBeat,
+      ticksPerBeat
     )
   }
 
   export function getMeasureStart(
     measures: Measure[],
     tick: number,
-    timebase: number,
+    timebase: number
   ) {
     const e = getLastSorted(measures, tick) ?? defaultValue
 
@@ -161,7 +161,7 @@ export namespace Measure {
   export function getPreviousMeasureTick(
     measures: Measure[],
     position: number,
-    timebase: number,
+    timebase: number
   ): number {
     const measureStart = getMeasureStart(measures, position, timebase)
 
@@ -176,7 +176,7 @@ export namespace Measure {
   export function getNextMeasureTick(
     measures: Measure[],
     position: number,
-    timebase: number,
+    timebase: number
   ): number {
     const measureStart = getMeasureStart(measures, position, timebase)
     return measureStart.tick + measureStart.duration
@@ -191,13 +191,13 @@ const pad = (v: number, digit: number) => {
 function defaultMBTFormatter(mbt: Beat): string {
   return `${pad(mbt.measure + 1, 4)}:${pad(mbt.beat + 1, 2)}:${pad(
     mbt.tick,
-    3,
+    3
   )}`
 }
 
 function getLastSorted<T extends { tick: number }>(
   events: T[],
-  tick: number,
+  tick: number
 ): T | null {
   let lastMeasure: T | null = null
   for (const m of events) {

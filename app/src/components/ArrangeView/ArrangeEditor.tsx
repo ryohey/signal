@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { ArrangeViewScope } from "../../hooks/useArrangeView"
 import { useArrangeViewKeyboardShortcut } from "../../hooks/useArrangeViewKeyboardShortcut"
 import { useAutoFocus } from "../../hooks/useAutoFocus"

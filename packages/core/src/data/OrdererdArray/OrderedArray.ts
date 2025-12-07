@@ -15,7 +15,7 @@ export class OrderedArray<
     readonly array: T[],
     private readonly keyExtractor: (item: T) => K,
     private readonly descending: boolean = false,
-    private readonly generateId: () => number = () => Math.random() * 1000000,
+    private readonly generateId: () => number = () => Math.random() * 1000000
   ) {
     this.lookupMap = new Map(array.map((item) => [item.id, item]))
     this.sort()

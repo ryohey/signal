@@ -1,30 +1,30 @@
 import {
-  Bytes,
-  Firestore,
-  FirestoreDataConverter,
-  Timestamp,
+  type Bytes,
   collection,
   doc,
+  type Firestore,
+  type FirestoreDataConverter,
   getDoc,
+  type Timestamp,
 } from "firebase/firestore"
-import { Functions, httpsCallable } from "firebase/functions"
-import { ICloudMidiRepository } from "./ICloudMidiRepository.js"
+import { type Functions, httpsCallable } from "firebase/functions"
+import type { ICloudMidiRepository } from "./ICloudMidiRepository.js"
 
 export const createCloudMidiRepository = (
   firestore: Firestore,
-  functions: Functions,
+  functions: Functions
 ): ICloudMidiRepository => new CloudMidiRepository(firestore, functions)
 
 class CloudMidiRepository implements ICloudMidiRepository {
   constructor(
     private readonly firestore: Firestore,
-    private readonly functions: Functions,
+    private readonly functions: Functions
   ) {}
 
   async get(id: string): Promise<Uint8Array> {
     const midiCollection = collection(this.firestore, "midis")
     const snapshot = await getDoc(
-      doc(midiCollection, id).withConverter(midiConverter),
+      doc(midiCollection, id).withConverter(midiConverter)
     )
     const data = snapshot.data()?.data
     if (data === undefined) {

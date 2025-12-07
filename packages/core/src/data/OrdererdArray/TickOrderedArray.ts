@@ -11,7 +11,7 @@ export class TickOrderedArray<
       array,
       (item) => item.tick,
       descending,
-      () => this.lastEventId++,
+      () => this.lastEventId++
     )
   }
 }

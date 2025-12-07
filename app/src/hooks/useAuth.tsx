@@ -1,4 +1,4 @@
-import { AuthUser, IUserRepository, User } from "@signal-app/api"
+import type { AuthUser, IUserRepository, User } from "@signal-app/api"
 import { makeObservable, observable } from "mobx"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { auth } from "../firebase/firebase"

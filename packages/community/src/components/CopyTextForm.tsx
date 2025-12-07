@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { useToast } from "dialog-hooks"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { Localized, useLocalization } from "../localize/useLocalization.js"
 import { PrimaryButton } from "./Button.js"
 

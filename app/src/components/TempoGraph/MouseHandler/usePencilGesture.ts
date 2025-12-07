@@ -5,8 +5,8 @@ import {
 } from "@signal-app/core"
 import { useUpdateEventsInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
-import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
-import { MouseGesture } from "../../../gesture/MouseGesture"
+import type { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
+import type { MouseGesture } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
@@ -22,7 +22,7 @@ export const usePencilGesture = (): MouseGesture<
   const updateEventsInRange = useUpdateEventsInRange(
     conductorTrackId,
     isSetTempoEvent,
-    (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v)),
+    (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v))
   )
 
   return {
@@ -49,7 +49,7 @@ export const usePencilGesture = (): MouseGesture<
           const local = Point.add(startPoint, deltaPx)
           const value = Math.max(
             0,
-            Math.min(transform.maxBPM, transform.fromPosition(local).bpm),
+            Math.min(transform.maxBPM, transform.fromPosition(local).bpm)
           )
           const tick = transform.getTick(local.x)
 

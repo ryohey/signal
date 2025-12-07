@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { Scale } from "../../entities/scale/Scale"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"

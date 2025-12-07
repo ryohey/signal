@@ -1,7 +1,7 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
-import React, { FC, useCallback, useMemo } from "react"
+import React, { type FC, useCallback, useMemo } from "react"
 import { useNoteColor } from "../../../hooks/useNoteColor"
-import { PianoNoteItem, useNotes } from "../../../hooks/useNotes"
+import { type PianoNoteItem, useNotes } from "../../../hooks/useNotes"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useSettings } from "../../../hooks/useSettings"
 import { useTrack } from "../../../hooks/useTrack"
@@ -128,7 +128,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
       dragNoteRightGesture,
       removeNoteFromSelectionGesture,
       addNoteToSelectionGesture,
-    ],
+    ]
   )
 
   const onMouseMove = useCallback(
@@ -139,7 +139,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
         removeEvent(item.id)
       }
     },
-    [removeEvent],
+    [removeEvent]
   )
 
   return (
@@ -169,7 +169,7 @@ const NoteHitArea = React.memo(
     onMouseDown: (
       e: MouseEvent,
       item: PianoNoteItem,
-      position: MousePositionType,
+      position: MousePositionType
     ) => void
     onMouseMove?: (e: MouseEvent, item: PianoNoteItem) => void
   }) => {
@@ -181,7 +181,7 @@ const NoteHitArea = React.memo(
         width: edgeSize,
         height: note.height,
       }),
-      [note.x, note.y, note.height, edgeSize],
+      [note.x, note.y, note.height, edgeSize]
     )
     const rightEdgeBounds = useMemo(
       () => ({
@@ -190,7 +190,7 @@ const NoteHitArea = React.memo(
         width: edgeSize,
         height: note.height,
       }),
-      [note.x, note.y, note.width, note.height, edgeSize],
+      [note.x, note.y, note.width, note.height, edgeSize]
     )
     const centerBounds = useMemo(
       () => ({
@@ -199,25 +199,25 @@ const NoteHitArea = React.memo(
         width: note.width - edgeSize * 2,
         height: note.height,
       }),
-      [note.x, note.y, note.width, note.height, edgeSize],
+      [note.x, note.y, note.width, note.height, edgeSize]
     )
     const onMouseDownLeft = useCallback(
       (e: MouseEvent) => onMouseDown(e, note, "left"),
-      [onMouseDown, note],
+      [onMouseDown, note]
     )
     const onMouseDownCenter = useCallback(
       (e: MouseEvent) => onMouseDown(e, note, "center"),
-      [onMouseDown, note],
+      [onMouseDown, note]
     )
     const onMouseDownRight = useCallback(
       (e: MouseEvent) => onMouseDown(e, note, "right"),
-      [onMouseDown, note],
+      [onMouseDown, note]
     )
     const onMouseMoveAll = useCallback(
       (e: MouseEvent) => {
         onMouseMove?.(e, note)
       },
-      [onMouseMove, note],
+      [onMouseMove, note]
     )
     return (
       <>
@@ -250,7 +250,7 @@ const NoteHitArea = React.memo(
         />
       </>
     )
-  },
+  }
 )
 
 type MousePositionType = "left" | "center" | "right"

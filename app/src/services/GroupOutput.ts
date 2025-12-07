@@ -1,5 +1,5 @@
-import { TrackId } from "@signal-app/core"
-import { SendableEvent, SynthOutput } from "@signal-app/player"
+import type { TrackId } from "@signal-app/core"
+import type { SendableEvent, SynthOutput } from "@signal-app/player"
 import { makeObservable, observable } from "mobx"
 import { METRONOME_TRACK_ID } from "../player/EventSource"
 import { TrackMute } from "../trackMute/TrackMute"
@@ -42,10 +42,10 @@ export class GroupOutput implements SynthOutput {
     event: SendableEvent,
     delayTime: number,
     timestampNow: number,
-    trackId?: TrackId,
+    trackId?: TrackId
   ): void {
     this.getOutputs(trackId).forEach((synth) =>
-      synth.sendEvent(event, delayTime, timestampNow, trackId),
+      synth.sendEvent(event, delayTime, timestampNow, trackId)
     )
   }
 }

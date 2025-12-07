@@ -1,4 +1,10 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react"
 
 type KeyType = string | number | symbol | boolean
 
@@ -45,7 +51,7 @@ export const useDialog = () => {
 
   return {
     async show<Keys extends KeyType>(
-      options: DialogOptions<Keys>,
+      options: DialogOptions<Keys>
     ): Promise<Keys> {
       return new Promise((resolve, _reject) => {
         setDialog({

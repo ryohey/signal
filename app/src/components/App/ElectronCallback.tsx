@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from "react"
-import { ElectronAPI } from "../../../../electron/src/ElectronAPI"
-import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
+import { type FC, useEffect, useState } from "react"
+import type { ElectronAPI } from "../../../../electron/src/ElectronAPI"
+import type { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 
 declare global {
   interface Window {
@@ -72,7 +72,7 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
   useEffect(() => window.electronAPI.onNewFile(onNewFile), [onNewFile])
   useEffect(
     () => window.electronAPI.onClickOpenFile(onClickOpenFile),
-    [onClickOpenFile],
+    [onClickOpenFile]
   )
   useEffect(() => window.electronAPI.onOpenFile(onOpenFile), [onOpenFile])
   useEffect(() => window.electronAPI.onSaveFile(onSaveFile), [onSaveFile])
@@ -91,31 +91,31 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
   useEffect(() => window.electronAPI.onSelectAll(onSelectAll), [onSelectAll])
   useEffect(
     () => window.electronAPI.onSelectNextNote(onSelectNextNote),
-    [onSelectNextNote],
+    [onSelectNextNote]
   )
   useEffect(
     () => window.electronAPI.onSelectPreviousNote(onSelectPreviousNote),
-    [onSelectPreviousNote],
+    [onSelectPreviousNote]
   )
   useEffect(
     () => window.electronAPI.onTransposeUpOctave(onTransposeUpOctave),
-    [onTransposeUpOctave],
+    [onTransposeUpOctave]
   )
   useEffect(
     () => window.electronAPI.onTransposeDownOctave(onTransposeDownOctave),
-    [onTransposeDownOctave],
+    [onTransposeDownOctave]
   )
   useEffect(() => window.electronAPI.onTranspose(onTranspose), [onTranspose])
   useEffect(() => window.electronAPI.onQuantize(onQuantize), [onQuantize])
   useEffect(() => window.electronAPI.onVelocity(onVelocity), [onVelocity])
   useEffect(
     () => window.electronAPI.onOpenSetting(onOpenSetting),
-    [onOpenSetting],
+    [onOpenSetting]
   )
   useEffect(() => window.electronAPI.onOpenHelp(onOpenHelp), [onOpenHelp])
   useEffect(
     () => window.electronAPI.onBrowserSignInCompleted(onBrowserSignInCompleted),
-    [onBrowserSignInCompleted],
+    [onBrowserSignInCompleted]
   )
 
   useEffect(() => {

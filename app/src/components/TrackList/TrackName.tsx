@@ -1,5 +1,5 @@
-import { TrackId } from "@signal-app/core"
-import { FC } from "react"
+import type { TrackId } from "@signal-app/core"
+import type { FC } from "react"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
 

@@ -1,4 +1,4 @@
-import { BatchUpdateOperation } from "@signal-app/core"
+import type { BatchUpdateOperation } from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeBatchUpdateSelectedNotesVelocity } from "../../actions"
 import { useArrangeView } from "../../hooks/useArrangeView"
@@ -13,7 +13,7 @@ export const ArrangeVelocityDialog = () => {
 
   const onClose = useCallback(
     () => setOpenVelocityDialog(false),
-    [setOpenVelocityDialog],
+    [setOpenVelocityDialog]
   )
 
   const onClickOK = useCallback(
@@ -24,7 +24,7 @@ export const ArrangeVelocityDialog = () => {
       })
       setOpenVelocityDialog(false)
     },
-    [setOpenVelocityDialog, arrangeBatchUpdateSelectedNotesVelocity],
+    [setOpenVelocityDialog, arrangeBatchUpdateSelectedNotesVelocity]
   )
 
   return (

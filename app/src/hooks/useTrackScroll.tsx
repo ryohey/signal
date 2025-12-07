@@ -1,10 +1,10 @@
-import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
+import { atom, type SetStateAction, useAtomValue, useSetAtom } from "jotai"
+import type { Store } from "jotai/vanilla/store"
 import { createScope } from "jotai-scope"
-import { Store } from "jotai/vanilla/store"
 import { clamp } from "lodash"
 import { createContext, useContext, useEffect } from "react"
-import { BAR_WIDTH } from "../components/inputs/ScrollBar"
 import { Layout } from "../Constants"
+import { BAR_WIDTH } from "../components/inputs/ScrollBar"
 import { TrackTransform } from "../entities/transform/TrackTransform"
 import { useMobxSelector } from "./useMobxSelector"
 import { useStores } from "./useStores"
@@ -38,7 +38,7 @@ export function TrackScrollProvider({
   const { songStore } = useStores()
   const trackCount = useMobxSelector(
     () => songStore.song.tracks.length,
-    [songStore],
+    [songStore]
   )
   const setTrackCount = useSetAtom(trackCountAtom, { store: scope })
 
@@ -108,7 +108,7 @@ const setScrollTopAtom = atom(
       BAR_WIDTH -
       get(canvasHeightAtom)
     set(scrollTopAtom, clamp(scrollTop, 0, maxOffset))
-  },
+  }
 )
 const setScaleYAtom = atom(null, (get, set, scaleY: number) => {
   set(scaleYAtom, clamp(scaleY, SCALE_Y_MIN, SCALE_Y_MAX))

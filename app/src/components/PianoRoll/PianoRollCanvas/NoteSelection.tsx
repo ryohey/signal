@@ -1,6 +1,6 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { FC, useMemo } from "react"
-import { Rect } from "../../../entities/geometry/Rect"
+import { type FC, useMemo } from "react"
+import type { Rect } from "../../../entities/geometry/Rect"
 import { Selection as SelectionEntity } from "../../../entities/selection/Selection"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { Selection } from "../../GLNodes/Selection"
@@ -41,7 +41,7 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
       width: edgeSize,
       height: rect.height,
     }),
-    [rect.x, rect.y, rect.height, edgeSize],
+    [rect.x, rect.y, rect.height, edgeSize]
   )
   const centerBounds: Rect = useMemo(
     () => ({
@@ -50,7 +50,7 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
       width: rect.width - edgeSize * 2,
       height: rect.height,
     }),
-    [rect.x, rect.y, rect.width, rect.height, edgeSize],
+    [rect.x, rect.y, rect.width, rect.height, edgeSize]
   )
   const rightEdgeBounds: Rect = useMemo(
     () => ({
@@ -59,7 +59,7 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
       width: edgeSize,
       height: rect.height,
     }),
-    [rect.x, rect.y, rect.width, rect.height, edgeSize],
+    [rect.x, rect.y, rect.width, rect.height, edgeSize]
   )
   const onMouseDownLeft = (e: MouseEvent) => {
     e.stopPropagation()

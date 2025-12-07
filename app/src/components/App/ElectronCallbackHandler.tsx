@@ -6,9 +6,8 @@ import {
   OAuthProvider,
   signInWithCredential,
 } from "firebase/auth"
-import { FC } from "react"
-import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
-import { auth } from "../.././firebase/firebase"
+import type { FC } from "react"
+import type { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 import {
   useDeleteSelection,
   useDuplicateSelection,
@@ -25,6 +24,7 @@ import {
   useCutSelectionGlobal,
   usePasteSelectionGlobal,
 } from "../../actions/hotkey"
+import { auth } from "../.././firebase/firebase"
 import { useAuth } from "../../hooks/useAuth"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useExport } from "../../hooks/useExport"
@@ -195,7 +195,7 @@ function createCredential(credential: FirebaseCredential) {
     case "google.com":
       return GoogleAuthProvider.credential(
         credential.idToken,
-        credential.accessToken,
+        credential.accessToken
       )
     case "github.com":
       return GithubAuthProvider.credential(credential.accessToken)

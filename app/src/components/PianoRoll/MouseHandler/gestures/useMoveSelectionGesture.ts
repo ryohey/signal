@@ -1,5 +1,5 @@
 import { useCloneSelection } from "../../../../actions"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
@@ -23,7 +23,7 @@ export const useMoveSelectionGesture = (): MouseGesture => {
           type: "note",
           position: "center",
           noteId,
-        })),
+        }))
       )
     },
   }

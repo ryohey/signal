@@ -1,12 +1,12 @@
-import { AnyEvent } from "midifile-ts"
+import type { AnyEvent } from "midifile-ts"
 import {
-  AnyEventFeature,
-  DeltaTimeProvider,
+  type AnyEventFeature,
+  type DeltaTimeProvider,
   isSequencerSpecificEvent,
-  TickProvider,
+  type TickProvider,
 } from "../entities/track"
 import { mapToSignalEvent } from "../entities/track/signalEvents"
-import { DistributiveOmit } from "../types"
+import type { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 
 export function addTick<T extends DeltaTimeProvider>(events: T[]) {
@@ -32,7 +32,7 @@ export const isSupportedEvent = (e: AnyEventFeature): boolean =>
 const toSignalEvent = <
   T extends DistributiveOmit<AnyEvent, "deltaTime"> & TickProvider,
 >(
-  e: T,
+  e: T
 ) => {
   if (isSequencerSpecificEvent(e)) {
     return mapToSignalEvent(e)
@@ -42,15 +42,15 @@ const toSignalEvent = <
 
 export function toTrackEvents(events: AnyEvent[]) {
   return assembleNotes(
-    addTick(events.filter(isSupportedEvent)).map(toSignalEvent),
+    addTick(events.filter(isSupportedEvent)).map(toSignalEvent)
   ).map(removeUnnecessaryProps)
 }
 
 // toTrackEvents without addTick
 export function tickedEventsToTrackEvents(
-  events: (DistributiveOmit<AnyEvent, "deltaTime"> & TickProvider)[],
+  events: (DistributiveOmit<AnyEvent, "deltaTime"> & TickProvider)[]
 ) {
   return assembleNotes(events.filter(isSupportedEvent).map(toSignalEvent)).map(
-    removeUnnecessaryProps,
+    removeUnnecessaryProps
   )
 }

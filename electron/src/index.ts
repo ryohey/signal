@@ -14,7 +14,7 @@ log.initialize()
 
 log.info(
   "electron:launch",
-  `v${app.getVersion()}, platform: ${process.platform}, arch: ${process.arch}, env: ${process.env.NODE_ENV}, isPacked: ${app.isPackaged}, isMas: ${isMas}, userData: ${app.getPath("userData")}`,
+  `v${app.getVersion()}, platform: ${process.platform}, arch: ${process.arch}, env: ${process.env.NODE_ENV}, isPacked: ${app.isPackaged}, isMas: ${isMas}, userData: ${app.getPath("userData")}`
 )
 
 process.on("uncaughtException", (err) => {
@@ -68,7 +68,7 @@ function updateMainMenu(isLoggedIn: boolean) {
       onClickSetting: () => ipc.send("onOpenSetting"),
       onClickHelp: () => ipc.send("onOpenHelp"),
       onClickSupport: () => openSupportPage(),
-    }),
+    })
   )
   Menu.setApplicationMenu(mainMenu)
 }
@@ -127,7 +127,7 @@ const createWindow = (): void => {
     mainWindow.webContents.openDevTools()
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, "..", "dist_renderer", "edit.html"),
+      path.join(__dirname, "..", "dist_renderer", "edit.html")
     )
   }
 
@@ -197,7 +197,7 @@ if (process.platform === "darwin" && !isMas) {
         if (filePath !== null) {
           onDropFileOnAppIcon(filePath)
         }
-      },
+      }
     )
   }
 }

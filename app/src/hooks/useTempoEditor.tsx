@@ -1,8 +1,8 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { createContext, useCallback, useContext, useMemo } from "react"
-import { Point } from "../entities/geometry/Point"
-import { TempoSelection } from "../entities/selection/TempoSelection"
+import type { Point } from "../entities/geometry/Point"
+import type { TempoSelection } from "../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../entities/transform/TempoCoordTransform"
 import { BeatsProvider, createBeatsScope } from "./useBeats"
 import { createQuantizerScope, QuantizerProvider } from "./useQuantizer"
@@ -48,7 +48,7 @@ export function TempoEditorProvider({
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
   const { tickScrollScope, quantizerScope, beatsScope } = useContext(
-    TempoEditorStoreContext,
+    TempoEditorStoreContext
   )
 
   return (
@@ -73,7 +73,7 @@ export function useTempoEditor() {
       const canvasHeight = useAtomValue(canvasHeightAtom)
       return useMemo(
         () => new TempoCoordTransform(tickTransform, canvasHeight),
-        [tickTransform, canvasHeight],
+        [tickTransform, canvasHeight]
       )
     },
     get selectedEventIds() {
@@ -90,7 +90,7 @@ export function useTempoEditor() {
           x: e.offsetX + scrollLeft,
           y: e.offsetY,
         }),
-        [scrollLeft],
+        [scrollLeft]
       )
     },
     setSelection: useSetAtom(selectionAtom),

@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
-import { Store } from "jotai/vanilla/store"
 import { useEffect } from "react"
 import { BeatWithX } from "../entities/beat/BeatWithX"
 import { useSong } from "./useSong"
@@ -31,7 +31,7 @@ export function BeatsProvider({
       transform,
       timebase,
       scrollLeft,
-      canvasWidth,
+      canvasWidth
     )
     setBeats(beats)
   }, [scrollLeft, transform, canvasWidth, measures, timebase, setBeats])

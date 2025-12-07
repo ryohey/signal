@@ -1,6 +1,6 @@
 import { isNoteEvent } from "@signal-app/core"
 import { useSelectNote } from "../../../../actions"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
@@ -69,7 +69,7 @@ const useDragNoteEdgeGesture =
                 selectNote(noteId)
               }
             },
-          },
+          }
         )
       },
     }

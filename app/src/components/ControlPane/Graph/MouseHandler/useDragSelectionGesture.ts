@@ -1,8 +1,8 @@
-import { TrackEventOf } from "@signal-app/core"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import type { TrackEventOf } from "@signal-app/core"
+import type { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
-import { Point } from "../../../../entities/geometry/Point"
-import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
+import type { Point } from "../../../../entities/geometry/Point"
+import type { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useCommands } from "../../../../hooks/useCommands"
 import { useControlPane } from "../../../../hooks/useControlPane"
@@ -28,7 +28,7 @@ export const useDragSelectionGesture = () => {
         e: MouseEvent,
         hitEventId: number,
         startPoint: Point,
-        transform: ControlCoordTransform,
+        transform: ControlCoordTransform
       ) => {
         pushHistory()
 
@@ -68,9 +68,9 @@ export const useDragSelectionGesture = () => {
                 tick: Math.max(0, Math.floor(ev.tick + quantizedDeltaTick)),
                 value: Math.min(
                   transform.maxValue,
-                  Math.max(0, Math.floor(ev.value + deltaValue)),
+                  Math.max(0, Math.floor(ev.value + deltaValue))
                 ),
-              })),
+              }))
             )
           },
 
@@ -78,7 +78,7 @@ export const useDragSelectionGesture = () => {
             // Find events with the same tick and remove it
             commands.track.removeRedundantEventsForEventIds(
               selectedTrackId,
-              selectedEventIds,
+              selectedEventIds
             )
           },
         })
@@ -92,7 +92,7 @@ export const useDragSelectionGesture = () => {
         updateEvents,
         commands,
         quantizeRound,
-      ],
+      ]
     ),
   }
 }

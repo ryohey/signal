@@ -1,5 +1,5 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
+import type { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { useControlPane } from "../../../hooks/useControlPane"
 import { Selection } from "../../GLNodes/Selection"
 

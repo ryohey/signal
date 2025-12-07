@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
-import { TrackEventRequired } from "@signal-app/core"
-import { ControllerEvent, ProgramChangeEvent } from "midifile-ts"
-import { FC } from "react"
-import { TickTransform } from "../../entities/transform/TickTransform"
+import type { TrackEventRequired } from "@signal-app/core"
+import type { ControllerEvent, ProgramChangeEvent } from "midifile-ts"
+import type { FC } from "react"
+import type { TickTransform } from "../../entities/transform/TickTransform"
 import { controllerTypeString as CCNames } from "../../helpers/noteNumberString"
 
 export type DisplayEvent = TrackEventRequired &

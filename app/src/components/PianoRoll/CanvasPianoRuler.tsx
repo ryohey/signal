@@ -1,15 +1,20 @@
 import { useTheme } from "@emotion/react"
-import { TrackEventOf } from "@signal-app/core"
-import { LoopSetting } from "@signal-app/player"
-import { TimeSignatureEvent } from "midifile-ts"
-import React, { FC, useCallback, useState } from "react"
+import type { TrackEventOf } from "@signal-app/core"
+import type { LoopSetting } from "@signal-app/player"
+import type { TimeSignatureEvent } from "midifile-ts"
+import type React from "react"
+import { type FC, useCallback, useState } from "react"
 import { Layout } from "../../Constants"
-import { TickTransform } from "../../entities/transform/TickTransform"
+import type { TickTransform } from "../../entities/transform/TickTransform"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { usePlayer } from "../../hooks/usePlayer"
-import { RulerBeat, RulerTimeSignature, useRuler } from "../../hooks/useRuler"
+import {
+  type RulerBeat,
+  type RulerTimeSignature,
+  useRuler,
+} from "../../hooks/useRuler"
 import { useTickScroll } from "../../hooks/useTickScroll"
-import { Theme } from "../../theme/Theme"
+import type { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { RulerContextMenu } from "./RulerContextMenu"
 import { TimeSignatureDialog } from "./TimeSignatureDialog"
@@ -20,7 +25,7 @@ function drawRuler(
   ctx: CanvasRenderingContext2D,
   height: number,
   beats: RulerBeat[],
-  theme: Theme,
+  theme: Theme
 ) {
   ctx.strokeStyle = theme.secondaryTextColor
   ctx.lineWidth = 1
@@ -51,7 +56,7 @@ function drawLoopPoints(
   loop: LoopSetting,
   height: number,
   transform: TickTransform,
-  theme: Theme,
+  theme: Theme
 ) {
   const flagSize = 8
   ctx.lineWidth = 1
@@ -93,7 +98,7 @@ function drawFlag(
   y: number,
   width: number,
   height: number,
-  flagSize: number,
+  flagSize: number
 ) {
   ctx.beginPath()
   ctx.moveTo(x, y)
@@ -109,7 +114,7 @@ function drawTimeSignatures(
   ctx: CanvasRenderingContext2D,
   height: number,
   events: RulerTimeSignature[],
-  theme: Theme,
+  theme: Theme
 ) {
   ctx.textBaseline = "bottom"
   ctx.font = `11px ${theme.canvasFont}`
@@ -127,7 +132,7 @@ function drawTimeSignatures(
       height - flagHeight,
       size.width + textPadding * 2,
       flagHeight,
-      textHeight,
+      textHeight
     )
     ctx.fillStyle = e.isSelected ? theme.onSurfaceColor : theme.textColor
     ctx.fillText(e.label, e.x + textPadding, height - textPadding)
@@ -188,7 +193,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
       setTimeSignatureDialogState,
       getQuantizedTick,
       onContextMenu,
-    ],
+    ]
   )
 
   const onClickRuler: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
@@ -202,7 +207,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
         setPosition(quantizedTick)
       }
     },
-    [getQuantizedTick, setLoopBegin, setLoopEnd, setPosition],
+    [getQuantizedTick, setLoopBegin, setLoopEnd, setPosition]
   )
 
   const onMouseDown: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
@@ -233,7 +238,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
       setRightClickTick,
       onContextMenu,
       _onMouseDown,
-    ],
+    ]
   )
 
   const draw = useCallback(
@@ -257,7 +262,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
       timeSignatures,
       loop,
       theme,
-    ],
+    ]
   )
 
   const closeOpenTimeSignatureDialog = useCallback(() => {
@@ -267,7 +272,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
   const okTimeSignatureDialog = useCallback(
     ({ numerator, denominator }: TimeSignatureDialogState) =>
       updateTimeSignature(numerator, denominator),
-    [updateTimeSignature],
+    [updateTimeSignature]
   )
 
   return (

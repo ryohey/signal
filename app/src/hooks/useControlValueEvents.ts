@@ -1,10 +1,10 @@
 import {
-  TrackEventOf,
   isControllerEventWithType,
   isPitchBendEvent,
+  type TrackEventOf,
 } from "@signal-app/core"
 import { maxBy } from "lodash"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import type { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useMemo } from "react"
 import { isNotUndefined } from "../helpers/array"
 import { useControlPane } from "./useControlPane"
@@ -33,7 +33,7 @@ export function useControlValueEvents() {
 
   const events = useMemo(
     () => windowedEvents.filter(filter),
-    [windowedEvents, filter],
+    [windowedEvents, filter]
   )
 
   // controller events in the outside of the visible area
@@ -43,7 +43,7 @@ export function useControlValueEvents() {
 
     return maxBy(
       controllerEvents.filter((e) => e.tick < tickStart),
-      (e) => e.tick,
+      (e) => e.tick
     )
   }, [filter, scrollLeft, transform, selectedTrackEvents])
 
