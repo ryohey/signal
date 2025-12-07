@@ -1,5 +1,5 @@
 import * as matchers from "@testing-library/jest-dom/matchers"
-import { expect } from "vitest"
+import { beforeAll, expect } from "vitest"
 
 expect.extend(matchers)
 

@@ -14,33 +14,18 @@
     "source.organizeImports": "explicit",
     "source.fixAll.eslint": "explicit"
   },
-  "testing.openTesting": "neverOpen",
   "testing.automaticallyOpenTestResults": "neverOpen",
-  "jest.virtualFolders": [
-    {
-      "name": "app",
-      "rootPath": "app"
-    },
-    {
-      "name": "community",
-      "rootPath": "packages/community"
-    },
-    {
-      "name": "player",
-      "rootPath": "packages/player"
-    }
-  ],
   "eslint.workingDirectories": [
     {
       "mode": "auto"
     }
   ],
   // Enable ESLint flat config support
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   // Enable ESLint for TypeScript and JavaScript files
   "eslint.validate": [
     "javascript",
-    "javascriptreact", 
+    "javascriptreact",
     "typescript",
     "typescriptreact"
   ]
