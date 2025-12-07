@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node generate-service-worker.js",
-    "build:electron": "webpack --config webpack.electron.prod.js",
+    "build:electron": "vite build --config vite-electron.config.mts",
     "serve": "npx http-server dist",
     "test": "jest",
     "format": "prettier --write src",

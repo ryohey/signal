@@ -2,6 +2,7 @@ import { useTheme } from "@emotion/react"
 import { GLNode, useRenderer, useTransform } from "@ryohey/webgl-react"
 import Color from "color"
 import { FC, useEffect, useMemo, useState } from "react"
+import fontAtlas from "../../../assets/font-atlas.png"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
 import { INoteLabelData, NoteLabelShader } from "./shaders/NoteLabelShader"
@@ -24,7 +25,7 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
     }
 
     const loadTexture = async () => {
-      const texture = await createTexture(gl, "/font-atlas.png")
+      const texture = await createTexture(gl, fontAtlas)
       setTexture(texture)
     }
     loadTexture()
