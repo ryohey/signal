@@ -98,7 +98,7 @@
     "jsdom": "^26.0.0",
     "react-refresh": "0.17.0",
     "ts-loader": "^9.5.2",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-checker": "^0.11.0",
     "vite-plugin-svgr": "^4.5.0",
