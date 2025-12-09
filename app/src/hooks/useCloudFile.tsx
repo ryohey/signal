@@ -3,7 +3,7 @@ import { emptySong } from "@signal-app/core"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { orderBy } from "lodash"
-import type { ChangeEvent } from "react"
+import { type ChangeEvent, useCallback } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
@@ -259,26 +259,29 @@ function useDeleteSong() {
   const { songStore } = useStores()
   const loadFiles = useLoadFiles()
 
-  return async (song: CloudSong) => {
-    await cloudSongDataRepository.delete(song.songDataId)
-    await cloudSongRepository.delete(song.id)
+  return useCallback(
+    async (song: CloudSong) => {
+      await cloudSongDataRepository.delete(song.songDataId)
+      await cloudSongRepository.delete(song.id)
 
-    if (songStore.song.cloudSongId === song.id) {
-      songStore.song.cloudSongId = null
-      songStore.song.cloudSongDataId = null
-    }
-    await loadFiles()
-  }
+      if (songStore.song.cloudSongId === song.id) {
+        songStore.song.cloudSongId = null
+        songStore.song.cloudSongDataId = null
+      }
+      await loadFiles()
+    },
+    [loadFiles, songStore]
+  )
 }
 
 function useLoadFiles() {
   const setIsLoading = useSetAtom(isLoadingAtom)
   const setFiles = useSetAtom(filesAtom)
 
-  return async () => {
+  return useCallback(async () => {
     setIsLoading(true)
     const files = await cloudSongRepository.getMySongs()
     setFiles(files)
     setIsLoading(false)
-  }
+  }, [setFiles, setIsLoading])
 }

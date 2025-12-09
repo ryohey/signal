@@ -28,6 +28,7 @@ export const FirebaseAuthUI = ({
   const [userSignedIn, setUserSignedIn] = useState(false)
   const elementRef = useRef(null)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when uiConfig changes
   useEffect(() => {
     // Get or Create a firebaseUI instance.
     const firebaseUiWidget =
@@ -59,7 +60,7 @@ export const FirebaseAuthUI = ({
       unregisterAuthObserver()
       firebaseUiWidget.reset()
     }
-  }, [firebaseui, uiConfig])
+  }, [uiConfig])
 
   return <div ref={elementRef} className={className} style={style} />
 }

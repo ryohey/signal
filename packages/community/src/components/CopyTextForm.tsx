@@ -27,8 +27,8 @@ export const CopyTextForm: FC<{ text: string }> = ({ text }) => {
 
   const onClick = useCallback(() => {
     navigator.clipboard.writeText(text)
-    toast.success(localized["copied"])
-  }, [text])
+    toast.success(localized.copied)
+  }, [text, localized.copied, toast.success])
 
   return (
     <Form>

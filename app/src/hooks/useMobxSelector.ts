@@ -16,7 +16,7 @@ export function useMobxSelector<T>(
           fireImmediately: true,
           equals,
         }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
       deps
     ),
     selector,
@@ -48,6 +48,6 @@ export function useMobxSetter<T, K extends keyof T>(
   store: T,
   prop: K
 ): (value: T[K]) => void {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useCallback((value: T[K]) => (store[prop] = value), [store])
+  // biome-ignore lint/suspicious/noAssignInExpressions: it's intended to set value
+  return useCallback((value: T[K]) => (store[prop] = value), [store, prop])
 }

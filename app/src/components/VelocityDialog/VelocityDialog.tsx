@@ -43,11 +43,11 @@ export const VelocityDialog: FC<VelocityDialogProps> = ({
     useState<BatchUpdateOperation["type"]>("set")
   const [value, setValue] = useState(initialValue)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when open changes
   useEffect(() => {
     if (open) {
       setValue(initialValue)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const _onClickOK = useCallback(() => {

@@ -8,7 +8,7 @@ import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const { trackTransform, resetSelection, setSelection } = useArrangeView()
+  const { resetSelection, setSelection } = useArrangeView()
   const { quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
@@ -49,7 +49,6 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           const deltaPx = e.clientX - startClientX
           const selectionToPx = startPosX + deltaPx
           const endTick = transform.getTick(selectionToPx)
-          // eslint-disable-next-line react-hooks/exhaustive-deps
           selection = selectionFromTickRange([startTick, endTick])
           setSelection(selection)
         },
@@ -58,10 +57,10 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
     [
       scrollLeft,
       transform,
-      trackTransform,
       selectionFromTickRange,
-      tracks,
       resetSelection,
+      selection,
+      setSelection,
     ]
   )
 

@@ -56,6 +56,7 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   )
 
   // Menu cannot handle keydown while disabling focus, so we deal with global keydown event
+  // biome-ignore lint/correctness/useExhaustiveDependencies: to work correctly if passed not memoized handleClose, we should not add it to dependency array
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (isOpen && e.key === "Escape") {
@@ -67,7 +68,6 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     return () => {
       document.removeEventListener("keydown", onKeyDown)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   if (!isOpen) {

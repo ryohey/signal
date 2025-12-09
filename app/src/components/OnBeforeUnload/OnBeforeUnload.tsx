@@ -7,6 +7,7 @@ export const OnBeforeUnload = () => {
   const { getSong } = useSong()
   const localized = useLocalization()
 
+  // wantfix: use useEffectEvent
   useEffect(() => {
     const listener = (e: BeforeUnloadEvent) => {
       if (!getSong().isSaved) {
@@ -36,7 +37,6 @@ export const OnBeforeUnload = () => {
     return () => {
       window.removeEventListener("beforeunload", listener)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return <></>
+  }, [getSong, localized.cancel, localized.close, localized["confirm-close"]])
+  return null
 }

@@ -42,13 +42,13 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
   const [numerator, setNumerator] = useState(initialNumerator)
   const [denominator, setDenominator] = useState(initialDenominator)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset values when opening the dialog
   useEffect(() => {
     // reset values when opening the dialog
     if (open) {
       setNumerator(initialNumerator)
       setDenominator(initialDenominator)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   return (

@@ -30,14 +30,14 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   const [_name, _setName] = useState(name)
   const [_channel, _setChannel] = useState(channel)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when open changes
   useEffect(() => {
     if (!open) {
       return
     }
     _setName(name)
     _setChannel(channel)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackId, open])
+  }, [open, channel])
 
   return (
     <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>

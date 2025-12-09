@@ -95,8 +95,7 @@ export const CloudFileList = () => {
 
   useEffect(() => {
     loadFiles()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadFiles])
 
   const onClickSong = async (song: CloudSong) => {
     try {

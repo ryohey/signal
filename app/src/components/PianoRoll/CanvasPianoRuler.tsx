@@ -188,12 +188,7 @@ const PianoRuler: FC<PianoRulerProps> = ({
         }
       }
     },
-    [
-      selectTimeSignature,
-      setTimeSignatureDialogState,
-      getQuantizedTick,
-      onContextMenu,
-    ]
+    [selectTimeSignature, getQuantizedTick, onContextMenu]
   )
 
   const onClickRuler: React.MouseEventHandler<HTMLCanvasElement> = useCallback(
@@ -235,7 +230,6 @@ const PianoRuler: FC<PianoRulerProps> = ({
       clearSelectedTimeSignature,
       onClickTimeSignature,
       onClickRuler,
-      setRightClickTick,
       onContextMenu,
       _onMouseDown,
     ]

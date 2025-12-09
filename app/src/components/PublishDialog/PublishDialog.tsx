@@ -32,6 +32,7 @@ export const PublishDialog: FC = () => {
   const theme = useTheme()
   const localized = useLocalization()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when open changes
   useEffect(() => {
     ;(async () => {
       if (open) {
@@ -46,7 +47,6 @@ export const PublishDialog: FC = () => {
         setIsLoading(false)
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const onClose = useCallback(

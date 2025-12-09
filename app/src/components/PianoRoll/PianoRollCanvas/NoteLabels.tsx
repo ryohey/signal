@@ -34,8 +34,7 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
         gl.deleteTexture(texture)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [renderer.gl])
+  }, [renderer.gl, texture])
 
   const theme = useTheme()
   const color = useMemo(
