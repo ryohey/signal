@@ -2,7 +2,9 @@ import {
   createContext,
   type FC,
   type ReactNode,
+  useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react"
 
@@ -12,10 +14,15 @@ export const PromptProvider: FC<{
 }> = ({ children, component: PromptDialog }) => {
   const [prompt, setPrompt] = useState<PromptProps | null>(null)
 
+  const setPromptCallback = useCallback(
+    (props: PromptProps | null) => setPrompt(props),
+    []
+  )
+
   return (
     <PromptContext.Provider
       value={{
-        setPrompt,
+        setPrompt: setPromptCallback,
       }}
     >
       {children}
@@ -43,8 +50,8 @@ export const PromptContext = createContext<{
 export const usePrompt = () => {
   const { setPrompt } = useContext(PromptContext)
 
-  return {
-    async show(options: PromptOptions): Promise<string | null> {
+  const show = useCallback(
+    async (options: PromptOptions): Promise<string | null> => {
       return new Promise((resolve, _reject) => {
         setPrompt({
           ...options,
@@ -52,5 +59,15 @@ export const usePrompt = () => {
         })
       })
     },
-  }
+    [setPrompt]
+  )
+
+  const prompt = useMemo(
+    () => ({
+      show,
+    }),
+    [show]
+  )
+
+  return prompt
 }
