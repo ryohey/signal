@@ -37,17 +37,15 @@ export const TrackListMenuButton: FC = () => {
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
-    <>
-      <NavBackButton
-        ref={ref}
-        tabIndex={-1}
-        onMouseDown={(e) => {
-          e.preventDefault()
-          onClickNavBack()
-        }}
-      >
-        <ArrowIcon isOpen={isOpen} />
-      </NavBackButton>
-    </>
+    <NavBackButton
+      ref={ref}
+      tabIndex={-1}
+      onMouseDown={(e) => {
+        e.preventDefault()
+        onClickNavBack()
+      }}
+    >
+      <ArrowIcon isOpen={isOpen} />
+    </NavBackButton>
   )
 }

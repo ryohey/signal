@@ -249,10 +249,7 @@ const DrumKeyLabel: FC<{
   )
 
   return (
-    <DrumKeyLabelBody
-      style={style}
-      data-highlighted={noteNumber % 12 === 0 ? true : false}
-    >
+    <DrumKeyLabelBody style={style} data-highlighted={noteNumber % 12 === 0}>
       {name}
     </DrumKeyLabelBody>
   )

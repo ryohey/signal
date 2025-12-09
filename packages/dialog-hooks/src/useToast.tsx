@@ -58,7 +58,7 @@ export const useToast = () => {
   const { addMessage } = useContext(ToastContext)
 
   const show = (message: string, options: { severity: ToastSeverity }) => {
-    addMessage({ message, ...options, key: new Date().getTime() })
+    addMessage({ message, ...options, key: Date.now() })
   }
 
   return {

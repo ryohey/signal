@@ -1,6 +1,6 @@
+import * as fs from "node:fs"
+import * as path from "node:path"
 import { emptyTrack } from "@signal-app/core"
-import * as fs from "fs"
-import * as path from "path"
 import { deserialize, serialize } from "serializr"
 import { describe, expect, it } from "vitest"
 import { songFromMidi } from "../../midi"

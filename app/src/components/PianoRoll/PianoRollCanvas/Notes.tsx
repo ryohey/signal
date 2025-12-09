@@ -223,7 +223,7 @@ const NoteHitArea = React.memo(
       <>
         {/* left edge */}
         <HitArea
-          key={note.id + "-left"}
+          key={`${note.id}-left`}
           bounds={leftEdgeBounds}
           cursor="w-resize"
           zIndex={zIndex}
@@ -232,7 +232,7 @@ const NoteHitArea = React.memo(
         />
         {/* center */}
         <HitArea
-          key={note.id + "-center"}
+          key={`${note.id}-center`}
           bounds={centerBounds}
           cursor="move"
           zIndex={zIndex}
@@ -241,7 +241,7 @@ const NoteHitArea = React.memo(
         />
         {/* right edge */}
         <HitArea
-          key={note.id + "-right"}
+          key={`${note.id}-right`}
           bounds={rightEdgeBounds}
           cursor="e-resize"
           zIndex={zIndex}

@@ -1,7 +1,7 @@
+import path from "node:path"
 import { app, BrowserWindow, Menu, shell } from "electron"
 import log from "electron-log"
 import windowStateKeeper from "electron-window-state"
-import path from "path"
 import { getArgument } from "./arguments"
 import { defaultMenuTemplate } from "./defaultMenu"
 import { Ipc } from "./ipc"

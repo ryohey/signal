@@ -53,8 +53,7 @@ export const SignInPage: FC = () => {
                   (redirectUrl.startsWith("jp.codingcafe.signal://") ||
                     redirectUrl.startsWith("jp.codingcafe.signal.dev://"))
                 ) {
-                  const url =
-                    redirectUrl + "?credential=" + JSON.stringify(credential)
+                  const url = `${redirectUrl}?credential=${JSON.stringify(credential)}`
 
                   try {
                     location.assign(url)

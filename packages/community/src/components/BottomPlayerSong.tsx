@@ -4,14 +4,6 @@ import type { FC } from "react"
 import { Link } from "wouter"
 import { Localized } from "../localize/useLocalization.js"
 
-const Avatar = styled.img`
-  border: 1px var(--color-divider) solid;
-  border-radius: 999px;
-  width: 2rem;
-  height: 2rem;
-  margin-right: 0.5rem;
-`
-
 const Wrapper = styled.div`
   display: flex;
   align-items: center;

@@ -1,3 +1,5 @@
+import { readdir, readFile, writeFile } from "node:fs/promises"
+import { isAbsolute, join } from "node:path"
 import {
   app,
   type BrowserWindow,
@@ -6,8 +8,6 @@ import {
   ipcMain,
 } from "electron"
 import log from "electron-log"
-import { readdir, readFile, writeFile } from "fs/promises"
-import { isAbsolute, join } from "path"
 import { getArgument } from "./arguments"
 import { signInWithBrowser } from "./auth"
 import type { FirebaseCredential } from "./FirebaseCredential"

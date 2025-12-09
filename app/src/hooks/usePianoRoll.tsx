@@ -322,7 +322,7 @@ const removePreviewingNoteNumbersAtom = atom(
 )
 const getSelectionAtom = atom(null, (get) => get(selectionAtom))
 const getSelectedNoteIdsAtom = atom(null, (get) => get(selectedNoteIdsAtom))
-const toggleToolAtom = atom(null, (get, set) =>
+const toggleToolAtom = atom(null, (_get, set) =>
   set(mouseModeAtom, (prev) => (prev === "pencil" ? "selection" : "pencil"))
 )
 const serializeAtom = atom(null, (get) => ({

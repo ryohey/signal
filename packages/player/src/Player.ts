@@ -208,8 +208,7 @@ export class Player {
 
     const timestamp = performance.now()
 
-    this.scheduler.loop =
-      this.loop !== null && this.loop.enabled ? this.loop : null
+    this.scheduler.loop = this.loop?.enabled ? this.loop : null
     const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
 
     events.forEach(({ event: e, timestamp: time }) => {

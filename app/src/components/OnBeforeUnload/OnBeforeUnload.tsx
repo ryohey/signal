@@ -19,7 +19,7 @@ export const OnBeforeUnload = () => {
             .showMessageBox({
               type: "question",
               message,
-              buttons: [localized["close"], localized["cancel"]],
+              buttons: [localized.close, localized.cancel],
             })
             .then((button) => {
               if (button === 0) {

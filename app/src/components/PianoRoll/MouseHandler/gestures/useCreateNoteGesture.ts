@@ -32,7 +32,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
         const local = getLocal(e)
         const { tick, noteNumber } = transform.getNotePoint(local)
 
-        if (channel == undefined || !NoteNumber.isValid(noteNumber)) {
+        if (channel === undefined || !NoteNumber.isValid(noteNumber)) {
           return
         }
 

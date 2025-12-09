@@ -1,6 +1,6 @@
-import * as fs from "fs"
+import * as fs from "node:fs"
+import * as path from "node:path"
 import type { AnyEvent } from "midifile-ts"
-import * as path from "path"
 import { describe, expect, it } from "vitest"
 import { emptySong, type NoteEvent, type Track } from "../entities"
 import {
@@ -19,7 +19,7 @@ import {
 // id for each event will not be serialized in midi file
 // we change ids sorted by order in events array
 const reassignIDs = (track: Track) => {
-  track.events.forEach((e, i) => {
+  track.events.forEach((_e, i) => {
     track.events[i].id = i
   })
 }

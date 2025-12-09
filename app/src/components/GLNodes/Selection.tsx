@@ -29,7 +29,7 @@ export const Selection: FC<{ rect: Rect | null; zIndex: number }> = ({
   )
 
   if (rect === null) {
-    return <></>
+    return null
   }
 
   return (

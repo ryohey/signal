@@ -28,7 +28,7 @@ export const signInWithBrowser = async (): Promise<FirebaseCredential> => {
 
     let isResolved = false
 
-    window.webContents.on("will-navigate", (event, url) => {
+    window.webContents.on("will-navigate", (_event, url) => {
       log.info("will-navigate", url)
       if (url.startsWith(authCallbackUrl)) {
         log.info("authCallbackUrl", url)

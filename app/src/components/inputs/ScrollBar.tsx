@@ -204,7 +204,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
       const startValue = scrollOffset
 
       observeDrag2(e.nativeEvent, {
-        onMouseMove: (e, delta) => {
+        onMouseMove: (_e, delta) => {
           const p = isVertical ? "y" : "x"
           const scale = maxOffset / (maxLength - thumbLength) // 移動量とスクロール量の補正値 -> Correction value of movement amount and scroll amount
           const value = startValue + delta[p] * scale

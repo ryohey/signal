@@ -72,7 +72,7 @@ export const CloudFileRow: FC<CloudFileRowProps> = ({
     }
   })()
   const songName = song.name.length > 0 ? song.name : localized["untitled-song"]
-  const dateStr = date.toLocaleDateString() + " " + date.toLocaleTimeString()
+  const dateStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
   return (
     <Container onClick={onClick}>
       <NameCell>

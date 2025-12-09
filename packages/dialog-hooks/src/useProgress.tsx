@@ -53,7 +53,7 @@ export const useProgress = () => {
 
   return {
     show(message: string) {
-      return addMessage({ message, key: new Date().getTime() })
+      return addMessage({ message, key: Date.now() })
     },
   }
 }

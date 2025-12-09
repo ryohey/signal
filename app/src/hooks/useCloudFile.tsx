@@ -85,9 +85,9 @@ export const useCloudFile = () => {
     const res = await dialog.show({
       title: localized["save-changes"],
       actions: [
-        { title: localized["yes"], key: "yes" },
-        { title: localized["no"], key: "no" },
-        { title: localized["cancel"], key: "cancel" },
+        { title: localized.yes, key: "yes" },
+        { title: localized.no, key: "no" },
+        { title: localized.cancel, key: "cancel" },
       ],
     })
     switch (res) {
@@ -167,7 +167,7 @@ export const useCloudFile = () => {
     async renameSong() {
       try {
         const text = await prompt.show({
-          title: localized["rename"],
+          title: localized.rename,
         })
         if (text !== null && text.length > 0) {
           setName(text)

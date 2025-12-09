@@ -56,7 +56,7 @@ export namespace TrackEvents {
   export const addEvent =
     <T extends TrackEvent>(e: Omit<T, "id"> & { subtype?: string }) =>
     (events: TickOrderedArray<TrackEvent>): T => {
-      if (!("tick" in e) || isNaN(e.tick)) {
+      if (!("tick" in e) || Number.isNaN(e.tick)) {
         throw new Error("invalid event is added")
       }
       if ("subtype" in e && e.subtype === "endOfTrack") {

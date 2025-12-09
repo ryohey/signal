@@ -126,5 +126,5 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <></>
+  return null
 }

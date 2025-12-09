@@ -22,7 +22,7 @@ const useDragNoteEdgeGesture =
         }
 
         const note = getEventById(noteId)
-        if (note == undefined || !isNoteEvent(note)) {
+        if (note === undefined || !isNoteEvent(note)) {
           return
         }
 
@@ -49,7 +49,7 @@ const useDragNoteEdgeGesture =
           {
             onChange(_e, { oldPosition, newPosition }) {
               const newNote = getEventById(noteId)
-              if (newNote == undefined || !isNoteEvent(newNote)) {
+              if (newNote === undefined || !isNoteEvent(newNote)) {
                 return
               }
               // save last note duration

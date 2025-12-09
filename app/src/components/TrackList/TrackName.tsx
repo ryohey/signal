@@ -11,11 +11,7 @@ export const TrackName: FC<{ trackId: TrackId }> = ({ trackId }) => {
     return <>{name}</>
   }
   if (channel === undefined) {
-    return (
-      <>
-        <Localized name="conductor-track" />
-      </>
-    )
+    return <Localized name="conductor-track" />
   }
   return (
     <>

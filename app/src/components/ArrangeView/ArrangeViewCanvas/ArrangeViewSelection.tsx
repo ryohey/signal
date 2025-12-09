@@ -41,7 +41,7 @@ export const ArrangeViewSelection = ({ zIndex }: { zIndex: number }) => {
   )
 
   if (selectionRect === null) {
-    return <></>
+    return null
   }
 
   return (

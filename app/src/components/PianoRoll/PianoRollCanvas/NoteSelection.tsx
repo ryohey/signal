@@ -18,7 +18,7 @@ export const NoteSelection: FC<{ zIndex: number }> = ({ zIndex }) => {
   }, [selection, transform])
 
   if (selectionBounds === null) {
-    return <></>
+    return null
   }
 
   return <NoteSelectionContent rect={selectionBounds} zIndex={zIndex} />

@@ -59,7 +59,7 @@ export const TrackDialog: FC<TrackDialogProps> = ({
         </Label>
         <Select
           value={_channel}
-          onChange={(e) => _setChannel(parseInt(e.target.value as string))}
+          onChange={(e) => _setChannel(parseInt(e.target.value as string, 10))}
         >
           {range(0, 16).map((v) => (
             <option key={v} value={v.toString()}>

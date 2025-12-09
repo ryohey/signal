@@ -141,7 +141,7 @@ export class ArrangeCommandService {
 
     transaction(() => {
       for (const trackIndexStr in selectedEventIds) {
-        const trackIndex = parseInt(trackIndexStr)
+        const trackIndex = parseInt(trackIndexStr, 10)
         const eventIds = selectedEventIds[trackIndex]
         const track = tracks[trackIndex]
         if (track === undefined) {
@@ -194,7 +194,7 @@ export class ArrangeCommandService {
           ? 0
           : -data.selectedTrackIndex + selectedTrackIndex
 
-        const destTrackIndex = parseInt(trackIndex) + trackNumberOffset
+        const destTrackIndex = parseInt(trackIndex, 10) + trackNumberOffset
 
         if (destTrackIndex < tracks.length) {
           tracks[destTrackIndex].addEvents(notes)

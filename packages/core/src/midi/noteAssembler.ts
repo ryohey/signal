@@ -67,7 +67,7 @@ export function deassemble<T extends object>(
   e: T | NoteEvent
 ): (T | TickNoteOnEvent | TickNoteOffEvent)[] {
   if ("subtype" in e && e.subtype === "note") {
-    const channel = (e as any)["channel"] ?? -1
+    const channel = (e as any).channel ?? -1
     const noteOn = noteOnMidiEvent(0, channel, e.noteNumber, e.velocity)
     const noteOff = noteOffMidiEvent(0, channel, e.noteNumber)
     return [

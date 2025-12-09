@@ -22,10 +22,7 @@ export interface PlayButtonProps {
   isPlaying: boolean
 }
 
-export const PlayButton: FC<PlayButtonProps> = (
-  { onMouseDown, isPlaying },
-  ref
-) => {
+export const PlayButton: FC<PlayButtonProps> = ({ onMouseDown, isPlaying }) => {
   return (
     <StyledButton
       id="button-play"

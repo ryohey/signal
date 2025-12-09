@@ -37,7 +37,7 @@ const CategoryName: FC<{ programNumber: number }> = ({ programNumber }) => {
     case 15:
       return <Localized name="Sound Effects" />
   }
-  return <></>
+  return null
 }
 
 export const FancyCategoryName: FC<{ programNumber: number }> = ({

@@ -71,7 +71,7 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   }, [isOpen])
 
   if (!isOpen) {
-    return <></>
+    return null
   }
 
   // fix position to avoid placing menu outside of the screen

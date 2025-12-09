@@ -135,7 +135,7 @@ export const useMuteNote = () => {
 
   return useCallback(
     (noteNumber: number) => {
-      if (channel == undefined) {
+      if (channel === undefined) {
         return
       }
       stopNote({ channel, noteNumber })

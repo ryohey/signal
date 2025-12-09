@@ -64,7 +64,7 @@ export class TrackCommandService {
       noteIds
         .map((id) => {
           const n = track.getEventById(id)
-          if (n == undefined || !isNoteEvent(n)) {
+          if (n === undefined || !isNoteEvent(n)) {
             return null
           }
           return {

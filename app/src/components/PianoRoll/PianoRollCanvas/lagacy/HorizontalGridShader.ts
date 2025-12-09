@@ -9,16 +9,13 @@ import {
 import type { Rect } from "../../../../entities/geometry/Rect"
 
 class HorizontalGridBuffer {
-  private gl: WebGLRenderingContext
-
   readonly buffers: {
     position: WebGLBuffer
   }
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl
+  constructor(readonly gl: WebGLRenderingContext) {
     this.buffers = {
-      position: gl.createBuffer()!,
+      position: gl.createBuffer(),
     }
   }
 

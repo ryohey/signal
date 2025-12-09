@@ -56,7 +56,7 @@ export class SoundFont {
             name: parameter.name,
           }
 
-          preset.samples.get(key)!.push(sampleMeta)
+          preset.samples.get(key)?.push(sampleMeta)
         }
       }
     }

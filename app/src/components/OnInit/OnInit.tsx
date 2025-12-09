@@ -23,7 +23,7 @@ export const OnInit: FC = () => {
   const { shouldShowAutoSaveDialog } = useAutoSave()
 
   const init = async () => {
-    const closeProgress = showProgress(localized["initializing"])
+    const closeProgress = showProgress(localized.initializing)
     try {
       await rootStore.init()
     } catch (e) {

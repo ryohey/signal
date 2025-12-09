@@ -31,9 +31,9 @@ export const useCreateOrUpdateControlEventsValue = () => {
         .filter(isNotUndefined)
 
       if (controllerEvents.length > 0) {
-        controllerEvents.forEach((e) =>
+        for (const e of controllerEvents) {
           updateEvent(e.id, { value: event.value })
-        )
+        }
       } else {
         createOrUpdate({
           ...event,

@@ -68,7 +68,7 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
             <Select
               value={keySignature?.key}
               onChange={(e) => {
-                const key = parseInt(e.target.value)
+                const key = parseInt(e.target.value, 10)
                 setKeySignature({
                   scale: keySignature?.scale ?? "major",
                   key,

@@ -145,7 +145,7 @@ const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   }
   return state
 })
-const clearHistoryAtom = atom(null, (get, set) => {
+const clearHistoryAtom = atom(null, (_get, set) => {
   set(undoHistoryAtom, [])
   set(redoHistoryAtom, [])
 })

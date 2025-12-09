@@ -13,8 +13,6 @@ export interface IColorData {
 }
 
 export class NoteBuffer {
-  private gl: WebGLRenderingContext
-
   readonly buffers: {
     position: WebGLBuffer
     bounds: WebGLBuffer
@@ -23,12 +21,11 @@ export class NoteBuffer {
 
   private _vertexCount: number = 0
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl
+  constructor(readonly gl: WebGLRenderingContext) {
     this.buffers = {
-      position: gl.createBuffer()!,
-      bounds: gl.createBuffer()!,
-      color: gl.createBuffer()!,
+      position: gl.createBuffer(),
+      bounds: gl.createBuffer(),
+      color: gl.createBuffer(),
     }
   }
 
