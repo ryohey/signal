@@ -4,7 +4,7 @@
   "description": "A friendly music sequencer application for OS X and Windows.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node generate-service-worker.js",
+    "build": "vite build && node generate-service-worker.mjs",
     "build:electron": "vite build --config vite-electron.config.mts",
     "serve": "npx http-server dist",
     "test": "vitest run",

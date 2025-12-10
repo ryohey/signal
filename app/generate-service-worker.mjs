@@ -36,3 +36,4 @@ generateSW({
     `Generated a service worker, which will precache ${count} files, totaling ${size} bytes.`,
   )
 })
+
