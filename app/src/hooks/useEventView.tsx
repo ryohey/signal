@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useSyncExternalStore,
 } from "react"
 import { EventView } from "../observer/EventView"
@@ -57,5 +58,7 @@ export function EventViewProvider({
 export function useEventView(
   eventView: EventView<TrackEvent> = useContext(EventViewContext),
 ) {
-  return useSyncExternalStore(eventView.subscribe, eventView.getEvents)
+  // Cache getSnapshot to avoid React 19 warning about infinite loops
+  const getSnapshot = useCallback(() => eventView.getEvents(), [eventView])
+  return useSyncExternalStore(eventView.subscribe, getSnapshot)
 }
