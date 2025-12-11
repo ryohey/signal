@@ -13,7 +13,6 @@ export interface SongMetadata {
 
 export interface GenerateRequest {
   prompt: string
-  agentType?: "llm" | "composition_agent"
 }
 
 export interface GenerateResponse {

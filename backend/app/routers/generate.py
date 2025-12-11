@@ -1,7 +1,5 @@
 import re
-import json
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
 from app.models.schemas import (
     GenerateRequest,
     GenerateResponse,
@@ -10,15 +8,7 @@ from app.models.schemas import (
     TrackData,
     SongMetadata,
 )
-from app.services.composition_agent import (
-    generate_midi_code as generate_midi_code_composition,
-    generate_single_track_code as generate_single_track_code_composition,
-    stream_composition_process,
-)
-from app.services.llm import (
-    generate_midi_code as generate_midi_code_llm,
-    generate_single_track_code as generate_single_track_code_llm,
-)
+from app.services.llm import generate_midi_code, generate_single_track_code
 from app.services.midi_executor import (
     execute_midi_generation,
     midi_to_base64,
@@ -92,20 +82,13 @@ async def generate_song(request: GenerateRequest):
     """Generate a multi-track song from a text prompt."""
 
     params = parse_prompt(request.prompt)
-    agent_type = request.agent_type or "composition_agent"
     last_error = None
-
-    # Select the appropriate generation function based on agent_type
-    if agent_type == "llm":
-        generate_func = generate_midi_code_llm
-    else:
-        generate_func = generate_midi_code_composition
 
     # Retry loop for transient generation errors
     for attempt in range(MAX_RETRIES):
         try:
             # Generate code from Claude
-            code = await generate_func(
+            code = await generate_midi_code(
                 prompt=params["style"], tempo=params["tempo"], key=params["key"]
             )
 
@@ -160,108 +143,6 @@ async def generate_song(request: GenerateRequest):
     )
 
 
-async def stream_llm_process(prompt: str, tempo: int, key: str):
-    """Generate code silently without streaming - LLM Direct mode doesn't stream."""
-    code = await generate_midi_code_llm(prompt=prompt, tempo=tempo, key=key)
-    # Send code_ready signal directly without streaming the code
-    yield json.dumps({
-        "type": "code_ready",
-        "code": code
-    }) + "\n"
-
-
-@router.post("/generate/stream")
-async def generate_song_stream(request: GenerateRequest):
-    """Stream the composition process with real-time updates."""
-    params = parse_prompt(request.prompt)
-    agent_type = request.agent_type or "composition_agent"
-    
-    async def generate():
-        try:
-            code = None
-            # Select streaming function based on agent_type
-            if agent_type == "llm":
-                stream_func = stream_llm_process
-            else:
-                stream_func = stream_composition_process
-            
-            async for chunk in stream_func(
-                prompt=params["style"],
-                tempo=params["tempo"],
-                key=params["key"]
-            ):
-                # Parse the chunk
-                try:
-                    data = json.loads(chunk.strip())
-                    if data.get("type") == "code_ready":
-                        code = data.get("code")
-                        # Send final message
-                        yield f"data: {json.dumps({'type': 'code_ready'})}\n\n"
-                    else:
-                        # Stream message content
-                        yield f"data: {chunk}"
-                except json.JSONDecodeError:
-                    # If it's not JSON, send as-is
-                    yield f"data: {chunk}"
-            
-            # After streaming, execute the code if we have it
-            if code:
-                try:
-                    midi_files = execute_midi_generation(
-                        code=code,
-                        tempo=params["tempo"],
-                        key=params["key"]
-                    )
-                    
-                    # Validate track count
-                    if len(midi_files) > MAX_TRACKS:
-                        midi_files = dict(list(midi_files.items())[:MAX_TRACKS])
-                    
-                    if len(midi_files) == 0:
-                        yield f"data: {json.dumps({'type': 'error', 'message': 'No tracks were generated'})}\n\n"
-                        return
-                    
-                    # Convert to response format
-                    tracks = []
-                    for index, (name, midi_bytes) in enumerate(midi_files.items()):
-                        config = get_track_config(name, index)
-                        tracks.append({
-                            "name": name,
-                            "midi_data": midi_to_base64(midi_bytes),
-                            "channel": config["channel"],
-                            "program_number": config["program"],
-                        })
-                    
-                    # Send final result
-                    result_data = {
-                        'type': 'complete',
-                        'tracks': tracks,
-                        'metadata': {
-                            'tempo': params['tempo'],
-                            'key': params['key'],
-                            'time_signature': '4/4'
-                        },
-                        'message': f'Generated {len(tracks)} track(s)'
-                    }
-                    yield f"data: {json.dumps(result_data)}\n\n"
-                except Exception as e:
-                    yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
-            else:
-                yield f"data: {json.dumps({'type': 'error', 'message': 'No code was generated'})}\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
-    
-    return StreamingResponse(
-        generate(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
-    )
-
-
 @router.post("/regenerate", response_model=RegenerateResponse)
 async def regenerate_track(request: RegenerateRequest):
     """Regenerate a single track based on instruction."""
@@ -269,14 +150,10 @@ async def regenerate_track(request: RegenerateRequest):
     context = request.context
     last_error = None
 
-    # For regenerate, default to composition_agent
-    # Could add agent_type to RegenerateRequest if needed in the future
-    generate_func = generate_single_track_code_composition
-
     for attempt in range(MAX_RETRIES):
         try:
             # Generate code for single track
-            code = await generate_func(
+            code = await generate_single_track_code(
                 track_name=request.track_name,
                 instruction=request.instruction,
                 context=context,

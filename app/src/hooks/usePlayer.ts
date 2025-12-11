@@ -4,15 +4,16 @@ import { useStores } from "./useStores"
 export function usePlayer() {
   const { player } = useStores()
 
-  // Call hooks at the top level, not inside getters
-  const position = useMobxGetter(player, "position")
-  const isPlaying = useMobxGetter(player, "isPlaying")
-  const loop = useMobxGetter(player, "loop")
-
   return {
-    position,
-    isPlaying,
-    loop,
+    get position() {
+      return useMobxGetter(player, "position")
+    },
+    get isPlaying() {
+      return useMobxGetter(player, "isPlaying")
+    },
+    get loop() {
+      return useMobxGetter(player, "loop")
+    },
     setPosition: useMobxSetter(player, "position"),
     playOrPause: player.playOrPause,
     play: player.play,

@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { DialogTitle } from "@radix-ui/react-dialog"
 import range from "lodash/range"
 import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
@@ -54,9 +53,6 @@ export const ColorPicker: FC<ColorPickerProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogTitle style={{ display: "none" }}>
-        Color Picker
-      </DialogTitle>
       <DialogContent>
         <Container>
           {colors.map((color) => (

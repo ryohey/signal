@@ -16,19 +16,6 @@ export function useTransportPanel() {
   const canRecording = useCanRecord()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
-  // Call hooks at the top level, not inside getters
-  const isRecording = useMobxGetter(midiRecorder, "isRecording")
-  const isMetronomeEnabled = useMobxGetter(synthGroup, "isMetronomeEnabled")
-  const currentMBTTime = useMobxSelector(
-    () =>
-      Measure.getMBTString(
-        songStore.song.measures,
-        player.position,
-        songStore.song.timebase,
-      ),
-    [songStore, player],
-  )
-
   return {
     play: playOrPause,
     stop: useStop(),
@@ -43,8 +30,22 @@ export function useTransportPanel() {
     isLoopEnabled: loop !== null,
     isLoopActive: loop?.enabled ?? false,
     canRecording,
-    isRecording,
-    isMetronomeEnabled,
-    currentMBTTime,
+    get isRecording() {
+      return useMobxGetter(midiRecorder, "isRecording")
+    },
+    get isMetronomeEnabled() {
+      return useMobxGetter(synthGroup, "isMetronomeEnabled")
+    },
+    get currentMBTTime() {
+      return useMobxSelector(
+        () =>
+          Measure.getMBTString(
+            songStore.song.measures,
+            player.position,
+            songStore.song.timebase,
+          ),
+        [songStore, player],
+      )
+    },
   }
 }
