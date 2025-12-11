@@ -24,6 +24,6 @@
     "vitest": "^4.0.10"
   },
   "dependencies": {
-    "@ryohey/wavelet": "^0.7.4"
+    "@ryohey/wavelet": "^0.7.5"
   }
 }

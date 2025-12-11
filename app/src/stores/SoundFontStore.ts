@@ -106,9 +106,23 @@ export class SoundFontStore {
     }
 
     this.isLoading = true
-    await this.synth.loadSoundFont(await loadSoundFont(soundfont))
-    this.selectedSoundFontId = id
-    this.isLoading = false
+    try {
+      await this.synth.loadSoundFont(await loadSoundFont(soundfont))
+      this.selectedSoundFontId = id
+    } catch (error) {
+      console.error("Failed to load SoundFont:", error)
+      // Try to provide a more helpful error message
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error"
+      if (errorMessage.includes("sampleID")) {
+        throw new Error(
+          `This SoundFont file may be incompatible or corrupted. Some instruments have invalid sample references. (${errorMessage})`,
+        )
+      }
+      throw error
+    } finally {
+      this.isLoading = false
+    }
   }
 
   addSoundFont = async (item: SoundFontItem, metadata: Metadata) => {

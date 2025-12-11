@@ -38,6 +38,29 @@ SYSTEM_PROMPT = """You are a music composition assistant.
 When asked to generate music, respond with ONLY valid Python code that creates MIDI files.
 No explanations, no markdown code blocks - just raw Python code.
 
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: STANDARD 4/4 BACKBEAT TIMING (NOT HALF-TIME)
+═══════════════════════════════════════════════════════════════════════════════
+
+In standard pop/rock 4/4 time, ONE BAR = 4 BEATS:
+- Beat 0: Kick drum (downbeat)
+- Beat 1: SNARE (backbeat) - THIS IS CRITICAL
+- Beat 2: Kick drum
+- Beat 3: SNARE (backbeat) - THIS IS CRITICAL
+
+SNARE MUST HIT ON BEATS 1 AND 3 (the "2 and 4" in musician counting).
+This creates the standard backbeat groove, NOT a half-time feel.
+
+Each bar in code uses time 0-4:
+- time 0 = beat 1 (kick)
+- time 1 = beat 2 (SNARE)
+- time 2 = beat 3 (kick)
+- time 3 = beat 4 (SNARE)
+
+Hi-hats play eighth notes: 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
+
+═══════════════════════════════════════════════════════════════════════════════
+
 REQUIREMENTS:
 1. Use MIDIUtil library
 2. Choose appropriate instrumentation for the style/genre (maximum 8 tracks)
@@ -86,9 +109,9 @@ RHYTHM COMPLEXITY (CRITICAL - music must groove):
 
 VELOCITY DYNAMICS (CRITICAL - music must breathe):
 - Full range: 30-100, not just 70-90
-- Strong beats (1, 3): velocity 85-100
-- Weak beats (2, 4): velocity 65-80
-- Off-beats: velocity 50-70
+- Downbeats (0, 2 in each bar): kick hits, velocity 85-100
+- Backbeats (1, 3 in each bar): SNARE hits, velocity 90-100 (accented!)
+- Off-beats (0.5, 1.5, 2.5, 3.5): hi-hats, velocity 50-70
 - Ghost notes: velocity 30-50
 - Crescendo into chorus: gradually increase velocity over 2-4 bars
 - Decrescendo in outro: gradually decrease velocity
@@ -102,13 +125,37 @@ PATTERN VARIATION (CRITICAL - avoid repetition):
 
 INSTRUMENT-SPECIFIC RULES:
 
-DRUMS:
-- Hi-hat: ALWAYS eighth notes minimum, sixteenths in chorus for energy
-- Kick: Syncopated pattern, NOT just beats 1 and 3 (e.g., 1, 2.5, 3, 4.5)
-- Snare: Main hits on 2 and 4, ADD ghost notes (vel 30-45) on other beats
-- Fills every 8 bars: tom rolls (45, 47, 50) or snare rolls before section changes
-- Crash (49) on beat 1 of new sections
-- Ride (51) in verses, hi-hat in chorus for contrast
+DRUMS (CRITICAL - defines the feel):
+- SNARE: MUST hit at times 1.0 and 3.0 in every bar (beats 2 and 4)
+  This is the standard backbeat - NOT half-time!
+- KICK: Syncopated pattern with hits at 0, 0.75, 2, 2.5 or similar
+  NEVER just times 0 and 2 alone - add syncopation!
+- HI-HAT: Eighth notes on EVERY eighth (0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5)
+  Or sixteenths in chorus for energy
+- Ghost snare notes (vel 30-45) can be added between main hits
+- Fills every 8 bars before section changes
+- Crash (49) on beat 0 of new sections
+
+EXAMPLE DRUM PATTERN (per bar) - COPY THIS EXACTLY:
+```
+bar_start = bar * 4
+
+# KICK - syncopated pattern (NOT just 0 and 2!)
+drums.addNote(0, 9, 36, bar_start + 0, 0.4, 100)     # Beat 1
+drums.addNote(0, 9, 36, bar_start + 0.75, 0.4, 80)   # Syncopated (before beat 2)
+drums.addNote(0, 9, 36, bar_start + 2, 0.4, 95)      # Beat 3
+drums.addNote(0, 9, 36, bar_start + 2.5, 0.4, 80)    # Syncopated (after beat 3)
+
+# SNARE - ALWAYS at times 1 and 3 (beats 2 and 4)
+drums.addNote(0, 9, 38, bar_start + 1, 0.3, 100)     # Beat 2 - BACKBEAT
+drums.addNote(0, 9, 38, bar_start + 3, 0.3, 100)     # Beat 4 - BACKBEAT
+
+# HI-HAT - eighth notes throughout
+for eighth in range(8):
+    time = bar_start + eighth * 0.5
+    vel = 75 if eighth % 2 == 0 else 55  # Accent downbeats
+    drums.addNote(0, 9, 42, time, 0.4, vel)
+```
 
 BASS:
 - NEVER just root notes on quarter notes - this sounds amateur
@@ -118,6 +165,7 @@ BASS:
 - Walking bass in jazz/soul styles
 - Slides: approach notes 1-2 semitones below
 - Octave jumps for energy in chorus
+- Bass notes often land on beats 0, 1.5, 2, 3.5 to lock with kick
 
 GUITAR (Rhythm):
 - Strumming: alternate DOWN-up-DOWN-up, not all downstrokes
@@ -138,8 +186,8 @@ KEYS/PIANO:
 - NOT just whole note pads - this is boring
 - Rhythmic comping: eighth note patterns with chord stabs
 - Use chord inversions for smooth voice leading
-- Left hand: bass notes or octaves on beats 1 and 3
-- Right hand: chord voicings with rhythmic variation
+- Left hand: bass notes or octaves on beats 0 and 2
+- Right hand: chord voicings with rhythmic variation, often hitting on backbeats (1, 3)
 - Occasional runs/fills between chord changes
 - Counter-melody lines in different register from main melody
 
@@ -148,20 +196,20 @@ MELODY TRACK:
 - Keep notes in singable range: C4-G5 (MIDI notes 60-79)
 - Phrases 2-4 bars with rests between (singers need to breathe!)
 - Stepwise motion primarily, leaps of 3rds/4ths for expression
-- Chord tones on strong beats, passing tones on weak beats
+- Chord tones on downbeats (0, 2), passing tones on backbeats and off-beats
 - Vary rhythm: mix quarter, eighth, dotted rhythms
 - Syncopation: anticipate chord changes by an eighth note
 - Silent during intro/outro
 
 STRUCTURE DYNAMICS:
-- Intro (8 bars): Sparse, 1-2 instruments, establish groove
-- Verse 1 (16 bars): Medium density, drums + bass + one melodic instrument
-- Pre-Chorus (4-8 bars): Build tension, add instruments, crescendo
-- Chorus (16 bars): Full band, highest energy, densest arrangement
-- Verse 2 (16 bars): Like verse 1 but with subtle variations (extra fills, ornaments)
-- Chorus 2 (16 bars): Even bigger - add extra layer or higher octave
-- Bridge (8 bars): Different feel - change pattern, maybe half-time or different groove
-- Outro (8 bars): Gradually reduce instruments, decrescendo, end on root chord
+- Intro (4 bars): Sparse, 1-2 instruments, establish groove
+- Verse 1 (8 bars): Medium density, drums + bass + one melodic instrument
+- Pre-Chorus (4 bars): Build tension, add instruments, crescendo
+- Chorus (8 bars): Full band, highest energy, densest arrangement
+- Verse 2 (8 bars): Like verse 1 but with subtle variations (extra fills, ornaments)
+- Chorus 2 (8 bars): Even bigger - add extra layer or higher octave
+- Bridge (4 bars): Different feel - change pattern, maybe half-time or different groove
+- Outro (4 bars): Gradually reduce instruments, decrescendo, end on root chord
 
 REFERENCE ARTISTS:
 - Users may reference artists (e.g., "like Arctic Monkeys" or "Radiohead vibes")
@@ -186,7 +234,8 @@ def humanize_timing(time, variance=0.02):
 
 def generate_song(output_dir: str, tempo: int, key: str):
     os.makedirs(output_dir, exist_ok=True)
-    structure = [("intro", 8), ("verse", 16), ("chorus", 16), ("verse", 16), ("chorus", 16), ("outro", 8)]
+    # Standard structure - each section in bars
+    structure = [("intro", 4), ("verse", 8), ("chorus", 8), ("verse", 8), ("chorus", 8), ("outro", 4)]
     chords = {"verse": ["Am", "F", "C", "G"], "chorus": ["F", "C", "G", "Am"]}
     generate_drums(output_dir, tempo, structure)
     generate_bass(output_dir, tempo, structure, chords)
@@ -452,6 +501,19 @@ SONG SPECIFICATION:
 {spec_json}
 
 ═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: STANDARD 4/4 BACKBEAT TIMING (NOT HALF-TIME)
+═══════════════════════════════════════════════════════════════════════════════
+
+In standard pop/rock 4/4 time, ONE BAR = 4 BEATS (times 0-4 in code):
+- time 0: Kick drum (beat 1, downbeat)
+- time 1: SNARE (beat 2, backbeat) - CRITICAL!
+- time 2: Kick drum (beat 3)
+- time 3: SNARE (beat 4, backbeat) - CRITICAL!
+
+SNARE MUST HIT AT TIMES 1 AND 3 IN EVERY BAR. This is the standard backbeat.
+Hi-hats: eighth notes at 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
+
+═══════════════════════════════════════════════════════════════════════════════
 QUALITY REQUIREMENTS - YOUR CODE WILL BE VALIDATED AGAINST THESE EXACT METRICS:
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -464,7 +526,9 @@ QUALITY REQUIREMENTS - YOUR CODE WILL BE VALIDATED AGAINST THESE EXACT METRICS:
 2. VELOCITY DYNAMICS (CRITICAL):
    - Velocity range must span at least 20 points (e.g., 60-85)
    - Use velocities from 40 to 100, not just 70-80
-   - Strong beats: 80-100, weak beats: 60-75, off-beats: 45-65
+   - Backbeats (snare at 1, 3): velocity 90-100 (accented!)
+   - Downbeats (kick at 0, 2): velocity 85-100
+   - Off-beats: velocity 50-70
    - Standard deviation must be at least 5 (vary velocities significantly)
 
 3. SYNCOPATION (CRITICAL):
@@ -493,7 +557,7 @@ STRUCTURE RULES:
 - Match the energy level (low=sparse, medium=normal, high=dense)
 - Add fills/transitions between sections
 
-REQUIRED CODE PATTERN - USE THIS EXACT STRUCTURE:
+REQUIRED CODE PATTERN - COPY THIS EXACTLY:
 ```
 from midiutil import MIDIFile
 import os
@@ -504,34 +568,54 @@ def humanize_velocity(base_vel, variance=15):
 
 def generate_song(output_dir: str, tempo: int, key: str):
     os.makedirs(output_dir, exist_ok=True)
+    total_bars = 40  # Adjust based on structure
 
-    # DRUMS - Example of correct rhythm/velocity patterns
+    # DRUMS - STANDARD BACKBEAT (snare at times 1 and 3)
     drums = MIDIFile(1)
     drums.addTempo(0, 0, tempo)
     for bar in range(total_bars):
-        # Hi-hat - EIGHTH NOTES (duration 0.5), varied velocity
-        for beat in range(8):
-            time = bar * 4 + beat * 0.5
-            vel = humanize_velocity(70 if beat % 2 == 0 else 55)  # Accented/unaccented
+        bar_start = bar * 4
+
+        # HI-HAT - eighth notes throughout
+        for eighth in range(8):
+            time = bar_start + eighth * 0.5
+            vel = humanize_velocity(75 if eighth % 2 == 0 else 55)
             drums.addNote(0, 9, 42, time, 0.4, vel)
 
-        # Kick - SYNCOPATED pattern (not just 1 and 3)
-        kicks = [0, 1.5, 2.5]  # Off-beat kicks at 1.5, 2.5
-        for k in kicks:
-            drums.addNote(0, 9, 36, bar * 4 + k, 0.4, humanize_velocity(95))
+        # KICK - syncopated (NOT just 0 and 2!)
+        drums.addNote(0, 9, 36, bar_start + 0, 0.4, humanize_velocity(100))
+        drums.addNote(0, 9, 36, bar_start + 0.75, 0.4, humanize_velocity(80))  # Syncopation!
+        drums.addNote(0, 9, 36, bar_start + 2, 0.4, humanize_velocity(95))
+        drums.addNote(0, 9, 36, bar_start + 2.5, 0.4, humanize_velocity(80))   # Syncopation!
 
-        # Snare on 2 and 4 with ghost notes
-        drums.addNote(0, 9, 38, bar * 4 + 1, 0.3, humanize_velocity(90))
-        drums.addNote(0, 9, 38, bar * 4 + 3, 0.3, humanize_velocity(90))
-        # Ghost notes (low velocity, off-beat)
-        drums.addNote(0, 9, 38, bar * 4 + 0.5, 0.2, humanize_velocity(35))
-        drums.addNote(0, 9, 38, bar * 4 + 2.5, 0.2, humanize_velocity(35))
+        # SNARE - ALWAYS at times 1 and 3 (this is the backbeat!)
+        drums.addNote(0, 9, 38, bar_start + 1, 0.3, humanize_velocity(100))
+        drums.addNote(0, 9, 38, bar_start + 3, 0.3, humanize_velocity(100))
 
     with open(os.path.join(output_dir, "drums.mid"), "wb") as f:
         drums.writeFile(f)
 
-    # Similar patterns for other instruments...
-    # Each must have: varied durations, varied velocities, some off-beat notes
+    # BASS - eighth note pattern, lock with kick
+    bass = MIDIFile(1)
+    bass.addTempo(0, 0, tempo)
+    bass.addProgramChange(0, 0, 0, 33)  # Electric bass
+    root = 40  # E2
+    for bar in range(total_bars):
+        bar_start = bar * 4
+        # Eighth note pattern: root-root-fifth-root
+        bass.addNote(0, 0, root, bar_start + 0, 0.4, humanize_velocity(90))
+        bass.addNote(0, 0, root, bar_start + 0.5, 0.4, humanize_velocity(70))
+        bass.addNote(0, 0, root + 7, bar_start + 1, 0.4, humanize_velocity(75))
+        bass.addNote(0, 0, root, bar_start + 1.5, 0.4, humanize_velocity(70))
+        bass.addNote(0, 0, root, bar_start + 2, 0.4, humanize_velocity(85))
+        bass.addNote(0, 0, root, bar_start + 2.5, 0.4, humanize_velocity(70))
+        bass.addNote(0, 0, root + 7, bar_start + 3, 0.4, humanize_velocity(75))
+        bass.addNote(0, 0, root, bar_start + 3.5, 0.4, humanize_velocity(70))
+
+    with open(os.path.join(output_dir, "bass.mid"), "wb") as f:
+        bass.writeFile(f)
+
+    # Add more instruments following similar patterns...
 
 generate_song("{output_dir}", {tempo}, "{key}")
 ```

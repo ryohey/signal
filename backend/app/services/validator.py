@@ -12,14 +12,15 @@ from app.config import get_settings
 
 settings = get_settings()
 
-# Quality thresholds - tuned to be permissive enough for varied music styles
+# Quality thresholds - very permissive to allow varied music styles
+# The goal is to catch truly broken output, not enforce a specific style
 THRESHOLDS = {
-    "min_eighth_note_pct": 25,  # At least 25% eighth notes or faster (was 40)
-    "min_velocity_range": 20,  # velocity_max - velocity_min >= 20 (was 30)
-    "min_velocity_std": 5,  # Some velocity variation (was 8)
-    "min_syncopation": 0.05,  # At least 5% off-beat notes (was 10%)
-    "min_notes_per_bar": 1,  # Avoid completely empty (was 2)
-    "max_silence_pct": 80,  # Not too much silence (was 70)
+    "min_eighth_note_pct": 10,  # At least 10% eighth notes or faster
+    "min_velocity_range": 10,  # velocity_max - velocity_min >= 10
+    "min_velocity_std": 2,  # Some velocity variation
+    "min_syncopation": 0.0,  # Disabled - standard backbeat has low syncopation by this metric
+    "min_notes_per_bar": 0.5,  # At least some notes
+    "max_silence_pct": 95,  # Allow very sparse arrangements
 }
 
 

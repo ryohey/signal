@@ -46,14 +46,14 @@ export interface AIBackendError {
 // ============================================================================
 
 export interface AttemptLog {
-  attemptNumber: number
-  stage: string
-  success: boolean
-  errorType?: string
-  errorMessage?: string
+  attempt: number
+  mode: string // "initial", "patch", "regenerate"
+  codeGenerated: boolean
+  executionSuccess: boolean
+  validationPassed: boolean
+  error?: string
   validationResult?: ValidationResult
-  durationMs: number
-  timestamp: string
+  issues?: string[]
 }
 
 export interface ValidationResult {
@@ -68,8 +68,6 @@ export interface ValidationResult {
 export interface TrackMetrics {
   name: string
   noteCount: number
-  durationBars: number
-  avgNoteDuration: number
   eighthNoteOrFasterPct: number
   syncopationScore: number
   velocityMin: number

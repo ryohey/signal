@@ -217,14 +217,15 @@ class AIBackendService {
   }
 
   private convertAttemptLogs(logs: unknown[]): AttemptLog[] {
+    if (!logs) return []
     return (logs as Record<string, unknown>[]).map((log) => ({
-      attemptNumber: log.attempt_number as number,
-      stage: log.stage as string,
-      success: log.success as boolean,
-      errorType: log.error_type as string | undefined,
-      errorMessage: log.error_message as string | undefined,
-      durationMs: log.duration_ms as number,
-      timestamp: log.timestamp as string,
+      attempt: log.attempt as number,
+      mode: log.mode as string,
+      codeGenerated: log.code_generated as boolean,
+      executionSuccess: log.execution_success as boolean,
+      validationPassed: log.validation_passed as boolean,
+      error: log.error as string | undefined,
+      issues: log.issues as string[] | undefined,
       // Skip full validation result for now to keep it simple
     }))
   }
