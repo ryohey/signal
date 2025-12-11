@@ -44,32 +44,100 @@ GENERAL MIDI PROGRAM NUMBERS (common instruments):
 - Brass: 56-63, Synth Brass: 62-63
 - Woodwinds: 64-79 (Flute: 73, Clarinet: 71, Sax: 65-67)
 - Synth Lead: 80-87, Synth Pad: 88-95
-- Drums: channel 9, kick=36, snare=38, hihat-closed=42, hihat-open=46, crash=49, ride=51
+- Drums: channel 9, kick=36, snare=38, hihat-closed=42, hihat-open=46, crash=49, ride=51, tom-low=45, tom-mid=47, tom-high=50
 
 NOTE RANGES:
 - Bass: octave 2-3 (36-48)
 - Guitar/Keys: octave 3-5 (48-72)
 - Melody/Lead: C4-G5 (60-79) for singable range
 - Pads/Strings: octave 4-5 (60-84)
-- Velocity: 80-100 for accents, 60-80 for normal, 40-60 for soft
 - Duration: 1 = quarter note, 0.5 = eighth, 0.25 = sixteenth
 
-MUSICAL COHESION RULES:
-1. Bass follows the kick drum rhythm (typically beats 1 and 3)
-2. Bass plays chord root notes primarily
-3. Rhythm instruments lock together
-4. Melodic instruments leave space for each other (different registers/rhythms)
-5. Density increases from verse to chorus
-6. Melody should be singable - stepwise motion with occasional leaps
+RHYTHM COMPLEXITY (CRITICAL - music must groove):
+- Minimum 60% eighth notes or faster - quarter notes alone sound robotic
+- Use syncopation: place notes BETWEEN beats (0.5, 1.5, 2.5, 3.5)
+- Vary note durations within each bar - mix eighths, sixteenths, quarters
+- Add strategic rests - don't fill every beat
+- Swing feel: optionally delay off-beat notes by 0.03-0.05
 
-MELODY TRACK GUIDELINES:
+VELOCITY DYNAMICS (CRITICAL - music must breathe):
+- Full range: 30-100, not just 70-90
+- Strong beats (1, 3): velocity 85-100
+- Weak beats (2, 4): velocity 65-80
+- Off-beats: velocity 50-70
+- Ghost notes: velocity 30-50
+- Crescendo into chorus: gradually increase velocity over 2-4 bars
+- Decrescendo in outro: gradually decrease velocity
+
+PATTERN VARIATION (CRITICAL - avoid repetition):
+- Change patterns every 4-8 bars
+- Verse pattern MUST differ from chorus pattern
+- Second verse should vary from first verse (add ornaments, change rhythm slightly)
+- Add fills every 8 bars to transition between sections
+- Bridge section: completely different pattern/feel
+
+INSTRUMENT-SPECIFIC RULES:
+
+DRUMS:
+- Hi-hat: ALWAYS eighth notes minimum, sixteenths in chorus for energy
+- Kick: Syncopated pattern, NOT just beats 1 and 3 (e.g., 1, 2.5, 3, 4.5)
+- Snare: Main hits on 2 and 4, ADD ghost notes (vel 30-45) on other beats
+- Fills every 8 bars: tom rolls (45, 47, 50) or snare rolls before section changes
+- Crash (49) on beat 1 of new sections
+- Ride (51) in verses, hi-hat in chorus for contrast
+
+BASS:
+- NEVER just root notes on quarter notes - this sounds amateur
+- Use eighth note patterns: root-root-fifth-root or root-octave-fifth-third
+- Add chromatic approach notes (one semitone below target note)
+- Lock rhythmically with kick drum pattern
+- Walking bass in jazz/soul styles
+- Slides: approach notes 1-2 semitones below
+- Octave jumps for energy in chorus
+
+GUITAR (Rhythm):
+- Strumming: alternate DOWN-up-DOWN-up, not all downstrokes
+- Eighth note strumming minimum, sixteenths for high energy
+- Palm muting in verses (shorter duration 0.1-0.2, lower velocity 50-65)
+- Open strumming in chorus (longer duration 0.3-0.5, higher velocity 75-90)
+- Power chords: staccato hits (duration 0.2-0.3)
+- Arpeggios: sixteenth notes through chord tones
+
+GUITAR (Lead):
+- Pentatonic runs and licks, not just held notes
+- Bends represented by quick chromatic steps
+- Vibrato: slight pitch oscillation (optional)
+- Call and response with vocals/melody
+- Solo section: faster sixteenth note runs, wider interval jumps
+
+KEYS/PIANO:
+- NOT just whole note pads - this is boring
+- Rhythmic comping: eighth note patterns with chord stabs
+- Use chord inversions for smooth voice leading
+- Left hand: bass notes or octaves on beats 1 and 3
+- Right hand: chord voicings with rhythmic variation
+- Occasional runs/fills between chord changes
+- Counter-melody lines in different register from main melody
+
+MELODY TRACK:
 - Use Flute (program 73) on channel 3 for vocal melody representation
 - Keep notes in singable range: C4-G5 (MIDI notes 60-79)
-- Write singable phrases that a vocalist could perform
-- Use stepwise motion primarily with occasional leaps of 3rds or 4ths
-- Keep phrases 2-4 bars long with rests between them
-- Melody should be silent during intro/outro, play during verse/chorus
-- Follow chord tones on strong beats, use passing tones on weak beats
+- Phrases 2-4 bars with rests between (singers need to breathe!)
+- Stepwise motion primarily, leaps of 3rds/4ths for expression
+- Chord tones on strong beats, passing tones on weak beats
+- Vary rhythm: mix quarter, eighth, dotted rhythms
+- Syncopation: anticipate chord changes by an eighth note
+- Silent during intro/outro
+
+STRUCTURE DYNAMICS:
+- Intro (8 bars): Sparse, 1-2 instruments, establish groove
+- Verse 1 (16 bars): Medium density, drums + bass + one melodic instrument
+- Pre-Chorus (4-8 bars): Build tension, add instruments, crescendo
+- Chorus (16 bars): Full band, highest energy, densest arrangement
+- Verse 2 (16 bars): Like verse 1 but with subtle variations (extra fills, ornaments)
+- Chorus 2 (16 bars): Even bigger - add extra layer or higher octave
+- Bridge (8 bars): Different feel - change pattern, maybe half-time or different groove
+- Outro (8 bars): Gradually reduce instruments, decrescendo, end on root chord
 
 REFERENCE ARTISTS:
 - Users may reference artists (e.g., "like Arctic Monkeys" or "Radiohead vibes")
@@ -77,42 +145,28 @@ REFERENCE ARTISTS:
 - Let artist references guide the overall musical approach
 
 HUMANIZATION (apply to all tracks):
-- Add slight velocity variations (±5-10 from target)
-- Keep kick/snare on grid for tight rhythm
-- Allow slight timing variations on other instruments (±0.02 beats)
+- Velocity variation: ±5-15 from target (use humanize_velocity function)
+- Timing: kick/snare ON grid, other instruments ±0.02 beats (use humanize_timing function)
+- Never have all notes at exact same velocity - this sounds robotic
 
 EXAMPLE CODE PATTERN:
 from midiutil import MIDIFile
 import os
 import random
 
-def humanize_velocity(velocity, variance=10):
-    return max(1, min(127, velocity + random.randint(-variance, variance)))
+def humanize_velocity(base_vel, variance=12):
+    return max(1, min(127, base_vel + random.randint(-variance, variance)))
 
 def humanize_timing(time, variance=0.02):
-    return time + random.uniform(-variance, variance)
+    return max(0, time + random.uniform(-variance, variance))
 
 def generate_song(output_dir: str, tempo: int, key: str):
-    # Define song structure
+    os.makedirs(output_dir, exist_ok=True)
     structure = [("intro", 8), ("verse", 16), ("chorus", 16), ("verse", 16), ("chorus", 16), ("outro", 8)]
-
-    # Define chord progressions
     chords = {"verse": ["Am", "F", "C", "G"], "chorus": ["F", "C", "G", "Am"]}
-
-    # Generate each instrument (adjust based on style)
     generate_drums(output_dir, tempo, structure)
     generate_bass(output_dir, tempo, structure, chords)
     # ... more instruments as appropriate for the style
-
-def generate_instrument(output_dir, filename, channel, program, tempo, notes):
-    midi = MIDIFile(1)
-    midi.addTempo(0, 0, tempo)
-    if channel != 9:
-        midi.addProgramChange(0, channel, 0, program)
-    for time, pitch, duration, velocity in notes:
-        midi.addNote(0, channel, pitch, time, duration, humanize_velocity(velocity))
-    with open(os.path.join(output_dir, filename), "wb") as f:
-        midi.writeFile(f)
 
 generate_song("{output_dir}", {tempo}, "{key}")
 """
