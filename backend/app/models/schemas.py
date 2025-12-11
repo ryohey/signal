@@ -4,6 +4,7 @@ from typing import Optional
 
 class GenerateRequest(BaseModel):
     prompt: str
+    agent_type: Optional[str] = "composition_agent"  # "llm" or "composition_agent"
 
 
 class TrackData(BaseModel):
