@@ -21,6 +21,10 @@ THRESHOLDS = {
     "min_syncopation": 0.0,  # Disabled - standard backbeat has low syncopation by this metric
     "min_notes_per_bar": 0.5,  # At least some notes
     "max_silence_pct": 95,  # Allow very sparse arrangements
+    # Drum-specific thresholds (to prevent half-time feel)
+    "min_snare_hits_per_bar": 1.5,  # Standard backbeat has 2, allow some fills/breaks
+    "min_hihat_hits_per_bar": 6.0,  # Eighth notes = 8/bar, allow some variation
+    "min_kick_hits_per_bar": 1.5,   # At least on beats 1 and 3
 }
 
 
@@ -67,6 +71,35 @@ def validate_track_metrics(metrics: TrackMetrics, is_drums: bool = False) -> Lis
         issues.append(
             f"{metrics.name}: too much silence - {metrics.silence_pct:.0f}% "
             f"(max {THRESHOLDS['max_silence_pct']}%)"
+        )
+
+    return issues
+
+
+def validate_drum_pattern(metrics: TrackMetrics) -> List[str]:
+    """Check drum-specific pattern metrics for half-time issues."""
+    issues = []
+
+    # Only validate if drum metrics are present
+    if metrics.snare_hits_per_bar is None:
+        return issues
+
+    if metrics.snare_hits_per_bar < THRESHOLDS["min_snare_hits_per_bar"]:
+        issues.append(
+            f"{metrics.name}: HALF-TIME DETECTED - only {metrics.snare_hits_per_bar:.1f} snare hits/bar "
+            f"(need {THRESHOLDS['min_snare_hits_per_bar']} for standard backbeat)"
+        )
+
+    if metrics.hihat_hits_per_bar is not None and metrics.hihat_hits_per_bar < THRESHOLDS["min_hihat_hits_per_bar"]:
+        issues.append(
+            f"{metrics.name}: hi-hat too sparse - {metrics.hihat_hits_per_bar:.1f} hits/bar "
+            f"(need {THRESHOLDS['min_hihat_hits_per_bar']} for eighth notes)"
+        )
+
+    if metrics.kick_hits_per_bar is not None and metrics.kick_hits_per_bar < THRESHOLDS["min_kick_hits_per_bar"]:
+        issues.append(
+            f"{metrics.name}: kick too sparse - {metrics.kick_hits_per_bar:.1f} hits/bar "
+            f"(need {THRESHOLDS['min_kick_hits_per_bar']})"
         )
 
     return issues
@@ -150,6 +183,11 @@ async def validate_midi_output(
             issues = validate_track_metrics(metrics, is_drums=is_drums)
             all_issues.extend(issues)
 
+            # Additional drum pattern validation
+            if is_drums:
+                drum_issues = validate_drum_pattern(metrics)
+                all_issues.extend(drum_issues)
+
         except Exception as e:
             all_issues.append(f"{track_name}: failed to parse MIDI - {str(e)}")
 
@@ -179,6 +217,13 @@ async def validate_midi_output(
         suggestions.append("Add more off-beat notes for groove")
     if any("sparse" in i for i in all_issues):
         suggestions.append("Increase note density")
+    if any("HALF-TIME" in i for i in all_issues):
+        suggestions.append(
+            "Drum pattern is half-time. Snare must hit on BOTH beats 2 and 4 (times 1.0 and 3.0) in each bar. "
+            "Hi-hat should play eighth notes (8 per bar). This is standard for rock/pop music."
+        )
+    if any("hi-hat too sparse" in i for i in all_issues):
+        suggestions.append("Hi-hat should play eighth notes throughout - 8 hits per bar minimum")
 
     passed = len(all_issues) == 0 and overall_score >= 0.8
 

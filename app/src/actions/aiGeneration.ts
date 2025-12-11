@@ -17,6 +17,9 @@ function base64ToUint8Array(base64: string): Uint8Array {
   return bytes
 }
 
+/** Default tempo if not provided in metadata */
+const DEFAULT_TEMPO = 120
+
 /**
  * Convert API track data to Signal Song
  */
@@ -31,9 +34,15 @@ function apiResponseToSong(response: GenerateResponse): Song {
   const conductor = conductorTrack("AI Generated Song")
   song.addTrack(conductor)
 
-  // Set tempo on conductor track from metadata
-  if (response.metadata.tempo) {
-    conductor.setTempo(response.metadata.tempo, 0)
+  // Set tempo on conductor track from metadata (with fallback)
+  const tempo = response.metadata.tempo
+  if (tempo && tempo > 0) {
+    conductor.setTempo(tempo, 0)
+  } else {
+    console.warn(
+      `AI Generation: Missing or invalid tempo in metadata (got: ${tempo}), using default ${DEFAULT_TEMPO} BPM`,
+    )
+    conductor.setTempo(DEFAULT_TEMPO, 0)
   }
 
   // Load each track's MIDI and extract events
@@ -49,12 +58,51 @@ function apiResponseToSong(response: GenerateResponse): Song {
     if (sourceTrack) {
       // Set track metadata
       sourceTrack.setName(trackData.name)
-      sourceTrack.channel = trackData.channel
+
+      // Ensure channel is set (required for playback)
+      // Channel 9 is reserved for drums in General MIDI
+      if (
+        trackData.channel === undefined ||
+        trackData.channel < 0 ||
+        trackData.channel > 15
+      ) {
+        console.warn(
+          `AI Generation: Invalid channel ${trackData.channel} for track "${trackData.name}", using channel 0`,
+        )
+        sourceTrack.channel = 0
+      } else {
+        sourceTrack.channel = trackData.channel
+      }
+
       sourceTrack.setProgramNumber(trackData.programNumber)
+
+      // Verify track has note events
+      const hasNotes = sourceTrack.events.some(
+        (e) => "subtype" in e && e.subtype === "note",
+      )
+      if (!hasNotes) {
+        console.warn(
+          `AI Generation: Track "${trackData.name}" has no note events - it will be silent`,
+        )
+      }
 
       // Add to our song
       song.addTrack(sourceTrack)
+    } else {
+      console.warn(
+        `AI Generation: Could not extract track data for "${trackData.name}" - MIDI may be malformed`,
+      )
     }
+  }
+
+  // Verify we have at least one playable track
+  const playableTracks = song.tracks.filter(
+    (t) => !t.isConductorTrack && t.events.length > 0,
+  )
+  if (playableTracks.length === 0) {
+    console.error(
+      "AI Generation: No playable tracks found in response - song will be silent",
+    )
   }
 
   return song
@@ -100,7 +148,9 @@ export function useRegenerateTrack() {
       )
 
       if (!existingTrack) {
-        console.warn(`Track "${trackData.name}" not found`)
+        console.warn(
+          `AI Generation: Track "${trackData.name}" not found in song`,
+        )
         return
       }
 
@@ -110,8 +160,20 @@ export function useRegenerateTrack() {
       const sourceTrack = trackSong.tracks.find((t) => !t.isConductorTrack)
 
       if (!sourceTrack) {
-        console.warn("No track data in response")
+        console.warn(
+          `AI Generation: No track data in response for "${trackData.name}" - MIDI may be malformed`,
+        )
         return
+      }
+
+      // Verify source track has note events
+      const hasNotes = sourceTrack.events.some(
+        (e) => "subtype" in e && e.subtype === "note",
+      )
+      if (!hasNotes) {
+        console.warn(
+          `AI Generation: Regenerated track "${trackData.name}" has no note events - it will be silent`,
+        )
       }
 
       // Clear existing events and add new ones

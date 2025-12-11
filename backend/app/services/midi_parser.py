@@ -211,6 +211,36 @@ def compute_track_metrics(
             off_beat_notes += 1
     syncopation = off_beat_notes / len(notes)
 
+    # Drum-specific analysis (for channel 9)
+    snare_hits_per_bar = None
+    kick_hits_per_bar = None
+    hihat_hits_per_bar = None
+
+    # Check if this is a drum track (channel 9)
+    channels = set(n['channel'] for n in notes)
+    if 9 in channels:
+        drum_notes = [n for n in notes if n['channel'] == 9]
+
+        # Count hits by drum type (GM standard)
+        SNARE_PITCHES = {38, 40}  # Acoustic snare, Electric snare
+        KICK_PITCHES = {35, 36}   # Acoustic bass drum, Bass drum 1
+        HIHAT_PITCHES = {42, 44, 46}  # Closed, Pedal, Open hi-hat
+
+        snare_hits = sum(1 for n in drum_notes if n['pitch'] in SNARE_PITCHES)
+        kick_hits = sum(1 for n in drum_notes if n['pitch'] in KICK_PITCHES)
+        hihat_hits = sum(1 for n in drum_notes if n['pitch'] in HIHAT_PITCHES)
+
+        # Calculate total bars for drum track
+        if drum_notes:
+            drum_max_end = max(n['start_tick'] + n['duration_ticks'] for n in drum_notes)
+            drum_min_start = min(n['start_tick'] for n in drum_notes)
+            drum_total_ticks = drum_max_end - drum_min_start
+            drum_total_bars = max(1, drum_total_ticks / (ticks_per_beat * 4))
+
+            snare_hits_per_bar = snare_hits / drum_total_bars
+            kick_hits_per_bar = kick_hits / drum_total_bars
+            hihat_hits_per_bar = hihat_hits / drum_total_bars
+
     # Calculate duration of piece and notes per bar
     if notes:
         max_end = max(n['start_tick'] + n['duration_ticks'] for n in notes)
@@ -237,4 +267,8 @@ def compute_track_metrics(
         'eighth_note_or_faster_pct': round(eighth_pct, 1),
         'syncopation_score': round(syncopation, 2),
         'silence_pct': round(silence_pct, 1),
+        # Drum-specific metrics
+        'snare_hits_per_bar': round(snare_hits_per_bar, 1) if snare_hits_per_bar is not None else None,
+        'kick_hits_per_bar': round(kick_hits_per_bar, 1) if kick_hits_per_bar is not None else None,
+        'hihat_hits_per_bar': round(hihat_hits_per_bar, 1) if hihat_hits_per_bar is not None else None,
     }

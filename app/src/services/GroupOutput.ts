@@ -21,6 +21,15 @@ export class GroupOutput implements SynthOutput {
     })
   }
 
+  /** Whether at least one enabled synth is ready to play audio */
+  get isReady(): boolean {
+    const enabledOutputs = this.outputs.filter((o) => o.isEnabled)
+    if (enabledOutputs.length === 0) {
+      return false
+    }
+    return enabledOutputs.some((o) => o.synth.isReady)
+  }
+
   activate() {
     this.outputs.filter((o) => o.isEnabled).forEach((o) => o.synth.activate())
   }

@@ -8,6 +8,11 @@ export default class MIDIOutput implements SynthOutput {
     this.midiOutput = midiOutput
   }
 
+  /** MIDI output is ready when the port is connected */
+  get isReady(): boolean {
+    return this.midiOutput.state === "connected"
+  }
+
   activate() {
     this.midiOutput.open()
   }

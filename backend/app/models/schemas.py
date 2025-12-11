@@ -127,6 +127,11 @@ class TrackMetrics(BaseModel):
     notes_per_bar: float
     silence_pct: float  # percentage of time with no notes
 
+    # Drum-specific metrics (only populated for drum tracks)
+    snare_hits_per_bar: Optional[float] = None
+    kick_hits_per_bar: Optional[float] = None
+    hihat_hits_per_bar: Optional[float] = None
+
 
 class ValidationResult(BaseModel):
     """Result of MIDI quality validation."""

@@ -60,13 +60,34 @@ Each bar in code uses time 0-4:
 Hi-hats play eighth notes: 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
 
 ═══════════════════════════════════════════════════════════════════════════════
+COMMON MISTAKE TO AVOID - DO NOT GENERATE HALF-TIME
+═══════════════════════════════════════════════════════════════════════════════
+
+WRONG (half-time - sounds slow and empty):
+- Snare on beat 3 only (time 2.0) = 1 snare per bar
+- Hi-hat on quarter notes only (times 0, 1, 2, 3) = 4 per bar
+- Kick on beat 1 only (time 0)
+
+CORRECT (standard time - sounds full and groovy):
+- Snare on beats 2 AND 4 (times 1.0 AND 3.0) = 2 snares per bar
+- Hi-hat on eighth notes (times 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5) = 8 per bar
+- Kick on beats 1 AND 3 minimum (times 0 AND 2) plus syncopation
+
+YOUR OUTPUT WILL BE VALIDATED: Snare must average >= 1.5 hits/bar, hi-hat >= 6 hits/bar.
+
+═══════════════════════════════════════════════════════════════════════════════
 
 REQUIREMENTS:
-1. Use MIDIUtil library
+1. Use MIDIUtil library with ticks_per_quarternote=480 (CRITICAL for Signal compatibility)
 2. Choose appropriate instrumentation for the style/genre (maximum 8 tracks)
 3. Create a separate .mid file for each instrument (e.g., drums.mid, bass.mid, etc.)
 4. All tracks must share the same tempo, time signature, and song structure
 5. Generate 32-64 bars of music with clear sections (intro, verse, chorus)
+
+CRITICAL - MIDI FILE CREATION:
+Always create MIDIFile with ticks_per_quarternote=480:
+    midi = MIDIFile(1, ticks_per_quarternote=480)
+This ensures compatibility with the Signal music application. Do NOT use the default (960).
 
 INSTRUMENTATION GUIDELINES:
 - Analyze the prompt to determine appropriate instruments for the style
@@ -308,7 +329,7 @@ from midiutil import MIDIFile
 import os
 
 def generate_{track_name}(output_dir, tempo, key):
-    midi = MIDIFile(1)
+    midi = MIDIFile(1, ticks_per_quarternote=480)  # MUST use 480 for Signal compatibility
     track = 0
     channel = {channel}
     midi.addTempo(track, 0, tempo)
@@ -514,6 +535,22 @@ SNARE MUST HIT AT TIMES 1 AND 3 IN EVERY BAR. This is the standard backbeat.
 Hi-hats: eighth notes at 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
 
 ═══════════════════════════════════════════════════════════════════════════════
+COMMON MISTAKE TO AVOID - DO NOT GENERATE HALF-TIME
+═══════════════════════════════════════════════════════════════════════════════
+
+WRONG (half-time):
+- Snare: 1 hit per bar at time 2.0 only
+- Hi-hat: 4 hits per bar (quarter notes)
+- Kick: 1 hit per bar at time 0 only
+
+CORRECT (standard time):
+- Snare: 2 hits per bar at times 1.0 AND 3.0
+- Hi-hat: 8 hits per bar (eighth notes)
+- Kick: 2+ hits per bar at times 0 AND 2 plus syncopation
+
+VALIDATION WILL FAIL if: snare < 1.5/bar, hi-hat < 6/bar, kick < 1.5/bar
+
+═══════════════════════════════════════════════════════════════════════════════
 QUALITY REQUIREMENTS - YOUR CODE WILL BE VALIDATED AGAINST THESE EXACT METRICS:
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -541,11 +578,16 @@ QUALITY REQUIREMENTS - YOUR CODE WILL BE VALIDATED AGAINST THESE EXACT METRICS:
    - No more than 80% silence in any track
 
 CODE REQUIREMENTS:
-1. Use MIDIUtil library only
+1. Use MIDIUtil library with ticks_per_quarternote=480 (CRITICAL for Signal compatibility)
 2. Create a separate .mid file for each instrument in the spec
 3. Follow the exact structure, instruments, and chord progressions from the spec
 4. Apply humanization: velocity ±10-15 random variance
 5. All tracks must call midi.writeFile() to save the file
+
+CRITICAL - MIDI FILE CREATION:
+Always create MIDIFile with ticks_per_quarternote=480:
+    midi = MIDIFile(1, ticks_per_quarternote=480)
+This ensures compatibility with the Signal music application. Do NOT use the default (960).
 
 INSTRUMENT-SPECIFIC RULES:
 - Follow the style_notes for each instrument
@@ -571,7 +613,7 @@ def generate_song(output_dir: str, tempo: int, key: str):
     total_bars = 40  # Adjust based on structure
 
     # DRUMS - STANDARD BACKBEAT (snare at times 1 and 3)
-    drums = MIDIFile(1)
+    drums = MIDIFile(1, ticks_per_quarternote=480)  # MUST use 480 for Signal
     drums.addTempo(0, 0, tempo)
     for bar in range(total_bars):
         bar_start = bar * 4
@@ -596,7 +638,7 @@ def generate_song(output_dir: str, tempo: int, key: str):
         drums.writeFile(f)
 
     # BASS - eighth note pattern, lock with kick
-    bass = MIDIFile(1)
+    bass = MIDIFile(1, ticks_per_quarternote=480)  # MUST use 480 for Signal
     bass.addTempo(0, 0, tempo)
     bass.addProgramChange(0, 0, 0, 33)  # Electric bass
     root = 40  # E2
@@ -688,11 +730,22 @@ EXACT REQUIREMENTS TO PASS VALIDATION:
 
 4. DENSITY: At least 1 note per bar, max 80% silence
 
+5. DRUM PATTERN (CRITICAL - prevents half-time feel):
+   - Snare: MUST hit at times 1.0 AND 3.0 in every bar (2 hits per bar)
+   - Hi-hat: MUST play eighth notes (8 hits per bar): 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
+   - Kick: MUST hit at times 0 AND 2 minimum (2+ hits per bar)
+   - If validation says "HALF-TIME DETECTED", you are missing snare hits
+
+6. MIDI FILE CREATION (CRITICAL for Signal compatibility):
+   - Always use: MIDIFile(1, ticks_per_quarternote=480)
+   - Do NOT use the default (960) - it causes half-speed playback in Signal
+
 Generate improved Python code that:
 1. Fixes ALL the issues listed above
 2. Keeps everything else the same
 3. Follows the same structure and file naming
 4. Uses humanize_velocity() with variance=15 for all notes
+5. Uses ticks_per_quarternote=480 for all MIDIFile objects
 
 Output ONLY the corrected Python code, no explanations."""
 
@@ -726,16 +779,40 @@ EXACT REQUIREMENTS TO PASS VALIDATION:
 
 4. DENSITY: At least 1 note per bar, max 80% silence
 
+5. DRUM PATTERN (CRITICAL - most common failure):
+   - Snare: 2 hits per bar at times 1.0 and 3.0 (NOT just time 2.0!)
+   - Hi-hat: 8 hits per bar using eighth notes
+   - Kick: 2+ hits per bar at times 0, 2, plus syncopation at 0.75, 2.5
+   - Copy this exact pattern:
+     ```
+     for bar in range(total_bars):
+         bar_start = bar * 4
+         # SNARE - two hits per bar
+         drums.addNote(0, 9, 38, bar_start + 1, 0.3, humanize_velocity(100))
+         drums.addNote(0, 9, 38, bar_start + 3, 0.3, humanize_velocity(100))
+         # HI-HAT - eighth notes
+         for eighth in range(8):
+             drums.addNote(0, 9, 42, bar_start + eighth * 0.5, 0.4, humanize_velocity(70))
+         # KICK - syncopated
+         drums.addNote(0, 9, 36, bar_start + 0, 0.4, humanize_velocity(100))
+         drums.addNote(0, 9, 36, bar_start + 2, 0.4, humanize_velocity(95))
+     ```
+
 REQUIRED HELPER FUNCTION:
 ```python
 def humanize_velocity(base_vel, variance=15):
     return max(30, min(110, base_vel + random.randint(-variance, variance)))
 ```
 
+6. MIDI FILE CREATION (CRITICAL for Signal compatibility):
+   - Always use: MIDIFile(1, ticks_per_quarternote=480)
+   - Do NOT use the default (960) - it causes half-speed playback in Signal
+
 Generate completely new Python code that:
 1. Avoids ALL the issues listed above
 2. Follows the specification exactly
 3. Uses the humanize_velocity function for EVERY note
+4. Uses ticks_per_quarternote=480 for all MIDIFile objects
 
 Output ONLY Python code, no explanations."""
 
