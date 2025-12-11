@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef, useEffect, FC } from "react"
 import styled from "@emotion/styled"
-import { aiBackend } from "../../services/aiBackend"
+import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
+import { aiBackend } from "../../services/aiBackend"
 
 const Container = styled.div`
   display: flex;
@@ -20,6 +20,35 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+`
+
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+`
+
+const Select = styled.select`
+  padding: 0.375rem 0.75rem;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border-radius: 0.375rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  color: ${({ theme }) => theme.textColor};
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.themeColor};
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `
 
 const StatusDot = styled.span<{ status: "connected" | "disconnected" | "checking" }>`
@@ -58,6 +87,13 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
     role === "user" || role === "error" ? theme.onSurfaceColor : theme.textColor};
   font-size: 0.875rem;
   line-height: 1.4;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  cursor: text;
 `
 
 const InputContainer = styled.div`
@@ -114,6 +150,23 @@ const Button = styled.button`
   }
 `
 
+const InterruptButton = styled.button`
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid ${({ theme }) => theme.redColor || "#f44336"};
+  border-radius: 0.5rem;
+  background: ${({ theme }) => theme.redColor || "#f44336"};
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`
+
 const WarningBanner = styled.div`
   padding: 0.75rem 1rem;
   background: ${({ theme }) => theme.yellowColor || "#ffc107"};
@@ -127,6 +180,8 @@ interface ChatMessage {
   content: string
 }
 
+const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
+
 export const AIChat: FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
@@ -134,8 +189,17 @@ export const AIChat: FC = () => {
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
+  const [agentType, setAgentType] = useState<"llm" | "composition_agent">(() => {
+    // Load from localStorage or default to composition_agent
+    const stored = localStorage.getItem(AGENT_TYPE_STORAGE_KEY)
+    return (stored === "llm" || stored === "composition_agent") 
+      ? stored 
+      : "composition_agent"
+  })
   const loadAISong = useLoadAISong()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const streamingMessageRef = useRef<number>(-1)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -162,50 +226,137 @@ export const AIChat: FC = () => {
 
     const userMessage = input.trim()
     setInput("")
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    
+    // Add user message and create placeholder for assistant response
+    setMessages((prev) => {
+      const newMessages = [...prev, { role: "user" as const, content: userMessage }]
+      const assistantIndex = newMessages.length
+      streamingMessageRef.current = assistantIndex
+      return [...newMessages, { role: "assistant" as const, content: "" }]
+    })
+    
     setIsLoading(true)
+    
+    // Create abort controller for this request
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
 
     try {
-      const response = await aiBackend.generate({ prompt: userMessage })
-
-      // Load the generated song
-      loadAISong(response)
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+      await aiBackend.generateStream(
+        { prompt: userMessage, agentType: agentType },
+        (content: string) => {
+          // Update the streaming message
+          setMessages((prev) => {
+            const updated = [...prev]
+            const index = streamingMessageRef.current
+            if (index >= 0 && index < updated.length) {
+              updated[index] = {
+                ...updated[index],
+                content: updated[index].content + content,
+              }
+            }
+            return updated
+          })
         },
-      ])
+        (response) => {
+          // Load the generated song
+          loadAISong(response)
+
+          // Update the final message
+          setMessages((prev) => {
+            const updated = [...prev]
+            const index = streamingMessageRef.current
+            if (index >= 0 && index < updated.length) {
+              updated[index] = {
+                role: "assistant",
+                content:
+                  prev[index].content +
+                  `\n\n✅ Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+              }
+            }
+            return updated
+          })
+          streamingMessageRef.current = -1
+          setIsLoading(false)
+          abortControllerRef.current = null
+        },
+        (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Generation failed"
+
+          // Provide user-friendly error messages
+          let friendlyMessage = errorMessage
+          if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
+            friendlyMessage =
+              "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+          } else if (errorMessage.includes("timeout")) {
+            friendlyMessage =
+              "Generation took too long. Try a simpler prompt or try again."
+          } else if (errorMessage.includes("syntax error")) {
+            friendlyMessage =
+              "The AI generated invalid code. Please try again with a different prompt."
+          }
+
+          setMessages((prev) => {
+            const updated = [...prev]
+            const index = streamingMessageRef.current
+            // Replace the streaming message with error
+            if (index >= 0 && index < updated.length) {
+              updated[index] = {
+                role: "error",
+                content: friendlyMessage,
+              }
+            }
+            return updated
+          })
+          streamingMessageRef.current = -1
+          setIsLoading(false)
+          abortControllerRef.current = null
+        },
+        abortController.signal,
+      )
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Generation failed"
 
-      // Provide user-friendly error messages
-      let friendlyMessage = errorMessage
-      if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-        friendlyMessage =
-          "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-      } else if (errorMessage.includes("timeout")) {
-        friendlyMessage =
-          "Generation took too long. Try a simpler prompt or try again."
-      } else if (errorMessage.includes("syntax error")) {
-        friendlyMessage =
-          "The AI generated invalid code. Please try again with a different prompt."
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "error",
-          content: friendlyMessage,
-        },
-      ])
-    } finally {
+      setMessages((prev) => {
+        const updated = [...prev]
+        const index = streamingMessageRef.current
+        if (index >= 0 && index < updated.length) {
+          updated[index] = {
+            role: "error",
+            content: errorMessage,
+          }
+        }
+        return updated
+      })
+      streamingMessageRef.current = -1
       setIsLoading(false)
+      abortControllerRef.current = null
     }
-  }, [input, isLoading, loadAISong])
+  }, [input, isLoading, loadAISong, agentType])
+
+  const handleInterrupt = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+      setIsLoading(false)
+      
+      // Update the streaming message to indicate interruption
+      setMessages((prev) => {
+        const updated = [...prev]
+        const index = streamingMessageRef.current
+        if (index >= 0 && index < updated.length) {
+          updated[index] = {
+            role: "error",
+            content: "Generation was interrupted by user.",
+          }
+        }
+        return updated
+      })
+      streamingMessageRef.current = -1
+    }
+  }, [])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -217,10 +368,27 @@ export const AIChat: FC = () => {
     [handleSubmit],
   )
 
+  const handleAgentTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newAgentType = e.target.value as "llm" | "composition_agent"
+    setAgentType(newAgentType)
+    localStorage.setItem(AGENT_TYPE_STORAGE_KEY, newAgentType)
+  }, [])
+
   return (
     <Container>
       <Header>
-        <span>AI Composer</span>
+        <HeaderLeft>
+          <span>AI Composer</span>
+          <Select
+            value={agentType}
+            onChange={handleAgentTypeChange}
+            disabled={isLoading}
+            title="Select AI agent type"
+          >
+            <option value="composition_agent">Deep Agent</option>
+            <option value="llm">LLM Direct</option>
+          </Select>
+        </HeaderLeft>
         <StatusDot
           status={backendStatus}
           title={
@@ -250,11 +418,6 @@ export const AIChat: FC = () => {
             {msg.content}
           </Message>
         ))}
-        {isLoading && (
-          <Message role="assistant">
-            Generating your song... This may take 30-60 seconds.
-          </Message>
-        )}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
@@ -265,14 +428,20 @@ export const AIChat: FC = () => {
           placeholder="Describe your song..."
           disabled={isLoading || backendStatus === "disconnected"}
         />
-        <Button
-          onClick={handleSubmit}
-          disabled={
-            isLoading || !input.trim() || backendStatus === "disconnected"
-          }
-        >
-          {isLoading ? "Generating..." : "Generate Song"}
-        </Button>
+        {isLoading ? (
+          <InterruptButton onClick={handleInterrupt}>
+            Stop Generation
+          </InterruptButton>
+        ) : (
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              !input.trim() || backendStatus === "disconnected"
+            }
+          >
+            Generate Song
+          </Button>
+        )}
       </InputContainer>
     </Container>
   )

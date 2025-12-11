@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { DialogTitle } from "@radix-ui/react-dialog"
 import { FC } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { Localized } from "../../localize/useLocalization"
@@ -65,6 +66,9 @@ export const InstrumentBrowser: FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
+      <DialogTitle>
+        <Localized name="instruments" />
+      </DialogTitle>
       <DialogContent className="InstrumentBrowser">
         <Finder>
           <Left>
