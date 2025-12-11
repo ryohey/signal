@@ -2,10 +2,12 @@ import styled from "@emotion/styled"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
+import Robot from "mdi-react/RobotIcon"
 import { CSSProperties, FC, MouseEvent, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
+import { useAIChat } from "../../hooks/useAIChat"
 import ArrangeIcon from "../../images/icons/arrange.svg"
 import PianoIcon from "../../images/icons/piano.svg"
 import TempoIcon from "../../images/icons/tempo.svg"
@@ -36,14 +38,19 @@ const Container = styled.div`
   }};
 `
 
-export const Tab = styled.div`
+export const Tab = styled.div<{ isActive?: boolean }>`
   display: flex;
   flex-direction: row;
-  align-items: center; 
+  align-items: center;
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   border-top: solid 0.1rem transparent;
-  color: var(--color-text-secondary);
+  color: ${({ isActive }) =>
+    isActive ? "var(--color-text)" : "var(--color-text-secondary)"};
+  background: ${({ isActive }) =>
+    isActive ? "var(--color-background)" : "transparent"};
+  border-top-color: ${({ isActive }) =>
+    isActive ? "var(--color-theme)" : "transparent"};
   cursor: pointer;
   -webkit-app-region: none;
 
@@ -61,7 +68,6 @@ export const Tab = styled.div`
     color: inherit;
     text-decoration: none;
   }
-}
 `
 
 export const TabTitle = styled.span`
@@ -85,6 +91,7 @@ export const IconStyle: CSSProperties = {
 export const Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
+  const { isOpen: isAIChatOpen, toggle: toggleAIChat } = useAIChat()
 
   const onClickPianoRollTab = useCallback(
     (e: MouseEvent) => {
@@ -124,6 +131,14 @@ export const Navigation: FC = () => {
       setOpenHelpDialog(true)
     },
     [setOpenHelpDialog],
+  )
+
+  const onClickAI = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault()
+      toggleAIChat()
+    },
+    [toggleAIChat],
   )
 
   return (
@@ -189,6 +204,13 @@ export const Navigation: FC = () => {
       </Tooltip>
 
       <FlexibleSpacer />
+
+      <Tooltip title="Toggle AI Composer" delayDuration={500}>
+        <Tab isActive={isAIChatOpen} onClick={onClickAI}>
+          <Robot style={IconStyle} />
+          <TabTitle>AI</TabTitle>
+        </Tab>
+      </Tooltip>
 
       {!isRunningInElectron() && (
         <>

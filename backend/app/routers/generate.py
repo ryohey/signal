@@ -1,0 +1,403 @@
+import re
+import json
+import asyncio
+from typing import Optional
+from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from app.models.schemas import (
+    GenerateRequest,
+    GenerateResponse,
+    RegenerateRequest,
+    RegenerateResponse,
+    TrackData,
+    SongMetadata,
+    AttemptLog,
+)
+from app.services.llm import generate_midi_code, generate_single_track_code
+from app.services.midi_executor import (
+    execute_midi_generation,
+    midi_to_base64,
+    MIDIExecutionError,
+)
+from app.services.generator import generate_song_deep, GenerationError
+
+router = APIRouter()
+
+# Default channel/program mappings for common instruments
+# The LLM will set program numbers in the MIDI files, but we use these
+# as fallbacks and for channel assignment
+DEFAULT_TRACK_CONFIG = {
+    "drums": {"channel": 9, "program": 0},
+    "bass": {"channel": 0, "program": 33},
+    "guitar": {"channel": 1, "program": 25},
+    "keys": {"channel": 2, "program": 4},
+    "piano": {"channel": 2, "program": 0},
+    "melody": {"channel": 3, "program": 73},
+    "synth": {"channel": 4, "program": 81},
+    "strings": {"channel": 5, "program": 48},
+    "pad": {"channel": 6, "program": 89},
+    "lead": {"channel": 3, "program": 80},
+    "arp": {"channel": 7, "program": 84},
+    "organ": {"channel": 2, "program": 16},
+    "brass": {"channel": 5, "program": 61},
+    "flute": {"channel": 3, "program": 73},
+    "sax": {"channel": 4, "program": 66},
+}
+
+
+def get_track_config(track_name: str, index: int) -> dict:
+    """Get channel/program for a track, with fallback for unknown instruments."""
+    name_lower = track_name.lower()
+
+    # Check for exact or partial matches
+    for key, config in DEFAULT_TRACK_CONFIG.items():
+        if key in name_lower:
+            return config
+
+    # Fallback: assign channel based on index (avoid channel 9 for non-drums)
+    channel = index if index < 9 else index + 1
+    return {"channel": min(channel, 15), "program": 0}
+
+MAX_RETRIES = 2
+MAX_TRACKS = 8
+
+
+def parse_prompt(prompt: str) -> dict:
+    """Extract tempo, key, and style from prompt."""
+    # Simple parsing - can be enhanced later
+    tempo = 120
+    key = "Am"
+
+    prompt_lower = prompt.lower()
+
+    # Try to extract BPM
+    bpm_match = re.search(r"(\d+)\s*bpm", prompt_lower)
+    if bpm_match:
+        tempo = int(bpm_match.group(1))
+
+    # Try to extract key
+    key_match = re.search(r"\b([A-G][#b]?m?)\b", prompt)
+    if key_match:
+        key = key_match.group(1)
+
+    return {"tempo": tempo, "key": key, "style": prompt}
+
+
+@router.post("/generate", response_model=GenerateResponse)
+async def generate_song(request: GenerateRequest):
+    """Generate a multi-track song from a text prompt."""
+
+    params = parse_prompt(request.prompt)
+    last_error = None
+
+    # Retry loop for transient generation errors
+    for attempt in range(MAX_RETRIES):
+        try:
+            # Generate code from Claude
+            code = await generate_midi_code(
+                prompt=params["style"], tempo=params["tempo"], key=params["key"]
+            )
+
+            # Execute the code
+            midi_files = execute_midi_generation(
+                code=code, tempo=params["tempo"], key=params["key"]
+            )
+
+            # Validate track count
+            if len(midi_files) > MAX_TRACKS:
+                # Take only the first MAX_TRACKS files
+                midi_files = dict(list(midi_files.items())[:MAX_TRACKS])
+
+            if len(midi_files) == 0:
+                raise HTTPException(status_code=422, detail="No tracks were generated")
+
+            # Convert to response format
+            tracks = []
+            for index, (name, midi_bytes) in enumerate(midi_files.items()):
+                config = get_track_config(name, index)
+                tracks.append(
+                    TrackData(
+                        name=name,
+                        midi_data=midi_to_base64(midi_bytes),
+                        channel=config["channel"],
+                        program_number=config["program"],
+                    )
+                )
+
+            return GenerateResponse(
+                tracks=tracks,
+                metadata=SongMetadata(
+                    tempo=params["tempo"], key=params["key"], time_signature="4/4"
+                ),
+                message=f"Generated {len(tracks)} track(s)",
+            )
+
+        except MIDIExecutionError as e:
+            last_error = e
+            error_msg = str(e).lower()
+            # Retry on transient generation errors
+            if "overlapping notes" in error_msg or "syntax error" in error_msg:
+                continue
+            raise HTTPException(status_code=422, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+    # If we exhausted retries
+    raise HTTPException(
+        status_code=422,
+        detail=f"Generation failed after {MAX_RETRIES} attempts: {str(last_error)}",
+    )
+
+
+@router.post("/regenerate", response_model=RegenerateResponse)
+async def regenerate_track(request: RegenerateRequest):
+    """Regenerate a single track based on instruction."""
+
+    context = request.context
+    last_error = None
+
+    for attempt in range(MAX_RETRIES):
+        try:
+            # Generate code for single track
+            code = await generate_single_track_code(
+                track_name=request.track_name,
+                instruction=request.instruction,
+                context=context,
+            )
+
+            # Execute the code
+            midi_files = execute_midi_generation(
+                code=code,
+                tempo=context.get("tempo", 120),
+                key=context.get("key", "Am"),
+            )
+
+            # Get the generated track
+            track_name = request.track_name.lower()
+            if track_name not in midi_files:
+                # Try to find any generated file
+                if midi_files:
+                    track_name = list(midi_files.keys())[0]
+                else:
+                    raise MIDIExecutionError("No MIDI file was generated")
+
+            midi_bytes = midi_files[track_name]
+            config = get_track_config(track_name, 0)
+
+            return RegenerateResponse(
+                track=TrackData(
+                    name=request.track_name,
+                    midi_data=midi_to_base64(midi_bytes),
+                    channel=config["channel"],
+                    program_number=config["program"],
+                ),
+                message=f"Regenerated {request.track_name} track",
+            )
+
+        except MIDIExecutionError as e:
+            last_error = e
+            error_msg = str(e).lower()
+            # Retry on transient generation errors
+            if "overlapping notes" in error_msg or "syntax error" in error_msg:
+                continue
+            raise HTTPException(status_code=422, detail=str(e))
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=f"Regeneration failed: {str(e)}"
+            )
+
+    raise HTTPException(
+        status_code=422,
+        detail=f"Regeneration failed after {MAX_RETRIES} attempts: {str(last_error)}",
+    )
+
+
+# ============================================================================
+# Deep Agent Architecture Endpoints
+# ============================================================================
+
+
+class DeepGenerateResponse(BaseModel):
+    """Response from deep generation endpoint."""
+
+    tracks: list[TrackData]
+    metadata: SongMetadata
+    message: str
+    attempt_logs: list[AttemptLog]
+    spec_used: Optional[dict] = None  # The SongSpec used (for debugging)
+
+
+@router.post("/generate/deep", response_model=DeepGenerateResponse)
+async def generate_song_deep_endpoint(request: GenerateRequest):
+    """
+    Generate a multi-track song using the deep agent architecture.
+
+    This endpoint uses:
+    1. Planning stage to create a structured song specification
+    2. Spec-driven code generation
+    3. MIDI quality validation
+    4. Iterative refinement (up to 5 attempts)
+
+    Returns detailed attempt logs for transparency.
+    """
+    params = parse_prompt(request.prompt)
+
+    try:
+        result = await generate_song_deep(
+            prompt=params["style"],
+            tempo=params["tempo"],
+            key=params["key"],
+        )
+
+        # Convert MIDI files to response format
+        midi_files = result["midi_files"]
+        spec = result["spec"]
+        attempt_logs = result["attempt_logs"]
+
+        tracks = []
+        for index, (name, midi_bytes) in enumerate(midi_files.items()):
+            config = get_track_config(name, index)
+            tracks.append(
+                TrackData(
+                    name=name,
+                    midi_data=midi_to_base64(midi_bytes),
+                    channel=config["channel"],
+                    program_number=config["program"],
+                )
+            )
+
+        return DeepGenerateResponse(
+            tracks=tracks,
+            metadata=SongMetadata(
+                tempo=spec.tempo, key=spec.key, time_signature=spec.time_signature
+            ),
+            message=f"Generated {len(tracks)} track(s) after {len(attempt_logs)} attempt(s)",
+            attempt_logs=attempt_logs,
+            spec_used=spec.model_dump(),
+        )
+
+    except GenerationError as e:
+        # Return detailed failure information
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": str(e),
+                "attempt_logs": [log.model_dump() for log in e.attempt_logs],
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+
+@router.post("/generate/stream")
+async def generate_song_stream(request: GenerateRequest, req: Request):
+    """
+    Generate a song with real-time progress updates via SSE.
+
+    Returns Server-Sent Events with the following event types:
+    - progress: Stage updates (planning, generating, validating, refining)
+    - complete: Final result with tracks
+    - error: Generation failed
+    """
+    params = parse_prompt(request.prompt)
+
+    async def event_generator():
+        progress_queue: asyncio.Queue = asyncio.Queue()
+
+        async def progress_callback(stage: str, data: dict):
+            await progress_queue.put({"stage": stage, **data})
+
+        # Start generation in background
+        async def run_generation():
+            try:
+                result = await generate_song_deep(
+                    prompt=params["style"],
+                    tempo=params["tempo"],
+                    key=params["key"],
+                    progress_callback=progress_callback,
+                )
+
+                # Convert MIDI files to response format
+                midi_files = result["midi_files"]
+                spec = result["spec"]
+                attempt_logs = result["attempt_logs"]
+
+                tracks = []
+                for index, (name, midi_bytes) in enumerate(midi_files.items()):
+                    config = get_track_config(name, index)
+                    tracks.append({
+                        "name": name,
+                        "midi_data": midi_to_base64(midi_bytes),
+                        "channel": config["channel"],
+                        "program_number": config["program"],
+                    })
+
+                await progress_queue.put(
+                    {
+                        "stage": "complete",
+                        "result": {
+                            "tracks": tracks,
+                            "metadata": {
+                                "tempo": spec.tempo,
+                                "key": spec.key,
+                                "time_signature": spec.time_signature,
+                            },
+                            "message": f"Generated {len(tracks)} track(s)",
+                        },
+                        "attempt_logs": [log.model_dump() for log in attempt_logs],
+                    }
+                )
+            except GenerationError as e:
+                await progress_queue.put(
+                    {
+                        "stage": "error",
+                        "error": str(e),
+                        "attempt_logs": [log.model_dump() for log in e.attempt_logs],
+                    }
+                )
+            except Exception as e:
+                await progress_queue.put(
+                    {
+                        "stage": "error",
+                        "error": str(e),
+                    }
+                )
+            finally:
+                await progress_queue.put(None)  # Signal end
+
+        # Start background task
+        task = asyncio.create_task(run_generation())
+
+        try:
+            while True:
+                # Check if client disconnected
+                if await req.is_disconnected():
+                    task.cancel()
+                    break
+
+                try:
+                    event = await asyncio.wait_for(progress_queue.get(), timeout=1.0)
+                except asyncio.TimeoutError:
+                    # Send keepalive
+                    yield ": keepalive\n\n"
+                    continue
+
+                if event is None:
+                    break
+
+                yield f"data: {json.dumps(event)}\n\n"
+
+        except asyncio.CancelledError:
+            task.cancel()
+            raise
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

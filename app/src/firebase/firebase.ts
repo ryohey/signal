@@ -27,7 +27,8 @@ const modules = (() => {
     const firestore = getFirestore(app)
     const functions = getFunctions(app)
 
-    if (process.env.NODE_ENV !== "production") {
+    // Only connect to emulators if explicitly enabled via environment variable
+    if (process.env.NODE_ENV !== "production" && process.env.USE_FIREBASE_EMULATORS === "true") {
       const currentHost = window.location.hostname
       connectAuthEmulator(auth, `http://${currentHost}:9099`)
       connectFirestoreEmulator(firestore, currentHost, 8080)

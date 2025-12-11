@@ -4,11 +4,12 @@
       "node",
       "webmidi",
       "wicg-file-system-access",
-      "vite-plugin-svgr/client"
+      "vite-plugin-svgr/client",
+      "vite/client"
     ],
     "sourceMap": true,
     "target": "esnext",
-    "module": "es2015",
+    "module": "esnext",
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
@@ -21,6 +22,7 @@
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
     "strict": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       // Avoid referencing the node_modules of the library when developing a local library.

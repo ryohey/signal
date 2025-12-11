@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { NumericFormat } from "react-number-format"
+import { NumericFormat, NumericFormatProps } from "react-number-format"
 
 export interface NumberInputProps {
   value: number
@@ -26,23 +26,31 @@ export const NumberInput: FC<NumberInputProps> = ({
   style,
   className,
 }) => {
+  const handleValueChange: NumericFormatProps["onValueChange"] = ({ floatValue }) => {
+    if (floatValue !== undefined && floatValue !== null) {
+      onChange(floatValue)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onEnter?.()
+    }
+  }
+
+  // Type assertion needed due to React 19's stricter type checking causing
+  // "union type too complex" error with NumericFormat's complex prop types
+  const NumericFormatTyped = NumericFormat as any
+
   return (
-    <NumericFormat
+    <NumericFormatTyped
       value={value}
-      onValueChange={({ floatValue }) => {
-        if (floatValue !== undefined) {
-          onChange(floatValue)
-        }
-      }}
+      onValueChange={handleValueChange}
       fixedDecimalScale
       allowNegative={allowNegative}
       style={style}
       className={className}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          onEnter?.()
-        }
-      }}
+      onKeyDown={handleKeyDown}
       min={min}
       max={max}
       step={step}

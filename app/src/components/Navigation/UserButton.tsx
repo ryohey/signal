@@ -42,7 +42,7 @@ export const UserButton: FC = () => {
   const theme = useTheme()
   const ref = useRef<HTMLDivElement>(null)
 
-  if (user === null) {
+  if (user === null || user === undefined) {
     return (
       <Tab onClick={onClickSignIn}>
         <AccountCircle style={IconStyle} />

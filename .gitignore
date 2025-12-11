@@ -46,3 +46,15 @@ dist
 *.provisionprofile
 .turbo
 *.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/venv/
+venv/
+env/
+ENV/
+.env.venv

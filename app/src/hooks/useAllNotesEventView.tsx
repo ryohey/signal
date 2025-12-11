@@ -34,5 +34,7 @@ export function useAllNotesEventView() {
 
   useSyncEventViewWithScroll(eventView)
 
-  return useSyncExternalStore(eventView.subscribe, eventView.getEvents)
+  // Cache getSnapshot to avoid React 19 warning about infinite loops
+  const getSnapshot = useCallback(() => eventView.getEvents(), [eventView])
+  return useSyncExternalStore(eventView.subscribe, getSnapshot)
 }
