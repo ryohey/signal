@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.routers import generate
 
@@ -20,6 +21,18 @@ app.add_middleware(
 )
 
 app.include_router(generate.router, prefix="/api", tags=["generation"])
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Handle all unhandled exceptions with a consistent error response."""
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "detail": str(exc) if settings.debug else "An unexpected error occurred",
+        },
+    )
 
 
 @app.get("/api/health")

@@ -17,6 +17,21 @@ const Header = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.dividerColor};
   font-weight: 600;
   color: ${({ theme }) => theme.textColor};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const StatusDot = styled.span<{ status: "connected" | "disconnected" | "checking" }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${({ status }) =>
+    status === "connected"
+      ? "#4caf50"
+      : status === "disconnected"
+        ? "#f44336"
+        : "#ff9800"};
 `
 
 const MessageList = styled.div`
@@ -28,15 +43,19 @@ const MessageList = styled.div`
   gap: 0.75rem;
 `
 
-const Message = styled.div<{ role: "user" | "assistant" }>`
+const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   max-width: 85%;
   align-self: ${({ role }) => (role === "user" ? "flex-end" : "flex-start")};
   background: ${({ role, theme }) =>
-    role === "user" ? theme.themeColor : theme.secondaryBackgroundColor};
+    role === "user"
+      ? theme.themeColor
+      : role === "error"
+        ? theme.redColor
+        : theme.secondaryBackgroundColor};
   color: ${({ role, theme }) =>
-    role === "user" ? theme.onSurfaceColor : theme.textColor};
+    role === "user" || role === "error" ? theme.onSurfaceColor : theme.textColor};
   font-size: 0.875rem;
   line-height: 1.4;
 `
@@ -95,14 +114,16 @@ const Button = styled.button`
   }
 `
 
-const ErrorMessage = styled.div`
-  color: ${({ theme }) => theme.redColor};
-  padding: 0.5rem;
-  font-size: 0.875rem;
+const WarningBanner = styled.div`
+  padding: 0.75rem 1rem;
+  background: ${({ theme }) => theme.yellowColor || "#ffc107"};
+  color: #000;
+  font-size: 0.8rem;
+  text-align: center;
 `
 
 interface ChatMessage {
-  role: "user" | "assistant"
+  role: "user" | "assistant" | "error"
   content: string
 }
 
@@ -110,7 +131,9 @@ export const AIChat: FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [backendStatus, setBackendStatus] = useState<
+    "connected" | "disconnected" | "checking"
+  >("checking")
   const loadAISong = useLoadAISong()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -122,12 +145,23 @@ export const AIChat: FC = () => {
     scrollToBottom()
   }, [messages, scrollToBottom])
 
+  // Check backend health on mount and periodically
+  useEffect(() => {
+    const checkHealth = async () => {
+      const isHealthy = await aiBackend.healthCheck()
+      setBackendStatus(isHealthy ? "connected" : "disconnected")
+    }
+
+    checkHealth()
+    const interval = setInterval(checkHealth, 30000) // Check every 30s
+    return () => clearInterval(interval)
+  }, [])
+
   const handleSubmit = useCallback(async () => {
     if (!input.trim() || isLoading) return
 
     const userMessage = input.trim()
     setInput("")
-    setError(null)
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
 
@@ -141,18 +175,31 @@ export const AIChat: FC = () => {
         ...prev,
         {
           role: "assistant",
-          content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. ${response.message}`,
+          content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
         },
       ])
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Generation failed"
-      setError(errorMessage)
+
+      // Provide user-friendly error messages
+      let friendlyMessage = errorMessage
+      if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
+        friendlyMessage =
+          "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+      } else if (errorMessage.includes("timeout")) {
+        friendlyMessage =
+          "Generation took too long. Try a simpler prompt or try again."
+      } else if (errorMessage.includes("syntax error")) {
+        friendlyMessage =
+          "The AI generated invalid code. Please try again with a different prompt."
+      }
+
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
-          content: `Error: ${errorMessage}`,
+          role: "error",
+          content: friendlyMessage,
         },
       ])
     } finally {
@@ -172,7 +219,25 @@ export const AIChat: FC = () => {
 
   return (
     <Container>
-      <Header>AI Composer</Header>
+      <Header>
+        <span>AI Composer</span>
+        <StatusDot
+          status={backendStatus}
+          title={
+            backendStatus === "connected"
+              ? "Backend connected"
+              : backendStatus === "disconnected"
+                ? "Backend not available"
+                : "Checking connection..."
+          }
+        />
+      </Header>
+      {backendStatus === "disconnected" && (
+        <WarningBanner>
+          AI backend not available. Start it with: cd backend && uvicorn
+          app.main:app --reload
+        </WarningBanner>
+      )}
       <MessageList>
         {messages.length === 0 && (
           <Message role="assistant">
@@ -186,20 +251,26 @@ export const AIChat: FC = () => {
           </Message>
         ))}
         {isLoading && (
-          <Message role="assistant">Generating your song...</Message>
+          <Message role="assistant">
+            Generating your song... This may take 30-60 seconds.
+          </Message>
         )}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Describe your song..."
-          disabled={isLoading}
+          disabled={isLoading || backendStatus === "disconnected"}
         />
-        <Button onClick={handleSubmit} disabled={isLoading || !input.trim()}>
+        <Button
+          onClick={handleSubmit}
+          disabled={
+            isLoading || !input.trim() || backendStatus === "disconnected"
+          }
+        >
           {isLoading ? "Generating..." : "Generate Song"}
         </Button>
       </InputContainer>
