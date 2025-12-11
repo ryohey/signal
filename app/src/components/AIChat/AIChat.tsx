@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, FC } from "react"
 import styled from "@emotion/styled"
-import { aiBackend } from "../../services/aiBackend"
+import { aiBackend, GenerationStage, ProgressEvent } from "../../services/aiBackend"
 import { useLoadAISong } from "../../actions/aiGeneration"
 
 const Container = styled.div`
@@ -41,6 +41,7 @@ const MessageList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  user-select: text;
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
@@ -58,6 +59,8 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
     role === "user" || role === "error" ? theme.onSurfaceColor : theme.textColor};
   font-size: 0.875rem;
   line-height: 1.4;
+  user-select: text;
+  cursor: text;
 `
 
 const InputContainer = styled.div`
@@ -122,6 +125,123 @@ const WarningBanner = styled.div`
   text-align: center;
 `
 
+// Progress indicator styled components
+const ProgressContainer = styled.div`
+  padding: 0.75rem 1rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+`
+
+const ProgressStage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+`
+
+const StageIcon = styled.span`
+  font-size: 1rem;
+`
+
+const StageName = styled.span`
+  font-weight: 500;
+  color: ${({ theme }) => theme.textColor};
+  font-size: 0.875rem;
+`
+
+const AttemptBadge = styled.span`
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 0.75rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+`
+
+const ProgressMessage = styled.div`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  margin-bottom: 0.5rem;
+  user-select: text;
+  cursor: text;
+`
+
+const ProgressBar = styled.div`
+  height: 4px;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 2px;
+  overflow: hidden;
+`
+
+const ProgressFill = styled.div<{ width: number }>`
+  height: 100%;
+  background: ${({ theme }) => theme.themeColor};
+  transition: width 0.3s ease;
+  width: ${({ width }) => width}%;
+`
+
+// Helper functions for progress display
+function getStageIcon(stage: GenerationStage): string {
+  switch (stage) {
+    case "planning":
+      return "📝"
+    case "generating":
+      return "🎵"
+    case "executing":
+      return "⚙️"
+    case "validating":
+      return "✅"
+    case "refining":
+      return "🔧"
+    case "complete":
+      return "🎉"
+    case "error":
+      return "❌"
+    default:
+      return "⏳"
+  }
+}
+
+function getStageLabel(stage: GenerationStage): string {
+  switch (stage) {
+    case "planning":
+      return "Planning song structure..."
+    case "generating":
+      return "Generating music code..."
+    case "executing":
+      return "Creating MIDI files..."
+    case "validating":
+      return "Checking quality..."
+    case "refining":
+      return "Improving output..."
+    case "complete":
+      return "Complete!"
+    case "error":
+      return "Error"
+    default:
+      return "Processing..."
+  }
+}
+
+function getStageProgress(stage: GenerationStage): number {
+  switch (stage) {
+    case "planning":
+      return 15
+    case "generating":
+      return 40
+    case "executing":
+      return 60
+    case "validating":
+      return 80
+    case "refining":
+      return 70 // Goes back during refinement
+    case "complete":
+      return 100
+    default:
+      return 0
+  }
+}
+
 interface ChatMessage {
   role: "user" | "assistant" | "error"
   content: string
@@ -134,6 +254,11 @@ export const AIChat: FC = () => {
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
+  // Deep agent progress state
+  const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
+  const [generationProgress, setGenerationProgress] = useState<string>("")
+  const [currentAttempt, setCurrentAttempt] = useState<number>(0)
+
   const loadAISong = useLoadAISong()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -164,18 +289,35 @@ export const AIChat: FC = () => {
     setInput("")
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
+    setGenerationStage("planning")
+    setGenerationProgress("Starting generation...")
+    setCurrentAttempt(0)
 
     try {
-      const response = await aiBackend.generate({ prompt: userMessage })
+      const response = await aiBackend.generateWithProgress(
+        { prompt: userMessage },
+        (event: ProgressEvent) => {
+          setGenerationStage(event.stage)
+          setGenerationProgress(event.message || "")
+          if (event.attempt) {
+            setCurrentAttempt(event.attempt)
+          }
+        },
+      )
 
       // Load the generated song
       loadAISong(response)
+
+      const attemptInfo =
+        response.attemptLogs.length > 1
+          ? ` (after ${response.attemptLogs.length} attempts)`
+          : ""
 
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+          content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}${attemptInfo}. Press play to listen!`,
         },
       ])
     } catch (err) {
@@ -193,6 +335,9 @@ export const AIChat: FC = () => {
       } else if (errorMessage.includes("syntax error")) {
         friendlyMessage =
           "The AI generated invalid code. Please try again with a different prompt."
+      } else if (errorMessage.includes("5 attempts")) {
+        friendlyMessage =
+          "Generation failed after multiple attempts. Try a different prompt or simpler request."
       }
 
       setMessages((prev) => [
@@ -204,6 +349,8 @@ export const AIChat: FC = () => {
       ])
     } finally {
       setIsLoading(false)
+      setGenerationStage(null)
+      setGenerationProgress("")
     }
   }, [input, isLoading, loadAISong])
 
@@ -250,10 +397,22 @@ export const AIChat: FC = () => {
             {msg.content}
           </Message>
         ))}
-        {isLoading && (
-          <Message role="assistant">
-            Generating your song... This may take 30-60 seconds.
-          </Message>
+        {isLoading && generationStage && (
+          <ProgressContainer>
+            <ProgressStage>
+              <StageIcon>{getStageIcon(generationStage)}</StageIcon>
+              <StageName>{getStageLabel(generationStage)}</StageName>
+              {currentAttempt > 0 && (
+                <AttemptBadge>Attempt {currentAttempt}/5</AttemptBadge>
+              )}
+            </ProgressStage>
+            {generationProgress && (
+              <ProgressMessage>{generationProgress}</ProgressMessage>
+            )}
+            <ProgressBar>
+              <ProgressFill width={getStageProgress(generationStage)} />
+            </ProgressBar>
+          </ProgressContainer>
         )}
         <div ref={messagesEndRef} />
       </MessageList>
