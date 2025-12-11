@@ -1,10 +1,33 @@
 import {
-  audioDataToAudioBuffer,
   getSampleEventsFromSoundFont,
   renderAudio as render,
 } from "@ryohey/wavelet"
 import { PlayerEvent } from "./PlayerEvent.js"
 import { toSynthEvents } from "./toSynthEvents.js"
+
+/**
+ * Create an AudioBuffer from rendered audio data.
+ * This is a local implementation to avoid potential issues with the wavelet export.
+ */
+function createAudioBuffer(
+  audioData: {
+    length: number
+    sampleRate: number
+    leftData: ArrayBuffer
+    rightData: ArrayBuffer
+  },
+  fallbackSampleRate: number,
+): AudioBuffer {
+  const rate = audioData.sampleRate ?? fallbackSampleRate
+  const audioBuffer = new AudioBuffer({
+    length: audioData.length,
+    sampleRate: rate,
+    numberOfChannels: 2,
+  })
+  audioBuffer.copyToChannel(new Float32Array(audioData.leftData), 0)
+  audioBuffer.copyToChannel(new Float32Array(audioData.rightData), 1)
+  return audioBuffer
+}
 
 export const renderAudio = async (
   soundFontData: ArrayBuffer,
@@ -53,14 +76,7 @@ export const renderAudio = async (
     throw new Error("renderAudio: render() returned undefined audioData")
   }
 
-  if (audioData.sampleRate === undefined) {
-    // Fallback: use the sampleRate we passed in if wavelet didn't return it
-    console.warn(
-      "renderAudio: audioData.sampleRate is undefined, using fallback",
-      sampleRate,
-    )
-    ;(audioData as any).sampleRate = sampleRate
-  }
-
-  return audioDataToAudioBuffer(audioData)
+  // Use our own implementation to create AudioBuffer to avoid potential issues
+  // with the wavelet audioDataToAudioBuffer export
+  return createAudioBuffer(audioData, sampleRate)
 }

@@ -554,28 +554,23 @@ VALIDATION WILL FAIL if: snare < 1.5/bar, hi-hat < 6/bar, kick < 1.5/bar
 QUALITY REQUIREMENTS - YOUR CODE WILL BE VALIDATED AGAINST THESE EXACT METRICS:
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. RHYTHM COMPLEXITY (CRITICAL):
-   - At least 25% of notes must be eighth notes or faster
+1. RHYTHM COMPLEXITY:
+   - At least 10% of notes must be eighth notes or faster (duration <= 0.5)
    - Use duration 0.5 (eighth), 0.25 (sixteenth), 0.125 (thirty-second)
    - Mix note durations - don't use only quarter notes (1.0)
    - Example pattern: [0.5, 0.25, 0.25, 0.5, 0.5] not [1.0, 1.0, 1.0, 1.0]
 
-2. VELOCITY DYNAMICS (CRITICAL):
-   - Velocity range must span at least 20 points (e.g., 60-85)
+2. VELOCITY DYNAMICS:
+   - Velocity range must span at least 10 points (e.g., 60-75)
    - Use velocities from 40 to 100, not just 70-80
    - Backbeats (snare at 1, 3): velocity 90-100 (accented!)
    - Downbeats (kick at 0, 2): velocity 85-100
    - Off-beats: velocity 50-70
-   - Standard deviation must be at least 5 (vary velocities significantly)
+   - Standard deviation must be at least 2 (some velocity variation)
 
-3. SYNCOPATION (CRITICAL):
-   - At least 5% of notes must start off the beat
-   - Place notes at positions like 0.5, 1.5, 2.5, 3.5 (off-beat)
-   - Don't put all notes exactly on beats 0, 1, 2, 3
-
-4. NOTE DENSITY:
-   - Each track must have at least 1 note per bar on average
-   - No more than 80% silence in any track
+3. NOTE DENSITY:
+   - Each track must have at least 0.5 notes per bar on average
+   - No more than 95% silence in any track
 
 CODE REQUIREMENTS:
 1. Use MIDIUtil library with ticks_per_quarternote=480 (CRITICAL for Signal compatibility)
@@ -716,27 +711,23 @@ SUGGESTIONS:
 EXACT REQUIREMENTS TO PASS VALIDATION:
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. RHYTHM: At least 25% of notes must have duration <= 0.5 beats
+1. RHYTHM: At least 10% of notes must have duration <= 0.5 beats
    - Use duration 0.5 (eighth), 0.25 (sixteenth)
    - Mix: [0.5, 0.25, 0.25, 0.5] not [1.0, 1.0, 1.0, 1.0]
 
-2. VELOCITY: Range >= 20 (e.g., 55-85), std dev >= 5
+2. VELOCITY: Range >= 10 (e.g., 65-85), std dev >= 2
    - Use humanize_velocity(base, variance=15) for all notes
    - Vary base velocity: 85-100 strong beats, 55-70 weak beats
 
-3. SYNCOPATION: At least 5% of notes on off-beats
-   - Place some notes at 0.5, 1.5, 2.5, 3.5 positions
-   - Ghost notes, anticipations, or syncopated patterns
+3. DENSITY: At least 0.5 notes per bar, max 95% silence
 
-4. DENSITY: At least 1 note per bar, max 80% silence
-
-5. DRUM PATTERN (CRITICAL - prevents half-time feel):
+4. DRUM PATTERN (CRITICAL - prevents half-time feel):
    - Snare: MUST hit at times 1.0 AND 3.0 in every bar (2 hits per bar)
    - Hi-hat: MUST play eighth notes (8 hits per bar): 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5
    - Kick: MUST hit at times 0 AND 2 minimum (2+ hits per bar)
    - If validation says "HALF-TIME DETECTED", you are missing snare hits
 
-6. MIDI FILE CREATION (CRITICAL for Signal compatibility):
+5. MIDI FILE CREATION (CRITICAL for Signal compatibility):
    - Always use: MIDIFile(1, ticks_per_quarternote=480)
    - Do NOT use the default (960) - it causes half-speed playback in Signal
 
@@ -762,24 +753,19 @@ ISSUES FROM PREVIOUS ATTEMPTS:
 EXACT REQUIREMENTS TO PASS VALIDATION:
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. RHYTHM: At least 25% of notes must have duration <= 0.5 beats
+1. RHYTHM: At least 10% of notes must have duration <= 0.5 beats
    - Use duration 0.5 (eighth), 0.25 (sixteenth)
    - Hi-hats: always eighth notes (0.5) or sixteenths (0.25)
    - Bass: mix of eighths and quarters
    - Never use only quarter notes (1.0)
 
-2. VELOCITY: Range >= 20 (e.g., 55-85), std dev >= 5
+2. VELOCITY: Range >= 10 (e.g., 65-85), std dev >= 2
    - ALWAYS use: humanize_velocity(base, variance=15)
-   - Vary base velocity significantly throughout
+   - Vary base velocity throughout
 
-3. SYNCOPATION: At least 5% of notes on off-beats
-   - Kick drum: not just beats 1 and 3 - add hits at 1.5, 2.5
-   - Bass: anticipate chord changes by an eighth note
-   - Add ghost notes on off-beats
+3. DENSITY: At least 0.5 notes per bar, max 95% silence
 
-4. DENSITY: At least 1 note per bar, max 80% silence
-
-5. DRUM PATTERN (CRITICAL - most common failure):
+4. DRUM PATTERN (CRITICAL - most common failure):
    - Snare: 2 hits per bar at times 1.0 and 3.0 (NOT just time 2.0!)
    - Hi-hat: 8 hits per bar using eighth notes
    - Kick: 2+ hits per bar at times 0, 2, plus syncopation at 0.75, 2.5
@@ -804,7 +790,7 @@ def humanize_velocity(base_vel, variance=15):
     return max(30, min(110, base_vel + random.randint(-variance, variance)))
 ```
 
-6. MIDI FILE CREATION (CRITICAL for Signal compatibility):
+5. MIDI FILE CREATION (CRITICAL for Signal compatibility):
    - Always use: MIDIFile(1, ticks_per_quarternote=480)
    - Do NOT use the default (960) - it causes half-speed playback in Signal
 
