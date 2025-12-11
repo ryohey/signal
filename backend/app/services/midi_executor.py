@@ -77,9 +77,9 @@ def execute_midi_generation(
                 )
             raise MIDIExecutionError(f"Code execution failed: {stderr}")
 
-        # Collect generated MIDI files
+        # Collect generated MIDI files (search recursively in case LLM creates subdirectory)
         midi_files = {}
-        for midi_path in Path(tmpdir).glob("*.mid"):
+        for midi_path in Path(tmpdir).rglob("*.mid"):
             midi_files[midi_path.stem] = midi_path.read_bytes()
 
         if not midi_files:

@@ -14,7 +14,7 @@
   "author": "ryohey",
   "license": "MIT",
   "peerDependencies": {
-    "firebase": "^10.0.0",
+    "firebase": "^10.0.0 || ^12.0.0",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },

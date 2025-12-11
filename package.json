@@ -5,7 +5,7 @@
   "scripts": {
     "start": "turbo run dev --parallel",
     "build": "npm run build:app",
-    "build:app": "turbo build && cpx \"app/dist/**/*\" dist",
+    "build:app": "turbo build && cpy \"app/dist/**/*\" dist --parents",
     "serve": "npx http-server dist",
     "test": "turbo test",
     "lint": "turbo lint",
@@ -13,7 +13,7 @@
     "firebase": "npm --prefix functions run build && firebase emulators:start",
     "firebase:deploy": "firebase deploy",
     "dev:electron": "concurrently \"npm run dev -w app\" \"npm run dev --prefix electron\"",
-    "build:electron": "npm run build:electron -w app && rimraf electron/dist_renderer && cpx \"app/dist/**/*\" electron/dist_renderer",
+    "build:electron": "npm run build:electron -w app && rimraf electron/dist_renderer && cpy \"app/dist/**/*\" electron/dist_renderer --parents",
     "package:electron:darwin": "npm run build:electron && npm run package:darwin --prefix electron",
     "package:electron": "npm run build:electron && npm run package --prefix electron",
     "make:electron": "npm run build:electron && npm run make:mas --prefix electron",
@@ -32,7 +32,7 @@
   "homepage": "https://github.com/ryohey/signal/",
   "private": true,
   "devDependencies": {
-    "cpx": "^1.2.1",
+    "cpy-cli": "^4.2.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "turbo": "^2.5.2"

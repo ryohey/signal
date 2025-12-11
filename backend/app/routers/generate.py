@@ -17,16 +17,43 @@ from app.services.midi_executor import (
 
 router = APIRouter()
 
-# Mapping of track names to MIDI channels and program numbers
-TRACK_CONFIG = {
+# Default channel/program mappings for common instruments
+# The LLM will set program numbers in the MIDI files, but we use these
+# as fallbacks and for channel assignment
+DEFAULT_TRACK_CONFIG = {
     "drums": {"channel": 9, "program": 0},
-    "bass": {"channel": 0, "program": 33},  # Electric Bass (finger)
-    "guitar": {"channel": 1, "program": 25},  # Acoustic Guitar (steel)
-    "keys": {"channel": 2, "program": 4},  # Electric Piano
-    "melody": {"channel": 3, "program": 73},  # Flute (for vocal melody)
+    "bass": {"channel": 0, "program": 33},
+    "guitar": {"channel": 1, "program": 25},
+    "keys": {"channel": 2, "program": 4},
+    "piano": {"channel": 2, "program": 0},
+    "melody": {"channel": 3, "program": 73},
+    "synth": {"channel": 4, "program": 81},
+    "strings": {"channel": 5, "program": 48},
+    "pad": {"channel": 6, "program": 89},
+    "lead": {"channel": 3, "program": 80},
+    "arp": {"channel": 7, "program": 84},
+    "organ": {"channel": 2, "program": 16},
+    "brass": {"channel": 5, "program": 61},
+    "flute": {"channel": 3, "program": 73},
+    "sax": {"channel": 4, "program": 66},
 }
 
+
+def get_track_config(track_name: str, index: int) -> dict:
+    """Get channel/program for a track, with fallback for unknown instruments."""
+    name_lower = track_name.lower()
+
+    # Check for exact or partial matches
+    for key, config in DEFAULT_TRACK_CONFIG.items():
+        if key in name_lower:
+            return config
+
+    # Fallback: assign channel based on index (avoid channel 9 for non-drums)
+    channel = index if index < 9 else index + 1
+    return {"channel": min(channel, 15), "program": 0}
+
 MAX_RETRIES = 2
+MAX_TRACKS = 8
 
 
 def parse_prompt(prompt: str) -> dict:
@@ -70,10 +97,18 @@ async def generate_song(request: GenerateRequest):
                 code=code, tempo=params["tempo"], key=params["key"]
             )
 
+            # Validate track count
+            if len(midi_files) > MAX_TRACKS:
+                # Take only the first MAX_TRACKS files
+                midi_files = dict(list(midi_files.items())[:MAX_TRACKS])
+
+            if len(midi_files) == 0:
+                raise HTTPException(status_code=422, detail="No tracks were generated")
+
             # Convert to response format
             tracks = []
-            for name, midi_bytes in midi_files.items():
-                config = TRACK_CONFIG.get(name, {"channel": 0, "program": 0})
+            for index, (name, midi_bytes) in enumerate(midi_files.items()):
+                config = get_track_config(name, index)
                 tracks.append(
                     TrackData(
                         name=name,
@@ -141,7 +176,7 @@ async def regenerate_track(request: RegenerateRequest):
                     raise MIDIExecutionError("No MIDI file was generated")
 
             midi_bytes = midi_files[track_name]
-            config = TRACK_CONFIG.get(track_name, {"channel": 0, "program": 0})
+            config = get_track_config(track_name, 0)
 
             return RegenerateResponse(
                 track=TrackData(
