@@ -6,6 +6,18 @@ import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
 
+const VisuallyHiddenTitle = styled(DialogTitle)`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+`
+
 export interface ColorPickerProps {
   open: boolean
   onSelect: (color: string | null) => void
@@ -54,9 +66,7 @@ export const ColorPicker: FC<ColorPickerProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogTitle style={{ display: "none" }}>
-        Color Picker
-      </DialogTitle>
+      <VisuallyHiddenTitle>Color Picker</VisuallyHiddenTitle>
       <DialogContent>
         <Container>
           {colors.map((color) => (

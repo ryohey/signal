@@ -37,7 +37,6 @@ export class AgentService {
       return this.agent
     }
 
-    // @ts-expect-error - import.meta.env is provided by Vite at runtime
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY as string
     if (!apiKey) {
       throw new Error(
@@ -73,10 +72,8 @@ export class AgentService {
     const song = this.rootStore.songStore.song
     const toolDefinitions = createToolDefinitions({ song })
 
-    // @ts-expect-error - DynamicStructuredTool has deep type instantiation issues with Zod
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tools: any[] = toolDefinitions.map((def) => {
-      // @ts-expect-error - Type instantiation too deep
       return new DynamicStructuredTool({
         name: def.name,
         description: def.description,

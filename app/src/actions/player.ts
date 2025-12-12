@@ -23,6 +23,7 @@ export const useRewindOneBar = () => {
   const { scrollLeftTicks, setScrollLeftInTicks } = usePianoRollTickScroll()
   const { position, setPosition } = usePlayer()
 
+  // Cache the callback to avoid getSnapshot warnings
   return useCallback(() => {
     const tick = Measure.getPreviousMeasureTick(measures, position, timebase)
     setPosition(tick)

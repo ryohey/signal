@@ -1,10 +1,12 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
+import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
-import { runAgentLoop, type ToolCall, type ToolResult } from "../../services/hybridAgent"
-import { useStores } from "../../hooks/useStores"
+import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
+import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
+import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
 const Container = styled.div`
   display: flex;
@@ -103,6 +105,15 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
 const InputContainer = styled.div`
   padding: 1rem;
   border-top: 1px solid ${({ theme }) => theme.dividerColor};
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`
+
+const InputRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
 `
 
 const Input = styled.textarea`
@@ -234,6 +245,68 @@ const ProgressFill = styled.div<{ width: number }>`
   width: ${({ width }) => width}%;
 `
 
+// Notes display component
+const NotesContainer = styled.div`
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 0.375rem;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+  font-family: monospace;
+  font-size: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+`
+
+const NotesHeader = styled.div`
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: ${({ theme }) => theme.textColor};
+  font-size: 0.8rem;
+`
+
+const NotesList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`
+
+const NoteItem = styled.div`
+  padding: 0.25rem 0.5rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.25rem;
+  color: ${({ theme }) => theme.textColor};
+`
+
+const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
+  // Convert MIDI note number to note name
+  const midiNoteToName = (midiNote: number): string => {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    const octave = Math.floor(midiNote / 12) - 1
+    const noteName = noteNames[midiNote % 12]
+    return `${noteName}${octave}`
+  }
+
+  return (
+    <NotesContainer>
+      <NotesHeader>🎵 Detected Notes ({notes.length}):</NotesHeader>
+      <NotesList>
+        {notes.map((note, i) => (
+          <NoteItem key={i}>
+            {midiNoteToName(note.pitch)} - pitch: {note.pitch}, start: {note.start} ticks, duration: {note.duration} ticks, velocity: {note.velocity}
+          </NoteItem>
+        ))}
+      </NotesList>
+      <div style={{ marginTop: "0.5rem", fontSize: "0.7rem", color: "rgba(255,255,255,0.6)", fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
+        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>Tool format (for addNotes):</div>
+        <div style={{ background: "rgba(0,0,0,0.2)", padding: "0.5rem", borderRadius: "0.25rem", overflowX: "auto" }}>
+          {JSON.stringify(notes.map(n => ({ pitch: n.pitch, start: n.start, duration: n.duration, velocity: n.velocity })), null, 2)}
+        </div>
+      </div>
+    </NotesContainer>
+  )
+}
+
 // Helper functions for progress display
 function getStageIcon(stage: GenerationStage): string {
   switch (stage) {
@@ -299,6 +372,7 @@ function getStageProgress(stage: GenerationStage): number {
 interface ChatMessage {
   role: "user" | "assistant" | "error"
   content: string
+  notes?: DetectedNote[] // Optional notes data for voice recordings
 }
 
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
@@ -316,8 +390,8 @@ export const AIChat: FC = () => {
     // Load from localStorage or default to hybrid
     const stored = localStorage.getItem(AGENT_TYPE_STORAGE_KEY)
     return (stored === "llm" || stored === "composition_agent" || stored === "hybrid")
-      ? stored as AgentType
-      : "hybrid"
+      ? (stored as AgentType)
+      : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
   // Deep agent progress state
@@ -350,15 +424,40 @@ export const AIChat: FC = () => {
     return () => clearInterval(interval)
   }, [])
 
-  const handleSubmit = useCallback(async () => {
-    if (!input.trim() || isLoading) return
+  const handleSubmit = useCallback(async (overrideInput?: string) => {
+    const messageToSubmit = overrideInput || input.trim()
+    if (!messageToSubmit || isLoading) return
 
-    const userMessage = input.trim()
-    setInput("")
+    // Find if there are notes in recent messages that should be included as context
+    const recentMessageWithNotes = messages
+      .slice()
+      .reverse()
+      .find((msg) => msg.role === "user" && msg.notes && msg.notes.length > 0)
+
+    let userMessage = messageToSubmit
+    
+    // If there are notes in a recent message, include them in the prompt
+    if (recentMessageWithNotes?.notes) {
+      const notesJson = JSON.stringify(
+        recentMessageWithNotes.notes.map((n) => ({
+          pitch: n.pitch,
+          start: n.start,
+          duration: n.duration,
+          velocity: n.velocity,
+        })),
+        null,
+        2
+      )
+      userMessage = `${messageToSubmit}\n\nHere are the notes to add (in addNotes tool format):\n\`\`\`json\n${notesJson}\n\`\`\``
+    }
+
+    if (!overrideInput) {
+      setInput("")
+    }
     
     // Add user message and create placeholder for assistant response
     setMessages((prev) => {
-      const newMessages = [...prev, { role: "user" as const, content: userMessage }]
+      const newMessages = [...prev, { role: "user" as const, content: messageToSubmit }]
       const assistantIndex = newMessages.length
       streamingMessageRef.current = assistantIndex
       return [...newMessages, { role: "assistant" as const, content: "" }]
@@ -384,9 +483,17 @@ export const AIChat: FC = () => {
                 const index = streamingMessageRef.current
                 if (index >= 0 && index < updated.length) {
                   const toolNames = toolCalls.map((tc) => tc.name).join(", ")
+                  const successCount = results.filter((r) => {
+                    try {
+                      const parsed = JSON.parse(r.result)
+                      return !parsed.error
+                    } catch {
+                      return true
+                    }
+                  }).length
                   updated[index] = {
                     ...updated[index],
-                    content: updated[index].content + `\n🔧 Executed: ${toolNames}`,
+                    content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
                   }
                 }
                 return updated
@@ -623,7 +730,7 @@ export const AIChat: FC = () => {
         streamingMessageRef.current = -1
       }
     }
-  }, [input, isLoading, loadAISong, agentType])
+  }, [input, isLoading, loadAISong, agentType, songStore.song, messages])
 
   const handleInterrupt = useCallback(() => {
     if (abortControllerRef.current) {
@@ -680,6 +787,26 @@ export const AIChat: FC = () => {
     localStorage.setItem(AGENT_TYPE_STORAGE_KEY, newAgentType)
   }, [])
 
+  // Handle notes detected from voice recorder
+  const handleNotesDetected = useCallback(
+    (notes: DetectedNote[]) => {
+      if (notes.length === 0) return
+
+      // Add a message to the chat with the notes displayed
+      const messageContent = `🎤 Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "user" as const,
+          content: messageContent,
+          notes: notes, // Store notes in the message for display and context
+        },
+      ])
+    },
+    []
+  )
+
   return (
     <Container>
       <Header>
@@ -723,6 +850,9 @@ export const AIChat: FC = () => {
         {messages.map((msg, i) => (
           <Message key={i} role={msg.role}>
             {msg.content}
+            {msg.notes && msg.notes.length > 0 && (
+              <NotesDisplay notes={msg.notes} />
+            )}
           </Message>
         ))}
         {/* Show progress UI only for composition_agent mode */}
@@ -746,20 +876,24 @@ export const AIChat: FC = () => {
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Describe your song..."
-          disabled={isLoading || backendStatus === "disconnected"}
-        />
+        <InputRow>
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Describe your song..."
+            disabled={isLoading || backendStatus === "disconnected"}
+            style={{ flex: 1 }}
+          />
+          <VoiceRecorder onNotesDetected={handleNotesDetected} />
+        </InputRow>
         {isLoading ? (
           <InterruptButton onClick={handleInterrupt}>
             Stop Generation
           </InterruptButton>
         ) : (
           <Button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={
               !input.trim() || backendStatus === "disconnected"
             }
