@@ -1,4 +1,7 @@
 .aider*
+/thoughts
+.beads/
+.claude/
 
 # Logs
 logs

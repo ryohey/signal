@@ -13,6 +13,9 @@ from app.models.schemas import (
     TrackData,
     SongMetadata,
     AttemptLog,
+    AgentStepRequest,
+    AgentStepResponse,
+    ToolCall,
 )
 from app.services.composition_agent import (
     generate_midi_code as generate_midi_code_composition,
@@ -29,6 +32,7 @@ from app.services.midi_executor import (
     MIDIExecutionError,
 )
 from app.services.generator import generate_song_deep, GenerationError
+from app.services.hybrid_agent import start_agent_step, resume_agent_step
 
 router = APIRouter()
 
@@ -522,3 +526,55 @@ async def generate_song_stream(request: GenerateRequest, req: Request):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# ============================================================================
+# Hybrid Agent Endpoint (frontend tool execution)
+# ============================================================================
+
+
+@router.post("/agent/step", response_model=AgentStepResponse)
+async def agent_step(request: AgentStepRequest):
+    """
+    Execute a single step of the hybrid agent.
+
+    This endpoint supports two modes:
+    1. Start new conversation: Send { prompt: "..." }
+    2. Resume after tool execution: Send { thread_id: "...", tool_results: [...] }
+
+    When the agent needs to execute tools, it returns:
+    - done: false
+    - tool_calls: Array of tools to execute on frontend
+
+    When the agent completes:
+    - done: true
+    - message: Final response from agent
+    """
+    try:
+        if request.tool_results and request.thread_id:
+            # Resume mode: continue after frontend tool execution
+            result = await resume_agent_step(
+                thread_id=request.thread_id,
+                tool_results=[{"id": tr.id, "result": tr.result} for tr in request.tool_results],
+            )
+        elif request.prompt:
+            # Start mode: new conversation
+            result = await start_agent_step(
+                prompt=request.prompt,
+                thread_id=request.thread_id,
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Must provide either 'prompt' (to start) or 'tool_results' (to resume)",
+            )
+
+        return AgentStepResponse(
+            thread_id=result["thread_id"],
+            tool_calls=[ToolCall(**tc) for tc in result["tool_calls"]],
+            done=result["done"],
+            message=result["message"],
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Agent step failed: {str(e)}")

@@ -163,3 +163,40 @@ class AttemptLog(BaseModel):
     error: Optional[str] = None
     validation_result: Optional[ValidationResult] = None
     issues: Optional[list[str]] = None
+
+
+# ============================================================================
+# Hybrid Agent Models (frontend tool execution)
+# ============================================================================
+
+
+class ToolCall(BaseModel):
+    """A tool call to be executed on the frontend."""
+
+    id: str
+    name: str
+    args: dict
+
+
+class ToolResult(BaseModel):
+    """Result of a tool execution from the frontend."""
+
+    id: str
+    result: str  # JSON string result
+
+
+class AgentStepRequest(BaseModel):
+    """Request for an agent step."""
+
+    prompt: Optional[str] = None  # For starting a new conversation
+    thread_id: Optional[str] = None  # For continuing an existing conversation
+    tool_results: Optional[list[ToolResult]] = None  # For resuming after tool execution
+
+
+class AgentStepResponse(BaseModel):
+    """Response from an agent step."""
+
+    thread_id: str
+    tool_calls: list[ToolCall]
+    done: bool
+    message: Optional[str] = None

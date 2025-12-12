@@ -3,6 +3,8 @@ import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
+import { runAgentLoop, type ToolCall, type ToolResult } from "../../services/hybridAgent"
+import { useStores } from "../../hooks/useStores"
 
 const Container = styled.div`
   display: flex;
@@ -301,6 +303,8 @@ interface ChatMessage {
 
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
+type AgentType = "llm" | "composition_agent" | "hybrid"
+
 export const AIChat: FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
@@ -308,13 +312,14 @@ export const AIChat: FC = () => {
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
-  const [agentType, setAgentType] = useState<"llm" | "composition_agent">(() => {
-    // Load from localStorage or default to composition_agent
+  const [agentType, setAgentType] = useState<AgentType>(() => {
+    // Load from localStorage or default to hybrid
     const stored = localStorage.getItem(AGENT_TYPE_STORAGE_KEY)
-    return (stored === "llm" || stored === "composition_agent") 
-      ? stored 
-      : "composition_agent"
+    return (stored === "llm" || stored === "composition_agent" || stored === "hybrid")
+      ? stored as AgentType
+      : "hybrid"
   })
+  const { songStore } = useStores()
   // Deep agent progress state
   const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
   const [generationProgress, setGenerationProgress] = useState<string>("")
@@ -362,7 +367,90 @@ export const AIChat: FC = () => {
     setIsLoading(true)
 
     // Branch based on agent type
-    if (agentType === "llm") {
+    if (agentType === "hybrid") {
+      // Hybrid Agent mode: Run agent loop with frontend tool execution
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      try {
+        const result = await runAgentLoop(
+          userMessage,
+          songStore.song,
+          {
+            onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
+              // Update message to show tools executed
+              setMessages((prev) => {
+                const updated = [...prev]
+                const index = streamingMessageRef.current
+                if (index >= 0 && index < updated.length) {
+                  const toolNames = toolCalls.map((tc) => tc.name).join(", ")
+                  updated[index] = {
+                    ...updated[index],
+                    content: updated[index].content + `\n🔧 Executed: ${toolNames}`,
+                  }
+                }
+                return updated
+              })
+            },
+            onMessage: (message: string) => {
+              setMessages((prev) => {
+                const updated = [...prev]
+                const index = streamingMessageRef.current
+                if (index >= 0 && index < updated.length) {
+                  updated[index] = {
+                    ...updated[index],
+                    content: updated[index].content + `\n\n${message}`,
+                  }
+                }
+                return updated
+              })
+            },
+            onError: (error: Error) => {
+              setMessages((prev) => {
+                const updated = [...prev]
+                const index = streamingMessageRef.current
+                if (index >= 0 && index < updated.length) {
+                  updated[index] = {
+                    role: "error",
+                    content: error.message,
+                  }
+                }
+                return updated
+              })
+            },
+          },
+          abortController.signal
+        )
+
+        if (result.success) {
+          setMessages((prev) => {
+            const updated = [...prev]
+            const index = streamingMessageRef.current
+            if (index >= 0 && index < updated.length) {
+              updated[index] = {
+                role: "assistant",
+                content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+              }
+            }
+            return updated
+          })
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Generation failed"
+        setMessages((prev) => {
+          const updated = [...prev]
+          const index = streamingMessageRef.current
+          if (index >= 0 && index < updated.length) {
+            updated[index] = { role: "error", content: errorMessage }
+          }
+          return updated
+        })
+      } finally {
+        streamingMessageRef.current = -1
+        setIsLoading(false)
+        abortControllerRef.current = null
+      }
+    } else if (agentType === "llm") {
       // LLM Direct mode: Use streaming with abort controller
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -587,7 +675,7 @@ export const AIChat: FC = () => {
   )
 
   const handleAgentTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newAgentType = e.target.value as "llm" | "composition_agent"
+    const newAgentType = e.target.value as AgentType
     setAgentType(newAgentType)
     localStorage.setItem(AGENT_TYPE_STORAGE_KEY, newAgentType)
   }, [])
@@ -603,6 +691,7 @@ export const AIChat: FC = () => {
             disabled={isLoading}
             title="Select AI agent type"
           >
+            <option value="hybrid">Hybrid Agent</option>
             <option value="composition_agent">Deep Agent</option>
             <option value="llm">LLM Direct</option>
           </Select>
