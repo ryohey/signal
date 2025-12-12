@@ -21,9 +21,9 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vitest": "^4.0.10"
+    "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@ryohey/wavelet": "^0.7.4"
+    "@ryohey/wavelet": "^0.7.5"
   }
 }
