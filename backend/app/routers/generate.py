@@ -1,6 +1,9 @@
 import re
 import json
-from fastapi import APIRouter, HTTPException
+import asyncio
+from typing import Optional
+from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from app.models.schemas import (
     GenerateRequest,
@@ -9,6 +12,7 @@ from app.models.schemas import (
     RegenerateResponse,
     TrackData,
     SongMetadata,
+    AttemptLog,
 )
 from app.services.composition_agent import (
     generate_midi_code as generate_midi_code_composition,
@@ -24,6 +28,7 @@ from app.services.midi_executor import (
     midi_to_base64,
     MIDIExecutionError,
 )
+from app.services.generator import generate_song_deep, GenerationError
 
 router = APIRouter()
 
@@ -326,4 +331,194 @@ async def regenerate_track(request: RegenerateRequest):
     raise HTTPException(
         status_code=422,
         detail=f"Regeneration failed after {MAX_RETRIES} attempts: {str(last_error)}",
+    )
+
+
+# ============================================================================
+# Deep Agent Architecture Endpoints
+# ============================================================================
+
+
+class DeepGenerateResponse(BaseModel):
+    """Response from deep generation endpoint."""
+
+    tracks: list[TrackData]
+    metadata: SongMetadata
+    message: str
+    attempt_logs: list[AttemptLog]
+    spec_used: Optional[dict] = None  # The SongSpec used (for debugging)
+
+
+@router.post("/generate/deep", response_model=DeepGenerateResponse)
+async def generate_song_deep_endpoint(request: GenerateRequest):
+    """
+    Generate a multi-track song using the deep agent architecture.
+
+    This endpoint uses:
+    1. Planning stage to create a structured song specification
+    2. Spec-driven code generation
+    3. MIDI quality validation
+    4. Iterative refinement (up to 5 attempts)
+
+    Returns detailed attempt logs for transparency.
+    """
+    params = parse_prompt(request.prompt)
+
+    try:
+        result = await generate_song_deep(
+            prompt=params["style"],
+            tempo=params["tempo"],
+            key=params["key"],
+        )
+
+        # Convert MIDI files to response format
+        midi_files = result["midi_files"]
+        spec = result["spec"]
+        attempt_logs = result["attempt_logs"]
+
+        tracks = []
+        for index, (name, midi_bytes) in enumerate(midi_files.items()):
+            config = get_track_config(name, index)
+            tracks.append(
+                TrackData(
+                    name=name,
+                    midi_data=midi_to_base64(midi_bytes),
+                    channel=config["channel"],
+                    program_number=config["program"],
+                )
+            )
+
+        return DeepGenerateResponse(
+            tracks=tracks,
+            metadata=SongMetadata(
+                tempo=spec.tempo, key=spec.key, time_signature=spec.time_signature
+            ),
+            message=f"Generated {len(tracks)} track(s) after {len(attempt_logs)} attempt(s)",
+            attempt_logs=attempt_logs,
+            spec_used=spec.model_dump(),
+        )
+
+    except GenerationError as e:
+        # Return detailed failure information
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": str(e),
+                "attempt_logs": [log.model_dump() for log in e.attempt_logs],
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+
+@router.post("/generate/stream")
+async def generate_song_stream(request: GenerateRequest, req: Request):
+    """
+    Generate a song with real-time progress updates via SSE.
+
+    Returns Server-Sent Events with the following event types:
+    - progress: Stage updates (planning, generating, validating, refining)
+    - complete: Final result with tracks
+    - error: Generation failed
+    """
+    params = parse_prompt(request.prompt)
+
+    async def event_generator():
+        progress_queue: asyncio.Queue = asyncio.Queue()
+
+        async def progress_callback(stage: str, data: dict):
+            await progress_queue.put({"stage": stage, **data})
+
+        # Start generation in background
+        async def run_generation():
+            try:
+                result = await generate_song_deep(
+                    prompt=params["style"],
+                    tempo=params["tempo"],
+                    key=params["key"],
+                    progress_callback=progress_callback,
+                )
+
+                # Convert MIDI files to response format
+                midi_files = result["midi_files"]
+                spec = result["spec"]
+                attempt_logs = result["attempt_logs"]
+
+                tracks = []
+                for index, (name, midi_bytes) in enumerate(midi_files.items()):
+                    config = get_track_config(name, index)
+                    tracks.append({
+                        "name": name,
+                        "midi_data": midi_to_base64(midi_bytes),
+                        "channel": config["channel"],
+                        "program_number": config["program"],
+                    })
+
+                await progress_queue.put(
+                    {
+                        "stage": "complete",
+                        "result": {
+                            "tracks": tracks,
+                            "metadata": {
+                                "tempo": spec.tempo,
+                                "key": spec.key,
+                                "time_signature": spec.time_signature,
+                            },
+                            "message": f"Generated {len(tracks)} track(s)",
+                        },
+                        "attempt_logs": [log.model_dump() for log in attempt_logs],
+                    }
+                )
+            except GenerationError as e:
+                await progress_queue.put(
+                    {
+                        "stage": "error",
+                        "error": str(e),
+                        "attempt_logs": [log.model_dump() for log in e.attempt_logs],
+                    }
+                )
+            except Exception as e:
+                await progress_queue.put(
+                    {
+                        "stage": "error",
+                        "error": str(e),
+                    }
+                )
+            finally:
+                await progress_queue.put(None)  # Signal end
+
+        # Start background task
+        task = asyncio.create_task(run_generation())
+
+        try:
+            while True:
+                # Check if client disconnected
+                if await req.is_disconnected():
+                    task.cancel()
+                    break
+
+                try:
+                    event = await asyncio.wait_for(progress_queue.get(), timeout=1.0)
+                except asyncio.TimeoutError:
+                    # Send keepalive
+                    yield ": keepalive\n\n"
+                    continue
+
+                if event is None:
+                    break
+
+                yield f"data: {json.dumps(event)}\n\n"
+
+        except asyncio.CancelledError:
+            task.cancel()
+            raise
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )

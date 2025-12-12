@@ -14,6 +14,15 @@ export class SoundFontSynth implements SynthOutput {
     return this._loadedSoundFont !== null
   }
 
+  /** Whether the synth is ready to play audio (SoundFont loaded and AudioContext running) */
+  get isReady(): boolean {
+    return (
+      this.synth !== null &&
+      this._loadedSoundFont !== null &&
+      this.context.state === "running"
+    )
+  }
+
   private sequenceNumber = 0
 
   constructor(private readonly context: AudioContext) {}
@@ -47,13 +56,24 @@ export class SoundFontSynth implements SynthOutput {
   }
 
   private postSynthMessage(e: SynthEvent, transfer?: Transferable[]) {
-    this.synth?.port.postMessage(
+    if (this.synth === null) {
+      console.warn(
+        "SoundFontSynth: Cannot send message - synth not initialized. SoundFont may not be loaded.",
+      )
+      return
+    }
+    this.synth.port.postMessage(
       { ...e, sequenceNumber: this.sequenceNumber++ },
       transfer ?? [],
     )
   }
 
   sendEvent(event: SendableEvent, delayTime: number = 0) {
+    if (this.context.state !== "running") {
+      console.warn(
+        `SoundFontSynth: AudioContext state is "${this.context.state}", not "running". Audio may not play.`,
+      )
+    }
     this.postSynthMessage({
       type: "midi",
       midi: event,

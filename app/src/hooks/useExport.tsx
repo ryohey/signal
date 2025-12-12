@@ -61,6 +61,16 @@ const useExportSong = () => {
 
     const soundFontData = synth.loadedSoundFont?.data
     if (soundFontData === undefined) {
+      console.error(
+        "Export failed: SoundFont not loaded. synth.loadedSoundFont =",
+        synth.loadedSoundFont,
+      )
+      await dialog.show({
+        title: localized["export"],
+        message:
+          "Export failed: SoundFont not loaded. Please wait for the SoundFont to finish loading and try again.",
+        actions: [{ title: "OK", key: "ok" }],
+      })
       return
     }
 
@@ -94,7 +104,13 @@ const useExportSong = () => {
       setOpenDialog(false)
       downloadBlob(blob, "song." + encoder.ext)
     } catch (e) {
-      console.warn(e)
+      console.error("Export failed:", e)
+      setOpenDialog(false)
+      await dialog.show({
+        title: localized["export"],
+        message: `Export failed: ${e instanceof Error ? e.message : "Unknown error"}`,
+        actions: [{ title: "OK", key: "ok" }],
+      })
     }
   }
 }

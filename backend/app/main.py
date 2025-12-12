@@ -1,8 +1,23 @@
+import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.routers import generate
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+    datefmt="%H:%M:%S",
+)
+
+# Set log levels for different modules
+logging.getLogger("app.services.generator").setLevel(logging.DEBUG)
+logging.getLogger("app.services.validator").setLevel(logging.DEBUG)
+logging.getLogger("app.services.llm").setLevel(logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 settings = get_settings()
 

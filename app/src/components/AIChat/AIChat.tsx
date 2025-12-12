@@ -1,7 +1,8 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
-import { aiBackend } from "../../services/aiBackend"
+import { aiBackend, GenerationStage } from "../../services/aiBackend"
+import type { ProgressEvent } from "../../services/aiBackend/types"
 
 const Container = styled.div`
   display: flex;
@@ -70,6 +71,7 @@ const MessageList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  user-select: text;
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
@@ -175,6 +177,123 @@ const WarningBanner = styled.div`
   text-align: center;
 `
 
+// Progress indicator styled components
+const ProgressContainer = styled.div`
+  padding: 0.75rem 1rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+`
+
+const ProgressStage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+`
+
+const StageIcon = styled.span`
+  font-size: 1rem;
+`
+
+const StageName = styled.span`
+  font-weight: 500;
+  color: ${({ theme }) => theme.textColor};
+  font-size: 0.875rem;
+`
+
+const AttemptBadge = styled.span`
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 0.75rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+`
+
+const ProgressMessage = styled.div`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  margin-bottom: 0.5rem;
+  user-select: text;
+  cursor: text;
+`
+
+const ProgressBar = styled.div`
+  height: 4px;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 2px;
+  overflow: hidden;
+`
+
+const ProgressFill = styled.div<{ width: number }>`
+  height: 100%;
+  background: ${({ theme }) => theme.themeColor};
+  transition: width 0.3s ease;
+  width: ${({ width }) => width}%;
+`
+
+// Helper functions for progress display
+function getStageIcon(stage: GenerationStage): string {
+  switch (stage) {
+    case "planning":
+      return "📝"
+    case "generating":
+      return "🎵"
+    case "executing":
+      return "⚙️"
+    case "validating":
+      return "✅"
+    case "refining":
+      return "🔧"
+    case "complete":
+      return "🎉"
+    case "error":
+      return "❌"
+    default:
+      return "⏳"
+  }
+}
+
+function getStageLabel(stage: GenerationStage): string {
+  switch (stage) {
+    case "planning":
+      return "Planning song structure..."
+    case "generating":
+      return "Generating music code..."
+    case "executing":
+      return "Creating MIDI files..."
+    case "validating":
+      return "Checking quality..."
+    case "refining":
+      return "Improving output..."
+    case "complete":
+      return "Complete!"
+    case "error":
+      return "Error"
+    default:
+      return "Processing..."
+  }
+}
+
+function getStageProgress(stage: GenerationStage): number {
+  switch (stage) {
+    case "planning":
+      return 15
+    case "generating":
+      return 40
+    case "executing":
+      return 60
+    case "validating":
+      return 80
+    case "refining":
+      return 70 // Goes back during refinement
+    case "complete":
+      return 100
+    default:
+      return 0
+  }
+}
+
 interface ChatMessage {
   role: "user" | "assistant" | "error"
   content: string
@@ -196,6 +315,11 @@ export const AIChat: FC = () => {
       ? stored 
       : "composition_agent"
   })
+  // Deep agent progress state
+  const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
+  const [generationProgress, setGenerationProgress] = useState<string>("")
+  const [currentAttempt, setCurrentAttempt] = useState<number>(0)
+
   const loadAISong = useLoadAISong()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const streamingMessageRef = useRef<number>(-1)
@@ -236,108 +360,186 @@ export const AIChat: FC = () => {
     })
     
     setIsLoading(true)
-    
-    // Create abort controller for this request
-    const abortController = new AbortController()
-    abortControllerRef.current = abortController
 
-    try {
-      await aiBackend.generateStream(
-        { prompt: userMessage, agentType: agentType },
-        (content: string) => {
-          // Update the streaming message
-          setMessages((prev) => {
-            const updated = [...prev]
-            const index = streamingMessageRef.current
-            if (index >= 0 && index < updated.length) {
-              updated[index] = {
-                ...updated[index],
-                content: updated[index].content + content,
+    // Branch based on agent type
+    if (agentType === "llm") {
+      // LLM Direct mode: Use streaming with abort controller
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      try {
+        await aiBackend.generateStream(
+          { prompt: userMessage, agentType: agentType },
+          (content: string) => {
+            // Update the streaming message
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  ...updated[index],
+                  content: updated[index].content + content,
+                }
               }
-            }
-            return updated
-          })
-        },
-        (response) => {
-          // Load the generated song
-          loadAISong(response)
+              return updated
+            })
+          },
+          (response) => {
+            // Load the generated song
+            loadAISong(response)
 
-          // Update the final message
-          setMessages((prev) => {
-            const updated = [...prev]
-            const index = streamingMessageRef.current
-            if (index >= 0 && index < updated.length) {
-              updated[index] = {
-                role: "assistant",
-                content:
-                  prev[index].content +
-                  `\n\n✅ Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+            // Update the final message
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "assistant",
+                  content:
+                    prev[index].content +
+                    `\n\n✅ Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+                }
               }
-            }
-            return updated
-          })
-          streamingMessageRef.current = -1
-          setIsLoading(false)
-          abortControllerRef.current = null
-        },
-        (error) => {
-          const errorMessage =
-            error instanceof Error ? error.message : "Generation failed"
+              return updated
+            })
+            streamingMessageRef.current = -1
+            setIsLoading(false)
+            abortControllerRef.current = null
+          },
+          (error) => {
+            const errorMessage =
+              error instanceof Error ? error.message : "Generation failed"
 
-          // Provide user-friendly error messages
-          let friendlyMessage = errorMessage
-          if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-            friendlyMessage =
-              "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-          } else if (errorMessage.includes("timeout")) {
-            friendlyMessage =
-              "Generation took too long. Try a simpler prompt or try again."
-          } else if (errorMessage.includes("syntax error")) {
-            friendlyMessage =
-              "The AI generated invalid code. Please try again with a different prompt."
+            // Provide user-friendly error messages
+            let friendlyMessage = errorMessage
+            if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
+              friendlyMessage =
+                "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+            } else if (errorMessage.includes("timeout")) {
+              friendlyMessage =
+                "Generation took too long. Try a simpler prompt or try again."
+            } else if (errorMessage.includes("syntax error")) {
+              friendlyMessage =
+                "The AI generated invalid code. Please try again with a different prompt."
+            }
+
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              // Replace the streaming message with error
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "error",
+                  content: friendlyMessage,
+                }
+              }
+              return updated
+            })
+            streamingMessageRef.current = -1
+            setIsLoading(false)
+            abortControllerRef.current = null
+          },
+          abortController.signal,
+        )
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Generation failed"
+
+        setMessages((prev) => {
+          const updated = [...prev]
+          const index = streamingMessageRef.current
+          if (index >= 0 && index < updated.length) {
+            updated[index] = {
+              role: "error",
+              content: errorMessage,
+            }
           }
+          return updated
+        })
+        streamingMessageRef.current = -1
+        setIsLoading(false)
+        abortControllerRef.current = null
+      }
+    } else {
+      // Composition Agent mode: Use progress tracking
+      setGenerationStage("planning")
+      setGenerationProgress("Starting generation...")
+      setCurrentAttempt(0)
 
-          setMessages((prev) => {
-            const updated = [...prev]
-            const index = streamingMessageRef.current
-            // Replace the streaming message with error
-            if (index >= 0 && index < updated.length) {
-              updated[index] = {
-                role: "error",
-                content: friendlyMessage,
-              }
+      try {
+        const response = await aiBackend.generateWithProgress(
+          { prompt: userMessage, agentType: agentType },
+          ((event: ProgressEvent) => {
+            setGenerationStage(event.stage)
+            setGenerationProgress(event.message || "")
+            if (event.attempt) {
+              setCurrentAttempt(event.attempt)
             }
-            return updated
-          })
-          streamingMessageRef.current = -1
-          setIsLoading(false)
-          abortControllerRef.current = null
-        },
-        abortController.signal,
-      )
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Generation failed"
+          }) as Parameters<typeof aiBackend.generateWithProgress>[1],
+        )
 
-      setMessages((prev) => {
-        const updated = [...prev]
-        const index = streamingMessageRef.current
-        if (index >= 0 && index < updated.length) {
-          updated[index] = {
-            role: "error",
-            content: errorMessage,
-          }
+        // Load the generated song
+        loadAISong(response)
+
+        const attemptInfo =
+          response.attemptLogs.length > 1
+            ? ` (after ${response.attemptLogs.length} attempts)`
+            : ""
+
+        // Remove the placeholder message and add final result
+        setMessages((prev) => {
+          const updated = prev.slice(0, -1) // Remove placeholder
+          return [
+            ...updated,
+            {
+              role: "assistant",
+              content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t: { name: string }) => t.name).join(", ")}${attemptInfo}. Press play to listen!`,
+            },
+          ]
+        })
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Generation failed"
+
+        // Provide user-friendly error messages
+        let friendlyMessage = errorMessage
+        if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
+          friendlyMessage =
+            "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+        } else if (errorMessage.includes("timeout")) {
+          friendlyMessage =
+            "Generation took too long. Try a simpler prompt or try again."
+        } else if (errorMessage.includes("syntax error")) {
+          friendlyMessage =
+            "The AI generated invalid code. Please try again with a different prompt."
+        } else if (errorMessage.includes("5 attempts")) {
+          friendlyMessage =
+            "Generation failed after multiple attempts. Try a different prompt or simpler request."
         }
-        return updated
-      })
-      streamingMessageRef.current = -1
-      setIsLoading(false)
-      abortControllerRef.current = null
+
+        // Remove placeholder and add error message
+        setMessages((prev) => {
+          const updated = prev.slice(0, -1) // Remove placeholder
+          return [
+            ...updated,
+            {
+              role: "error",
+              content: friendlyMessage,
+            },
+          ]
+        })
+      } finally {
+        setIsLoading(false)
+        setGenerationStage(null)
+        setGenerationProgress("")
+        streamingMessageRef.current = -1
+      }
     }
   }, [input, isLoading, loadAISong, agentType])
 
   const handleInterrupt = useCallback(() => {
     if (abortControllerRef.current) {
+      // LLM mode: abort the stream
       abortControllerRef.current.abort()
       abortControllerRef.current = null
       setIsLoading(false)
@@ -355,8 +557,24 @@ export const AIChat: FC = () => {
         return updated
       })
       streamingMessageRef.current = -1
+    } else if (agentType === "composition_agent" && isLoading) {
+      // Composition agent mode: just stop and clean up
+      setIsLoading(false)
+      setGenerationStage(null)
+      setGenerationProgress("")
+      setMessages((prev) => {
+        const updated = prev.slice(0, -1) // Remove placeholder
+        return [
+          ...updated,
+          {
+            role: "error",
+            content: "Generation was interrupted by user.",
+          },
+        ]
+      })
+      streamingMessageRef.current = -1
     }
-  }, [])
+  }, [agentType, isLoading])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -418,6 +636,24 @@ export const AIChat: FC = () => {
             {msg.content}
           </Message>
         ))}
+        {/* Show progress UI only for composition_agent mode */}
+        {isLoading && agentType === "composition_agent" && generationStage && (
+          <ProgressContainer>
+            <ProgressStage>
+              <StageIcon>{getStageIcon(generationStage)}</StageIcon>
+              <StageName>{getStageLabel(generationStage)}</StageName>
+              {currentAttempt > 0 && (
+                <AttemptBadge>Attempt {currentAttempt}/5</AttemptBadge>
+              )}
+            </ProgressStage>
+            {generationProgress && (
+              <ProgressMessage>{generationProgress}</ProgressMessage>
+            )}
+            <ProgressBar>
+              <ProgressFill width={getStageProgress(generationStage)} />
+            </ProgressBar>
+          </ProgressContainer>
+        )}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
