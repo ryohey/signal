@@ -10,7 +10,7 @@ import { EventListInput } from "./EventListInput"
 interface EventListItemProps {
   item: TrackEvent
   style?: React.CSSProperties
-  onClick: (e: React.MouseEvent, ev: TrackEvent) => void
+  onClick?: (e: React.MouseEvent, ev: TrackEvent) => void
 }
 
 const equalEventListItemProps = (
@@ -75,7 +75,7 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
       <Row
         style={style}
         onClick={useCallback(
-          (e: React.MouseEvent) => onClick(e, item),
+          (e: React.MouseEvent) => onClick?.(e, item),
           [item, onClick]
         )}
         onKeyDown={useCallback(
