@@ -59,6 +59,67 @@ const Container = styled.div`
   gap: 0.5rem;
 `
 
+const AudioVisualizer = styled.div`
+  width: 100%;
+  max-width: 200px;
+  padding: 0.5rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.375rem;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+`
+
+const LevelMeter = styled.div`
+  width: 100%;
+  height: 8px;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  position: relative;
+`
+
+const LevelBar = styled.div<{ level: number }>`
+  height: 100%;
+  width: ${({ level }) => Math.min(100, level * 100)}%;
+  background: ${({ level, theme }) => {
+    if (level > 0.7) return theme.redColor || "#f44336"
+    if (level > 0.4) return theme.yellowColor || "#ffc107"
+    return theme.themeColor
+  }};
+  transition: width 0.1s ease-out, background 0.1s ease-out;
+  border-radius: 4px;
+`
+
+const FrequencyDisplay = styled.div`
+  font-size: 0.7rem;
+  color: ${({ theme }) => theme.textColor};
+  text-align: center;
+  font-family: monospace;
+`
+
+const NoteName = styled.div`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.themeColor};
+  text-align: center;
+  margin-top: 0.25rem;
+`
+
+const WaveformContainer = styled.div`
+  width: 100%;
+  height: 40px;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 0.25rem;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+`
+
+const WaveformCanvas = styled.canvas`
+  width: 100%;
+  height: 100%;
+`
+
 export interface DetectedNote {
   pitch: number // MIDI note number (0-127)
   start: number // Start time in ticks
@@ -108,12 +169,18 @@ function detectPitch(
     }
   }
 
-  // Only return if correlation is strong enough
-  if (bestCorrelation < 0.1 || bestPeriod === 0) {
+  // Only return if correlation is strong enough (lowered threshold for better detection)
+  if (bestCorrelation < 0.05 || bestPeriod === 0) {
     return null
   }
 
   const frequency = sampleRate / bestPeriod
+  
+  // Validate frequency is in a reasonable range for voice/music
+  if (frequency < 80 || frequency > 2000) {
+    return null
+  }
+  
   return frequency
 }
 
@@ -124,6 +191,87 @@ function quantizeToNearestNote(midiNote: number): number {
   return Math.round(midiNote)
 }
 
+/**
+ * Convert MIDI note number to note name
+ */
+function midiNoteToName(midiNote: number): string {
+  const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+  const octave = Math.floor(midiNote / 12) - 1
+  const noteName = noteNames[midiNote % 12]
+  return `${noteName}${octave}`
+}
+
+/**
+ * Calculate RMS (Root Mean Square) audio level
+ * Returns a normalized value between 0 and 1
+ */
+function calculateRMS(buffer: Float32Array): number {
+  let sum = 0
+  for (let i = 0; i < buffer.length; i++) {
+    sum += buffer[i] * buffer[i]
+  }
+  const rms = Math.sqrt(sum / buffer.length)
+  // Normalize and amplify for better visualization
+  // RMS values are typically very small (0.001-0.1), so we scale them up
+  return Math.min(1, rms * 10) // Scale by 10x and cap at 1.0
+}
+
+/**
+ * Draw waveform on canvas
+ */
+function drawWaveform(
+  canvas: HTMLCanvasElement,
+  buffer: Float32Array,
+  width: number,
+  height: number
+) {
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return
+
+  ctx.clearRect(0, 0, width, height)
+  
+  // Find max amplitude for scaling
+  let maxAmplitude = 0
+  for (let i = 0; i < buffer.length; i++) {
+    maxAmplitude = Math.max(maxAmplitude, Math.abs(buffer[i]))
+  }
+  
+  // Scale factor to make waveform more visible (amplify low signals)
+  const scaleFactor = maxAmplitude > 0 ? Math.min(10, 0.1 / maxAmplitude) : 1
+  
+  ctx.strokeStyle = "#4caf50"
+  ctx.lineWidth = 2
+  ctx.beginPath()
+
+  const sliceWidth = width / buffer.length
+  const centerY = height / 2
+  let x = 0
+
+  for (let i = 0; i < buffer.length; i++) {
+    // Center the waveform and scale it
+    const v = buffer[i] * scaleFactor
+    const y = centerY - (v * centerY)
+
+    if (i === 0) {
+      ctx.moveTo(x, y)
+    } else {
+      ctx.lineTo(x, y)
+    }
+
+    x += sliceWidth
+  }
+
+  ctx.stroke()
+  
+  // Draw center line
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(0, centerY)
+  ctx.lineTo(width, centerY)
+  ctx.stroke()
+}
+
 interface VoiceRecorderProps {
   onNotesDetected?: (notes: DetectedNote[]) => void
 }
@@ -131,15 +279,20 @@ interface VoiceRecorderProps {
 export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
   const [isRecording, setIsRecording] = useState(false)
   const [status, setStatus] = useState<string>("")
+  const [audioLevel, setAudioLevel] = useState<number>(0)
+  const [currentFrequency, setCurrentFrequency] = useState<number | null>(null)
+  const [currentNoteName, setCurrentNoteName] = useState<string | null>(null)
   const mediaStreamRef = useRef<MediaStream | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const dataArrayRef = useRef<Float32Array | null>(null)
+  const waveformCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const recordingStartTimeRef = useRef<number>(0)
   const notesRef = useRef<DetectedNote[]>([])
   const currentNoteRef = useRef<{ pitch: number; startTime: number } | null>(null)
   const animationFrameRef = useRef<number | null>(null)
   const onNotesDetectedRef = useRef<((notes: DetectedNote[]) => void) | null>(null)
+  const isRecordingRef = useRef<boolean>(false) // Use ref to track recording state immediately
   const { currentTempo } = useConductorTrack()
   
   // Store callback in ref to avoid dependency issues
@@ -172,19 +325,72 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
 
     analyserRef.current = null
     dataArrayRef.current = null
+    isRecordingRef.current = false
     setIsRecording(false)
+    setAudioLevel(0)
+    setCurrentFrequency(null)
+    setCurrentNoteName(null)
   }, [])
 
   const processAudio = useCallback(() => {
-    if (!analyserRef.current || !dataArrayRef.current || !isRecording) {
+    // Use ref instead of state to avoid closure issues
+    if (!analyserRef.current || !dataArrayRef.current || !isRecordingRef.current) {
       return
     }
 
-    analyserRef.current.getFloatTimeDomainData(dataArrayRef.current)
+    // Check if audio context is still valid
     const audioContext = audioContextRef.current
-    if (!audioContext) return
+    if (!audioContext || audioContext.state === "closed") {
+      return
+    }
+    
+    if (audioContext.state === "suspended") {
+      audioContext.resume()
+    }
+
+    // Check if stream is still active
+    if (!mediaStreamRef.current) {
+      return
+    }
+    
+    const tracks = mediaStreamRef.current.getAudioTracks()
+    const activeTrack = tracks.find(t => t.readyState === "live")
+    if (!activeTrack) {
+      return
+    }
+
+    try {
+      analyserRef.current.getFloatTimeDomainData(dataArrayRef.current)
+      
+      // Calculate audio level (RMS)
+      const rms = calculateRMS(dataArrayRef.current)
+      setAudioLevel(rms)
+      
+      // Visual feedback only - no console logging
+
+    // Draw waveform
+    if (waveformCanvasRef.current) {
+      const canvas = waveformCanvasRef.current
+      drawWaveform(canvas, dataArrayRef.current, canvas.width, canvas.height)
+    }
 
     const frequency = detectPitch(dataArrayRef.current, audioContext.sampleRate)
+    
+    // Update frequency display
+    if (frequency && frequency > 0) {
+      setCurrentFrequency(frequency)
+      const midiNote = frequencyToMidiNote(frequency)
+      const quantizedNote = quantizeToNearestNote(midiNote)
+      if (quantizedNote >= 0 && quantizedNote <= 127) {
+        setCurrentNoteName(midiNoteToName(quantizedNote))
+      } else {
+        setCurrentNoteName(null)
+      }
+    } else {
+      setCurrentFrequency(null)
+      setCurrentNoteName(null)
+    }
+
     const currentTime = Date.now()
     const elapsedMs = currentTime - recordingStartTimeRef.current
     // Convert milliseconds to ticks: (ms / 1000) * (BPM / 60) * TICKS_PER_QUARTER
@@ -240,42 +446,141 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       }
     }
 
-    if (isRecording) {
+    } catch (error) {
+      console.error("Error in processAudio:", error)
+    }
+
+    // Continue the loop
+    if (isRecordingRef.current) {
       animationFrameRef.current = requestAnimationFrame(processAudio)
     }
-  }, [isRecording])
+  }, [tempo])
 
   const startRecording = useCallback(async () => {
     try {
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus("Microphone API not available in this browser")
+        console.error("getUserMedia not available")
+        return
+      }
+
       setStatus("Requesting microphone access...")
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      
+      // Request microphone with better error handling
+      let stream: MediaStream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+          } 
+        })
+      } catch (err) {
+        const error = err as Error
+        console.error("getUserMedia error:", error)
+        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+          setStatus("Microphone permission denied. Please allow microphone access.")
+        } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+          setStatus("No microphone found. Please connect a microphone.")
+        } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+          setStatus("Microphone is being used by another application.")
+        } else {
+          setStatus(`Microphone error: ${error.message}`)
+        }
+        return
+      }
+
+      // Verify stream has active audio tracks
+      const audioTracks = stream.getAudioTracks()
+      if (audioTracks.length === 0) {
+        setStatus("No audio tracks found in stream")
+        stream.getTracks().forEach(track => track.stop())
+        return
+      }
+
+      // Check if tracks are active
+      const activeTrack = audioTracks.find(track => track.readyState === "live")
+      if (!activeTrack) {
+        setStatus("Audio tracks are not active")
+        stream.getTracks().forEach(track => track.stop())
+        return
+      }
+
+      // Microphone connected successfully
+
       mediaStreamRef.current = stream
 
+      // Create audio context
       const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+      
+      // Resume audio context if suspended (required in some browsers)
+      if (audioContext.state === "suspended") {
+        await audioContext.resume()
+      }
+
       audioContextRef.current = audioContext
 
       const source = audioContext.createMediaStreamSource(stream)
       const analyser = audioContext.createAnalyser()
       analyser.fftSize = 2048
-      analyser.smoothingTimeConstant = 0.8
+      analyser.smoothingTimeConstant = 0.3 // Lower for more responsive visualization
+      analyser.minDecibels = -90
+      analyser.maxDecibels = -10
       source.connect(analyser)
 
       analyserRef.current = analyser
       dataArrayRef.current = new Float32Array(analyser.fftSize)
 
-      recordingStartTimeRef.current = Date.now()
-      notesRef.current = []
-      currentNoteRef.current = null
+      // Monitor track state changes
+      activeTrack.addEventListener("ended", () => {
+        setStatus("Microphone disconnected")
+        stopRecording()
+      })
 
-      setIsRecording(true)
-      setStatus("Recording... Hum or sing a melody!")
-      processAudio()
+      activeTrack.addEventListener("mute", () => {
+        setStatus("Microphone muted")
+      })
+
+      activeTrack.addEventListener("unmute", () => {
+        setStatus("Recording... Hum or sing a melody!")
+      })
+
+    // Setup waveform canvas
+    if (waveformCanvasRef.current) {
+      const canvas = waveformCanvasRef.current
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio
+      const ctx = canvas.getContext("2d")
+      if (ctx) {
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      }
+    }
+
+    recordingStartTimeRef.current = Date.now()
+    notesRef.current = []
+    currentNoteRef.current = null
+    setAudioLevel(0)
+    setCurrentFrequency(null)
+    setCurrentNoteName(null)
+
+    // Set recording state in both ref and state
+    isRecordingRef.current = true
+    setIsRecording(true)
+    setStatus("Recording... Hum or sing a melody!")
+    
+    // Start the audio processing loop
+    processAudio()
     } catch (error) {
       console.error("Error starting recording:", error)
+      const err = error as Error
       setStatus(
-        error instanceof Error && error.name === "NotAllowedError"
-          ? "Microphone access denied"
-          : "Failed to start recording"
+        err.name === "NotAllowedError" || err.name === "PermissionDeniedError"
+          ? "Microphone permission denied"
+          : err.name === "NotFoundError"
+            ? "No microphone found"
+            : `Error: ${err.message || "Failed to start recording"}`
       )
       await stopRecording()
     }
@@ -302,18 +607,18 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
 
       // Pass notes to agent via callback
       if (notesRef.current.length > 0) {
-        setStatus(`Detected ${notesRef.current.length} notes, sending to agent...`)
+        setStatus(`Detected ${notesRef.current.length} notes, sending to chat...`)
         
         // Call the callback to pass notes to parent (AIChat)
         if (onNotesDetectedRef.current) {
           onNotesDetectedRef.current(notesRef.current)
-          setStatus(`Sent ${notesRef.current.length} notes to agent!`)
+          setStatus(`✅ ${notesRef.current.length} notes added to chat!`)
         } else {
           setStatus("No agent handler available")
         }
         setTimeout(() => setStatus(""), 3000)
       } else {
-        setStatus("No notes detected. Try humming louder!")
+        setStatus("No notes detected. Try humming a clear melody!")
         setTimeout(() => setStatus(""), 3000)
       }
     } else {
@@ -336,6 +641,30 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       >
         {isRecording ? "⏹" : "🎤"}
       </MicButton>
+      {isRecording && (
+        <AudioVisualizer>
+          <LevelMeter>
+            <LevelBar level={audioLevel} />
+          </LevelMeter>
+          {currentFrequency !== null ? (
+            <>
+              <FrequencyDisplay>
+                {currentFrequency.toFixed(1)} Hz
+              </FrequencyDisplay>
+              {currentNoteName && (
+                <NoteName>{currentNoteName}</NoteName>
+              )}
+            </>
+          ) : (
+            <FrequencyDisplay style={{ color: "rgba(255,255,255,0.5)" }}>
+              {audioLevel > 0.01 ? "Detecting pitch..." : "No audio detected"}
+            </FrequencyDisplay>
+          )}
+          <WaveformContainer>
+            <WaveformCanvas ref={waveformCanvasRef} />
+          </WaveformContainer>
+        </AudioVisualizer>
+      )}
       {status && <StatusText>{status}</StatusText>}
     </Container>
   )

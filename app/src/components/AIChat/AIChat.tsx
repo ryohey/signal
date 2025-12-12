@@ -298,9 +298,17 @@ const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
         ))}
       </NotesList>
       <div style={{ marginTop: "0.5rem", fontSize: "0.7rem", color: "rgba(255,255,255,0.6)", fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
-        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>Tool format (for addNotes):</div>
+        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>addNotes tool format:</div>
         <div style={{ background: "rgba(0,0,0,0.2)", padding: "0.5rem", borderRadius: "0.25rem", overflowX: "auto" }}>
-          {JSON.stringify(notes.map(n => ({ pitch: n.pitch, start: n.start, duration: n.duration, velocity: n.velocity })), null, 2)}
+          {JSON.stringify({
+            trackId: 0, // User will specify track
+            notes: notes.map(n => ({
+              pitch: n.pitch,
+              start: n.start,
+              duration: n.duration,
+              velocity: n.velocity
+            }))
+          }, null, 2)}
         </div>
       </div>
     </NotesContainer>
@@ -436,18 +444,18 @@ export const AIChat: FC = () => {
 
     let userMessage = messageToSubmit
     
-    // If there are notes in a recent message, include them in the prompt
+    // If there are notes in a recent message, include them in the exact addNotes tool format
     if (recentMessageWithNotes?.notes) {
-      const notesJson = JSON.stringify(
-        recentMessageWithNotes.notes.map((n) => ({
+      const notesData = {
+        trackId: 0, // User will specify which track
+        notes: recentMessageWithNotes.notes.map((n) => ({
           pitch: n.pitch,
           start: n.start,
           duration: n.duration,
           velocity: n.velocity,
         })),
-        null,
-        2
-      )
+      }
+      const notesJson = JSON.stringify(notesData, null, 2)
       userMessage = `${messageToSubmit}\n\nHere are the notes to add (in addNotes tool format):\n\`\`\`json\n${notesJson}\n\`\`\``
     }
 
