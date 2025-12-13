@@ -58,7 +58,7 @@ const CreateButton = styled.a`
   }
   &:active {
     background: ${({ theme }) =>
-      Color(theme.secondaryBackgroundColor).lighten(0.1).hex()};
+    Color(theme.secondaryBackgroundColor).lighten(0.1).hex()};
   }
 `
 

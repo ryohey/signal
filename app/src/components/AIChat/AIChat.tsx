@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
-import { useRouter } from "../../hooks/useRouter"
 import { useAIChat } from "../../hooks/useAIChat"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
@@ -332,8 +332,8 @@ const ToolCallItem = styled.div<{ status: 'pending' | 'executing' | 'done' }>`
   font-size: 0.8rem;
   color: ${({ theme, status }) =>
     status === 'done' ? theme.themeColor :
-    status === 'executing' ? theme.yellowColor || '#ffc107' :
-    theme.secondaryTextColor};
+      status === 'executing' ? theme.yellowColor || '#ffc107' :
+        theme.secondaryTextColor};
 `
 
 const ToolCallName = styled.span`
@@ -560,7 +560,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       .find((msg) => msg.role === "user" && msg.notes && msg.notes.length > 0)
 
     let userMessage = messageToSubmit
-    
+
     // If there are notes in a recent message, include them in the exact addNotes tool format
     if (recentMessageWithNotes?.notes) {
       const notesData = {
@@ -579,7 +579,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     if (!overrideInput) {
       setInput("")
     }
-    
+
     // Add user message and create placeholder for assistant response
     setMessages((prev) => {
       const newMessages = [...prev, { role: "user" as const, content: messageToSubmit }]
@@ -587,9 +587,9 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       streamingMessageRef.current = assistantIndex
       return [...newMessages, { role: "assistant" as const, content: "" }]
     })
-    
+
     setIsLoading(true)
-    
+
     // Navigate to arrange view and ensure AI chat is open when generation starts
     setPath("/arrange")
     setAIChatOpen(true)
@@ -664,14 +664,29 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 })
               },
               onError: (error: Error) => {
+                // Log full error details to console for debugging
+                console.error("[AIChat] Streaming agent error:", error)
+
+                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
                   const index = streamingMessageRef.current
                   if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      role: "error",
-                      content: error.message,
+                    // If the message is empty, replace it with error. Otherwise append.
+                    if (!updated[index].content || updated[index].content.trim() === "") {
+                      updated[index] = {
+                        role: "error",
+                        content: `❌ ${friendlyMessage}`,
+                      }
+                    } else {
+                      updated[index] = {
+                        role: "error",
+                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                      }
                     }
+                  } else {
+                    // If index is invalid, add error as new message
+                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
                   }
                   return updated
                 })
@@ -693,6 +708,22 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 updated[index] = {
                   role: "assistant",
                   content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+                }
+              }
+              return updated
+            })
+          } else {
+            // Handle failure case for non-streaming agent
+            const errorMessage = result.message || "The agent encountered an error. Please try again."
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "error",
+                  content: updated[index].content
+                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
+                    : `❌ Error: ${errorMessage}`,
                 }
               }
               return updated
@@ -741,14 +772,29 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 })
               },
               onError: (error: Error) => {
+                // Log full error details to console for debugging
+                console.error("[AIChat] Non-streaming agent error:", error)
+
+                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
                   const index = streamingMessageRef.current
                   if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      role: "error",
-                      content: error.message,
+                    // If the message is empty, replace it with error. Otherwise append.
+                    if (!updated[index].content || updated[index].content.trim() === "") {
+                      updated[index] = {
+                        role: "error",
+                        content: `❌ ${friendlyMessage}`,
+                      }
+                    } else {
+                      updated[index] = {
+                        role: "error",
+                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                      }
                     }
+                  } else {
+                    // If index is invalid, add error as new message
+                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
                   }
                   return updated
                 })
@@ -769,15 +815,46 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               }
               return updated
             })
+          } else {
+            // Handle failure case
+            const errorMessage = result.message || "The agent encountered an error. Please try again."
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "error",
+                  content: updated[index].content
+                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
+                    : `❌ Error: ${errorMessage}`,
+                }
+              }
+              return updated
+            })
           }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Generation failed"
+        const friendlyMessage = errorMessage || "An unexpected error occurred. Please try again."
         setMessages((prev) => {
           const updated = [...prev]
           const index = streamingMessageRef.current
           if (index >= 0 && index < updated.length) {
-            updated[index] = { role: "error", content: errorMessage }
+            // If the message is empty, replace it with error. Otherwise append.
+            if (!updated[index].content || updated[index].content.trim() === "") {
+              updated[index] = {
+                role: "error",
+                content: `❌ ${friendlyMessage}`
+              }
+            } else {
+              updated[index] = {
+                role: "error",
+                content: updated[index].content + `\n\n❌ ${friendlyMessage}`
+              }
+            }
+          } else {
+            // If index is invalid, add error as new message
+            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
           }
           return updated
         })
@@ -834,31 +911,30 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             abortControllerRef.current = null
           },
           (error) => {
-            const errorMessage =
-              error instanceof Error ? error.message : "Generation failed"
+            // Log full error details to console for debugging
+            console.error("[AIChat] LLM generation error:", error)
 
-            // Provide user-friendly error messages
-            let friendlyMessage = errorMessage
-            if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-              friendlyMessage =
-                "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-            } else if (errorMessage.includes("timeout")) {
-              friendlyMessage =
-                "Generation took too long. Try a simpler prompt or try again."
-            } else if (errorMessage.includes("syntax error")) {
-              friendlyMessage =
-                "The AI generated invalid code. Please try again with a different prompt."
-            }
-
+            const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
             setMessages((prev) => {
               const updated = [...prev]
               const index = streamingMessageRef.current
               // Replace the streaming message with error
               if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "error",
-                  content: friendlyMessage,
+                // If the message is empty, replace it with error. Otherwise append.
+                if (!updated[index].content || updated[index].content.trim() === "") {
+                  updated[index] = {
+                    role: "error",
+                    content: `❌ ${friendlyMessage}`,
+                  }
+                } else {
+                  updated[index] = {
+                    role: "error",
+                    content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                  }
                 }
+              } else {
+                // If index is invalid, add error as new message
+                return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
               }
               return updated
             })
@@ -869,17 +945,29 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           abortController.signal,
         )
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Generation failed"
+        // Log full error details to console for debugging
+        console.error("[AIChat] LLM catch error:", err)
 
+        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
         setMessages((prev) => {
           const updated = [...prev]
           const index = streamingMessageRef.current
           if (index >= 0 && index < updated.length) {
-            updated[index] = {
-              role: "error",
-              content: errorMessage,
+            // If the message is empty, replace it with error. Otherwise append.
+            if (!updated[index].content || updated[index].content.trim() === "") {
+              updated[index] = {
+                role: "error",
+                content: `❌ ${friendlyMessage}`,
+              }
+            } else {
+              updated[index] = {
+                role: "error",
+                content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+              }
             }
+          } else {
+            // If index is invalid, add error as new message
+            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
           }
           return updated
         })
@@ -925,33 +1013,18 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           ]
         })
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Generation failed"
-
-        // Provide user-friendly error messages
-        let friendlyMessage = errorMessage
-        if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-          friendlyMessage =
-            "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-        } else if (errorMessage.includes("timeout")) {
-          friendlyMessage =
-            "Generation took too long. Try a simpler prompt or try again."
-        } else if (errorMessage.includes("syntax error")) {
-          friendlyMessage =
-            "The AI generated invalid code. Please try again with a different prompt."
-        } else if (errorMessage.includes("5 attempts")) {
-          friendlyMessage =
-            "Generation failed after multiple attempts. Try a different prompt or simpler request."
-        }
+        // Log full error details to console for debugging
+        console.error("[AIChat] Composition agent error:", err)
 
         // Remove placeholder and add error message
+        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
         setMessages((prev) => {
           const updated = prev.slice(0, -1) // Remove placeholder
           return [
             ...updated,
             {
               role: "error",
-              content: friendlyMessage,
+              content: `❌ ${friendlyMessage}`,
             },
           ]
         })
@@ -1031,7 +1104,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
 
       // Add a message to the chat with the notes displayed
       const messageContent = `🎤 Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
-      
+
       setMessages((prev) => [
         ...prev,
         {
