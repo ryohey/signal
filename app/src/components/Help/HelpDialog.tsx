@@ -117,7 +117,6 @@ export const HelpDialog: FC = () => {
           hotKeys={[
             [envString.cmdOrCtrl, "1"],
             [envString.cmdOrCtrl, "2"],
-            [envString.cmdOrCtrl, "3"],
           ]}
           text={<Localized name="switch-tab" />}
         />

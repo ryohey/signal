@@ -2,7 +2,7 @@
   "name": "@signal-app/api",
   "private": true,
   "version": "0.0.1",
-  "description": "signal api",
+  "description": "PipeDream 2.0 api",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",

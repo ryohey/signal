@@ -1,7 +1,7 @@
 {
-  "name": "signal",
+  "name": "pipedream-2.0",
   "version": "0.0.1",
-  "description": "A friendly music sequencer application for OS X and Windows.",
+  "description": "PipeDream 2.0 - A simple and enjoyable music creation tool with AI assistance.",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node generate-service-worker.mjs",

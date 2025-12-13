@@ -87,7 +87,7 @@ REQUIREMENTS:
 CRITICAL - MIDI FILE CREATION:
 Always create MIDIFile with ticks_per_quarternote=480:
     midi = MIDIFile(1, ticks_per_quarternote=480)
-This ensures compatibility with the Signal music application. Do NOT use the default (960).
+This ensures compatibility with the PipeDream 2.0 music application. Do NOT use the default (960).
 
 INSTRUMENTATION GUIDELINES:
 - Analyze the prompt to determine appropriate instruments for the style
@@ -582,7 +582,7 @@ CODE REQUIREMENTS:
 CRITICAL - MIDI FILE CREATION:
 Always create MIDIFile with ticks_per_quarternote=480:
     midi = MIDIFile(1, ticks_per_quarternote=480)
-This ensures compatibility with the Signal music application. Do NOT use the default (960).
+This ensures compatibility with the PipeDream 2.0 music application. Do NOT use the default (960).
 
 INSTRUMENT-SPECIFIC RULES:
 - Follow the style_notes for each instrument

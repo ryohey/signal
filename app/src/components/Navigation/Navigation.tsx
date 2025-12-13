@@ -1,16 +1,14 @@
 import styled from "@emotion/styled"
-import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
-import Settings from "mdi-react/SettingsIcon"
 import Robot from "mdi-react/RobotIcon"
+import Settings from "mdi-react/SettingsIcon"
 import { CSSProperties, FC, MouseEvent, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
+import { useAIChat } from "../../hooks/useAIChat"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
-import { useAIChat } from "../../hooks/useAIChat"
 import ArrangeIcon from "../../images/icons/arrange.svg"
 import PianoIcon from "../../images/icons/piano.svg"
-import TempoIcon from "../../images/icons/tempo.svg"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { Tooltip } from "../ui/Tooltip"
@@ -109,14 +107,6 @@ export const Navigation: FC = () => {
     [setPath],
   )
 
-  const onClickTempoTab = useCallback(
-    (e: MouseEvent) => {
-      e.preventDefault()
-      setPath("/tempo")
-    },
-    [setPath],
-  )
-
   const onClickSettings = useCallback(
     (e: MouseEvent) => {
       e.preventDefault()
@@ -184,25 +174,6 @@ export const Navigation: FC = () => {
         </Tab>
       </Tooltip>
 
-      <Tooltip
-        title={
-          <>
-            <Localized name="switch-tab" /> [{envString.cmdOrCtrl}+3]
-          </>
-        }
-        delayDuration={500}
-      >
-        <Tab
-          className={path === "/tempo" ? "active" : undefined}
-          onMouseDown={onClickTempoTab}
-        >
-          <TempoIcon style={IconStyle} viewBox="0 0 128 128" />
-          <TabTitle>
-            <Localized name="tempo" />
-          </TabTitle>
-        </Tab>
-      </Tooltip>
-
       <FlexibleSpacer />
 
       <Tooltip title="Toggle AI Composer" delayDuration={500}>
@@ -225,19 +196,6 @@ export const Navigation: FC = () => {
             <Help style={IconStyle} />
             <TabTitle>
               <Localized name="help" />
-            </TabTitle>
-          </Tab>
-
-          <Tab>
-            <Forum style={IconStyle} />
-            <TabTitle>
-              <a
-                href="https://discord.gg/XQxzNdDJse"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Discord
-              </a>
             </TabTitle>
           </Tab>
         </>

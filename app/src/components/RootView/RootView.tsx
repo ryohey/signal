@@ -19,7 +19,6 @@ import { PianoRollEditor } from "../PianoRoll/PianoRollEditor"
 import { PublishDialog } from "../PublishDialog/PublishDialog"
 import { SettingDialog } from "../SettingDialog/SettingDialog"
 import { SignInDialog } from "../SignInDialog/SignInDialog"
-import { TempoEditor } from "../TempoGraph/TempoEditor"
 import { TransportPanel } from "../TransportPanel/TransportPanel"
 import { DeleteAccountDialog } from "../UserSettingsDialog/DeleteAccountDialog"
 import { UserSettingsDialog } from "../UserSettingsDialog/UserSettingsDialog"
@@ -46,7 +45,6 @@ const Routes: FC = () => {
   return (
     <>
       {path === "/track" && <PianoRollEditor />}
-      {path === "/tempo" && <TempoEditor />}
       {path === "/arrange" && <ArrangeEditor />}
     </>
   )

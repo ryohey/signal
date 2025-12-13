@@ -4,8 +4,8 @@
   "display": "standalone",
   "scope": "/edit",
   "start_url": "/edit",
-  "name": "signal",
-  "short_name": "signal",
+  "name": "PipeDream 2.0",
+  "short_name": "PipeDream 2.0",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -34,10 +34,10 @@
       "purpose": "maskable"
     }
   ],
-  "id": "signal",
+  "id": "pipedream-2.0",
   "lang": "en",
   "categories": [
     "music"
   ],
-  "description": "signal is a user-friendly music sequencer application developed using web technology, designed for seamless, cross-platform use."
+  "description": "PipeDream 2.0 is a simple and enjoyable music creation tool with AI assistance."
 }

@@ -17,11 +17,6 @@ import {
   useArrangeDeleteSelection,
   useArrangePasteSelection,
 } from "./arrangeView"
-import {
-  useCopyTempoSelection,
-  useDeleteTempoSelection,
-  usePasteTempoSelection,
-} from "./tempo"
 
 export const useCopySelectionGlobal = () => {
   const { selectedNoteIds } = usePianoRoll()
@@ -29,7 +24,6 @@ export const useCopySelectionGlobal = () => {
   const { selectedEventIds: controlSelectedEventIds } = useControlPane()
   const copySelection = useCopySelection()
   const arrangeCopySelection = useArrangeCopySelection()
-  const copyTempoSelection = useCopyTempoSelection()
   const copyControlSelection = useCopyControlSelection()
 
   return () => {
@@ -44,9 +38,6 @@ export const useCopySelectionGlobal = () => {
       case "/arrange":
         arrangeCopySelection()
         break
-      case "/tempo":
-        copyTempoSelection()
-        break
     }
   }
 }
@@ -59,8 +50,6 @@ export const useCutSelectionGlobal = () => {
   const deleteSelection = useDeleteSelection()
   const arrangeCopySelection = useArrangeCopySelection()
   const arrangeDeleteSelection = useArrangeDeleteSelection()
-  const copyTempoSelection = useCopyTempoSelection()
-  const deleteTempoSelection = useDeleteTempoSelection()
   const copyControlSelection = useCopyControlSelection()
   const deleteControlSelection = useDeleteControlSelection()
 
@@ -79,10 +68,6 @@ export const useCutSelectionGlobal = () => {
         arrangeCopySelection()
         arrangeDeleteSelection()
         break
-      case "/tempo":
-        copyTempoSelection()
-        deleteTempoSelection()
-        break
     }
   }
 }
@@ -91,7 +76,6 @@ export const usePasteSelectionGlobal = () => {
   const { path } = useRouter()
   const pasteSelection = usePasteSelection()
   const arrangePasteSelection = useArrangePasteSelection()
-  const pasteTempoSelection = usePasteTempoSelection()
   const pasteControlSelection = usePasteControlSelection()
 
   return async () => {
@@ -111,8 +95,6 @@ export const usePasteSelectionGlobal = () => {
       case "/arrange":
         arrangePasteSelection()
         break
-      case "/tempo":
-        pasteTempoSelection()
     }
   }
 }
