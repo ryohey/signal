@@ -1,11 +1,11 @@
 import styled from "@emotion/styled"
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { useToast } from "dialog-hooks"
 import DownloadIcon from "mdi-react/DownloadIcon.js"
 import PlayArrow from "mdi-react/PlayArrowIcon.js"
 import ShareIcon from "mdi-react/ShareIcon.js"
 import { observer } from "mobx-react-lite"
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { Helmet } from "react-helmet-async"
 import { Link } from "wouter"
 import { playSong } from "../actions/song.js"
@@ -119,7 +119,8 @@ export const SongPage: FC<SongPageProps> = observer(({ songId }) => {
       return
     }
     const songData = await cloudSongDataRepository.get(song.songDataId)
-    const blob = new Blob([songData], { type: "application/octet-stream" })
+    const uint8Array = new Uint8Array(songData)
+    const blob = new Blob([uint8Array], { type: "application/octet-stream" })
     const sanitizedFileName = song.name.replace(/[\\/:"*?<>|]/g, "_")
     const filename = `${sanitizedFileName}.mid`
     downloadBlob(blob, filename)

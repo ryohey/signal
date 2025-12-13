@@ -5,7 +5,7 @@ import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
 import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
 import { useCallback, useState } from "react"
 import {
-  ControlMode,
+  type ControlMode,
   controlModeKey,
   defaultControlModes,
   isEqualControlMode,
@@ -34,7 +34,7 @@ const nonControllerControlModes: ControlMode[] = [
 
 const getAllControlModes = (): ControlMode[] =>
   nonControllerControlModes.concat(
-    range(0, 128).map((i) => ({ type: "controller", controllerType: i })),
+    range(0, 128).map((i) => ({ type: "controller", controllerType: i }))
   )
 
 const Item = styled.div`
@@ -80,7 +80,7 @@ export const ControlSettingDialog = () => {
     useRootView()
   const { controlModes, setControlModes } = useControlPane()
   const [selectedLeftMode, setSelectedLeftMode] = useState<ControlMode | null>(
-    null,
+    null
   )
   const [selectedRightMode, setSelectedRightMode] =
     useState<ControlMode | null>(null)
@@ -88,7 +88,7 @@ export const ControlSettingDialog = () => {
   const leftModes = controlModes
 
   const rightModes = getAllControlModes().filter(
-    (mode) => !controlModes.some((m) => isEqualControlMode(m, mode)),
+    (mode) => !controlModes.some((m) => isEqualControlMode(m, mode))
   )
 
   const leftItems = leftModes.map((mode) => ({
@@ -105,7 +105,7 @@ export const ControlSettingDialog = () => {
 
   const onClose = useCallback(
     () => setOpenControlSettingDialog(false),
-    [setOpenControlSettingDialog],
+    [setOpenControlSettingDialog]
   )
 
   const onClickAdd = () => {
@@ -119,8 +119,8 @@ export const ControlSettingDialog = () => {
     if (selectedLeftMode) {
       setControlModes(
         controlModes.filter(
-          (mode) => !isEqualControlMode(mode, selectedLeftMode),
-        ),
+          (mode) => !isEqualControlMode(mode, selectedLeftMode)
+        )
       )
       setSelectedLeftMode(null)
     }
@@ -128,10 +128,10 @@ export const ControlSettingDialog = () => {
 
   const onLeftItemMoved = (fromId: string, toId: string) => {
     const fromIndex = leftItems.findIndex(
-      (item) => controlModeKey(item.mode) === fromId,
+      (item) => controlModeKey(item.mode) === fromId
     )
     const toIndex = leftItems.findIndex(
-      (item) => controlModeKey(item.mode) === toId,
+      (item) => controlModeKey(item.mode) === toId
     )
     if (fromIndex === -1 || toIndex === -1) {
       return

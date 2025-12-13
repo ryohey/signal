@@ -1,14 +1,14 @@
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
-  AnyEvent,
-  EndOfTrackEvent,
-  MidiFile,
+  type AnyEvent,
+  type EndOfTrackEvent,
+  type MidiFile,
   read,
-  StreamSource,
+  type StreamSource,
   write as writeMidiFile,
 } from "midifile-ts"
-import { AnyEventFeature, Song, Track } from "../entities"
+import { type AnyEventFeature, Song, Track } from "../entities"
 import { isNotNull } from "../helpers/array"
 import { addDeltaTime, toRawEvents } from "./toRawEvents"
 import {
@@ -40,7 +40,7 @@ const tracksFromFormat0Events = (events: AnyEvent[]): Track[] => {
   const tracks: Track[] = []
   for (const channel of Object.keys(eventsPerChannel)) {
     const events = eventsPerChannel[channel]
-    const ch = parseInt(channel)
+    const ch = parseInt(channel, 10)
     while (tracks.length <= ch) {
       const track = new Track()
       track.channel = ch > 0 ? ch - 1 : undefined
@@ -69,7 +69,7 @@ const isConductorEvent = (e: AnyEventFeature) =>
   "subtype" in e && (e.subtype === "timeSignature" || e.subtype === "setTempo")
 
 export const createConductorTrackIfNeeded = (
-  tracks: AnyEvent[][],
+  tracks: AnyEvent[][]
 ): AnyEvent[][] => {
   // Find conductor track
   const [conductorTracks, normalTracks] = partition(tracks, isConductorTrack)
@@ -94,7 +94,7 @@ export const createConductorTrackIfNeeded = (
         }
         return e
       })
-      .filter(isNotNull),
+      .filter(isNotNull)
   )
 
   return [conductorTrack, ...newTracks].map(addDeltaTime)
@@ -115,7 +115,9 @@ export function songFromMidi(data: StreamSource) {
   const song = new Song()
   const midi = read(data)
 
-  getTracks(midi).forEach((t) => song.addTrack(t))
+  for (const t of getTracks(midi)) {
+    song.addTrack(t)
+  }
 
   if (midi.header.formatType === 1 && song.tracks.length > 0) {
     // Use the first track name as the song title

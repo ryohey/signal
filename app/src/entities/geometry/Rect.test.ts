@@ -17,8 +17,8 @@ describe("Rect", () => {
             y: 2,
             width: 1,
             height: 1,
-          },
-        ),
+          }
+        )
       ).toBeTruthy()
 
       expect(
@@ -34,8 +34,8 @@ describe("Rect", () => {
             y: 1,
             width: 1,
             height: 1,
-          },
-        ),
+          }
+        )
       ).toBeTruthy()
     })
 
@@ -53,8 +53,8 @@ describe("Rect", () => {
             y: 2,
             width: 1,
             height: 1,
-          },
-        ),
+          }
+        )
       ).toBeTruthy()
     })
 
@@ -72,8 +72,8 @@ describe("Rect", () => {
             y: 2,
             width: 1,
             height: 1,
-          },
-        ),
+          }
+        )
       ).toBeFalsy()
     })
 
@@ -91,8 +91,8 @@ describe("Rect", () => {
             y: 2,
             width: 1,
             height: 1,
-          },
-        ),
+          }
+        )
       ).toBeFalsy()
     })
 
@@ -110,8 +110,8 @@ describe("Rect", () => {
             y: 1,
             width: 0,
             height: 0,
-          },
-        ),
+          }
+        )
       ).toBeFalsy()
     })
   })

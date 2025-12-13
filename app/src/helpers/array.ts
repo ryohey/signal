@@ -12,7 +12,7 @@ export function isNotNullOrUndefined<T>(a: T | null): a is T {
 
 export const joinObjects = <T extends object>(
   list: T[],
-  separator: (prev: T, next: T) => T,
+  separator: (prev: T, next: T) => T
 ): T[] => {
   const result = []
   for (let i = 0; i < list.length; i++) {

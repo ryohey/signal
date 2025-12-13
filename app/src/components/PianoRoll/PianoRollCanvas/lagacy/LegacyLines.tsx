@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Layout } from "../../../../Constants"
 import { colorToVec4 } from "../../../../gl/color"
 import { useKeyScroll } from "../../../../hooks/useKeyScroll"
@@ -14,12 +14,12 @@ export const LegacyLines: FC<{ zIndex: number }> = ({ zIndex }) => {
 
   const color = useMemo(
     () => colorToVec4(Color(theme.pianoLaneEdgeColor)),
-    [theme],
+    [theme]
   )
 
   const hightlightedColor = useMemo(
     () => colorToVec4(Color(theme.editorGridColor)),
-    [theme],
+    [theme]
   )
 
   const blackLaneColor = colorToVec4(Color(theme.pianoBlackKeyLaneColor))

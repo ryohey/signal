@@ -7,13 +7,13 @@ import {
   DialogPortal,
   Overlay,
   Portal,
-  DialogProps as Props,
+  type DialogProps as Props,
   Root,
 } from "@radix-ui/react-dialog"
 import {
-  ComponentPropsWithoutRef,
-  ElementRef,
-  FC,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type FC,
   forwardRef,
   useRef,
 } from "react"

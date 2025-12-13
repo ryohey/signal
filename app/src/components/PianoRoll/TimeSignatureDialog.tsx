@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { range } from "lodash"
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -42,13 +42,13 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
   const [numerator, setNumerator] = useState(initialNumerator)
   const [denominator, setDenominator] = useState(initialDenominator)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset values when opening the dialog
   useEffect(() => {
     // reset values when opening the dialog
     if (open) {
       setNumerator(initialNumerator)
       setDenominator(initialDenominator)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   return (
@@ -69,7 +69,7 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
             type="number"
             min={1}
             max={32}
-            onChange={(e) => setNumerator(parseInt(e.target.value))}
+            onChange={(e) => setNumerator(parseInt(e.target.value, 10))}
             onBlur={() => setNumerator(Math.max(1, Math.min(32, numerator)))}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
@@ -93,10 +93,12 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
               minWidth: "5em",
             }}
             value={denominator.toString()}
-            onChange={(e) => setDenominator(parseInt(e.target.value as string))}
+            onChange={(e) =>
+              setDenominator(parseInt(e.target.value as string, 10))
+            }
           >
             {range(0, 6)
-              .map((v) => Math.pow(2, v))
+              .map((v) => 2 ** v)
               .map((v) => (
                 <option key={v} value={v.toString()}>
                   {v}
@@ -114,7 +116,7 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
             onClickOK({ numerator, denominator })
             onClose()
           }}
-          disabled={isNaN(numerator) && numerator <= 32 && numerator > 0}
+          disabled={Number.isNaN(numerator) && numerator <= 32 && numerator > 0}
         >
           <Localized name="ok" />
         </PrimaryButton>

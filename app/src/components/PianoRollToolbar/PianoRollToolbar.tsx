@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { InstrumentBrowser } from "../InstrumentBrowser/InstrumentBrowser"
 import { AutoScrollButton } from "../Toolbar/AutoScrollButton"
 import { QuantizeSelector } from "../Toolbar/QuantizeSelector/QuantizeSelector"

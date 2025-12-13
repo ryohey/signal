@@ -1,5 +1,5 @@
-import { CloudSong } from "@signal-app/api"
-import { Song, songFromMidi, songToMidi } from "@signal-app/core"
+import type { CloudSong } from "@signal-app/api"
+import { type Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { useAutoSave } from "../hooks/useAutoSave"
 import {

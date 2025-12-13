@@ -1,7 +1,7 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Layout } from "../../../Constants"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../gl/color"
@@ -32,34 +32,33 @@ const _Lines: FC<{ zIndex: number }> = ({ zIndex }) => {
 
   const laneColors = useMemo(() => {
     const whiteLaneColor = colorToVec4(
-      Color(theme.pianoWhiteKeyLaneColor),
+      Color(theme.pianoWhiteKeyLaneColor)
     ) as number[]
 
     const blackLaneColor = colorToVec4(
-      Color(theme.pianoBlackKeyLaneColor),
+      Color(theme.pianoBlackKeyLaneColor)
     ) as number[]
 
     if (keySignature === null) {
       return Float32Array.from(
         Array(12)
           .fill(0)
-          .map((_, i) =>
+          .flatMap((_, i) =>
             KeySignature.getIntervals({ scale: "major", key: 0 }).includes(i)
               ? whiteLaneColor
-              : blackLaneColor,
+              : blackLaneColor
           )
-          .flat(),
       )
     }
 
     const highlightedKeys = keySignatureToConditions(keySignature)
 
     const highlightedLaneColor = colorToVec4(
-      Color(theme.pianoHighlightedLaneColor),
+      Color(theme.pianoHighlightedLaneColor)
     ) as number[]
 
     const laneColors = highlightedKeys.map((isHighlighted) =>
-      isHighlighted ? highlightedLaneColor : whiteLaneColor,
+      isHighlighted ? highlightedLaneColor : whiteLaneColor
     )
 
     return Float32Array.from(laneColors.flat())
@@ -67,12 +66,12 @@ const _Lines: FC<{ zIndex: number }> = ({ zIndex }) => {
 
   const color = useMemo(
     () => colorToVec4(Color(theme.pianoLaneEdgeColor)),
-    [theme],
+    [theme]
   )
 
   const hightlightedColor = useMemo(
     () => colorToVec4(Color(theme.editorGridColor)),
-    [theme],
+    [theme]
   )
 
   return (

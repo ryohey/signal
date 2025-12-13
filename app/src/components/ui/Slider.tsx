@@ -1,12 +1,12 @@
 import styled from "@emotion/styled"
 import {
-  SliderProps as Props,
+  type SliderProps as Props,
   Range,
   Root,
   Thumb,
   Track,
 } from "@radix-ui/react-slider"
-import { FC } from "react"
+import type { FC } from "react"
 
 export type SliderProps = Omit<
   Props,
@@ -82,9 +82,9 @@ export const Slider: FC<SliderProps> = ({
   >
     <StyledTrack>
       <StyledRange />
-      {marks?.map((value, index) => (
+      {marks?.map((value) => (
         <Mark
-          key={index}
+          key={value}
           style={{
             left: `${(value / (props.max ?? 100)) * 100}%`,
           }}

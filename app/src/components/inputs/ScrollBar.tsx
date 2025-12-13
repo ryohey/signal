@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import ArrowDropUp from "mdi-react/ArrowDropUpIcon"
-import React, { FC, useRef } from "react"
-import { Point } from "../../entities/geometry/Point"
+import React, { type FC, useRef } from "react"
+import type { Point } from "../../entities/geometry/Point"
 import { observeDrag, observeDrag2 } from "../../helpers/observeDrag"
 
 export const BAR_WIDTH = 17
@@ -102,7 +102,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
     onScroll,
     children,
   },
-  ref,
+  ref
 ) => {
   const buttonLength = BUTTON_SIZE
   const maxOffset = contentLength - barLength
@@ -119,7 +119,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
     pageBackwardLength = maxLength
   } else {
     pageForwardLength = Math.floor(
-      (maxLength - thumbLength) * normalize(scrollOffset / maxOffset),
+      (maxLength - thumbLength) * normalize(scrollOffset / maxOffset)
     )
     pageBackwardLength = Math.floor(maxLength - thumbLength - pageForwardLength)
   }
@@ -143,7 +143,8 @@ const _ScrollBar: React.ForwardRefRenderFunction<
 
       let intervalId = 0
       let scroll = scrollOffset
-      onScroll2((scroll += delta))
+      scroll += delta
+      onScroll2(scroll)
 
       const isHoverOnTarget = () =>
         document.elementFromPoint(startPos.x, startPos.y) === currentTarget
@@ -158,12 +159,14 @@ const _ScrollBar: React.ForwardRefRenderFunction<
             return
           }
 
-          onScroll2((scroll += delta))
+          scroll += delta
+          onScroll2(scroll)
 
           // 二回目からは素早く繰り返す
           // Repeat quickly from the second time
           intervalId = window.setInterval(() => {
-            onScroll2((scroll += delta * LONG_PRESS_SPEED))
+            scroll += delta * LONG_PRESS_SPEED
+            onScroll2(scroll)
 
             if (!isHoverOnTarget()) {
               stopLongPressTimer()
@@ -204,7 +207,7 @@ const _ScrollBar: React.ForwardRefRenderFunction<
       const startValue = scrollOffset
 
       observeDrag2(e.nativeEvent, {
-        onMouseMove: (e, delta) => {
+        onMouseMove: (_e, delta) => {
           const p = isVertical ? "y" : "x"
           const scale = maxOffset / (maxLength - thumbLength) // 移動量とスクロール量の補正値 -> Correction value of movement amount and scroll amount
           const value = startValue + delta[p] * scale
@@ -291,7 +294,7 @@ export type HorizontalScrollBarProps = Omit<HorizontalScrollBar_Props, "size">
 
 const areEqual = (
   props: VerticalScrollBar_Props,
-  nextProps: VerticalScrollBar_Props,
+  nextProps: VerticalScrollBar_Props
 ) =>
   props.scrollOffset === nextProps.scrollOffset &&
   props.contentLength === nextProps.contentLength &&

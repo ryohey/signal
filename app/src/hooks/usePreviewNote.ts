@@ -61,7 +61,7 @@ export function usePreviewNote() {
         playingNoteRef.current = { noteNumber }
       }
     },
-    [channel, startNote, addPreviewingNoteNumbers, previewNoteOff],
+    [channel, startNote, addPreviewingNoteNumbers, previewNoteOff]
   )
 
   return { previewNoteOn, previewNoteOff }

@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import type { Range } from "@signal-app/core"
 import { Measure } from "../measure/Measure"
 
 export interface Beat {
@@ -11,7 +11,7 @@ export namespace Beat {
   export const createInRange = (
     allMeasures: Measure[],
     timebase: number,
-    tickRange: Range,
+    tickRange: Range
   ): Beat[] => {
     const beats: Beat[] = []
     const measures = Measure.getMeasuresInRange(allMeasures, tickRange)
@@ -27,7 +27,7 @@ export namespace Beat {
 
       const startBeat = Math.max(
         0,
-        Math.floor((tickRange[0] - measure.tick) / ticksPerBeat),
+        Math.floor((tickRange[0] - measure.tick) / ticksPerBeat)
       )
       const endBeat = (lastTick - measure.tick) / ticksPerBeat
 

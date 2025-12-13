@@ -1,4 +1,4 @@
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../../hooks/useTickScroll"

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import Pause from "mdi-react/PauseIcon.js"
 import PlayArrow from "mdi-react/PlayArrowIcon.js"
-import { FC } from "react"
+import type { FC } from "react"
 import { CircleButton } from "./CircleButton.js"
 
 export const StyledButton = styled(CircleButton)`
@@ -22,10 +22,7 @@ export interface PlayButtonProps {
   isPlaying: boolean
 }
 
-export const PlayButton: FC<PlayButtonProps> = (
-  { onMouseDown, isPlaying },
-  ref,
-) => {
+export const PlayButton: FC<PlayButtonProps> = ({ onMouseDown, isPlaying }) => {
   return (
     <StyledButton
       id="button-play"

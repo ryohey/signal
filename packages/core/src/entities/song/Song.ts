@@ -15,7 +15,7 @@ import {
   serialize,
 } from "serializr"
 import { Measure } from "../measure/Measure"
-import { isTimeSignatureEvent, Track, TrackId } from "../track"
+import { isTimeSignatureEvent, Track, type TrackId } from "../track"
 import { collectAllEvents } from "./collectAllEvents"
 
 const END_MARGIN = 480 * 30
@@ -60,7 +60,9 @@ export class Song {
           this.name,
         ]
       },
-      () => (this.isSaved = false),
+      () => {
+        this.isSaved = false
+      }
     )
   }
 
@@ -124,7 +126,9 @@ export class Song {
   }
 
   updateEndOfSong() {
-    this.tracks.forEach((t) => t.updateEndOfTrack())
+    for (const t of this.tracks) {
+      t.updateEndOfTrack()
+    }
   }
 
   get allEvents() {

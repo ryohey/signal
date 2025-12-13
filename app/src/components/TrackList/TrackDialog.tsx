@@ -1,6 +1,6 @@
-import { TrackId } from "@signal-app/core"
+import type { TrackId } from "@signal-app/core"
 import { range } from "lodash"
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useState } from "react"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
 import {
@@ -30,14 +30,14 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   const [_name, _setName] = useState(name)
   const [_channel, _setChannel] = useState(channel)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when open changes
   useEffect(() => {
     if (!open) {
       return
     }
     _setName(name)
     _setChannel(channel)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackId, open])
+  }, [open, channel])
 
   return (
     <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
@@ -59,7 +59,7 @@ export const TrackDialog: FC<TrackDialogProps> = ({
         </Label>
         <Select
           value={_channel}
-          onChange={(e) => _setChannel(parseInt(e.target.value as string))}
+          onChange={(e) => _setChannel(parseInt(e.target.value as string, 10))}
         >
           {range(0, 16).map((v) => (
             <option key={v} value={v.toString()}>

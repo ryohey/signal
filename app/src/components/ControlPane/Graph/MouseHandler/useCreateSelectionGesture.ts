@@ -1,6 +1,6 @@
 import { Point } from "../../../../entities/geometry/Point"
-import { ControlSelection } from "../../../../entities/selection/ControlSelection"
-import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
+import type { ControlSelection } from "../../../../entities/selection/ControlSelection"
+import type { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
@@ -21,8 +21,8 @@ export const useCreateSelectionGesture = () => {
       startPoint: Point,
       controlTransform: ControlCoordTransform,
       getControllerEventIdsInSelection: (
-        selection: ControlSelection,
-      ) => number[],
+        selection: ControlSelection
+      ) => number[]
     ) {
       setSelectedEventIds([])
 
@@ -53,7 +53,7 @@ export const useCreateSelectionGesture = () => {
         },
         onMouseUp: () => {
           setSelectedEventIds(
-            selection ? getControllerEventIdsInSelection(selection) : [],
+            selection ? getControllerEventIdsInSelection(selection) : []
           )
           setSelection(null)
         },

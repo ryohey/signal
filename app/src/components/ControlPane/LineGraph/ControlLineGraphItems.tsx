@@ -1,7 +1,7 @@
 import { useCallback } from "react"
-import { Point } from "../../../entities/geometry/Point"
+import type { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
-import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
+import type { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { useControlPane } from "../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
@@ -42,7 +42,7 @@ export const ControlLineGraphItems = ({
       x: e.offsetX + scrollLeft,
       y: e.offsetY,
     }),
-    [scrollLeft],
+    [scrollLeft]
   )
 
   const handleMouseDownItem = useCallback(
@@ -54,7 +54,7 @@ export const ControlLineGraphItems = ({
       const local = getLocal(e)
       dragSelectionGesture.onMouseDown(e, hitEventId, local, controlTransform)
     },
-    [mouseMode, dragSelectionGesture, getLocal, controlTransform],
+    [mouseMode, dragSelectionGesture, getLocal, controlTransform]
   )
 
   return (

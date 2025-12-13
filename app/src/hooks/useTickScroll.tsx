@@ -1,8 +1,8 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
-import { Store } from "jotai/vanilla/store"
 import { clamp } from "lodash"
-import { SetStateAction, useEffect } from "react"
+import { type SetStateAction, useEffect } from "react"
 import { Layout } from "../Constants"
 import { TickTransform } from "../entities/transform/TickTransform"
 import { useMobxSelector } from "./useMobxSelector"
@@ -74,7 +74,7 @@ export function useTickScroll(store = useStore()) {
       const transform = useAtomValue(transformAtom, { store })
       return useMobxSelector(
         () => transform.getX(player.position),
-        [transform, player],
+        [transform, player]
       )
     },
     get scrollLeft() {
@@ -117,10 +117,10 @@ const maxScaleXAtom = atom(15)
 
 // derived atoms
 const transformAtom = atom(
-  (get) => new TickTransform(Layout.pixelsPerTick * get(scaleXAtom)),
+  (get) => new TickTransform(Layout.pixelsPerTick * get(scaleXAtom))
 )
 const scrollLeftAtom = atom((get) =>
-  Math.round(get(transformAtom).getX(get(scrollLeftTicksAtom))),
+  Math.round(get(transformAtom).getX(get(scrollLeftTicksAtom)))
 )
 const contentWidthAtom = atom((get) => {
   const transform = get(transformAtom)
@@ -144,7 +144,7 @@ const setScrollLeftInPixelsAtom = atom(
     const maxX = contentWidth - canvasWidth
     const scrollLeft = clamp(x, 0, maxX)
     set(scrollLeftTicksAtom, transform.getTick(scrollLeft))
-  },
+  }
 )
 const setScrollLeftInTicksAtom = atom(null, (get, set, ticks: number) => {
   const transform = get(transformAtom)
@@ -179,7 +179,7 @@ const scaleAroundPointXAtom = atom(
     const scrollLeft = get(scrollLeftAtom)
     const pixelXInTicks0 = transform.getTick(scrollLeft + pixelX)
     set(scaleXAtom, (prev) =>
-      clamp(prev * (1 + scaleXDelta), minScaleX, maxScaleX),
+      clamp(prev * (1 + scaleXDelta), minScaleX, maxScaleX)
     )
     const updatedTransform = get(transformAtom)
     const updatedScrollLeft = get(scrollLeftAtom)
@@ -187,7 +187,7 @@ const scaleAroundPointXAtom = atom(
     const scrollInTicks = pixelXInTicks1 - pixelXInTicks0
     const scrollLeftTicks = get(scrollLeftTicksAtom)
     set(setScrollLeftInTicksAtom, scrollLeftTicks - scrollInTicks)
-  },
+  }
 )
 const getTickAtom = atom(null, (get, _set, offsetX: number) => {
   const transform = get(transformAtom)

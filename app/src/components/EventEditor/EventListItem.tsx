@@ -1,6 +1,6 @@
-import { TrackEvent } from "@signal-app/core"
+import type { TrackEvent } from "@signal-app/core"
 import isEqual from "lodash/isEqual"
-import React, { FC, useCallback } from "react"
+import React, { type FC, useCallback } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTrack } from "../../hooks/useTrack"
 import { getEventController } from "./EventController"
@@ -10,12 +10,12 @@ import { EventListInput } from "./EventListInput"
 interface EventListItemProps {
   item: TrackEvent
   style?: React.CSSProperties
-  onClick: (e: React.MouseEvent, ev: TrackEvent) => void
+  onClick?: (e: React.MouseEvent, ev: TrackEvent) => void
 }
 
 const equalEventListItemProps = (
   a: EventListItemProps,
-  b: EventListItemProps,
+  b: EventListItemProps
 ) =>
   isEqual(a.item, b.item) &&
   isEqual(a.style, b.style) &&
@@ -32,17 +32,17 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
       (e: TrackEvent) => {
         removeEvent(e.id)
       },
-      [removeEvent],
+      [removeEvent]
     )
 
     const onChangeTick = useCallback(
       (input: string) => {
-        const value = parseInt(input)
-        if (!isNaN(value)) {
+        const value = parseInt(input, 10)
+        if (!Number.isNaN(value)) {
           updateEvent(item.id, { tick: Math.max(0, value) })
         }
       },
-      [updateEvent, item],
+      [updateEvent, item]
     )
 
     const onChangeGate = useCallback(
@@ -55,7 +55,7 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
           updateEvent(item.id, obj)
         }
       },
-      [controller, updateEvent, item],
+      [controller, updateEvent, item]
     )
 
     const onChangeValue = useCallback(
@@ -68,15 +68,15 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
           updateEvent(item.id, obj)
         }
       },
-      [controller, updateEvent, item],
+      [controller, updateEvent, item]
     )
 
     return (
       <Row
         style={style}
         onClick={useCallback(
-          (e: React.MouseEvent) => onClick(e, item),
-          [item, onClick],
+          (e: React.MouseEvent) => onClick?.(e, item),
+          [item, onClick]
         )}
         onKeyDown={useCallback(
           (e: React.KeyboardEvent) => {
@@ -88,7 +88,7 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
               e.stopPropagation()
             }
           },
-          [item, onDelete],
+          [item, onDelete]
         )}
         tabIndex={-1}
       >
@@ -121,5 +121,5 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
       </Row>
     )
   },
-  equalEventListItemProps,
+  equalEventListItemProps
 )

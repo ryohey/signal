@@ -16,7 +16,7 @@ export class VelocityTransform {
   getVelocity(y: number): number {
     return Math.max(
       1,
-      Math.round(Math.max(0, Math.min(1, 1 - y / this.height)) * 127),
+      Math.round(Math.max(0, Math.min(1, 1 - y / this.height)) * 127)
     )
   }
 }

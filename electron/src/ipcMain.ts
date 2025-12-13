@@ -1,16 +1,16 @@
+import { readdir, readFile, writeFile } from "node:fs/promises"
+import { isAbsolute, join } from "node:path"
 import {
-  BrowserWindow,
-  IpcMainInvokeEvent,
   app,
+  type BrowserWindow,
   dialog,
+  type IpcMainInvokeEvent,
   ipcMain,
 } from "electron"
 import log from "electron-log"
-import { readFile, readdir, writeFile } from "fs/promises"
-import { isAbsolute, join } from "path"
 import { getArgument } from "./arguments"
 import { signInWithBrowser } from "./auth"
-import { FirebaseCredential } from "./FirebaseCredential"
+import type { FirebaseCredential } from "./FirebaseCredential"
 
 interface Callbacks {
   getMainWindow: () => BrowserWindow
@@ -40,7 +40,7 @@ const api = ({
       message: string
       buttons: string[]
       type?: "none" | "info" | "error" | "question" | "warning"
-    },
+    }
   ) => {
     const result = await dialog.showMessageBox(getMainWindow(), {
       message,

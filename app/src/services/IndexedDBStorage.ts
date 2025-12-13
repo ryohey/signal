@@ -11,7 +11,7 @@ export class IndexedDBStorage<Data, Metadata> {
 
   constructor(
     private readonly dbName: string,
-    private readonly version: number,
+    private readonly version: number
   ) {}
 
   async init() {
@@ -43,7 +43,7 @@ export class IndexedDBStorage<Data, Metadata> {
     const store = transaction.objectStore(catalogStoreName)
     const request = store.get(catalogKey)
     const result = await requestToPromise<Catalog<Metadata> | undefined>(
-      request,
+      request
     )
     return result ?? { files: {} }
   }
@@ -57,7 +57,7 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   private async updateCatalog(
-    update: (catalog: Catalog<Metadata>) => Catalog<Metadata>,
+    update: (catalog: Catalog<Metadata>) => Catalog<Metadata>
   ): Promise<void> {
     const currentCatalog = await this.getCatalog()
     const newCatalog = update(currentCatalog)

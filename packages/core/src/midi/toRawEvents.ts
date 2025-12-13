@@ -1,6 +1,10 @@
 import flatten from "lodash/flatten"
-import { AnyEvent } from "midifile-ts"
-import { DeltaTimeProvider, TickProvider, TrackEvent } from "../entities/track"
+import type { AnyEvent } from "midifile-ts"
+import type {
+  DeltaTimeProvider,
+  TickProvider,
+  TrackEvent,
+} from "../entities/track"
 import {
   isSignalEvent,
   mapFromSignalEvent,
@@ -9,7 +13,7 @@ import { deassemble as deassembleNote } from "./noteAssembler"
 
 // events in each tracks
 export function addDeltaTime<T extends TickProvider>(
-  events: T[],
+  events: T[]
 ): (T & DeltaTimeProvider)[] {
   let prevTick = 0
   return events

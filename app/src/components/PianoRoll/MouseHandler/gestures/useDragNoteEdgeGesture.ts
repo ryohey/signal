@@ -1,12 +1,12 @@
 import { isNoteEvent } from "@signal-app/core"
 import { useSelectNote } from "../../../../actions"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
-const useDragNoteEdgeGesture =
+const createUseDragNoteEdgeGesture =
   (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
     const { selectedTrackId, selectedNoteIds, setLastNoteDuration } =
       usePianoRoll()
@@ -22,7 +22,7 @@ const useDragNoteEdgeGesture =
         }
 
         const note = getEventById(noteId)
-        if (note == undefined || !isNoteEvent(note)) {
+        if (note === undefined || !isNoteEvent(note)) {
           return
         }
 
@@ -49,7 +49,7 @@ const useDragNoteEdgeGesture =
           {
             onChange(_e, { oldPosition, newPosition }) {
               const newNote = getEventById(noteId)
-              if (newNote == undefined || !isNoteEvent(newNote)) {
+              if (newNote === undefined || !isNoteEvent(newNote)) {
                 return
               }
               // save last note duration
@@ -69,12 +69,12 @@ const useDragNoteEdgeGesture =
                 selectNote(noteId)
               }
             },
-          },
+          }
         )
       },
     }
   }
 
-export const useDragNoteLeftGesture = useDragNoteEdgeGesture("left")
-export const useDragNoteRightGesture = useDragNoteEdgeGesture("right")
-export const useDragNoteCenterGesture = useDragNoteEdgeGesture("center")
+export const useDragNoteLeftGesture = createUseDragNoteEdgeGesture("left")
+export const useDragNoteRightGesture = createUseDragNoteEdgeGesture("right")
+export const useDragNoteCenterGesture = createUseDragNoteEdgeGesture("center")

@@ -17,7 +17,7 @@ export function usePianoKeys() {
   const { programNumber, isRhythmTrack } = useTrack(selectedTrackId)
   const selectedKeys = useMemo(
     () => new Set([...touchingKeys, ...previewingNoteNumbers]),
-    [touchingKeys, previewingNoteNumbers],
+    [touchingKeys, previewingNoteNumbers]
   )
 
   const onMouseDownKey = useCallback(
@@ -25,7 +25,7 @@ export function usePianoKeys() {
       previewNoteOn(noteNumber)
       setTouchingKeys(new Set([noteNumber]))
     },
-    [previewNoteOn],
+    [previewNoteOn]
   )
 
   const onMouseMoveKey = useCallback(
@@ -34,7 +34,7 @@ export function usePianoKeys() {
       previewNoteOn(noteNumber)
       setTouchingKeys(new Set([noteNumber]))
     },
-    [previewNoteOff, previewNoteOn],
+    [previewNoteOff, previewNoteOn]
   )
 
   const onMouseUpKey = useCallback(() => {
@@ -71,7 +71,7 @@ export function usePianoKeys() {
 
 function mapmap<K, V, R>(
   map: Map<K, V>,
-  fn: (value: V, key: K) => R,
+  fn: (value: V, key: K) => R
 ): Map<K, R> {
   const result = new Map<K, R>()
   for (const [key, value] of map.entries()) {

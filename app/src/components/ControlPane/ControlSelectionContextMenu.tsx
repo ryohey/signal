@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import {
   useCopyControlSelection,
   useDeleteControlSelection,
@@ -10,7 +10,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
   ContextMenu,
-  ContextMenuProps,
+  type ContextMenuProps,
   ContextMenuHotKey as HotKey,
 } from "../ContextMenu/ContextMenu"
 import { MenuItem } from "../ui/Menu"

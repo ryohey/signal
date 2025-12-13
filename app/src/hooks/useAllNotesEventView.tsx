@@ -19,11 +19,11 @@ export function useEventViewForAllTracks() {
               event,
               trackId: track.id,
               trackIndex: index,
-            })),
-          ),
-        ),
+            }))
+          )
+        )
       ),
-    [songStore],
+    [songStore]
   )
   return useDisposable(createEventView)
 }

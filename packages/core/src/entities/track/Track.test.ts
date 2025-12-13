@@ -1,7 +1,7 @@
 import { deserialize, serialize } from "serializr"
 import { describe, expect, it } from "vitest"
 import { Track } from "./Track"
-import { NoteEvent } from "./TrackEvent"
+import type { NoteEvent } from "./TrackEvent"
 import { emptyTrack } from "./TrackFactory"
 
 describe("Track", () => {

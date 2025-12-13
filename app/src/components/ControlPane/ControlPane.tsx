@@ -1,9 +1,10 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import React, { FC, useCallback, useRef } from "react"
+import React, { type FC, useCallback, useRef } from "react"
 import {
-  ControlMode,
+  type ControlMode,
+  controlModeKey,
   isEqualControlMode,
 } from "../../entities/control/ControlMode"
 import { useControlPane } from "../../hooks/useControlPane"
@@ -74,11 +75,11 @@ const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
 
   return (
     <Toolbar>
-      {controlModes.map((mode, i) => (
+      {controlModes.map((mode) => (
         <TabButton
           data-selected={isEqualControlMode(selectedMode, mode)}
           onMouseDown={() => onSelect(mode)}
-          key={i}
+          key={controlModeKey(mode)}
         >
           <NoWrap>
             <ControlName mode={mode} />

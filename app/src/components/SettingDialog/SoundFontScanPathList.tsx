@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import RemoveIcon from "mdi-react/RemoveIcon"
-import { FC } from "react"
+import type { FC } from "react"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
 import { Button } from "../ui/Button"

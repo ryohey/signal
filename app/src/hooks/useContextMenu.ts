@@ -31,7 +31,7 @@ export const useContextMenu = () => {
       x: state.mouseX,
       y: state.mouseY,
     }),
-    [state.mouseX, state.mouseY],
+    [state.mouseX, state.mouseY]
   )
 
   return {

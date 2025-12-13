@@ -1,6 +1,5 @@
-import { FC, useState } from "react"
-
 import styled from "@emotion/styled"
+import { type FC, useState } from "react"
 import "firebase/auth"
 import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../firebase/firebase"
@@ -47,15 +46,14 @@ export const SignInPage: FC = () => {
             callbacks: {
               signInSuccessWithAuthResult: ({ credential }) => {
                 const redirectUrl = new URLSearchParams(location.search).get(
-                  "redirect_uri",
+                  "redirect_uri"
                 )
                 if (
                   redirectUrl &&
                   (redirectUrl.startsWith("jp.codingcafe.signal://") ||
                     redirectUrl.startsWith("jp.codingcafe.signal.dev://"))
                 ) {
-                  const url =
-                    redirectUrl + "?credential=" + JSON.stringify(credential)
+                  const url = `${redirectUrl}?credential=${JSON.stringify(credential)}`
 
                   try {
                     location.assign(url)

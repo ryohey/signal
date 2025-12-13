@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react"
+import { type FC, useCallback, useMemo } from "react"
 import {
   useArrangeCopySelection,
   useArrangeDeleteSelection,
@@ -12,7 +12,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
   ContextMenu,
-  ContextMenuProps,
+  type ContextMenuProps,
   ContextMenuHotKey as HotKey,
 } from "../ContextMenu/ContextMenu"
 import { MenuDivider, MenuItem } from "../ui/Menu"
@@ -31,7 +31,7 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
 
   const isNoteSelected = useMemo(
     () => selection !== null && commands.arrange.hasSelectionNotes(selection),
-    [selection, commands],
+    [selection, commands]
   )
 
   const onClickVelocity = useCallback(() => {

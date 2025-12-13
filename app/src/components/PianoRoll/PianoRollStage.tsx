@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { Layout } from "../../Constants"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { Positioned } from "../ui/Positioned"

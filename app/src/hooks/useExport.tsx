@@ -1,4 +1,4 @@
-import { Song } from "@signal-app/core"
+import type { Song } from "@signal-app/core"
 import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
@@ -52,7 +52,7 @@ const useExportSong = () => {
 
     if (!canExport(getSong())) {
       await dialog.show({
-        title: localized["export"],
+        title: localized.export,
         message: localized["export-error-too-short"],
         actions: [{ title: "OK", key: "ok" }],
       })
@@ -82,7 +82,7 @@ const useExportSong = () => {
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>
             setProgress(numFrames / totalFrames),
-        },
+        }
       )
 
       setProgress(1)
@@ -92,7 +92,7 @@ const useExportSong = () => {
 
       const blob = new Blob([audioData as any], { type: encoder.mimeType })
       setOpenDialog(false)
-      downloadBlob(blob, "song." + encoder.ext)
+      downloadBlob(blob, `song.${encoder.ext}`)
     } catch (e) {
       console.warn(e)
     }

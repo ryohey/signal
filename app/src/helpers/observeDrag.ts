@@ -42,7 +42,7 @@ export interface DragHandler2 {
 
 export const observeDrag2 = (
   e: MouseEvent,
-  { onMouseMove, onMouseUp, onClick }: DragHandler2,
+  { onMouseMove, onMouseUp, onClick }: DragHandler2
 ) => {
   let isMoved = false
   const startClientPos = getClientPos(e)

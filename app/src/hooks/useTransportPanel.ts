@@ -42,9 +42,9 @@ export function useTransportPanel() {
           Measure.getMBTString(
             songStore.song.measures,
             player.position,
-            songStore.song.timebase,
+            songStore.song.timebase
           ),
-        [songStore, player],
+        [songStore, player]
       )
     },
   }

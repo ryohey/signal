@@ -9,7 +9,7 @@ export class MIDIInput {
   readonly removeDevice = (device: WebMidi.MIDIInput) => {
     device.removeEventListener(
       "midimessage",
-      this.onMidiMessage as (e: Event) => void,
+      this.onMidiMessage as (e: Event) => void
     )
     this.devices = this.devices.filter((d) => d.id !== device.id)
   }
@@ -20,7 +20,9 @@ export class MIDIInput {
   }
 
   readonly onMidiMessage = (e: WebMidi.MIDIMessageEvent) => {
-    this.listeners.forEach((callback) => callback(e))
+    for (const callback of this.listeners) {
+      callback(e)
+    }
   }
 
   on(event: "midiMessage", callback: (e: WebMidi.MIDIMessageEvent) => void) {

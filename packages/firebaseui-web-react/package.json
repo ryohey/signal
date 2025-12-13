@@ -19,7 +19,7 @@
     "react-dom": ">=16.8.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "firebaseui": "^6.1.0"

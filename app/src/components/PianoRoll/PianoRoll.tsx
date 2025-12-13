@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { type FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
@@ -65,24 +65,24 @@ const PianoRollWrapper: FC = () => {
 
   const onClickScaleUpHorizontal = useCallback(
     () => scaleAroundPointX(0.2, 0),
-    [scaleAroundPointX],
+    [scaleAroundPointX]
   )
   const onClickScaleDownHorizontal = useCallback(
     () => scaleAroundPointX(-0.2, 0),
-    [scaleAroundPointX],
+    [scaleAroundPointX]
   )
   const onClickScaleResetHorizontal = useCallback(
     () => setScaleX(1),
-    [setScaleX],
+    [setScaleX]
   )
 
   const onClickScaleUpVertical = useCallback(
     () => scaleAroundPointY(0.2, 0),
-    [scaleAroundPointY],
+    [scaleAroundPointY]
   )
   const onClickScaleDownVertical = useCallback(
     () => scaleAroundPointY(-0.2, 0),
-    [scaleAroundPointY],
+    [scaleAroundPointY]
   )
   const onClickScaleResetVertical = useCallback(() => setScaleY(1), [setScaleY])
 
@@ -109,7 +109,7 @@ const PianoRollWrapper: FC = () => {
         scrollBy(-e.deltaX, -deltaY)
       }
     },
-    [scrollBy, transform, scaleAroundPointX, scaleAroundPointY],
+    [scrollBy, transform, scaleAroundPointX, scaleAroundPointY]
   )
 
   const onChangeSplitPane = useCallback(() => {
@@ -118,7 +118,7 @@ const PianoRollWrapper: FC = () => {
 
   const onFocusNotes = useCallback(
     () => setActivePane("notes"),
-    [setActivePane],
+    [setActivePane]
   )
 
   const onBlurNotes = useCallback(() => setActivePane(null), [setActivePane])
@@ -127,7 +127,7 @@ const PianoRollWrapper: FC = () => {
     () => () => {
       setActivePane(null)
     },
-    [setActivePane],
+    [setActivePane]
   )
 
   return (
@@ -172,7 +172,7 @@ const PianoRollWrapper: FC = () => {
             setScrollLeftInPixels(v)
             setAutoScroll(false)
           },
-          [setScrollLeftInPixels, setAutoScroll],
+          [setScrollLeftInPixels, setAutoScroll]
         )}
         onClickScaleUp={onClickScaleUpHorizontal}
         onClickScaleDown={onClickScaleDownHorizontal}

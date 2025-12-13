@@ -15,16 +15,16 @@ export function useConductorTrack() {
   const { tracks, timebase } = useSong()
   const conductorTrack = useMobxSelector(
     () => tracks.find((t) => t.isConductorTrack),
-    [tracks],
+    [tracks]
   )
   const timeSignatures = useMobxSelector(
     () => (conductorTrack?.events ?? []).filter(isTimeSignatureEvent),
     [conductorTrack],
-    isEqual,
+    isEqual
   )
   const measures = useMemo(
     () => Measure.fromTimeSignatures(timeSignatures, timebase),
-    [timeSignatures, timebase],
+    [timeSignatures, timebase]
   )
 
   return {
@@ -35,27 +35,27 @@ export function useConductorTrack() {
       const { position } = usePlayer()
       return useMobxSelector(
         () => conductorTrack?.getTempo(position) ?? 0,
-        [conductorTrack, position],
+        [conductorTrack, position]
       )
     },
     get tempoEvents() {
       return useMobxSelector(
         () => (conductorTrack?.events ?? []).filter(isSetTempoEvent),
         [conductorTrack],
-        isEqual,
+        isEqual
       )
     },
     timeSignatures,
     measures,
     getEvents: useCallback(
       () => conductorTrack?.events ?? [],
-      [conductorTrack],
+      [conductorTrack]
     ),
     setTempo: useCallback(
       (bpm: number, tick: number) => {
         conductorTrack?.setTempo(bpm, tick)
       },
-      [conductorTrack],
+      [conductorTrack]
     ),
     ...useTrackEvents(conductorTrack),
   }

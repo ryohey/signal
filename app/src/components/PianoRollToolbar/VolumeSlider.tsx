@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import VolumeUp from "mdi-react/VolumeHighIcon"
-import { FC } from "react"
+import type { FC } from "react"
 import { useVolumeSlider } from "../../hooks/useVolumeSlider"
 import { Slider } from "../ui/Slider"
 

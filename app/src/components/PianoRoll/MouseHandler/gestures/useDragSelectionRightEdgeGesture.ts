@@ -1,4 +1,4 @@
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import type { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 export const useDragSelectionRightEdgeGesture = (): MouseGesture<
@@ -18,7 +18,7 @@ export const useDragSelectionRightEdgeGesture = (): MouseGesture<
           type: "note",
           position: "right",
           noteId,
-        })),
+        }))
       )
     },
   }

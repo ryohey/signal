@@ -1,13 +1,13 @@
 import {
-  BatchUpdateOperation,
+  type BatchUpdateOperation,
   Measure,
   programChangeMidiEvent,
+  type TrackEvent,
+  type TrackEventOf,
+  type TrackId,
   timeSignatureMidiEvent,
-  TrackEvent,
-  TrackEventOf,
-  TrackId,
 } from "@signal-app/core"
-import { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
+import type { AnyChannelEvent, AnyEvent, SetTempoEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { ValueEventType } from "../entities/event/ValueEventType"
 import { addedSet, deletedSet } from "../helpers/set"
@@ -31,7 +31,7 @@ export const useChangeTempo = () => {
         microsecondsPerBeat: microsecondsPerBeat,
       })
     },
-    [updateEvent, pushHistory],
+    [updateEvent, pushHistory]
   )
 }
 
@@ -49,11 +49,11 @@ export const useChangeNotesVelocity = () => {
         noteIds.map((id) => ({
           id,
           velocity: velocity,
-        })),
+        }))
       )
       setNewNoteVelocity(velocity)
     },
-    [pushHistory, updateEvents, setNewNoteVelocity],
+    [pushHistory, updateEvents, setNewNoteVelocity]
   )
 }
 
@@ -80,7 +80,7 @@ export const useCreateEvent = () => {
 
       return id
     },
-    [pushHistory, createOrUpdate, quantizeRound, position, sendEvent],
+    [pushHistory, createOrUpdate, quantizeRound, position, sendEvent]
   )
 }
 
@@ -88,7 +88,7 @@ export const useCreateEvent = () => {
 export const useUpdateEventsInRange = (
   trackId: TrackId,
   filterEvent: (e: TrackEvent) => boolean,
-  createEvent: (value: number) => AnyEvent,
+  createEvent: (value: number) => AnyEvent
 ) => {
   const { quantizeFloor, quantizeUnit } = useQuantizer()
   const commands = useCommands()
@@ -98,7 +98,7 @@ export const useUpdateEventsInRange = (
       startValue: number,
       endValue: number,
       startTick: number,
-      endTick: number,
+      endTick: number
     ) => {
       commands.track.updateEventsInRange(
         trackId,
@@ -109,10 +109,10 @@ export const useUpdateEventsInRange = (
         startValue,
         endValue,
         startTick,
-        endTick,
+        endTick
       )
     },
-    [commands, trackId, filterEvent, createEvent, quantizeFloor, quantizeUnit],
+    [commands, trackId, filterEvent, createEvent, quantizeFloor, quantizeUnit]
   )
 }
 
@@ -122,7 +122,7 @@ export const useUpdateValueEvents = (type: ValueEventType) => {
   return useUpdateEventsInRange(
     selectedTrackId,
     ValueEventType.getEventPredicate(type),
-    ValueEventType.getEventFactory(type),
+    ValueEventType.getEventFactory(type)
   )
 }
 
@@ -135,12 +135,12 @@ export const useMuteNote = () => {
 
   return useCallback(
     (noteNumber: number) => {
-      if (channel == undefined) {
+      if (channel === undefined) {
         return
       }
       stopNote({ channel, noteNumber })
     },
-    [channel, stopNote],
+    [channel, stopNote]
   )
 }
 
@@ -156,7 +156,7 @@ export const useSetTrackName = () => {
       pushHistory()
       setName(name)
     },
-    [pushHistory, setName],
+    [pushHistory, setName]
   )
 }
 
@@ -176,7 +176,7 @@ export const useSetTrackInstrument = (trackId: TrackId) => {
         sendEvent(programChangeMidiEvent(0, channel, programNumber))
       }
     },
-    [pushHistory, setProgramNumber, channel, sendEvent],
+    [pushHistory, setProgramNumber, channel, sendEvent]
   )
 }
 
@@ -193,7 +193,7 @@ export const useToggleGhostTrack = () => {
         setNotGhostTrackIds(addedSet(trackId))
       }
     },
-    [pushHistory, notGhostTrackIds, setNotGhostTrackIds],
+    [pushHistory, notGhostTrackIds, setNotGhostTrackIds]
   )
 }
 
@@ -222,7 +222,7 @@ export const useAddTimeSignature = () => {
       const measureStartTick = Measure.getMeasureStart(
         measures,
         tick,
-        timebase,
+        timebase
       ).tick
 
       // prevent duplication
@@ -237,7 +237,7 @@ export const useAddTimeSignature = () => {
         tick: measureStartTick,
       })
     },
-    [timebase, pushHistory, measures, timeSignatures, addEvent],
+    [timebase, pushHistory, measures, timeSignatures, addEvent]
   )
 }
 
@@ -253,7 +253,7 @@ export const useUpdateTimeSignature = () => {
         denominator,
       })
     },
-    [pushHistory, updateEvent],
+    [pushHistory, updateEvent]
   )
 }
 
@@ -268,9 +268,9 @@ export const useBatchUpdateSelectedNotesVelocity = () => {
       commands.track.batchUpdateNotesVelocity(
         selectedTrackId,
         selectedNoteIds,
-        operation,
+        operation
       )
     },
-    [selectedTrackId, selectedNoteIds, pushHistory, commands],
+    [selectedTrackId, selectedNoteIds, pushHistory, commands]
   )
 }

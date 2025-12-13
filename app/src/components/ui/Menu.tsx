@@ -10,7 +10,8 @@ import {
   Trigger,
 } from "@radix-ui/react-dropdown-menu"
 import { FocusScope } from "@radix-ui/react-focus-scope"
-import React, { FC, PropsWithChildren } from "react"
+import type React from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export type MenuProps = PropsWithChildren<{
   open?: boolean

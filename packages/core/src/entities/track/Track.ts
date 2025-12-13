@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable, transaction } from "mobx"
 import { createModelSchema, object, primitive } from "serializr"
 import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
-import { Branded } from "../../types"
+import type { Branded } from "../../types"
 import { isNoteEvent } from "./identify"
 import {
   getPan,
@@ -11,9 +11,9 @@ import {
   getTrackNameEvent,
   getVolume,
 } from "./selector"
-import { SignalTrackColorEvent } from "./signalEvents"
-import { TrackColor } from "./TrackColor"
-import { TrackEvent } from "./TrackEvent"
+import type { SignalTrackColorEvent } from "./signalEvents"
+import type { TrackColor } from "./TrackColor"
+import type { TrackEvent } from "./TrackEvent"
 import { TrackEvents } from "./TrackEvents"
 
 export type TrackId = Branded<number, "TrackId">
@@ -104,7 +104,7 @@ export class Track {
   /* helper */
 
   createOrUpdate<T extends TrackEvent>(
-    newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
+    newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number }
   ): T {
     return TrackEvents.createOrUpdate(newEvent)(this._events)
   }
@@ -117,7 +117,7 @@ export class Track {
     if (isNoteEvent(newEvent)) {
       this.endOfTrack = Math.max(
         this.endOfTrack,
-        newEvent.tick + newEvent.duration,
+        newEvent.tick + newEvent.duration
       )
     }
   }

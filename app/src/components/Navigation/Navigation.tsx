@@ -2,7 +2,12 @@ import styled from "@emotion/styled"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
-import { CSSProperties, FC, MouseEvent, useCallback } from "react"
+import {
+  type CSSProperties,
+  type FC,
+  type MouseEvent,
+  useCallback,
+} from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
@@ -91,7 +96,7 @@ export const Navigation: FC = () => {
       e.preventDefault()
       setPath("/track")
     },
-    [setPath],
+    [setPath]
   )
 
   const onClickArrangeTab = useCallback(
@@ -99,7 +104,7 @@ export const Navigation: FC = () => {
       e.preventDefault()
       setPath("/arrange")
     },
-    [setPath],
+    [setPath]
   )
 
   const onClickTempoTab = useCallback(
@@ -107,7 +112,7 @@ export const Navigation: FC = () => {
       e.preventDefault()
       setPath("/tempo")
     },
-    [setPath],
+    [setPath]
   )
 
   const onClickSettings = useCallback(
@@ -115,7 +120,7 @@ export const Navigation: FC = () => {
       e.preventDefault()
       setOpenSettingDialog(true)
     },
-    [setOpenSettingDialog],
+    [setOpenSettingDialog]
   )
 
   const onClickHelp = useCallback(
@@ -123,7 +128,7 @@ export const Navigation: FC = () => {
       e.preventDefault()
       setOpenHelpDialog(true)
     },
-    [setOpenHelpDialog],
+    [setOpenHelpDialog]
   )
 
   return (

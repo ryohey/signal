@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import PencilIcon from "../../images/icons/pencil.svg"
 import SelectionIcon from "../../images/icons/selection.svg"
 import { Localized } from "../../localize/useLocalization"

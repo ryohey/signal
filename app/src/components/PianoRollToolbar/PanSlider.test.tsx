@@ -32,7 +32,7 @@ describe("PanSlider", () => {
     render(
       <LocalizationContext.Provider value={{ language: "en" }}>
         <PanSlider />
-      </LocalizationContext.Provider>,
+      </LocalizationContext.Provider>
     )
     const slider = screen.getByRole("slider")
     expect(slider).toHaveAttribute("aria-valuenow", "42") // equals currentPan
@@ -54,7 +54,7 @@ describe("PanSlider", () => {
     render(
       <LocalizationContext.Provider value={{ language: "en" }}>
         <PanSlider />
-      </LocalizationContext.Provider>,
+      </LocalizationContext.Provider>
     )
     const slider = screen.getByRole("slider")
     await user.dblClick(slider)

@@ -15,8 +15,8 @@
     }
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "vitest": "^4.0.10"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
   },
   "dependencies": {
     "lodash": "^4.17.21",

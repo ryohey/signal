@@ -1,11 +1,11 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { useToast } from "dialog-hooks"
 import ArrowDownward from "mdi-react/ArrowDownwardIcon"
 import ArrowDropDown from "mdi-react/ArrowDropDownIcon"
 import ArrowUpward from "mdi-react/ArrowUpwardIcon"
-import { FC, useEffect } from "react"
+import { type FC, useEffect } from "react"
 import { useSetSong } from "../../actions"
 import { useLoadSong } from "../../actions/cloudSong"
 import { useCloudFile } from "../../hooks/useCloudFile"
@@ -95,8 +95,7 @@ export const CloudFileList = () => {
 
   useEffect(() => {
     loadFiles()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadFiles])
 
   const onClickSong = async (song: CloudSong) => {
     try {

@@ -1,8 +1,8 @@
 import { clamp } from "lodash"
 import { MaxNoteNumber } from "../../Constants"
-import { Rect } from "../geometry/Rect"
-import { NoteCoordTransform } from "../transform/NoteCoordTransform"
-import { NotePoint } from "../transform/NotePoint"
+import type { Rect } from "../geometry/Rect"
+import type { NoteCoordTransform } from "../transform/NoteCoordTransform"
+import type { NotePoint } from "../transform/NotePoint"
 
 export interface Selection {
   readonly fromTick: number
@@ -14,7 +14,7 @@ export interface Selection {
 export namespace Selection {
   export const getBounds = (
     selection: Selection,
-    transform: NoteCoordTransform,
+    transform: NoteCoordTransform
   ): Rect => {
     const left = transform.getX(selection.fromTick)
     const right = transform.getX(selection.toTick)
@@ -31,7 +31,7 @@ export namespace Selection {
   export const moved = (
     selection: Selection,
     dt: number,
-    dn: number,
+    dn: number
   ): Selection => {
     return {
       fromTick: selection.fromTick + dt,
@@ -48,7 +48,7 @@ export namespace Selection {
     // integer containing the original coordinates.
     const topNoteNumber = Math.ceil(Math.max(start.noteNumber, end.noteNumber))
     const bottomNoteNumber = Math.floor(
-      Math.min(start.noteNumber, end.noteNumber),
+      Math.min(start.noteNumber, end.noteNumber)
     )
 
     return {

@@ -6,19 +6,16 @@ import {
   uniformMat4,
   uniformVec4,
 } from "@ryohey/webgl-react/legacy"
-import { Rect } from "../../../../entities/geometry/Rect"
+import type { Rect } from "../../../../entities/geometry/Rect"
 
 class HorizontalGridBuffer {
-  private gl: WebGLRenderingContext
-
   readonly buffers: {
     position: WebGLBuffer
   }
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl
+  constructor(readonly gl: WebGLRenderingContext) {
     this.buffers = {
-      position: gl.createBuffer()!,
+      position: gl.createBuffer(),
     }
   }
 
@@ -93,5 +90,5 @@ export const HorizontalGridShader = (gl: WebGLRenderingContext) =>
       blackLaneColor: uniformVec4(gl, program, "uBlackLaneColor"),
       height: uniformFloat(gl, program, "uHeight"),
     }),
-    (gl) => new HorizontalGridBuffer(gl),
+    (gl) => new HorizontalGridBuffer(gl)
   )

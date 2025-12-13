@@ -6,7 +6,7 @@
  */
 export async function writeFile(
   fileHandle: FileSystemFileHandle,
-  contents: FileSystemWriteChunkType,
+  contents: FileSystemWriteChunkType
 ) {
   // Create a FileSystemWritableFileStream to write to.
   const writable = await fileHandle.createWritable()
@@ -26,7 +26,7 @@ export async function writeFile(
  */
 export async function verifyPermission(
   fileHandle: FileSystemFileHandle,
-  withWrite: boolean,
+  withWrite: boolean
 ) {
   const opts: FileSystemHandlePermissionDescriptor = {}
   if (withWrite) {

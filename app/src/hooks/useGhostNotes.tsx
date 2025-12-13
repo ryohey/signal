@@ -1,4 +1,4 @@
-import { isNoteEvent, NoteEvent, TrackId } from "@signal-app/core"
+import { isNoteEvent, type NoteEvent, type TrackId } from "@signal-app/core"
 import { useCallback, useMemo } from "react"
 import {
   useEventView,
@@ -18,13 +18,13 @@ export function useGhostNotes(trackId: TrackId) {
 
   const noteEvents = useMemo(
     () => windowedEvents.filter(isNoteEvent),
-    [windowedEvents],
+    [windowedEvents]
   )
 
   const getRect = useCallback(
     (e: NoteEvent) =>
       isRhythmTrack ? transform.getDrumRect(e) : transform.getRect(e),
-    [transform, isRhythmTrack],
+    [transform, isRhythmTrack]
   )
 
   const notes = useMemo(
@@ -39,7 +39,7 @@ export function useGhostNotes(trackId: TrackId) {
           isSelected: false,
         }
       }),
-    [noteEvents, getRect],
+    [noteEvents, getRect]
   )
 
   return { notes, isRhythmTrack }

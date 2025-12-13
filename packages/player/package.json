@@ -20,10 +20,10 @@
     "mobx": "^6.12.3"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
-    "vitest": "^4.0.10"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@ryohey/wavelet": "^0.7.4"
+    "@ryohey/wavelet": "^0.7.5"
   }
 }

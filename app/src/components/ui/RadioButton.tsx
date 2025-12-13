@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import CircleIcon from "mdi-react/CircleIcon"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
 const Button = styled.div`
   display: inline-flex;

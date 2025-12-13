@@ -1,14 +1,14 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { VelocityItems } from "./VelocityItems"
 import { useVelocityPaintGesture } from "./useVelocityPaintGesture"
+import { VelocityItems } from "./VelocityItems"
 
 export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
   width,
@@ -19,20 +19,20 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
   const theme = useTheme()
   const velocityTransform = useMemo(
     () => new VelocityTransform(height),
-    [height],
+    [height]
   )
   const velocityPaintGesture = useVelocityPaintGesture({
     velocityTransform: velocityTransform,
   })
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
-    [scrollLeft],
+    [scrollLeft]
   )
   const style = useMemo(
     () => ({
       backgroundColor: theme.editorBackgroundColor,
     }),
-    [theme],
+    [theme]
   )
 
   return (

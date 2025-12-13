@@ -2,8 +2,8 @@ import { useTheme } from "@emotion/react"
 import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import { FC, useMemo } from "react"
-import { BeatWithX } from "../../entities/beat/BeatWithX"
+import { type FC, useMemo } from "react"
+import type { BeatWithX } from "../../entities/beat/BeatWithX"
 import { colorToVec4 } from "../../gl/color"
 import { LegacyBeats } from "./legacy/LegacyBeats"
 import { VerticalLines } from "./VerticalLines"
@@ -23,7 +23,7 @@ const _Beats: FC<BeatsProps> = ({ height, beats, zIndex }) => {
 
   const [highlightedBeats, nonHighlightedBeats] = partition(
     beats,
-    (b) => b.beat === 0,
+    (b) => b.beat === 0
   )
 
   const lines = nonHighlightedBeats.map((b) => b.x)
@@ -31,11 +31,11 @@ const _Beats: FC<BeatsProps> = ({ height, beats, zIndex }) => {
 
   const color = useMemo(
     () => colorToVec4(Color(theme.editorSecondaryGridColor)),
-    [theme],
+    [theme]
   )
   const highlightedColor = useMemo(
     () => colorToVec4(Color(theme.editorGridColor)),
-    [theme],
+    [theme]
   )
 
   return (

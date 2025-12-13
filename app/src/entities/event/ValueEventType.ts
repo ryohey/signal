@@ -32,7 +32,7 @@ export namespace ValueEventType {
 
   export const equals = (
     item: ValueEventType,
-    other: ValueEventType,
+    other: ValueEventType
   ): boolean => {
     switch (item.type) {
       case "pitchBend":

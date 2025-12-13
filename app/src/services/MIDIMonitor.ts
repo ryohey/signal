@@ -1,4 +1,4 @@
-import { Player } from "@signal-app/player"
+import type { Player } from "@signal-app/player"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 
 export class MIDIMonitor {

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
 import { useDisableBrowserContextMenu } from "../../hooks/useDisableBrowserContextMenu"
 import { useDisableZoom } from "../../hooks/useDisableZoom"

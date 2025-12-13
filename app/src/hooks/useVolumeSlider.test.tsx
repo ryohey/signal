@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import RootStore from "../stores/RootStore"
+import type RootStore from "../stores/RootStore"
 import { SongStore } from "../stores/SongStore"
 import { StoreContext } from "./useStores"
 import { useVolumeSlider } from "./useVolumeSlider"
@@ -41,7 +41,7 @@ vi.mock("./usePianoRoll", () => ({
   usePianoRoll: () => ({
     get selectedTrack() {
       return mockStore?.songStore?.song?.tracks?.find(
-        (track: any) => track.id === 1,
+        (track: any) => track.id === 1
       )
     },
     selectedTrackId: 1,

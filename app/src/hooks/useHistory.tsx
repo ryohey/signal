@@ -44,7 +44,7 @@ function useSerializeState() {
       controlStore: serializeControlPane(),
       arrangeViewStore: serializeArrangeView(),
     }),
-    [songStore, serializePianoRoll, serializeControlPane, serializeArrangeView],
+    [songStore, serializePianoRoll, serializeControlPane, serializeArrangeView]
   )
 }
 
@@ -62,7 +62,7 @@ function useRestoreState() {
       restoreControlPane(serializedState.controlStore)
       restoreArrangeView(serializedState.arrangeViewStore)
     },
-    [setSong, restorePianoRoll, restoreControlPane, restoreArrangeView],
+    [setSong, restorePianoRoll, restoreControlPane, restoreArrangeView]
   )
 }
 
@@ -75,8 +75,8 @@ function usePushHistory() {
         const state = serializeState()
         set(pushHistoryAtom, state)
       },
-      [serializeState],
-    ),
+      [serializeState]
+    )
   )
 }
 
@@ -92,8 +92,8 @@ function useUndo() {
           restoreState(state)
         }
       },
-      [restoreState, serializeState],
-    ),
+      [restoreState, serializeState]
+    )
   )
 }
 
@@ -109,8 +109,8 @@ function useRedo() {
           restoreState(state)
         }
       },
-      [serializeState, restoreState],
-    ),
+      [serializeState, restoreState]
+    )
   )
 }
 
@@ -145,7 +145,7 @@ const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   }
   return state
 })
-const clearHistoryAtom = atom(null, (get, set) => {
+const clearHistoryAtom = atom(null, (_get, set) => {
   set(undoHistoryAtom, [])
   set(redoHistoryAtom, [])
 })

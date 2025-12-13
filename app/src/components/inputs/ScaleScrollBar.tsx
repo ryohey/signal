@@ -3,8 +3,8 @@ import useComponentSize from "@rehooks/component-size"
 import Add from "mdi-react/AddIcon"
 import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import Minus from "mdi-react/MinusIcon"
-import React, { FC, useRef } from "react"
-import { BAR_WIDTH, ScrollBar, ScrollBarProps } from "./ScrollBar"
+import React, { type FC, useRef } from "react"
+import { BAR_WIDTH, ScrollBar, type ScrollBarProps } from "./ScrollBar"
 
 const ScaleButton = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ type HorizontalScaleScrollBarProps = Omit<
 }
 
 const HorizontalScaleScrollBar_: FC<HorizontalScaleScrollBarProps> = (
-  props,
+  props
 ) => {
   const ref = useRef<HTMLDivElement>(null)
   const size = useComponentSize(ref)
@@ -92,7 +92,7 @@ const VerticalScaleScrollBar_: FC<
 
 const areEqual = (
   props: HorizontalScaleScrollBarProps,
-  nextProps: HorizontalScaleScrollBarProps,
+  nextProps: HorizontalScaleScrollBarProps
 ) =>
   props.scrollOffset === nextProps.scrollOffset &&
   props.contentLength === nextProps.contentLength &&
@@ -103,10 +103,10 @@ const areEqual = (
 
 export const HorizontalScaleScrollBar = React.memo(
   HorizontalScaleScrollBar_,
-  areEqual,
+  areEqual
 )
 
 export const VerticalScaleScrollBar = React.memo(
   VerticalScaleScrollBar_,
-  areEqual,
+  areEqual
 )

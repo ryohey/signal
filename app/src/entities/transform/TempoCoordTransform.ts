@@ -1,12 +1,12 @@
-import { Point } from "../geometry/Point"
-import { TickTransform } from "./TickTransform"
+import type { Point } from "../geometry/Point"
+import type { TickTransform } from "./TickTransform"
 
 export class TempoCoordTransform {
   constructor(
     private readonly tickTransform: TickTransform,
     // The height of the drawing area of the graph
     readonly height: number,
-    readonly maxBPM = 320,
+    readonly maxBPM = 320
   ) {}
 
   getX(tick: number) {

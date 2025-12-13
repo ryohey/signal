@@ -1,7 +1,7 @@
 import {
+  closestCenter,
   DndContext,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
@@ -19,7 +19,7 @@ interface SortableItemProps<ID extends string | number> {
 }
 
 const SortableItem = <ID extends string | number>(
-  props: SortableItemProps<ID>,
+  props: SortableItemProps<ID>
 ) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id })
@@ -62,7 +62,7 @@ export const DraggableList = <T extends object, ID extends string | number>({
       activationConstraint: {
         distance: 5, // Enable item click
       },
-    }),
+    })
   )
 
   return (

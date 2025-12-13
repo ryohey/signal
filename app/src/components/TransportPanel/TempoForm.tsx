@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { DEFAULT_TEMPO } from "@signal-app/player"
-import { FC } from "react"
+import type { FC } from "react"
 import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { usePlayer } from "../../hooks/usePlayer"
 import { NumberInput } from "../inputs/NumberInput"

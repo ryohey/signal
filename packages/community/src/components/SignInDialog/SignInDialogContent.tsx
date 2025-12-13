@@ -1,7 +1,6 @@
-import { FC } from "react"
-import { Dialog, DialogActions, DialogContent, DialogTitle } from "../Dialog.js"
-
 import styled from "@emotion/styled"
+import type { FC } from "react"
+import { Dialog, DialogActions, DialogContent, DialogTitle } from "../Dialog.js"
 import "firebase/auth"
 import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../../firebase/firebase.js"
@@ -15,11 +14,6 @@ const BetaLabel = styled.span`
   padding: 0.1rem 0.4rem;
   margin-left: 1em;
   color: var(--color-text-secondary);
-`
-
-const Description = styled.div`
-  margin: 1rem 0 2rem 0;
-  line-height: 1.5;
 `
 
 export interface SignInDialogContentProps {

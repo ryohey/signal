@@ -12,7 +12,7 @@ export async function readClipboardData(): Promise<object | null> {
 }
 
 export async function writeClipboardData<T extends object>(
-  data: T,
+  data: T
 ): Promise<void> {
   try {
     const jsonData = JSON.stringify(data)

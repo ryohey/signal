@@ -1,5 +1,5 @@
-import { TrackEventOf } from "@signal-app/core"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import type { TrackEventOf } from "@signal-app/core"
+import type { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import React, { useCallback } from "react"
 import { useCreateOrUpdateControlEventsValue } from "../../../actions/control"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
@@ -43,7 +43,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
       const event = ValueEventType.getEventFactory(eventType)(value)
       createOrUpdateControlEventsValue(event)
     },
-    [eventType, createOrUpdateControlEventsValue],
+    [eventType, createOrUpdateControlEventsValue]
   )
 
   return (

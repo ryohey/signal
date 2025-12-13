@@ -1,6 +1,6 @@
 import { GLFallback } from "@ryohey/webgl-react"
-import { TrackId } from "@signal-app/core"
-import { FC } from "react"
+import type { TrackId } from "@signal-app/core"
+import type { FC } from "react"
 import { useGhostNoteColor } from "../../../hooks/useGhostNoteColor"
 import { useGhostNotes } from "../../../hooks/useGhostNotes"
 import { LegacyGhostNotes } from "./lagacy/LegacyGhostNotes"

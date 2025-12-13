@@ -15,7 +15,7 @@ export const CloudFileDialog = () => {
 
   const onClose = useCallback(
     () => setOpenCloudFileDialog(false),
-    [setOpenCloudFileDialog],
+    [setOpenCloudFileDialog]
   )
 
   return (

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -30,8 +30,8 @@ export const TransposeDialog: FC<TransposeDialogProps> = ({
   }, [open])
 
   const _onClickOK = () => {
-    const value = parseInt(input)
-    onClickOK(isNaN(value) ? 0 : value)
+    const value = parseInt(input, 10)
+    onClickOK(Number.isNaN(value) ? 0 : value)
     onClose()
   }
 
