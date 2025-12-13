@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
 
-export type RoutePath = "/track" | "/arrange"
+export type RoutePath = "/" | "/track" | "/arrange"
 
 export function useRouter() {
   return {
@@ -12,4 +12,4 @@ export function useRouter() {
 }
 
 // atoms
-const pathAtom = atom<RoutePath>("/arrange")
+const pathAtom = atom<RoutePath>("/")

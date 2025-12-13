@@ -14,10 +14,14 @@ const Container = styled.div<{ standalone?: boolean }>`
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: ${({ theme }) => theme.backgroundColor};
   border-left: ${({ standalone, theme }) =>
     standalone ? "none" : `1px solid ${theme.dividerColor}`};
-  min-width: 300px;
+  overflow: hidden;
 `
 
 const Header = styled.div`
@@ -29,6 +33,10 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
 `
 
 const HeaderLeft = styled.div`
@@ -74,17 +82,23 @@ const StatusDot = styled.span<{ status: "connected" | "disconnected" | "checking
 const MessageList = styled.div`
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   user-select: text;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   max-width: 85%;
+  width: 85%;
+  min-width: 0;
   align-self: ${({ role }) => (role === "user" ? "flex-end" : "flex-start")};
   background: ${({ role, theme }) =>
     role === "user"
@@ -102,7 +116,10 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   -ms-user-select: text;
   white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   cursor: text;
+  box-sizing: border-box;
 `
 
 const InputContainer = styled.div`
@@ -111,12 +128,18 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const InputRow = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Input = styled.textarea`
@@ -199,6 +222,13 @@ const ProgressContainer = styled.div`
   background: ${({ theme }) => theme.secondaryBackgroundColor};
   border-radius: 0.5rem;
   margin: 0.5rem 0;
+  max-width: 85%;
+  min-width: 0;
+  width: fit-content;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `
 
 const ProgressStage = styled.div`
@@ -255,6 +285,12 @@ const StreamingContainer = styled.div`
   border-radius: 0.5rem;
   margin: 0.5rem 0;
   max-width: 85%;
+  min-width: 0;
+  width: fit-content;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `
 
 const StreamingHeader = styled.div<{ expanded: boolean }>`
@@ -299,6 +335,9 @@ const StreamingContent = styled.div<{ expanded: boolean }>`
   max-height: ${({ expanded }) => expanded ? '200px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s ease, margin-top 0.3s ease;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const ThinkingText = styled.div`
@@ -307,12 +346,17 @@ const ThinkingText = styled.div`
   line-height: 1.4;
   white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   font-family: monospace;
   background: ${({ theme }) => theme.backgroundColor};
   padding: 0.5rem;
   border-radius: 0.25rem;
   max-height: 150px;
   overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const ToolCallsList = styled.div`
@@ -482,11 +526,7 @@ function getStageProgress(stage: GenerationStage): number {
   }
 }
 
-interface ChatMessage {
-  role: "user" | "assistant" | "error"
-  content: string
-  notes?: DetectedNote[] // Optional notes data for voice recordings
-}
+// ChatMessage is now imported from useAIChat hook
 
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
@@ -497,9 +537,27 @@ export interface AIChatProps {
 }
 
 export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const {
+    messages,
+    setMessages,
+    isLoading,
+    setIsLoading,
+    streamingThinking,
+    setStreamingThinking,
+    streamingToolCalls,
+    setStreamingToolCalls,
+    executedToolIds,
+    setExecutedToolIds,
+    generationStage,
+    setGenerationStage,
+    generationProgress,
+    setGenerationProgress,
+    currentAttempt,
+    setCurrentAttempt,
+    streamingMessageIndex,
+    setStreamingMessageIndex,
+  } = useAIChat()
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
@@ -511,14 +569,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
-  // Deep agent progress state
-  const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
-  const [generationProgress, setGenerationProgress] = useState<string>("")
-  const [currentAttempt, setCurrentAttempt] = useState<number>(0)
-  // Streaming agent state (for hybrid agent)
-  const [streamingThinking, setStreamingThinking] = useState<string>("")
-  const [streamingToolCalls, setStreamingToolCalls] = useState<ToolCall[]>([])
-  const [executedToolIds, setExecutedToolIds] = useState<Set<string>>(new Set())
   const [thinkingExpanded, setThinkingExpanded] = useState(false)
   const [useStreaming, setUseStreaming] = useState(true) // Toggle for streaming vs non-streaming
 
@@ -526,7 +576,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
   const { setPath } = useRouter()
   const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const streamingMessageRef = useRef<number>(-1)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = useCallback(() => {
@@ -584,15 +633,16 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     setMessages((prev) => {
       const newMessages = [...prev, { role: "user" as const, content: messageToSubmit }]
       const assistantIndex = newMessages.length
-      streamingMessageRef.current = assistantIndex
+      setStreamingMessageIndex(assistantIndex)
       return [...newMessages, { role: "assistant" as const, content: "" }]
     })
 
-    setIsLoading(true)
-
-    // Navigate to arrange view and ensure AI chat is open when generation starts
+    // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
+    // This ensures the route is set before any async operations
     setPath("/arrange")
     setAIChatOpen(true)
+
+    setIsLoading(true)
 
     // Branch based on agent type
     if (agentType === "hybrid") {
@@ -614,13 +664,34 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             {
               onThinking: (content: string) => {
                 setStreamingThinking((prev) => prev + content)
+                // Accumulate thinking content in message bubble
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageIndex
+                  if (index >= 0 && index < updated.length) {
+                    // Append thinking content to the message
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + content,
+                    }
+                  }
+                  return updated
+                })
               },
               onToolCalls: (toolCalls: ToolCall[]) => {
                 setStreamingToolCalls(toolCalls)
+                // Create separate message bubbles for tool calls
+                setMessages((prev) => {
+                  const toolCallMessages = toolCalls.map((tc) => ({
+                    role: "assistant" as const,
+                    content: `🔧 ${tc.name}(${JSON.stringify(tc.args).slice(0, 200)}${JSON.stringify(tc.args).length > 200 ? "..." : ""})`,
+                  }))
+                  return [...prev, ...toolCallMessages]
+                })
               },
               onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
                 // Mark tools as executed
-                setExecutedToolIds((prev) => {
+                setExecutedToolIds((prev: Set<string>) => {
                   const newSet = new Set(prev)
                   toolCalls.forEach((tc) => newSet.add(tc.id))
                   return newSet
@@ -628,7 +699,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     const toolNames = toolCalls.map((tc) => tc.name).join(", ")
                     const successCount = results.filter((r) => {
@@ -641,7 +712,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                     }).length
                     updated[index] = {
                       ...updated[index],
-                      content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
+                      content: updated[index].content + `\n✅ Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
                     }
                   }
                   return updated
@@ -653,7 +724,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               onMessage: (message: string) => {
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     updated[index] = {
                       ...updated[index],
@@ -670,7 +741,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     // If the message is empty, replace it with error. Otherwise append.
                     if (!updated[index].content || updated[index].content.trim() === "") {
@@ -703,7 +774,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           if (result.success) {
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
@@ -717,7 +788,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             const errorMessage = result.message || "The agent encountered an error. Please try again."
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "error",
@@ -739,7 +810,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     const toolNames = toolCalls.map((tc) => tc.name).join(", ")
                     const successCount = results.filter((r) => {
@@ -761,7 +832,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               onMessage: (message: string) => {
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     updated[index] = {
                       ...updated[index],
@@ -778,7 +849,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     // If the message is empty, replace it with error. Otherwise append.
                     if (!updated[index].content || updated[index].content.trim() === "") {
@@ -806,7 +877,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           if (result.success) {
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
@@ -820,7 +891,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             const errorMessage = result.message || "The agent encountered an error. Please try again."
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "error",
@@ -838,7 +909,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         const friendlyMessage = errorMessage || "An unexpected error occurred. Please try again."
         setMessages((prev) => {
           const updated = [...prev]
-          const index = streamingMessageRef.current
+          const index = streamingMessageIndex
           if (index >= 0 && index < updated.length) {
             // If the message is empty, replace it with error. Otherwise append.
             if (!updated[index].content || updated[index].content.trim() === "") {
@@ -859,7 +930,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           return updated
         })
       } finally {
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
         setIsLoading(false)
         abortControllerRef.current = null
         setStreamingThinking("")
@@ -878,7 +949,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             // Update the streaming message
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   ...updated[index],
@@ -895,7 +966,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             // Update the final message
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
@@ -906,7 +977,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               }
               return updated
             })
-            streamingMessageRef.current = -1
+            setStreamingMessageIndex(-1)
             setIsLoading(false)
             abortControllerRef.current = null
           },
@@ -917,7 +988,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               // Replace the streaming message with error
               if (index >= 0 && index < updated.length) {
                 // If the message is empty, replace it with error. Otherwise append.
@@ -938,7 +1009,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               }
               return updated
             })
-            streamingMessageRef.current = -1
+            setStreamingMessageIndex(-1)
             setIsLoading(false)
             abortControllerRef.current = null
           },
@@ -951,7 +1022,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
         setMessages((prev) => {
           const updated = [...prev]
-          const index = streamingMessageRef.current
+          const index = streamingMessageIndex
           if (index >= 0 && index < updated.length) {
             // If the message is empty, replace it with error. Otherwise append.
             if (!updated[index].content || updated[index].content.trim() === "") {
@@ -971,7 +1042,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           }
           return updated
         })
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
         setIsLoading(false)
         abortControllerRef.current = null
       }
@@ -1032,7 +1103,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         setIsLoading(false)
         setGenerationStage(null)
         setGenerationProgress("")
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
       }
     }
   }, [input, isLoading, loadAISong, agentType, songStore.song, messages])
@@ -1052,7 +1123,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       // Update the streaming message to indicate interruption
       setMessages((prev) => {
         const updated = [...prev]
-        const index = streamingMessageRef.current
+        const index = streamingMessageIndex
         if (index >= 0 && index < updated.length) {
           updated[index] = {
             role: "error",
@@ -1061,7 +1132,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         }
         return updated
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
       setIsLoading(false)
@@ -1077,7 +1148,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           },
         ]
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     }
   }, [agentType, isLoading])
 
@@ -1183,46 +1254,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             </ProgressBar>
           </ProgressContainer>
         )}
-        {/* Show streaming progress UI for hybrid agent */}
-        {isLoading && agentType === "hybrid" && useStreaming && (streamingThinking || streamingToolCalls.length > 0) && (
-          <StreamingContainer>
-            <StreamingHeader
-              expanded={thinkingExpanded}
-              onClick={() => setThinkingExpanded(!thinkingExpanded)}
-            >
-              <StreamingIcon isAnimated={streamingToolCalls.length === 0}>
-                {streamingToolCalls.length > 0 ? "🔧" : "💭"}
-              </StreamingIcon>
-              <StreamingTitle>
-                {streamingToolCalls.length > 0
-                  ? `Executing ${streamingToolCalls.length} tool${streamingToolCalls.length > 1 ? "s" : ""}...`
-                  : "Thinking..."}
-              </StreamingTitle>
-              <ExpandIcon expanded={thinkingExpanded}>▼</ExpandIcon>
-            </StreamingHeader>
-            <StreamingContent expanded={thinkingExpanded}>
-              {streamingThinking && (
-                <ThinkingText>{streamingThinking}</ThinkingText>
-              )}
-              {streamingToolCalls.length > 0 && (
-                <ToolCallsList>
-                  {streamingToolCalls.map((tc) => (
-                    <ToolCallItem
-                      key={tc.id}
-                      status={executedToolIds.has(tc.id) ? "done" : "executing"}
-                    >
-                      <ToolCallName>{tc.name}</ToolCallName>
-                      <ToolCallArgs>
-                        {JSON.stringify(tc.args).slice(0, 50)}
-                        {JSON.stringify(tc.args).length > 50 ? "..." : ""}
-                      </ToolCallArgs>
-                    </ToolCallItem>
-                  ))}
-                </ToolCallsList>
-              )}
-            </StreamingContent>
-          </StreamingContainer>
-        )}
+        {/* Streaming content is now shown in message bubbles, no separate container needed */}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
