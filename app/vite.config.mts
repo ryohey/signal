@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         input: {
-          main: path.resolve(__dirname, "edit.html"),
+          main: path.resolve(__dirname, "index.html"),
           auth: path.resolve(__dirname, "auth.html"),
           community: path.resolve(__dirname, "community.html"),
         },
@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
     publicDir: "public",
     server: {
       port: 3000,
-      open: "/edit",
+      open: "/",
     },
     resolve: {
       alias: {

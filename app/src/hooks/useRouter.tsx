@@ -12,4 +12,4 @@ export function useRouter() {
 }
 
 // atoms
-const pathAtom = atom<RoutePath>("/track")
+const pathAtom = atom<RoutePath>("/arrange")

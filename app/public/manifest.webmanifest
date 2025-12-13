@@ -2,8 +2,8 @@
   "theme_color": "#4c41cc",
   "background_color": "#272a36",
   "display": "standalone",
-  "scope": "/edit",
-  "start_url": "/edit",
+  "scope": "/",
+  "start_url": "/",
   "name": "PipeDream 2.0",
   "short_name": "PipeDream 2.0",
   "icons": [

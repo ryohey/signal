@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         input: {
-          main: path.resolve(__dirname, "edit.html"),
+          main: path.resolve(__dirname, "index.html"),
         },
       },
     },

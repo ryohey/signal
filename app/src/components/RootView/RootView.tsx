@@ -1,10 +1,12 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
 import { useDisableBrowserContextMenu } from "../../hooks/useDisableBrowserContextMenu"
 import { useDisableZoom } from "../../hooks/useDisableZoom"
 import { useGlobalKeyboardShortcut } from "../../hooks/useGlobalKeyboardShortcut"
 import { useRouter } from "../../hooks/useRouter"
+import { useSong } from "../../hooks/useSong"
+import { useStores } from "../../hooks/useStores"
 import { ArrangeEditor } from "../ArrangeView/ArrangeEditor"
 import { BuildInfo } from "../BuildInfo"
 import { CloudFileDialog } from "../CloudFileDialog/CloudFileDialog"
@@ -12,6 +14,7 @@ import { ControlSettingDialog } from "../ControlSettingDialog/ControlSettingDial
 import { ExportProgressDialog } from "../ExportDialog/ExportProgressDialog"
 import { Head } from "../Head/Head"
 import { HelpDialog } from "../Help/HelpDialog"
+import { InitialView } from "../InitialView/InitialView"
 import { Navigation } from "../Navigation/Navigation"
 import { OnBeforeUnload } from "../OnBeforeUnload/OnBeforeUnload"
 import { OnInit } from "../OnInit/OnInit"
@@ -55,6 +58,38 @@ export const RootView: FC = () => {
   useDisableZoom()
   useDisableBounceScroll()
   useDisableBrowserContextMenu()
+  const { songStore } = useStores()
+  const { tracks } = useSong()
+
+  // Check if song has any non-conductor tracks with note events (i.e., has musical content)
+  const hasSongContent = useMemo(() => {
+    return tracks.some(
+      (track) =>
+        !track.isConductorTrack &&
+        track.events.some((e) => "subtype" in e && e.subtype === "note"),
+    )
+  }, [tracks])
+
+  // Show initial AI-only view if no song content exists
+  if (!hasSongContent) {
+    return (
+      <>
+        <InitialView />
+        <HelpDialog />
+        <ExportProgressDialog />
+        <Head />
+        <SignInDialog />
+        <CloudFileDialog />
+        <SettingDialog />
+        <ControlSettingDialog />
+        <OnInit />
+        <OnBeforeUnload />
+        <PublishDialog />
+        <UserSettingsDialog />
+        <DeleteAccountDialog />
+      </>
+    )
+  }
 
   return (
     <>

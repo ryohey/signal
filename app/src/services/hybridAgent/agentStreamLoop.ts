@@ -6,8 +6,8 @@
  */
 
 import type { Song } from "@signal-app/core"
+import { formatSongStateForPrompt, serializeSongState } from "./songStateSerializer"
 import { executeToolCalls, type ToolCall, type ToolResult } from "./toolExecutor"
-import { serializeSongState, formatSongStateForPrompt } from "./songStateSerializer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 

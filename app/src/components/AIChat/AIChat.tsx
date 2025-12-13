@@ -1,6 +1,8 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
+import { useRouter } from "../../hooks/useRouter"
+import { useAIChat } from "../../hooks/useAIChat"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
@@ -8,12 +10,13 @@ import { runAgentLoop, runAgentStreamLoop, type ToolCall } from "../../services/
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
-const Container = styled.div`
+const Container = styled.div<{ standalone?: boolean }>`
   display: flex;
   flex-direction: column;
   height: 100%;
   background: ${({ theme }) => theme.backgroundColor};
-  border-left: 1px solid ${({ theme }) => theme.dividerColor};
+  border-left: ${({ standalone, theme }) =>
+    standalone ? "none" : `1px solid ${theme.dividerColor}`};
   min-width: 300px;
 `
 
@@ -489,7 +492,11 @@ const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
 type AgentType = "llm" | "composition_agent" | "hybrid"
 
-export const AIChat: FC = () => {
+export interface AIChatProps {
+  standalone?: boolean
+}
+
+export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -516,6 +523,8 @@ export const AIChat: FC = () => {
   const [useStreaming, setUseStreaming] = useState(true) // Toggle for streaming vs non-streaming
 
   const loadAISong = useLoadAISong()
+  const { setPath } = useRouter()
+  const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const streamingMessageRef = useRef<number>(-1)
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -580,6 +589,10 @@ export const AIChat: FC = () => {
     })
     
     setIsLoading(true)
+    
+    // Navigate to arrange view and ensure AI chat is open when generation starts
+    setPath("/arrange")
+    setAIChatOpen(true)
 
     // Branch based on agent type
     if (agentType === "hybrid") {
@@ -1032,7 +1045,7 @@ export const AIChat: FC = () => {
   )
 
   return (
-    <Container>
+    <Container standalone={standalone}>
       <Header>
         <HeaderLeft>
           <span>AI Composer</span>
