@@ -137,7 +137,9 @@ export interface ToolDefinition<T> {
  * These can be converted to LangChain tools using DynamicStructuredTool.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createToolDefinitions(context: ToolContext): ToolDefinition<any>[] {
+export function createToolDefinitions(
+  context: ToolContext,
+): ToolDefinition<any>[] {
   const { song } = context
 
   const createTrack: ToolDefinition<CreateTrackInput> = {

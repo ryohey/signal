@@ -11,10 +11,10 @@ export function useMobxSelector<T>(
 ): T {
   // Cache the selector function reference to ensure getSnapshot is stable
   const stableSelector = useMemo(() => selector, deps)
-  
+
   // Cache getSnapshot to avoid React 19 warning about infinite loops
   const getSnapshot = useCallback(() => stableSelector(), [stableSelector])
-  
+
   return useSyncExternalStoreWithSelector(
     useCallback(
       (onStoreChange) =>

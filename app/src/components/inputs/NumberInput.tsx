@@ -26,7 +26,9 @@ export const NumberInput: FC<NumberInputProps> = ({
   style,
   className,
 }) => {
-  const handleValueChange: NumericFormatProps["onValueChange"] = ({ floatValue }) => {
+  const handleValueChange: NumericFormatProps["onValueChange"] = ({
+    floatValue,
+  }) => {
     if (floatValue !== undefined && floatValue !== null) {
       onChange(floatValue)
     }

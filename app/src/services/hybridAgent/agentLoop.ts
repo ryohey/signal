@@ -3,8 +3,15 @@
  */
 
 import type { Song } from "@signal-app/core"
-import { executeToolCalls, type ToolCall, type ToolResult } from "./toolExecutor"
-import { serializeSongState, formatSongStateForPrompt } from "./songStateSerializer"
+import {
+  executeToolCalls,
+  type ToolCall,
+  type ToolResult,
+} from "./toolExecutor"
+import {
+  serializeSongState,
+  formatSongStateForPrompt,
+} from "./songStateSerializer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 
@@ -31,7 +38,7 @@ export async function runAgentLoop(
   prompt: string,
   song: Song,
   callbacks?: AgentLoopCallbacks,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): Promise<{ success: boolean; message?: string }> {
   let threadId: string | null = null
 
@@ -69,7 +76,9 @@ export async function runAgentLoop(
         break
       }
 
-      console.log(`[HybridAgent] Executing ${result.tool_calls.length} tool calls`)
+      console.log(
+        `[HybridAgent] Executing ${result.tool_calls.length} tool calls`,
+      )
       // Execute tools on the frontend
       const toolResults = executeToolCalls(song, result.tool_calls)
       console.log(`[HybridAgent] Tool results:`, toolResults)

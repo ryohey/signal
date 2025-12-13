@@ -58,9 +58,8 @@ export function serializeSongState(song: Song): SongState {
   const tracks: TrackSummary[] = song.tracks.map((track, index) => {
     const noteCount = track.events.filter(isNoteEvent).length
     const programNumber = track.programNumber
-    const instrumentName = programNumber !== undefined
-      ? getInstrumentName(programNumber)
-      : undefined
+    const instrumentName =
+      programNumber !== undefined ? getInstrumentName(programNumber) : undefined
 
     return {
       id: index,
@@ -91,7 +90,9 @@ export function formatSongStateForPrompt(state: SongState): string {
 
   lines.push(`Current song state:`)
   lines.push(`- Tempo: ${state.tempo} BPM`)
-  lines.push(`- Time signature: ${state.timeSignature.numerator}/${state.timeSignature.denominator}`)
+  lines.push(
+    `- Time signature: ${state.timeSignature.numerator}/${state.timeSignature.denominator}`,
+  )
   lines.push(`- Timebase: ${state.timebase} ticks per quarter note`)
   lines.push(`- Tracks: ${state.trackCount}`)
 
@@ -104,7 +105,9 @@ export function formatSongStateForPrompt(state: SongState): string {
       } else {
         const instrument = track.instrumentName ?? track.name ?? "Unknown"
         const drums = track.isDrums ? " (drums)" : ""
-        lines.push(`  [${track.id}] ${instrument}${drums} - channel ${track.channel}, ${track.noteCount} notes`)
+        lines.push(
+          `  [${track.id}] ${instrument}${drums} - channel ${track.channel}, ${track.noteCount} notes`,
+        )
       }
     }
   }

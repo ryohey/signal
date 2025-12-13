@@ -9,9 +9,7 @@ import {
   timeSignatureMidiEvent,
   toTrackEvents,
 } from "@signal-app/core"
-import {
-  getInstrumentProgramNumber,
-} from "../../agent/instrumentMapping"
+import { getInstrumentProgramNumber } from "../../agent/instrumentMapping"
 
 export interface ToolCall {
   id: string
@@ -77,10 +75,14 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
         track.setProgramNumber(instrumentInfo.programNumber)
       }
 
-      console.log(`[HybridAgent] Adding track to song. Current tracks: ${song.tracks.length}`)
+      console.log(
+        `[HybridAgent] Adding track to song. Current tracks: ${song.tracks.length}`,
+      )
       song.addTrack(track)
       const trackId = song.tracks.indexOf(track)
-      console.log(`[HybridAgent] Track added. New track count: ${song.tracks.length}, trackId: ${trackId}`)
+      console.log(
+        `[HybridAgent] Track added. New track count: ${song.tracks.length}, trackId: ${trackId}`,
+      )
 
       return JSON.stringify({
         trackId,
@@ -176,7 +178,7 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
  */
 export function executeToolCalls(
   song: Song,
-  toolCalls: ToolCall[]
+  toolCalls: ToolCall[],
 ): ToolResult[] {
   return toolCalls.map((tc) => ({
     id: tc.id,

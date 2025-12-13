@@ -75,8 +75,12 @@ MIDI REFERENCE:
 
 WORKFLOW:
 1. Check the song state to see what exists
-2. For simple requests, call tools directly
-3. For complex compositions, plan first then execute step by step
+2. For simple, clear requests (e.g., "add a piano track", "write a C scale"), execute tools directly
+3. For complex or ambiguous requests, use proposePlan to discuss with the user first:
+   - Multi-instrument arrangements
+   - Style/genre decisions
+   - Open-ended creative requests ("make something cool")
+   - When you're unsure what the user wants
 4. Only set tempo/time signature if needed (check current values first)
 5. Reuse existing tracks when appropriate instead of creating new ones
 
@@ -144,8 +148,33 @@ def setTimeSignature(numerator: int, denominator: int, tick: int = 0) -> str:
     return '{"status": "pending_frontend_execution"}'
 
 
+@tool
+def proposePlan(plan: str, questions: Optional[list[str]] = None) -> str:
+    """Propose a plan to the user for discussion before executing.
+
+    Use this tool when the request is complex, ambiguous, or involves creative
+    choices where user input would be valuable. Do NOT use this for simple,
+    clear requests like "add a piano track" or "create a C major scale".
+
+    Use this when:
+    - The composition involves multiple instruments or complex arrangements
+    - There are stylistic choices (jazz vs classical, tempo decisions, etc.)
+    - The request is open-ended ("create something interesting")
+    - You're unsure about the user's preferences
+    - The task would benefit from discussion before execution
+
+    Args:
+        plan: Your proposed approach, explaining what you intend to create
+        questions: Optional list of specific questions to ask the user
+
+    Returns:
+        The user's response/feedback to incorporate into your execution
+    """
+    return '{"status": "awaiting_user_response"}'
+
+
 # All available tools
-TOOLS = [createTrack, addNotes, setTempo, setTimeSignature]
+TOOLS = [createTrack, addNotes, setTempo, setTimeSignature, proposePlan]
 
 
 def create_agent():

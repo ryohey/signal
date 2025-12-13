@@ -121,7 +121,11 @@ export const RegenerateDialog: FC<RegenerateDialogProps> = ({
   )
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange} style={{ minWidth: "24rem" }}>
+    <Dialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      style={{ minWidth: "24rem" }}
+    >
       <DialogTitle>Regenerate Track with AI</DialogTitle>
       <DialogContent>
         <TrackInfo>
