@@ -31,7 +31,7 @@
     "concurrently": "^8.2.2",
     "electron": "^31.4.0",
     "nodemon": "^3.1.4",
-    "rollup": "^4.20.0",
+    "rollup": "^4.40.0",
     "typescript": "5.5.4"
   },
   "dependencies": {
