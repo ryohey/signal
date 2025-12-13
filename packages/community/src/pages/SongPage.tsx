@@ -119,7 +119,8 @@ export const SongPage: FC<SongPageProps> = observer(({ songId }) => {
       return
     }
     const songData = await cloudSongDataRepository.get(song.songDataId)
-    const blob = new Blob([songData], { type: "application/octet-stream" })
+    const uint8Array = new Uint8Array(songData)
+    const blob = new Blob([uint8Array], { type: "application/octet-stream" })
     const sanitizedFileName = song.name.replace(/[\\/:"*?<>|]/g, "_")
     const filename = `${sanitizedFileName}.mid`
     downloadBlob(blob, filename)
