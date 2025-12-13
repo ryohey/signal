@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
+import { useAIChat } from "../../hooks/useAIChat"
 import { ArrangeViewScope } from "../../hooks/useArrangeView"
 import { useArrangeViewKeyboardShortcut } from "../../hooks/useArrangeViewKeyboardShortcut"
 import { useAutoFocus } from "../../hooks/useAutoFocus"
-import { useAIChat } from "../../hooks/useAIChat"
+import { AIChat } from "../AIChat/AIChat"
 import { ArrangeToolbar } from "../ArrangeToolbar/ArrangeToolbar"
+import { StyledSplitPane } from "../PianoRoll/StyledSplitPane"
 import { ArrangeTransposeDialog } from "../TransposeDialog/ArrangeTransposeDialog"
 import { ArrangeVelocityDialog } from "../VelocityDialog/ArrangeVelocityDialog"
-import { AIChat } from "../AIChat/AIChat"
 import { ArrangeView } from "./ArrangeView"
-import { StyledSplitPane } from "../PianoRoll/StyledSplitPane"
 
 const Container = styled.div`
   overflow: hidden;
@@ -18,12 +18,17 @@ const Container = styled.div`
   flex-grow: 1;
   position: relative;
   outline: none;
+  height: 100%;
+  min-height: 0;
 `
 
 const MainContainer = styled.div`
   display: flex;
   flex-grow: 1;
   position: relative;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 `
 
 const Content: FC = () => {

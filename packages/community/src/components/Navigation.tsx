@@ -58,7 +58,7 @@ const CreateButton = styled.a`
   }
   &:active {
     background: ${({ theme }) =>
-      Color(theme.secondaryBackgroundColor).lighten(0.1).hex()};
+    Color(theme.secondaryBackgroundColor).lighten(0.1).hex()};
   }
 `
 
@@ -72,7 +72,7 @@ export const Navigation: FC = observer(() => {
           </Link>
         </LogoWrapper>
         <Right>
-          <CreateButton href="/edit" target="_blank">
+          <CreateButton href="/" target="_blank">
             <PlusIcon size="1rem" style={{ marginRight: "0.5rem" }} />
             <Localized name="create-new" />
           </CreateButton>

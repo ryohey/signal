@@ -4,7 +4,7 @@ import { writeFile } from "../services/fs-helper"
 import { useSetSong } from "./song"
 
 // URL parameter for automation purposes used in scripts/perf/index.js
-// /edit?disableFileSystem=true
+// /?disableFileSystem=true
 export const disableFileSystem =
   new URL(window.location.href).searchParams.get("disableFileSystem") === "true"
 

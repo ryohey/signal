@@ -1,6 +1,8 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
+import { useAIChat } from "../../hooks/useAIChat"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
@@ -8,13 +10,18 @@ import { runAgentLoop, runAgentStreamLoop, type ToolCall } from "../../services/
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
-const Container = styled.div`
+const Container = styled.div<{ standalone?: boolean }>`
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: ${({ theme }) => theme.backgroundColor};
-  border-left: 1px solid ${({ theme }) => theme.dividerColor};
-  min-width: 300px;
+  border-left: ${({ standalone, theme }) =>
+    standalone ? "none" : `1px solid ${theme.dividerColor}`};
+  overflow: hidden;
 `
 
 const Header = styled.div`
@@ -26,6 +33,10 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
 `
 
 const HeaderLeft = styled.div`
@@ -71,17 +82,23 @@ const StatusDot = styled.span<{ status: "connected" | "disconnected" | "checking
 const MessageList = styled.div`
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   user-select: text;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   max-width: 85%;
+  width: 85%;
+  min-width: 0;
   align-self: ${({ role }) => (role === "user" ? "flex-end" : "flex-start")};
   background: ${({ role, theme }) =>
     role === "user"
@@ -99,7 +116,10 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   -ms-user-select: text;
   white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   cursor: text;
+  box-sizing: border-box;
 `
 
 const InputContainer = styled.div`
@@ -108,12 +128,18 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const InputRow = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Input = styled.textarea`
@@ -196,6 +222,13 @@ const ProgressContainer = styled.div`
   background: ${({ theme }) => theme.secondaryBackgroundColor};
   border-radius: 0.5rem;
   margin: 0.5rem 0;
+  max-width: 85%;
+  min-width: 0;
+  width: fit-content;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `
 
 const ProgressStage = styled.div`
@@ -252,6 +285,12 @@ const StreamingContainer = styled.div`
   border-radius: 0.5rem;
   margin: 0.5rem 0;
   max-width: 85%;
+  min-width: 0;
+  width: fit-content;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `
 
 const StreamingHeader = styled.div<{ expanded: boolean }>`
@@ -296,6 +335,9 @@ const StreamingContent = styled.div<{ expanded: boolean }>`
   max-height: ${({ expanded }) => expanded ? '200px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s ease, margin-top 0.3s ease;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const ThinkingText = styled.div`
@@ -304,12 +346,17 @@ const ThinkingText = styled.div`
   line-height: 1.4;
   white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   font-family: monospace;
   background: ${({ theme }) => theme.backgroundColor};
   padding: 0.5rem;
   border-radius: 0.25rem;
   max-height: 150px;
   overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const ToolCallsList = styled.div`
@@ -329,8 +376,8 @@ const ToolCallItem = styled.div<{ status: 'pending' | 'executing' | 'done' }>`
   font-size: 0.8rem;
   color: ${({ theme, status }) =>
     status === 'done' ? theme.themeColor :
-    status === 'executing' ? theme.yellowColor || '#ffc107' :
-    theme.secondaryTextColor};
+      status === 'executing' ? theme.yellowColor || '#ffc107' :
+        theme.secondaryTextColor};
 `
 
 const ToolCallName = styled.span`
@@ -479,20 +526,38 @@ function getStageProgress(stage: GenerationStage): number {
   }
 }
 
-interface ChatMessage {
-  role: "user" | "assistant" | "error"
-  content: string
-  notes?: DetectedNote[] // Optional notes data for voice recordings
-}
+// ChatMessage is now imported from useAIChat hook
 
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
 type AgentType = "llm" | "composition_agent" | "hybrid"
 
-export const AIChat: FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+export interface AIChatProps {
+  standalone?: boolean
+}
+
+export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
+  const {
+    messages,
+    setMessages,
+    isLoading,
+    setIsLoading,
+    streamingThinking,
+    setStreamingThinking,
+    streamingToolCalls,
+    setStreamingToolCalls,
+    executedToolIds,
+    setExecutedToolIds,
+    generationStage,
+    setGenerationStage,
+    generationProgress,
+    setGenerationProgress,
+    currentAttempt,
+    setCurrentAttempt,
+    streamingMessageIndex,
+    setStreamingMessageIndex,
+  } = useAIChat()
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
@@ -504,20 +569,13 @@ export const AIChat: FC = () => {
       : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
-  // Deep agent progress state
-  const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
-  const [generationProgress, setGenerationProgress] = useState<string>("")
-  const [currentAttempt, setCurrentAttempt] = useState<number>(0)
-  // Streaming agent state (for hybrid agent)
-  const [streamingThinking, setStreamingThinking] = useState<string>("")
-  const [streamingToolCalls, setStreamingToolCalls] = useState<ToolCall[]>([])
-  const [executedToolIds, setExecutedToolIds] = useState<Set<string>>(new Set())
   const [thinkingExpanded, setThinkingExpanded] = useState(false)
   const [useStreaming, setUseStreaming] = useState(true) // Toggle for streaming vs non-streaming
 
   const loadAISong = useLoadAISong()
+  const { setPath } = useRouter()
+  const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const streamingMessageRef = useRef<number>(-1)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = useCallback(() => {
@@ -551,7 +609,7 @@ export const AIChat: FC = () => {
       .find((msg) => msg.role === "user" && msg.notes && msg.notes.length > 0)
 
     let userMessage = messageToSubmit
-    
+
     // If there are notes in a recent message, include them in the exact addNotes tool format
     if (recentMessageWithNotes?.notes) {
       const notesData = {
@@ -570,15 +628,20 @@ export const AIChat: FC = () => {
     if (!overrideInput) {
       setInput("")
     }
-    
+
     // Add user message and create placeholder for assistant response
     setMessages((prev) => {
       const newMessages = [...prev, { role: "user" as const, content: messageToSubmit }]
       const assistantIndex = newMessages.length
-      streamingMessageRef.current = assistantIndex
+      setStreamingMessageIndex(assistantIndex)
       return [...newMessages, { role: "assistant" as const, content: "" }]
     })
-    
+
+    // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
+    // This ensures the route is set before any async operations
+    setPath("/arrange")
+    setAIChatOpen(true)
+
     setIsLoading(true)
 
     // Branch based on agent type
@@ -601,13 +664,34 @@ export const AIChat: FC = () => {
             {
               onThinking: (content: string) => {
                 setStreamingThinking((prev) => prev + content)
+                // Accumulate thinking content in message bubble
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageIndex
+                  if (index >= 0 && index < updated.length) {
+                    // Append thinking content to the message
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + content,
+                    }
+                  }
+                  return updated
+                })
               },
               onToolCalls: (toolCalls: ToolCall[]) => {
                 setStreamingToolCalls(toolCalls)
+                // Create separate message bubbles for tool calls
+                setMessages((prev) => {
+                  const toolCallMessages = toolCalls.map((tc) => ({
+                    role: "assistant" as const,
+                    content: `🔧 ${tc.name}(${JSON.stringify(tc.args).slice(0, 200)}${JSON.stringify(tc.args).length > 200 ? "..." : ""})`,
+                  }))
+                  return [...prev, ...toolCallMessages]
+                })
               },
               onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
                 // Mark tools as executed
-                setExecutedToolIds((prev) => {
+                setExecutedToolIds((prev: Set<string>) => {
                   const newSet = new Set(prev)
                   toolCalls.forEach((tc) => newSet.add(tc.id))
                   return newSet
@@ -615,7 +699,7 @@ export const AIChat: FC = () => {
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     const toolNames = toolCalls.map((tc) => tc.name).join(", ")
                     const successCount = results.filter((r) => {
@@ -628,7 +712,7 @@ export const AIChat: FC = () => {
                     }).length
                     updated[index] = {
                       ...updated[index],
-                      content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
+                      content: updated[index].content + `\n✅ Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
                     }
                   }
                   return updated
@@ -640,7 +724,7 @@ export const AIChat: FC = () => {
               onMessage: (message: string) => {
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     updated[index] = {
                       ...updated[index],
@@ -651,14 +735,29 @@ export const AIChat: FC = () => {
                 })
               },
               onError: (error: Error) => {
+                // Log full error details to console for debugging
+                console.error("[AIChat] Streaming agent error:", error)
+
+                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      role: "error",
-                      content: error.message,
+                    // If the message is empty, replace it with error. Otherwise append.
+                    if (!updated[index].content || updated[index].content.trim() === "") {
+                      updated[index] = {
+                        role: "error",
+                        content: `❌ ${friendlyMessage}`,
+                      }
+                    } else {
+                      updated[index] = {
+                        role: "error",
+                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                      }
                     }
+                  } else {
+                    // If index is invalid, add error as new message
+                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
                   }
                   return updated
                 })
@@ -675,11 +774,27 @@ export const AIChat: FC = () => {
           if (result.success) {
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
                   content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+                }
+              }
+              return updated
+            })
+          } else {
+            // Handle failure case for non-streaming agent
+            const errorMessage = result.message || "The agent encountered an error. Please try again."
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageIndex
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "error",
+                  content: updated[index].content
+                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
+                    : `❌ Error: ${errorMessage}`,
                 }
               }
               return updated
@@ -695,7 +810,7 @@ export const AIChat: FC = () => {
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     const toolNames = toolCalls.map((tc) => tc.name).join(", ")
                     const successCount = results.filter((r) => {
@@ -717,7 +832,7 @@ export const AIChat: FC = () => {
               onMessage: (message: string) => {
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
                     updated[index] = {
                       ...updated[index],
@@ -728,14 +843,29 @@ export const AIChat: FC = () => {
                 })
               },
               onError: (error: Error) => {
+                // Log full error details to console for debugging
+                console.error("[AIChat] Non-streaming agent error:", error)
+
+                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
                 setMessages((prev) => {
                   const updated = [...prev]
-                  const index = streamingMessageRef.current
+                  const index = streamingMessageIndex
                   if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      role: "error",
-                      content: error.message,
+                    // If the message is empty, replace it with error. Otherwise append.
+                    if (!updated[index].content || updated[index].content.trim() === "") {
+                      updated[index] = {
+                        role: "error",
+                        content: `❌ ${friendlyMessage}`,
+                      }
+                    } else {
+                      updated[index] = {
+                        role: "error",
+                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                      }
                     }
+                  } else {
+                    // If index is invalid, add error as new message
+                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
                   }
                   return updated
                 })
@@ -747,7 +877,7 @@ export const AIChat: FC = () => {
           if (result.success) {
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
@@ -756,20 +886,51 @@ export const AIChat: FC = () => {
               }
               return updated
             })
+          } else {
+            // Handle failure case
+            const errorMessage = result.message || "The agent encountered an error. Please try again."
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageIndex
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "error",
+                  content: updated[index].content
+                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
+                    : `❌ Error: ${errorMessage}`,
+                }
+              }
+              return updated
+            })
           }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Generation failed"
+        const friendlyMessage = errorMessage || "An unexpected error occurred. Please try again."
         setMessages((prev) => {
           const updated = [...prev]
-          const index = streamingMessageRef.current
+          const index = streamingMessageIndex
           if (index >= 0 && index < updated.length) {
-            updated[index] = { role: "error", content: errorMessage }
+            // If the message is empty, replace it with error. Otherwise append.
+            if (!updated[index].content || updated[index].content.trim() === "") {
+              updated[index] = {
+                role: "error",
+                content: `❌ ${friendlyMessage}`
+              }
+            } else {
+              updated[index] = {
+                role: "error",
+                content: updated[index].content + `\n\n❌ ${friendlyMessage}`
+              }
+            }
+          } else {
+            // If index is invalid, add error as new message
+            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
           }
           return updated
         })
       } finally {
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
         setIsLoading(false)
         abortControllerRef.current = null
         setStreamingThinking("")
@@ -788,7 +949,7 @@ export const AIChat: FC = () => {
             // Update the streaming message
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   ...updated[index],
@@ -805,7 +966,7 @@ export const AIChat: FC = () => {
             // Update the final message
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
                   role: "assistant",
@@ -816,61 +977,72 @@ export const AIChat: FC = () => {
               }
               return updated
             })
-            streamingMessageRef.current = -1
+            setStreamingMessageIndex(-1)
             setIsLoading(false)
             abortControllerRef.current = null
           },
           (error) => {
-            const errorMessage =
-              error instanceof Error ? error.message : "Generation failed"
+            // Log full error details to console for debugging
+            console.error("[AIChat] LLM generation error:", error)
 
-            // Provide user-friendly error messages
-            let friendlyMessage = errorMessage
-            if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-              friendlyMessage =
-                "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-            } else if (errorMessage.includes("timeout")) {
-              friendlyMessage =
-                "Generation took too long. Try a simpler prompt or try again."
-            } else if (errorMessage.includes("syntax error")) {
-              friendlyMessage =
-                "The AI generated invalid code. Please try again with a different prompt."
-            }
-
+            const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageRef.current
+              const index = streamingMessageIndex
               // Replace the streaming message with error
               if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "error",
-                  content: friendlyMessage,
+                // If the message is empty, replace it with error. Otherwise append.
+                if (!updated[index].content || updated[index].content.trim() === "") {
+                  updated[index] = {
+                    role: "error",
+                    content: `❌ ${friendlyMessage}`,
+                  }
+                } else {
+                  updated[index] = {
+                    role: "error",
+                    content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+                  }
                 }
+              } else {
+                // If index is invalid, add error as new message
+                return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
               }
               return updated
             })
-            streamingMessageRef.current = -1
+            setStreamingMessageIndex(-1)
             setIsLoading(false)
             abortControllerRef.current = null
           },
           abortController.signal,
         )
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Generation failed"
+        // Log full error details to console for debugging
+        console.error("[AIChat] LLM catch error:", err)
 
+        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
         setMessages((prev) => {
           const updated = [...prev]
-          const index = streamingMessageRef.current
+          const index = streamingMessageIndex
           if (index >= 0 && index < updated.length) {
-            updated[index] = {
-              role: "error",
-              content: errorMessage,
+            // If the message is empty, replace it with error. Otherwise append.
+            if (!updated[index].content || updated[index].content.trim() === "") {
+              updated[index] = {
+                role: "error",
+                content: `❌ ${friendlyMessage}`,
+              }
+            } else {
+              updated[index] = {
+                role: "error",
+                content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
+              }
             }
+          } else {
+            // If index is invalid, add error as new message
+            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
           }
           return updated
         })
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
         setIsLoading(false)
         abortControllerRef.current = null
       }
@@ -912,33 +1084,18 @@ export const AIChat: FC = () => {
           ]
         })
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Generation failed"
-
-        // Provide user-friendly error messages
-        let friendlyMessage = errorMessage
-        if (errorMessage.includes("fetch") || errorMessage.includes("network")) {
-          friendlyMessage =
-            "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
-        } else if (errorMessage.includes("timeout")) {
-          friendlyMessage =
-            "Generation took too long. Try a simpler prompt or try again."
-        } else if (errorMessage.includes("syntax error")) {
-          friendlyMessage =
-            "The AI generated invalid code. Please try again with a different prompt."
-        } else if (errorMessage.includes("5 attempts")) {
-          friendlyMessage =
-            "Generation failed after multiple attempts. Try a different prompt or simpler request."
-        }
+        // Log full error details to console for debugging
+        console.error("[AIChat] Composition agent error:", err)
 
         // Remove placeholder and add error message
+        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
         setMessages((prev) => {
           const updated = prev.slice(0, -1) // Remove placeholder
           return [
             ...updated,
             {
               role: "error",
-              content: friendlyMessage,
+              content: `❌ ${friendlyMessage}`,
             },
           ]
         })
@@ -946,7 +1103,7 @@ export const AIChat: FC = () => {
         setIsLoading(false)
         setGenerationStage(null)
         setGenerationProgress("")
-        streamingMessageRef.current = -1
+        setStreamingMessageIndex(-1)
       }
     }
   }, [input, isLoading, loadAISong, agentType, songStore.song, messages])
@@ -966,7 +1123,7 @@ export const AIChat: FC = () => {
       // Update the streaming message to indicate interruption
       setMessages((prev) => {
         const updated = [...prev]
-        const index = streamingMessageRef.current
+        const index = streamingMessageIndex
         if (index >= 0 && index < updated.length) {
           updated[index] = {
             role: "error",
@@ -975,7 +1132,7 @@ export const AIChat: FC = () => {
         }
         return updated
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
       setIsLoading(false)
@@ -991,7 +1148,7 @@ export const AIChat: FC = () => {
           },
         ]
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     }
   }, [agentType, isLoading])
 
@@ -1018,7 +1175,7 @@ export const AIChat: FC = () => {
 
       // Add a message to the chat with the notes displayed
       const messageContent = `🎤 Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
-      
+
       setMessages((prev) => [
         ...prev,
         {
@@ -1032,7 +1189,7 @@ export const AIChat: FC = () => {
   )
 
   return (
-    <Container>
+    <Container standalone={standalone}>
       <Header>
         <HeaderLeft>
           <span>AI Composer</span>
@@ -1097,46 +1254,7 @@ export const AIChat: FC = () => {
             </ProgressBar>
           </ProgressContainer>
         )}
-        {/* Show streaming progress UI for hybrid agent */}
-        {isLoading && agentType === "hybrid" && useStreaming && (streamingThinking || streamingToolCalls.length > 0) && (
-          <StreamingContainer>
-            <StreamingHeader
-              expanded={thinkingExpanded}
-              onClick={() => setThinkingExpanded(!thinkingExpanded)}
-            >
-              <StreamingIcon isAnimated={streamingToolCalls.length === 0}>
-                {streamingToolCalls.length > 0 ? "🔧" : "💭"}
-              </StreamingIcon>
-              <StreamingTitle>
-                {streamingToolCalls.length > 0
-                  ? `Executing ${streamingToolCalls.length} tool${streamingToolCalls.length > 1 ? "s" : ""}...`
-                  : "Thinking..."}
-              </StreamingTitle>
-              <ExpandIcon expanded={thinkingExpanded}>▼</ExpandIcon>
-            </StreamingHeader>
-            <StreamingContent expanded={thinkingExpanded}>
-              {streamingThinking && (
-                <ThinkingText>{streamingThinking}</ThinkingText>
-              )}
-              {streamingToolCalls.length > 0 && (
-                <ToolCallsList>
-                  {streamingToolCalls.map((tc) => (
-                    <ToolCallItem
-                      key={tc.id}
-                      status={executedToolIds.has(tc.id) ? "done" : "executing"}
-                    >
-                      <ToolCallName>{tc.name}</ToolCallName>
-                      <ToolCallArgs>
-                        {JSON.stringify(tc.args).slice(0, 50)}
-                        {JSON.stringify(tc.args).length > 50 ? "..." : ""}
-                      </ToolCallArgs>
-                    </ToolCallItem>
-                  ))}
-                </ToolCallsList>
-              )}
-            </StreamingContent>
-          </StreamingContainer>
-        )}
+        {/* Streaming content is now shown in message bubbles, no separate container needed */}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
