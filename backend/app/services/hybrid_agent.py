@@ -43,6 +43,29 @@ You have access to tools that manipulate a MIDI sequencer:
 
 IMPORTANT: When calling tools, you must use the exact parameter names and formats specified.
 
+SONG STATE CONTEXT:
+You will receive the current song state before each request. This tells you:
+- Current tempo and time signature
+- Existing tracks with their IDs, instruments, channels, and note counts
+- Track [0] is usually the conductor track (tempo/time signature only)
+
+Use this context to:
+- Reference existing tracks by their ID when adding notes
+- Avoid creating duplicate tracks (e.g., if a piano track exists, use it)
+- Understand what's already in the song before making changes
+
+Example context:
+```
+Current song state:
+- Tempo: 120 BPM
+- Time signature: 4/4
+- Tracks: 2
+
+Track details:
+  [0] Conductor track (tempo/time signature)
+  [1] Acoustic Grand Piano - channel 0, 16 notes
+```
+
 MIDI REFERENCE:
 - Note numbers: Middle C = 60, each semitone = +1 (C4=60, D4=62, E4=64, F4=65, G4=67, A4=69, B4=71)
 - Timing: 480 ticks = 1 quarter note
@@ -51,10 +74,11 @@ MIDI REFERENCE:
 - Common scales from C: Major [60,62,64,65,67,69,71,72], Minor [60,62,63,65,67,68,70,72]
 
 WORKFLOW:
-1. For simple requests, call tools directly
-2. For complex compositions, plan first then execute step by step
-3. Always set tempo and time signature before adding notes
-4. Create tracks before adding notes to them
+1. Check the song state to see what exists
+2. For simple requests, call tools directly
+3. For complex compositions, plan first then execute step by step
+4. Only set tempo/time signature if needed (check current values first)
+5. Reuse existing tracks when appropriate instead of creating new ones
 
 Be concise in your responses. Focus on executing the user's request efficiently."""
 
@@ -153,12 +177,13 @@ def generate_thread_id() -> str:
     return str(uuid.uuid4())
 
 
-async def start_agent_step(prompt: str, thread_id: Optional[str] = None) -> dict:
+async def start_agent_step(prompt: str, thread_id: Optional[str] = None, context: Optional[str] = None) -> dict:
     """Start a new agent interaction or continue an existing one.
 
     Args:
         prompt: The user's request
         thread_id: Optional existing thread ID to continue. If None, creates new session.
+        context: Optional song state context to prepend to the prompt.
 
     Returns:
         dict with:
@@ -175,9 +200,14 @@ async def start_agent_step(prompt: str, thread_id: Optional[str] = None) -> dict
 
     config = {"configurable": {"thread_id": thread_id}}
 
+    # Build the full message with context if provided
+    full_prompt = prompt
+    if context:
+        full_prompt = f"{context}\n\n---\n\nUser request: {prompt}"
+
     # Invoke the agent
     result = await agent.ainvoke(
-        {"messages": [{"role": "user", "content": prompt}]},
+        {"messages": [{"role": "user", "content": full_prompt}]},
         config=config,
     )
 
@@ -280,3 +310,203 @@ async def resume_agent_step(thread_id: str, tool_results: list[dict]) -> dict:
             "done": True,
             "message": content,
         }
+
+
+async def stream_agent_step(prompt: str, thread_id: Optional[str] = None, context: Optional[str] = None):
+    """Stream agent events as SSE.
+
+    Yields events:
+        - thinking: Agent reasoning/processing
+        - tool_calls: Tools to execute on frontend
+        - message: Final response from agent
+        - error: Any errors that occurred
+
+    Args:
+        prompt: The user's request
+        thread_id: Optional existing thread ID to continue
+        context: Optional song state context
+
+    Yields:
+        dict with 'type' and event-specific data
+    """
+    agent = get_agent()
+
+    # Create or reuse thread ID
+    if thread_id is None:
+        thread_id = generate_thread_id()
+
+    config = {"configurable": {"thread_id": thread_id}}
+
+    # Build the full message with context if provided
+    full_prompt = prompt
+    if context:
+        full_prompt = f"{context}\n\n---\n\nUser request: {prompt}"
+
+    try:
+        # Emit thinking event
+        yield {"type": "thinking", "thread_id": thread_id, "content": "Processing your request..."}
+
+        # Track which LLM run we've seen to avoid duplicate tokens
+        seen_tokens = set()
+
+        # Stream events from the agent
+        async for event in agent.astream_events(
+            {"messages": [{"role": "user", "content": full_prompt}]},
+            config=config,
+            version="v2",
+        ):
+            event_type = event.get("event")
+            run_id = event.get("run_id", "")
+
+            # Handle LLM streaming tokens - only from chat model events
+            if event_type == "on_chat_model_stream":
+                chunk = event.get("data", {}).get("chunk")
+                if chunk and hasattr(chunk, "content") and chunk.content:
+                    # Create a unique key for this token to avoid duplicates
+                    token_key = f"{run_id}:{chunk.content}"
+                    if token_key not in seen_tokens:
+                        seen_tokens.add(token_key)
+                        yield {"type": "thinking", "thread_id": thread_id, "content": chunk.content}
+
+        # After streaming completes, check state for tool calls or completion
+        state = await agent.aget_state(config)
+
+        if state.next:
+            # Agent is paused at interrupt - extract tool calls
+            messages = state.values.get("messages", [])
+            if messages:
+                last_msg = messages[-1]
+                if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+                    tool_calls = []
+                    for tc in last_msg.tool_calls:
+                        tool_calls.append({
+                            "id": tc["id"],
+                            "name": tc["name"],
+                            "args": tc["args"],
+                        })
+                    yield {
+                        "type": "tool_calls",
+                        "thread_id": thread_id,
+                        "tool_calls": tool_calls,
+                        "done": False,
+                    }
+                    return
+
+        # Agent completed - get final message
+        messages = state.values.get("messages", [])
+        if messages:
+            last_message = messages[-1]
+            content = last_message.content if hasattr(last_message, "content") else str(last_message)
+            yield {
+                "type": "message",
+                "thread_id": thread_id,
+                "content": content,
+                "done": True,
+            }
+
+    except Exception as e:
+        yield {"type": "error", "thread_id": thread_id, "error": str(e)}
+
+
+async def stream_agent_resume(thread_id: str, tool_results: list[dict]):
+    """Stream agent events after tool results are received.
+
+    Yields events:
+        - tool_results_received: Acknowledgment of tool results
+        - thinking: Agent reasoning/processing
+        - tool_calls: More tools to execute
+        - message: Final response from agent
+        - error: Any errors that occurred
+
+    Args:
+        thread_id: Session identifier from previous step
+        tool_results: List of tool results from frontend
+
+    Yields:
+        dict with 'type' and event-specific data
+    """
+    from langchain_core.messages import ToolMessage
+
+    agent = get_agent()
+    config = {"configurable": {"thread_id": thread_id}}
+
+    # Acknowledge tool results received
+    yield {
+        "type": "tool_results_received",
+        "thread_id": thread_id,
+        "count": len(tool_results),
+    }
+
+    # Build tool messages
+    tool_messages = []
+    for tr in tool_results:
+        tool_messages.append(
+            ToolMessage(
+                content=tr["result"],
+                tool_call_id=tr["id"],
+            )
+        )
+
+    try:
+        yield {"type": "thinking", "thread_id": thread_id, "content": "Processing tool results..."}
+
+        # Track which LLM run we've seen to avoid duplicate tokens
+        seen_tokens = set()
+
+        # Stream events from the agent
+        async for event in agent.astream_events(
+            Command(resume=tool_messages),
+            config=config,
+            version="v2",
+        ):
+            event_type = event.get("event")
+            run_id = event.get("run_id", "")
+
+            # Handle LLM streaming tokens - only from chat model events
+            if event_type == "on_chat_model_stream":
+                chunk = event.get("data", {}).get("chunk")
+                if chunk and hasattr(chunk, "content") and chunk.content:
+                    # Create a unique key for this token to avoid duplicates
+                    token_key = f"{run_id}:{chunk.content}"
+                    if token_key not in seen_tokens:
+                        seen_tokens.add(token_key)
+                        yield {"type": "thinking", "thread_id": thread_id, "content": chunk.content}
+
+        # After streaming completes, check state for tool calls or completion
+        state = await agent.aget_state(config)
+
+        if state.next:
+            # Agent is paused at interrupt - extract tool calls
+            messages = state.values.get("messages", [])
+            if messages:
+                last_msg = messages[-1]
+                if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+                    tool_calls = []
+                    for tc in last_msg.tool_calls:
+                        tool_calls.append({
+                            "id": tc["id"],
+                            "name": tc["name"],
+                            "args": tc["args"],
+                        })
+                    yield {
+                        "type": "tool_calls",
+                        "thread_id": thread_id,
+                        "tool_calls": tool_calls,
+                        "done": False,
+                    }
+                    return
+
+        # Agent completed - get final message
+        messages = state.values.get("messages", [])
+        if messages:
+            last_message = messages[-1]
+            content = last_message.content if hasattr(last_message, "content") else str(last_message)
+            yield {
+                "type": "message",
+                "thread_id": thread_id,
+                "content": content,
+                "done": True,
+            }
+
+    except Exception as e:
+        yield {"type": "error", "thread_id": thread_id, "error": str(e)}

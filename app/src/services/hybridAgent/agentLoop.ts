@@ -4,6 +4,7 @@
 
 import type { Song } from "@signal-app/core"
 import { executeToolCalls, type ToolCall, type ToolResult } from "./toolExecutor"
+import { serializeSongState, formatSongStateForPrompt } from "./songStateSerializer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 
@@ -35,11 +36,16 @@ export async function runAgentLoop(
   let threadId: string | null = null
 
   try {
+    // Serialize current song state for agent context
+    const songState = serializeSongState(song)
+    const context = formatSongStateForPrompt(songState)
+    console.log(`[HybridAgent] Song context:`, context)
+
     // Initial request
     let response = await fetch(`${API_BASE}/api/agent/step`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt, context }),
       signal: abortSignal,
     })
 

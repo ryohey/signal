@@ -32,7 +32,12 @@ from app.services.midi_executor import (
     MIDIExecutionError,
 )
 from app.services.generator import generate_song_deep, GenerationError
-from app.services.hybrid_agent import start_agent_step, resume_agent_step
+from app.services.hybrid_agent import (
+    start_agent_step,
+    resume_agent_step,
+    stream_agent_step,
+    stream_agent_resume,
+)
 
 router = APIRouter()
 
@@ -562,6 +567,7 @@ async def agent_step(request: AgentStepRequest):
             result = await start_agent_step(
                 prompt=request.prompt,
                 thread_id=request.thread_id,
+                context=request.context,
             )
         else:
             raise HTTPException(
@@ -578,3 +584,57 @@ async def agent_step(request: AgentStepRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent step failed: {str(e)}")
+
+
+@router.post("/agent/step/stream")
+async def agent_step_stream(request: AgentStepRequest, req: Request):
+    """
+    Execute a hybrid agent step with real-time SSE streaming.
+
+    This endpoint supports two modes:
+    1. Start new conversation: Send { prompt: "..." }
+    2. Resume after tool execution: Send { thread_id: "...", tool_results: [...] }
+
+    Returns Server-Sent Events with the following event types:
+    - thinking: Agent reasoning/processing (streamed tokens)
+    - tool_calls: Tools to execute on frontend (pauses stream, wait for resume)
+    - tool_results_received: Acknowledgment after frontend sends tool results
+    - message: Final response from agent
+    - error: Any errors that occurred
+    """
+
+    async def event_generator():
+        try:
+            if request.tool_results and request.thread_id:
+                # Resume mode: continue after frontend tool execution
+                async for event in stream_agent_resume(
+                    thread_id=request.thread_id,
+                    tool_results=[{"id": tr.id, "result": tr.result} for tr in request.tool_results],
+                ):
+                    yield f"data: {json.dumps(event)}\n\n"
+            elif request.prompt:
+                # Start mode: new conversation
+                async for event in stream_agent_step(
+                    prompt=request.prompt,
+                    thread_id=request.thread_id,
+                    context=request.context,
+                ):
+                    yield f"data: {json.dumps(event)}\n\n"
+            else:
+                yield f"data: {json.dumps({'type': 'error', 'error': 'Must provide either prompt (to start) or tool_results (to resume)'})}\n\n"
+
+        except asyncio.CancelledError:
+            # Client disconnected
+            raise
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'error': str(e)})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

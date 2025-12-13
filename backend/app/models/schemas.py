@@ -191,6 +191,7 @@ class AgentStepRequest(BaseModel):
     prompt: Optional[str] = None  # For starting a new conversation
     thread_id: Optional[str] = None  # For continuing an existing conversation
     tool_results: Optional[list[ToolResult]] = None  # For resuming after tool execution
+    context: Optional[str] = None  # Current song state for agent awareness
 
 
 class AgentStepResponse(BaseModel):

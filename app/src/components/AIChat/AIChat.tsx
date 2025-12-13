@@ -4,7 +4,7 @@ import { useLoadAISong } from "../../actions/aiGeneration"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
-import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
+import { runAgentLoop, runAgentStreamLoop, type ToolCall } from "../../services/hybridAgent"
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
@@ -245,6 +245,108 @@ const ProgressFill = styled.div<{ width: number }>`
   width: ${({ width }) => width}%;
 `
 
+// Streaming progress styled components (for hybrid agent)
+const StreamingContainer = styled.div`
+  padding: 0.75rem 1rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  max-width: 85%;
+`
+
+const StreamingHeader = styled.div<{ expanded: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`
+
+const StreamingIcon = styled.span<{ isAnimated?: boolean }>`
+  font-size: 1rem;
+  ${({ isAnimated }) => isAnimated && `
+    animation: pulse 1.5s infinite;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  `}
+`
+
+const StreamingTitle = styled.span`
+  font-weight: 500;
+  color: ${({ theme }) => theme.textColor};
+  font-size: 0.875rem;
+  flex: 1;
+`
+
+const ExpandIcon = styled.span<{ expanded: boolean }>`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  transform: ${({ expanded }) => expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+  transition: transform 0.2s ease;
+`
+
+const StreamingContent = styled.div<{ expanded: boolean }>`
+  margin-top: ${({ expanded }) => expanded ? '0.75rem' : '0'};
+  max-height: ${({ expanded }) => expanded ? '200px' : '0'};
+  overflow: hidden;
+  transition: max-height 0.3s ease, margin-top 0.3s ease;
+`
+
+const ThinkingText = styled.div`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+  background: ${({ theme }) => theme.backgroundColor};
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  max-height: 150px;
+  overflow-y: auto;
+`
+
+const ToolCallsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`
+
+const ToolCallItem = styled.div<{ status: 'pending' | 'executing' | 'done' }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  background: ${({ theme }) => theme.backgroundColor};
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  color: ${({ theme, status }) =>
+    status === 'done' ? theme.themeColor :
+    status === 'executing' ? theme.yellowColor || '#ffc107' :
+    theme.secondaryTextColor};
+`
+
+const ToolCallName = styled.span`
+  font-weight: 500;
+`
+
+const ToolCallArgs = styled.span`
+  font-family: monospace;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
 // Notes display component
 const NotesContainer = styled.div`
   margin-top: 0.75rem;
@@ -406,6 +508,12 @@ export const AIChat: FC = () => {
   const [generationStage, setGenerationStage] = useState<GenerationStage | null>(null)
   const [generationProgress, setGenerationProgress] = useState<string>("")
   const [currentAttempt, setCurrentAttempt] = useState<number>(0)
+  // Streaming agent state (for hybrid agent)
+  const [streamingThinking, setStreamingThinking] = useState<string>("")
+  const [streamingToolCalls, setStreamingToolCalls] = useState<ToolCall[]>([])
+  const [executedToolIds, setExecutedToolIds] = useState<Set<string>>(new Set())
+  const [thinkingExpanded, setThinkingExpanded] = useState(false)
+  const [useStreaming, setUseStreaming] = useState(true) // Toggle for streaming vs non-streaming
 
   const loadAISong = useLoadAISong()
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -479,76 +587,176 @@ export const AIChat: FC = () => {
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      try {
-        const result = await runAgentLoop(
-          userMessage,
-          songStore.song,
-          {
-            onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
-              // Update message to show tools executed
-              setMessages((prev) => {
-                const updated = [...prev]
-                const index = streamingMessageRef.current
-                if (index >= 0 && index < updated.length) {
-                  const toolNames = toolCalls.map((tc) => tc.name).join(", ")
-                  const successCount = results.filter((r) => {
-                    try {
-                      const parsed = JSON.parse(r.result)
-                      return !parsed.error
-                    } catch {
-                      return true
-                    }
-                  }).length
-                  updated[index] = {
-                    ...updated[index],
-                    content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
-                  }
-                }
-                return updated
-              })
-            },
-            onMessage: (message: string) => {
-              setMessages((prev) => {
-                const updated = [...prev]
-                const index = streamingMessageRef.current
-                if (index >= 0 && index < updated.length) {
-                  updated[index] = {
-                    ...updated[index],
-                    content: updated[index].content + `\n\n${message}`,
-                  }
-                }
-                return updated
-              })
-            },
-            onError: (error: Error) => {
-              setMessages((prev) => {
-                const updated = [...prev]
-                const index = streamingMessageRef.current
-                if (index >= 0 && index < updated.length) {
-                  updated[index] = {
-                    role: "error",
-                    content: error.message,
-                  }
-                }
-                return updated
-              })
-            },
-          },
-          abortController.signal
-        )
+      // Reset streaming state
+      setStreamingThinking("")
+      setStreamingToolCalls([])
+      setExecutedToolIds(new Set())
 
-        if (result.success) {
-          setMessages((prev) => {
-            const updated = [...prev]
-            const index = streamingMessageRef.current
-            if (index >= 0 && index < updated.length) {
-              updated[index] = {
-                role: "assistant",
-                content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+      try {
+        if (useStreaming) {
+          // Use streaming agent loop
+          const result = await runAgentStreamLoop(
+            userMessage,
+            songStore.song,
+            {
+              onThinking: (content: string) => {
+                setStreamingThinking((prev) => prev + content)
+              },
+              onToolCalls: (toolCalls: ToolCall[]) => {
+                setStreamingToolCalls(toolCalls)
+              },
+              onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
+                // Mark tools as executed
+                setExecutedToolIds((prev) => {
+                  const newSet = new Set(prev)
+                  toolCalls.forEach((tc) => newSet.add(tc.id))
+                  return newSet
+                })
+                // Update message to show tools executed
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    const toolNames = toolCalls.map((tc) => tc.name).join(", ")
+                    const successCount = results.filter((r) => {
+                      try {
+                        const parsed = JSON.parse(r.result)
+                        return !parsed.error
+                      } catch {
+                        return true
+                      }
+                    }).length
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
+                    }
+                  }
+                  return updated
+                })
+                // Reset for next round
+                setStreamingThinking("")
+                setStreamingToolCalls([])
+              },
+              onMessage: (message: string) => {
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + `\n\n${message}`,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onError: (error: Error) => {
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      role: "error",
+                      content: error.message,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onComplete: () => {
+                setStreamingThinking("")
+                setStreamingToolCalls([])
+                setExecutedToolIds(new Set())
+              },
+            },
+            abortController.signal
+          )
+
+          if (result.success) {
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "assistant",
+                  content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+                }
               }
-            }
-            return updated
-          })
+              return updated
+            })
+          }
+        } else {
+          // Use non-streaming agent loop (fallback)
+          const result = await runAgentLoop(
+            userMessage,
+            songStore.song,
+            {
+              onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
+                // Update message to show tools executed
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    const toolNames = toolCalls.map((tc) => tc.name).join(", ")
+                    const successCount = results.filter((r) => {
+                      try {
+                        const parsed = JSON.parse(r.result)
+                        return !parsed.error
+                      } catch {
+                        return true
+                      }
+                    }).length
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onMessage: (message: string) => {
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content + `\n\n${message}`,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onError: (error: Error) => {
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  const index = streamingMessageRef.current
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      role: "error",
+                      content: error.message,
+                    }
+                  }
+                  return updated
+                })
+              },
+            },
+            abortController.signal
+          )
+
+          if (result.success) {
+            setMessages((prev) => {
+              const updated = [...prev]
+              const index = streamingMessageRef.current
+              if (index >= 0 && index < updated.length) {
+                updated[index] = {
+                  role: "assistant",
+                  content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
+                }
+              }
+              return updated
+            })
+          }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Generation failed"
@@ -564,6 +772,9 @@ export const AIChat: FC = () => {
         streamingMessageRef.current = -1
         setIsLoading(false)
         abortControllerRef.current = null
+        setStreamingThinking("")
+        setStreamingToolCalls([])
+        setExecutedToolIds(new Set())
       }
     } else if (agentType === "llm") {
       // LLM Direct mode: Use streaming with abort controller
@@ -742,11 +953,16 @@ export const AIChat: FC = () => {
 
   const handleInterrupt = useCallback(() => {
     if (abortControllerRef.current) {
-      // LLM mode: abort the stream
+      // Abort the stream (works for both LLM and hybrid modes)
       abortControllerRef.current.abort()
       abortControllerRef.current = null
       setIsLoading(false)
-      
+
+      // Clean up streaming state for hybrid agent
+      setStreamingThinking("")
+      setStreamingToolCalls([])
+      setExecutedToolIds(new Set())
+
       // Update the streaming message to indicate interruption
       setMessages((prev) => {
         const updated = [...prev]
@@ -880,6 +1096,46 @@ export const AIChat: FC = () => {
               <ProgressFill width={getStageProgress(generationStage)} />
             </ProgressBar>
           </ProgressContainer>
+        )}
+        {/* Show streaming progress UI for hybrid agent */}
+        {isLoading && agentType === "hybrid" && useStreaming && (streamingThinking || streamingToolCalls.length > 0) && (
+          <StreamingContainer>
+            <StreamingHeader
+              expanded={thinkingExpanded}
+              onClick={() => setThinkingExpanded(!thinkingExpanded)}
+            >
+              <StreamingIcon isAnimated={streamingToolCalls.length === 0}>
+                {streamingToolCalls.length > 0 ? "🔧" : "💭"}
+              </StreamingIcon>
+              <StreamingTitle>
+                {streamingToolCalls.length > 0
+                  ? `Executing ${streamingToolCalls.length} tool${streamingToolCalls.length > 1 ? "s" : ""}...`
+                  : "Thinking..."}
+              </StreamingTitle>
+              <ExpandIcon expanded={thinkingExpanded}>▼</ExpandIcon>
+            </StreamingHeader>
+            <StreamingContent expanded={thinkingExpanded}>
+              {streamingThinking && (
+                <ThinkingText>{streamingThinking}</ThinkingText>
+              )}
+              {streamingToolCalls.length > 0 && (
+                <ToolCallsList>
+                  {streamingToolCalls.map((tc) => (
+                    <ToolCallItem
+                      key={tc.id}
+                      status={executedToolIds.has(tc.id) ? "done" : "executing"}
+                    >
+                      <ToolCallName>{tc.name}</ToolCallName>
+                      <ToolCallArgs>
+                        {JSON.stringify(tc.args).slice(0, 50)}
+                        {JSON.stringify(tc.args).length > 50 ? "..." : ""}
+                      </ToolCallArgs>
+                    </ToolCallItem>
+                  ))}
+                </ToolCallsList>
+              )}
+            </StreamingContent>
+          </StreamingContainer>
         )}
         <div ref={messagesEndRef} />
       </MessageList>
