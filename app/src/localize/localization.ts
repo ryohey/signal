@@ -139,7 +139,7 @@ export default {
     "song-published": "Song published",
     "song-unpublished": "Song unpublished",
     "share-my-song-text":
-      "🎶 Just created a new track on signal! 🎹✨\nListen to my latest MIDI composition! 🎧👇\n#midi #signalmidi @signalmidi",
+      "🎶 Just created a new track on PipeDream 2.0! 🎹✨\nListen to my latest MIDI composition! 🎧👇\n#midi #signalmidi @signalmidi",
     "publish-rules":
       "Important Notice: On this site, we only permit the posting of music that you have created yourself. In compliance with copyright laws, please ensure that you are the copyright holder or have explicit permission for any music you post. Unauthorized publication of others' music or copyright-protected works is legally prohibited. If such violations are detected, your post may be removed, and restrictions may be placed on your account. We encourage you to share creative and original works and contribute to the healthy growth of our community.",
     "soundfont-location": "Location",
@@ -500,7 +500,7 @@ export default {
     "song-published": "Morceaux publié",
     "song-unpublished": "Publication du morceaux annulée",
     "share-my-song-text":
-      "🎶 Je viens de finir un morceaux sur signal! 🎹✨\nÉcoutez ma dernière composition MIDI! 🎧👇\n#midi #signalmidi @signalmidi",
+      "🎶 Je viens de finir un morceaux sur PipeDream 2.0! 🎹✨\nÉcoutez ma dernière composition MIDI! 🎧👇\n#midi #signalmidi @signalmidi",
     "publish-rules":
       "Note importante: sur ce site, nous autorisons uniquement la publication de musique que vous avez créée vous-même. Conformément aux lois sur les droits d'auteur, veuillez vous assurer que vous êtes le détenteur des droits d'auteur ou que vous disposez d'une autorisation explicite pour toute musique que vous publiez. La publication non autorisée de la musique d'autrui ou d'œuvres protégées par le droit d'auteur est légalement interdite. Si de telles violations sont détectées, votre message peut être supprimé et des restrictions peuvent être imposées à votre compte. Nous vous encourageons à partager des œuvres créatives et originales et à contribuer à la croissance saine de notre communauté.",
     "soundfont-location": "Emplacement",
@@ -855,7 +855,7 @@ export default {
     "song-published": "曲を公開しました",
     "song-unpublished": "曲を非公開にしました",
     "share-my-song-text":
-      "🎶 signalで新しいトラックを作成しました！🎹✨\nMIDIを聴いてください！🎧👇\n#midi #signalmidi @signalmidi",
+      "🎶 PipeDream 2.0で新しいトラックを作成しました！🎹✨\nMIDIを聴いてください！🎧👇\n#midi #signalmidi @signalmidi",
     "publish-rules":
       "重要なお知らせ：当サイトでは、あなた自身が制作した楽曲のみの投稿を許可しています。著作権法に基づき、あなたが著作権者である、または明示的な許可を得た楽曲のみを投稿してください。他者の楽曲や、著作権で保護されている作品を無許可で公開することは、法的に禁止されています。このような違反が発見された場合、投稿は削除され、アカウントに対して制限が加えられる可能性があります。クリエイティブでオリジナルな作品を共有し、コミュニティの健全な成長にご協力ください。",
     "soundfont-location": "ロケーション",
@@ -1211,7 +1211,7 @@ export default {
     "song-published": "Song published",
     "song-unpublished": "Song unpublished",
     "share-my-song-text":
-      "🎶 Just created a new track on signal! 🎹✨\nListen to my latest MIDI composition! 🎧👇\n#midi #signalmidi @signalmidi",
+      "🎶 Just created a new track on PipeDream 2.0! 🎹✨\nListen to my latest MIDI composition! 🎧👇\n#midi #signalmidi @signalmidi",
     "publish-rules":
       "重要通知：本网站只允许发布您自己创作的音乐作品。根据著作权法，请确保您是音乐作品的著作权持有人，或已获得明确许可。未经授权公开他人音乐或受著作权保护的作品是法律所禁止的。如果发现此类违规行为，您的帖子可能会被删除，且您的账户可能会受到限制。我们鼓励您分享创意和原创作品，共同促进我们社区的健康成长。",
     "soundfont-location": "Location",
@@ -1565,7 +1565,7 @@ export default {
     "song-published": "曲目已設為公開",
     "song-unpublished": "曲目已設為非公開",
     "share-my-song-text":
-      "🎶 我用signal做了一首曲子囉！🎹✨\n來聽聽看我的MIDI作品吧！🎧👇\n#midi #signalmidi @signalmidi",
+      "🎶 我用PipeDream 2.0做了一首曲子囉！🎹✨\n來聽聽看我的MIDI作品吧！🎧👇\n#midi #signalmidi @signalmidi",
     "publish-rules":
       "重要通知：本網站只允許發佈您自己創作的音樂作品。根據著作權法，請確保您是音樂作品的著作權持有者，或已獲得明確許可。未經授權公開他人音樂或受著作權保護的作品是法律所禁止的。如果發現此類違規行為，您的貼文可能會被刪除，且您的帳號可能會受到限制。我們鼓勵您分享創意和原創作品，共同促進我們社群的健康成長。",
     "soundfont-location": "Location",

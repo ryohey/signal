@@ -32,7 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-Signal is a web-based music sequencer built with React and TypeScript, with cross-platform Electron support. The project uses a monorepo structure managed by Turbo.
+PipeDream 2.0 is a web-based music sequencer built with React and TypeScript, with cross-platform Electron support. The project uses a monorepo structure managed by Turbo.
 
 ### Core Components
 

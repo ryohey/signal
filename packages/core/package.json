@@ -1,7 +1,7 @@
 {
   "name": "@signal-app/core",
   "version": "0.1.0",
-  "description": "Signal music domain core entities and logic",
+  "description": "PipeDream 2.0 music domain core entities and logic",
   "type": "module",
   "scripts": {
     "test": "vitest run",

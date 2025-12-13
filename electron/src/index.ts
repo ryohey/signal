@@ -108,7 +108,7 @@ const createWindow = (): void => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    title: `signal v${app.getVersion()}`,
+    title: `PipeDream 2.0 v${app.getVersion()}`,
     titleBarStyle: isMas ? "hidden" : "default",
     trafficLightPosition: { x: 10, y: 17 },
     webPreferences: {
