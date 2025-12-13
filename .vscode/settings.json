@@ -5,28 +5,23 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "editor.formatOnSave": true,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
-    "source.fixAll.eslint": "explicit"
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
-  "testing.automaticallyOpenTestResults": "neverOpen",
-  "eslint.workingDirectories": [
-    {
-      "mode": "auto"
-    }
-  ],
-  // Enable ESLint flat config support
-  "eslint.useFlatConfig": true,
-  // Enable ESLint for TypeScript and JavaScript files
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ]
+  "testing.automaticallyOpenTestResults": "neverOpen"
 }
