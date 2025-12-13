@@ -1,5 +1,6 @@
 /**
  * Hybrid agent loop - communicates with backend and executes tools on frontend.
+ * Supports multi-turn conversation via thread_id persistence.
  */
 
 import type { Song } from "@signal-app/core"
@@ -28,31 +29,44 @@ interface AgentLoopCallbacks {
   onError?: (error: Error) => void
 }
 
+export interface AgentLoopResult {
+  success: boolean
+  message?: string
+  threadId?: string
+}
+
 /**
  * Run the hybrid agent loop.
  *
  * Sends prompt to backend, executes returned tool calls on the song store,
- * and continues until the agent is done.
+ * and continues until the agent is done. Supports multi-turn via threadId.
  */
 export async function runAgentLoop(
   prompt: string,
   song: Song,
-  callbacks?: AgentLoopCallbacks,
-  abortSignal?: AbortSignal,
-): Promise<{ success: boolean; message?: string }> {
-  let threadId: string | null = null
+  options?: {
+    threadId?: string
+    callbacks?: AgentLoopCallbacks
+    abortSignal?: AbortSignal
+  },
+): Promise<AgentLoopResult> {
+  const { threadId: existingThreadId, callbacks, abortSignal } = options ?? {}
+  let threadId: string | null = existingThreadId ?? null
 
   try {
     // Serialize current song state for agent context
     const songState = serializeSongState(song)
     const context = formatSongStateForPrompt(songState)
-    console.log(`[HybridAgent] Song context:`, context)
 
     // Initial request
     let response = await fetch(`${API_BASE}/api/agent/step`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, context }),
+      body: JSON.stringify({
+        prompt,
+        context,
+        thread_id: threadId, // Continue existing thread if provided
+      }),
       signal: abortSignal,
     })
 
@@ -108,10 +122,18 @@ export async function runAgentLoop(
       callbacks?.onMessage?.(result.message)
     }
 
-    return { success: true, message: result.message ?? undefined }
+    return {
+      success: true,
+      message: result.message ?? undefined,
+      threadId: threadId ?? undefined,
+    }
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error))
     callbacks?.onError?.(err)
-    return { success: false, message: err.message }
+    return {
+      success: false,
+      message: err.message,
+      threadId: threadId ?? undefined,
+    }
   }
 }

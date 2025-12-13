@@ -4,9 +4,8 @@
  * Consumes SSE from /api/agent/step/stream and handles tool execution
  * with stream reconnection for resume operations.
  *
- * Supports multi-turn conversations by tracking thread_id. When the agent
- * needs user input (e.g., proposePlan), the loop ends and returns the thread_id
- * so the conversation can be continued with the user's response.
+ * Supports multi-turn conversations by tracking thread_id. The thread
+ * persists across messages, allowing natural back-and-forth conversation.
  */
 
 import type { Song } from "@signal-app/core"
@@ -42,8 +41,7 @@ interface SSEEvent {
 
 /** Reason why the agent loop ended */
 export type AgentStopReason =
-  | "complete" // Agent finished the task
-  | "awaiting_input" // Agent needs user input (e.g., plan feedback)
+  | "complete" // Agent finished (may continue in next turn)
   | "error" // An error occurred
   | "aborted" // User aborted
 
@@ -53,13 +51,6 @@ export interface AgentLoopResult {
   message?: string
   threadId?: string // Thread ID for continuing the conversation
   stopReason: AgentStopReason
-  /** If awaiting input, contains details about what the agent is waiting for */
-  awaitingInput?: {
-    type: "plan_feedback"
-    plan: string
-    questions?: string[]
-    toolCallId: string // The tool call ID to resume with
-  }
 }
 
 interface StreamingCallbacks {
@@ -209,13 +200,12 @@ async function resumeStreamRequest(
  * Run the streaming hybrid agent loop.
  *
  * Streams events from the backend, executes tool calls on the frontend,
- * and reconnects to stream results until completion or until user input is needed.
+ * and reconnects to stream results until completion.
  *
  * @param prompt - The user's message
  * @param song - The Song object for tool execution
  * @param options - Configuration options
  * @param options.threadId - Optional thread ID to continue an existing conversation
- * @param options.resumeToolResult - If resuming after awaiting_input, provide the tool result to send
  * @param options.callbacks - Event callbacks
  * @param options.abortSignal - Signal to abort the operation
  */
@@ -224,18 +214,11 @@ export async function runAgentStreamLoop(
   song: Song,
   options?: {
     threadId?: string
-    /** Resume with a pending tool result (e.g., user's response to proposePlan) */
-    resumeToolResult?: ToolResult
     callbacks?: StreamingCallbacks
     abortSignal?: AbortSignal
   },
 ): Promise<AgentLoopResult> {
-  const {
-    threadId: existingThreadId,
-    resumeToolResult,
-    callbacks,
-    abortSignal,
-  } = options ?? {}
+  const { threadId: existingThreadId, callbacks, abortSignal } = options ?? {}
   let threadId: string | null = existingThreadId ?? null
   let thinkingBuffer = ""
 
@@ -243,14 +226,12 @@ export async function runAgentStreamLoop(
     success: boolean,
     stopReason: AgentStopReason,
     message?: string,
-    awaitingInput?: AgentLoopResult["awaitingInput"],
   ): AgentLoopResult => {
     const result: AgentLoopResult = {
       success,
       stopReason,
       message,
       threadId: threadId ?? undefined,
-      awaitingInput,
     }
     callbacks?.onComplete?.(result)
     return result
@@ -260,29 +241,14 @@ export async function runAgentStreamLoop(
     // Serialize current song state for agent context
     const songState = serializeSongState(song)
     const context = formatSongStateForPrompt(songState)
-    console.log(`[AgentStream] Starting with context:`, context)
 
-    let response: Response
-
-    // If we have a pending tool result (e.g., user's response to proposePlan), resume with it
-    if (resumeToolResult && threadId) {
-      console.log(
-        `[AgentStream] Resuming with tool result for ${resumeToolResult.id}`,
-      )
-      response = await resumeStreamRequest(
-        threadId,
-        [resumeToolResult],
-        abortSignal,
-      )
-    } else {
-      // Start initial stream (or continue existing thread with new prompt)
-      response = await startStreamRequest(
-        prompt,
-        context,
-        threadId ?? undefined,
-        abortSignal,
-      )
-    }
+    // Start stream (continue existing thread if threadId provided)
+    let response = await startStreamRequest(
+      prompt,
+      context,
+      threadId ?? undefined,
+      abortSignal,
+    )
 
     while (true) {
       if (abortSignal?.aborted) {
@@ -295,8 +261,6 @@ export async function runAgentStreamLoop(
 
       // Consume the stream
       for await (const event of consumeSSEStream(response, abortSignal)) {
-        console.log(`[AgentStream] Event:`, event)
-
         // Capture thread_id from any event
         if (event.thread_id) {
           threadId = event.thread_id
@@ -318,9 +282,7 @@ export async function runAgentStreamLoop(
             break
 
           case "tool_results_received":
-            console.log(
-              `[AgentStream] Tool results acknowledged: ${event.count}`,
-            )
+            // Tool results acknowledged by backend
             break
 
           case "message":
@@ -347,47 +309,8 @@ export async function runAgentStreamLoop(
       }
 
       if (pendingToolCalls && pendingToolCalls.length > 0 && threadId) {
-        // Check if this is a proposePlan call - end the loop and await user input
-        const planCall = pendingToolCalls.find(
-          (tc) => tc.name === "proposePlan",
-        )
-
-        if (planCall) {
-          // Extract plan and questions from the tool call
-          const plan =
-            typeof planCall.args.plan === "string" ? planCall.args.plan : ""
-          const questions = Array.isArray(planCall.args.questions)
-            ? (planCall.args.questions as string[])
-            : undefined
-
-          console.log(
-            `[AgentStream] Plan proposed, ending loop to await user input`,
-          )
-
-          // Execute any other tools that came with the plan call
-          const otherTools = pendingToolCalls.filter(
-            (tc) => tc.id !== planCall.id,
-          )
-          if (otherTools.length > 0) {
-            const toolResults = executeToolCalls(song, otherTools)
-            callbacks?.onToolsExecuted?.(otherTools, toolResults)
-          }
-
-          // Return with awaiting_input status - the UI will resume with the tool result
-          return makeResult(true, "awaiting_input", undefined, {
-            type: "plan_feedback",
-            plan,
-            questions,
-            toolCallId: planCall.id,
-          })
-        }
-
-        // Normal tool execution
-        console.log(
-          `[AgentStream] Executing ${pendingToolCalls.length} tool calls`,
-        )
+        // Execute all tool calls
         const toolResults = executeToolCalls(song, pendingToolCalls)
-        console.log(`[AgentStream] Tool results:`, toolResults)
         callbacks?.onToolsExecuted?.(pendingToolCalls, toolResults)
 
         // Reset thinking buffer for next round
@@ -403,8 +326,7 @@ export async function runAgentStreamLoop(
         return makeResult(true, "complete", finalMessage)
       }
 
-      // Unexpected end
-      console.warn("[AgentStream] Stream ended unexpectedly")
+      // Unexpected end - return thinking buffer as fallback message
       return makeResult(true, "complete", thinkingBuffer || undefined)
     }
   } catch (error) {

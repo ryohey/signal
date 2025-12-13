@@ -1,9 +1,5 @@
 export { runAgentLoop } from "./agentLoop"
-export { runAgentStreamLoop } from "./agentStreamLoop"
-export type {
-  AgentLoopResult,
-  AgentStopReason,
-} from "./agentStreamLoop"
+export type { AgentLoopResult } from "./agentLoop"
 export { executeToolCalls } from "./toolExecutor"
 export type { ToolCall, ToolResult } from "./toolExecutor"
 export {
