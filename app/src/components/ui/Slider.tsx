@@ -82,9 +82,9 @@ export const Slider: FC<SliderProps> = ({
   >
     <StyledTrack>
       <StyledRange />
-      {marks?.map((value, index) => (
+      {marks?.map((value) => (
         <Mark
-          key={index}
+          key={value}
           style={{
             left: `${(value / (props.max ?? 100)) * 100}%`,
           }}

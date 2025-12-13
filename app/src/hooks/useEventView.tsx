@@ -12,6 +12,7 @@ import { useDisposable } from "./useDisposable"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const EventViewContext = createContext<EventView<TrackEvent>>(null!)
 
 export function useSyncEventViewWithScroll<T extends { tick: number }>(

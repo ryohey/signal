@@ -57,6 +57,7 @@ class AuthStore {
   }
 }
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const AuthStoreContext = createContext<AuthStore>(null!)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

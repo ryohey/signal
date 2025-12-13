@@ -31,6 +31,7 @@ type ArrangeViewStore = {
   beatsScope: Store
 }
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const ArrangeViewStoreContext = createContext<ArrangeViewStore>(null!)
 
 export function ArrangeViewProvider({

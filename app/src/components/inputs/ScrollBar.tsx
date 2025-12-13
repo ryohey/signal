@@ -143,7 +143,8 @@ const _ScrollBar: React.ForwardRefRenderFunction<
 
       let intervalId = 0
       let scroll = scrollOffset
-      onScroll2((scroll += delta))
+      scroll += delta
+      onScroll2(scroll)
 
       const isHoverOnTarget = () =>
         document.elementFromPoint(startPos.x, startPos.y) === currentTarget
@@ -158,12 +159,14 @@ const _ScrollBar: React.ForwardRefRenderFunction<
             return
           }
 
-          onScroll2((scroll += delta))
+          scroll += delta
+          onScroll2(scroll)
 
           // 二回目からは素早く繰り返す
           // Repeat quickly from the second time
           intervalId = window.setInterval(() => {
-            onScroll2((scroll += delta * LONG_PRESS_SPEED))
+            scroll += delta * LONG_PRESS_SPEED
+            onScroll2(scroll)
 
             if (!isHoverOnTarget()) {
               stopLongPressTimer()

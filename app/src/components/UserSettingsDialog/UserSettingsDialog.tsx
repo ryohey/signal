@@ -25,7 +25,7 @@ const UserCard = () => {
   const { authUser: user } = useAuth()
 
   if (user === null) {
-    return <></>
+    return null
   }
 
   return (

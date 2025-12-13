@@ -33,7 +33,7 @@ export default class DrawCanvas extends Component<DrawCanvasProps> {
   }
 
   render() {
-    const { width, height, draw, style, ...props } = this.props
+    const { width, height, draw: _draw, style, ...props } = this.props
     return (
       <canvas
         ref={(c) => {

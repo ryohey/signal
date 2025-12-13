@@ -6,7 +6,7 @@ import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
-const useDragNoteEdgeGesture =
+const createUseDragNoteEdgeGesture =
   (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
     const { selectedTrackId, selectedNoteIds, setLastNoteDuration } =
       usePianoRoll()
@@ -75,6 +75,6 @@ const useDragNoteEdgeGesture =
     }
   }
 
-export const useDragNoteLeftGesture = useDragNoteEdgeGesture("left")
-export const useDragNoteRightGesture = useDragNoteEdgeGesture("right")
-export const useDragNoteCenterGesture = useDragNoteEdgeGesture("center")
+export const useDragNoteLeftGesture = createUseDragNoteEdgeGesture("left")
+export const useDragNoteRightGesture = createUseDragNoteEdgeGesture("right")
+export const useDragNoteCenterGesture = createUseDragNoteEdgeGesture("center")

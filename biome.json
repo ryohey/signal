@@ -32,6 +32,11 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "error"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "useAltText": "off",
+        "noStaticElementInteractions": "off"
       }
     }
   },

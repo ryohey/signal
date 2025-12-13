@@ -53,6 +53,10 @@ export class ControlCommandService {
       ...e,
       tick: e.tick + position,
     }))
-    transaction(() => events.forEach((e) => track.createOrUpdate(e)))
+    transaction(() => {
+      for (const e of events) {
+        track.createOrUpdate(e)
+      }
+    })
   }
 }

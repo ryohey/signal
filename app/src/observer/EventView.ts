@@ -80,6 +80,8 @@ export class EventView<T extends TrackEvent> {
   }
 
   private notifyListeners = () => {
-    this.listeners.forEach((listener) => listener())
+    for (const listener of this.listeners) {
+      listener()
+    }
   }
 }

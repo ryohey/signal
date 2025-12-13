@@ -192,7 +192,7 @@ export const ArrangeView: FC = () => {
           {tracks.map((t, i) => (
             <TrackHeader
               style={{ height: trackHeight }}
-              key={i}
+              key={t.id}
               data-selected={i === selectedTrackIndex}
               onClick={() => setSelectedTrackIndex(i)}
               onDoubleClick={() => openTrack(t.id)}

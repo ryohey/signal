@@ -39,6 +39,7 @@ type PianoRollStore = {
   beatsScope: Store
 }
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollProvider({ children }: { children: React.ReactNode }) {

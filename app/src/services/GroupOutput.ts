@@ -22,7 +22,11 @@ export class GroupOutput implements SynthOutput {
   }
 
   activate() {
-    this.outputs.filter((o) => o.isEnabled).forEach((o) => o.synth.activate())
+    for (const o of this.outputs) {
+      if (o.isEnabled) {
+        o.synth.activate()
+      }
+    }
   }
 
   private getOutputs(trackId: TrackId | undefined): SynthOutput[] {
@@ -44,8 +48,8 @@ export class GroupOutput implements SynthOutput {
     timestampNow: number,
     trackId?: TrackId
   ): void {
-    this.getOutputs(trackId).forEach((synth) =>
+    for (const synth of this.getOutputs(trackId)) {
       synth.sendEvent(event, delayTime, timestampNow, trackId)
-    )
+    }
   }
 }

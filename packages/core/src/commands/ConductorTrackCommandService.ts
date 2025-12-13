@@ -112,7 +112,9 @@ export class ConductorTrackCommandService {
       tick: e.tick + tick,
     }))
     transaction(() => {
-      events.forEach((e) => conductorTrack.createOrUpdate(e))
+      for (const e of events) {
+        conductorTrack.createOrUpdate(e)
+      }
     })
   }
 }

@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import type { FC, PropsWithChildren, ReactNode } from "react"
 
 export interface SelectBoxProps<T> {
-  items: { label: ReactNode; value: T }[]
+  items: { label: ReactNode; value: T; key: React.Key }[]
   selectedValue: T
   onChange: (value: T) => void
 }
@@ -75,9 +75,9 @@ export const SelectBox = <T,>({
 
   return (
     <Select onKeyDown={onKeyDown} tabIndex={0}>
-      {items.map((item, i) => (
+      {items.map((item) => (
         <Option
-          key={i}
+          key={item.key}
           checked={item.value === selectedValue}
           onClick={() => onChange(item.value)}
         >

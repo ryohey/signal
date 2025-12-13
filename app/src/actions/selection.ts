@@ -116,7 +116,7 @@ export const useCopySelection = () => {
       .filter(isNoteEvent)
 
     const startTick =
-      selection?.fromTick ?? min(selectedNotes.map((note) => note.tick))!
+      selection?.fromTick ?? min(selectedNotes.map((note) => note.tick)) ?? 0
 
     // 選択されたノートをコピー
     // Copy selected note

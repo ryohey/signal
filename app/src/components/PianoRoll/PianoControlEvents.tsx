@@ -90,9 +90,9 @@ const PianoControlEvents: FC<PianoControlEventsProps> = ({
     <Container style={{ width, marginLeft: keyWidth }}>
       <div className="inner">
         <div className="content" style={{ left: -scrollLeft }}>
-          {eventGroups.map((g, i) => (
+          {eventGroups.map((g) => (
             <ControlMark
-              key={i}
+              key={g.map((e) => e.id).join("-")}
               group={g}
               transform={transform}
               onDoubleClick={() => onDoubleClickMark(g)}

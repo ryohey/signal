@@ -68,8 +68,9 @@ const updateInputDevices: Reaction =
 
 const disableSeekWhileRecording: Reaction =
   ({ player, midiRecorder }) =>
-  () =>
-    (player.disableSeek = midiRecorder.isRecording)
+  () => {
+    player.disableSeek = midiRecorder.isRecording
+  }
 
 const stopRecordingWhenStopPlayer: Reaction =
   ({ player, midiRecorder }) =>

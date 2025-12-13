@@ -2,7 +2,7 @@ import { keyframes, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import * as Portal from "@radix-ui/react-portal"
 import type { ToastSeverity } from "dialog-hooks"
-import Error from "mdi-react/AlertCircleIcon.js"
+import ErrorIcon from "mdi-react/AlertCircleIcon.js"
 import Warning from "mdi-react/AlertIcon.js"
 import CheckCircle from "mdi-react/CheckCircleIcon.js"
 import Info from "mdi-react/InformationIcon.js"
@@ -65,7 +65,7 @@ const SeverityIcon: FC<{ severity: ToastSeverity }> = ({ severity }) => {
   const fill = colorForSeverity(severity, theme)
   switch (severity) {
     case "error":
-      return <Error style={{ fill }} />
+      return <ErrorIcon style={{ fill }} />
     case "info":
       return <Info style={{ fill }} />
     case "success":

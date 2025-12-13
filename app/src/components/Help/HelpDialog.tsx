@@ -46,6 +46,7 @@ const HotKey: FC<HotKeyProps> = ({ hotKeys, text }) => {
       {hotKeys
         .map((c, i1) =>
           c
+            // biome-ignore lint/suspicious/noArrayIndexKey: unique enough in this case
             .map<ReactNode>((k, i2) => <Key key={i1 * 10000 + i2}>{k}</Key>)
             .reduce((a, b) => [a, <span key={"plus"}>+</span>, b])
         )

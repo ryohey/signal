@@ -262,7 +262,7 @@ const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({
     case 127:
       return <Localized name="Gunshot" />
   }
-  return <></>
+  return null
 }
 
 const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
@@ -288,7 +288,7 @@ const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
     case 56:
       return <Localized name="SFX Drum Kit" />
     default:
-      return <></>
+      return null
   }
 }
 

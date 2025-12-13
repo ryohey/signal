@@ -92,7 +92,7 @@ export const saveFile = async (song: Song) => {
 }
 
 export const saveFileAs = async (song: Song) => {
-  let fileHandle
+  let fileHandle: FileSystemFileHandle
   try {
     fileHandle = await window.showSaveFilePicker({
       types: [

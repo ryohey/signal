@@ -209,11 +209,11 @@ export class TrackCommandService {
     const controllerEvents = track.events.filter((e: TrackEvent) =>
       eventIds.includes(e.id)
     )
-    transaction(() =>
-      controllerEvents.forEach((e: TrackEvent) =>
+    transaction(() => {
+      for (const e of controllerEvents) {
         this.removeRedundantEvents(trackId, e)
-      )
-    )
+      }
+    })
   }
 
   quantizeNotes = (

@@ -44,7 +44,11 @@ export class SoundFont {
           })
         }
 
-        const preset = drumKitPresets.get(programNumber)!
+        const preset = drumKitPresets.get(programNumber)
+
+        if (!preset) {
+          continue // This should not happen
+        }
 
         // Add sample metadata for each key in the range
         for (let key = keyStart; key <= keyEnd; key++) {

@@ -14,10 +14,9 @@ export const SignInDialog: FC = observer(() => {
   const toast = useToast()
   const localized = useLocalization()
 
-  const onClose = useCallback(
-    () => (rootViewStore.openSignInDialog = false),
-    [rootViewStore]
-  )
+  const onClose = useCallback(() => {
+    rootViewStore.openSignInDialog = false
+  }, [rootViewStore])
 
   const signInSuccessWithAuthResult = async () => {
     rootViewStore.openSignInDialog = false

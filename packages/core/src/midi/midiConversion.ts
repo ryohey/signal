@@ -115,7 +115,9 @@ export function songFromMidi(data: StreamSource) {
   const song = new Song()
   const midi = read(data)
 
-  getTracks(midi).forEach((t) => song.addTrack(t))
+  for (const t of getTracks(midi)) {
+    song.addTrack(t)
+  }
 
   if (midi.header.formatType === 1 && song.tracks.length > 0) {
     // Use the first track name as the song title

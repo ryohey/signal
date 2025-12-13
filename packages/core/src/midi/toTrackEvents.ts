@@ -22,7 +22,7 @@ export function addTick<T extends DeltaTimeProvider>(events: T[]) {
 }
 
 export const removeUnnecessaryProps = <T>(e: T): T => {
-  const { channel, ...ev } = e as any
+  const { channel: _channel, ...ev } = e as any
   return ev
 }
 

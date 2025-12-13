@@ -26,6 +26,7 @@ export const createTrackScrollScope = (parentStore: Store) =>
     parentStore,
   })
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const TrackScrollContext = createContext<Store>(null!)
 
 export function TrackScrollProvider({

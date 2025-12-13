@@ -51,6 +51,7 @@ export const InstrumentBrowser: FC = () => {
 
   const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
     value: i,
+    key: preset,
     label: isRhythmTrack ? (
       <DrumKitCategoryName />
     ) : (
@@ -60,6 +61,7 @@ export const InstrumentBrowser: FC = () => {
 
   const instrumentOptions = categoryInstruments.map((p) => ({
     value: p,
+    key: p,
     label: <InstrumentName programNumber={p} isRhythmTrack={isRhythmTrack} />,
   }))
 

@@ -76,7 +76,7 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
               }}
             >
               {keyNames.map((name, i) => (
-                <option key={i} value={i}>
+                <option key={name} value={i}>
                   {name}
                 </option>
               ))}
@@ -96,8 +96,8 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
                 })
               }}
             >
-              {Scale.values.map((name, i) => (
-                <option key={i} value={name}>
+              {Scale.values.map((name) => (
+                <option key={name} value={name}>
                   <ScaleName scale={name} />
                 </option>
               ))}

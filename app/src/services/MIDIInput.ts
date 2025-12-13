@@ -20,7 +20,9 @@ export class MIDIInput {
   }
 
   readonly onMidiMessage = (e: WebMidi.MIDIMessageEvent) => {
-    this.listeners.forEach((callback) => callback(e))
+    for (const callback of this.listeners) {
+      callback(e)
+    }
   }
 
   on(event: "midiMessage", callback: (e: WebMidi.MIDIMessageEvent) => void) {

@@ -18,6 +18,7 @@ type TempoEditorStore = {
   beatsScope: Store
 }
 
+// biome-ignore lint/style/noNonNullAssertion: this is safe because of the provider
 const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
 
 export function TempoEditorProvider({
