@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
 import { useAutoFocus } from "../../hooks/useAutoFocus"
+import { useEditorMode } from "../../hooks/useEditorMode"
 import { useEventList } from "../../hooks/useEventList"
 import { PianoRollScope } from "../../hooks/usePianoRoll"
 import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
@@ -49,6 +50,7 @@ const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
 const PianoRollPanes: FC = () => {
   const { isOpen: showTrackList } = useTrackList()
   const { isOpen: showEventList } = useEventList()
+  const { isAdvanced } = useEditorMode()
 
   return (
     <div style={{ display: "flex", flexGrow: 1, position: "relative" }}>
@@ -65,7 +67,7 @@ const PianoRollPanes: FC = () => {
           minSize={240}
           pane1Style={{ display: "flex" }}
           pane2Style={{ display: "flex" }}
-          isShow={showEventList}
+          isShow={isAdvanced && showEventList}
           pane={<EventList />}
         >
           <PianoRoll />

@@ -1,10 +1,12 @@
 import styled from "@emotion/styled"
+import CodeTags from "mdi-react/CodeTagsIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Robot from "mdi-react/RobotIcon"
 import Settings from "mdi-react/SettingsIcon"
 import { CSSProperties, FC, MouseEvent, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useAIChat } from "../../hooks/useAIChat"
+import { useEditorMode } from "../../hooks/useEditorMode"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
 import ArrangeIcon from "../../images/icons/arrange.svg"
@@ -90,6 +92,7 @@ export const Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
   const { isOpen: isAIChatOpen, toggle: toggleAIChat } = useAIChat()
+  const { mode, toggle: toggleEditorMode, isAdvanced } = useEditorMode()
 
   const onClickPianoRollTab = useCallback(
     (e: MouseEvent) => {
@@ -129,6 +132,14 @@ export const Navigation: FC = () => {
       toggleAIChat()
     },
     [toggleAIChat],
+  )
+
+  const onClickModeToggle = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault()
+      toggleEditorMode()
+    },
+    [toggleEditorMode],
   )
 
   return (
@@ -175,6 +186,16 @@ export const Navigation: FC = () => {
       </Tooltip>
 
       <FlexibleSpacer />
+
+      <Tooltip
+        title={isAdvanced ? "Advanced Mode" : "Basic Mode"}
+        delayDuration={500}
+      >
+        <Tab isActive={isAdvanced} onClick={onClickModeToggle}>
+          <CodeTags style={IconStyle} />
+          <TabTitle>{mode === "advanced" ? "Advanced" : "Basic"}</TabTitle>
+        </Tab>
+      </Tooltip>
 
       <Tooltip title="Toggle AI Composer" delayDuration={500}>
         <Tab isActive={isAIChatOpen} onClick={onClickAI}>
