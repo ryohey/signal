@@ -518,6 +518,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
   // Use a ref to track the streaming message index - this allows callbacks to
   // access the current value at execution time rather than definition time
   const streamingMessageIndexRef = useRef<number>(-1)
+  // Track if we've navigated to arrange view for this generation session
+  const hasNavigatedRef = useRef<boolean>(false)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -584,8 +586,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         return [...newMessages, { role: "assistant" as const, content: "" }]
       })
 
-      // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
-      setPath("/arrange")
+      // Reset navigation flag for this generation session
+      hasNavigatedRef.current = false
       setAIChatOpen(true)
 
       setIsLoading(true)
@@ -605,6 +607,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 toolCalls: ToolCall[],
                 results: ToolResult[],
               ) => {
+                // Navigate to arrange view when tools are actually executed (generation has started)
+                if (!hasNavigatedRef.current) {
+                  setPath("/arrange")
+                  hasNavigatedRef.current = true
+                }
                 // Capture index BEFORE setMessages to avoid race with finally block
                 const index = streamingMessageIndexRef.current
                 // Update message to show tools executed
@@ -709,6 +716,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           await aiBackend.generateStream(
             { prompt: userMessage, agentType: agentType },
             (content: string) => {
+              // Navigate to arrange view when first content is received (generation has started)
+              if (!hasNavigatedRef.current && content.trim().length > 0) {
+                setPath("/arrange")
+                hasNavigatedRef.current = true
+              }
               // Capture index from ref BEFORE setMessages
               const index = streamingMessageIndexRef.current
               // Update the streaming message
@@ -820,6 +832,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           const response = await aiBackend.generateWithProgress(
             { prompt: userMessage, agentType: agentType },
             ((event: ProgressEvent) => {
+              // Navigate to arrange view when progress callback is first called (generation has started)
+              if (!hasNavigatedRef.current) {
+                setPath("/arrange")
+                hasNavigatedRef.current = true
+              }
               setGenerationStage(event.stage)
               setGenerationProgress(event.message || "")
               if (event.attempt) {
