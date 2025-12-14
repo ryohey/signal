@@ -6,7 +6,7 @@ import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
-import { runAgentLoop, runAgentStreamLoop, type ToolCall } from "../../services/hybridAgent"
+import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
@@ -46,6 +46,26 @@ const HeaderLeft = styled.div`
   flex: 1;
 `
 
+const NewChatButton = styled.button`
+  padding: 0.25rem 0.5rem;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+  border-radius: 0.25rem;
+  background: transparent;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.highlightColor};
+    color: ${({ theme }) => theme.textColor};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`
+
 const Select = styled.select`
   padding: 0.375rem 0.75rem;
   border: 1px solid ${({ theme }) => theme.dividerColor};
@@ -55,19 +75,21 @@ const Select = styled.select`
   font-size: 0.75rem;
   font-family: inherit;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.themeColor};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 `
 
-const StatusDot = styled.span<{ status: "connected" | "disconnected" | "checking" }>`
+const StatusDot = styled.span<{
+  status: "connected" | "disconnected" | "checking"
+}>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -107,7 +129,9 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
         ? theme.redColor
         : theme.secondaryBackgroundColor};
   color: ${({ role, theme }) =>
-    role === "user" || role === "error" ? theme.onSurfaceColor : theme.textColor};
+    role === "user" || role === "error"
+      ? theme.onSurfaceColor
+      : theme.textColor};
   font-size: 0.875rem;
   line-height: 1.4;
   user-select: text;
@@ -278,122 +302,6 @@ const ProgressFill = styled.div<{ width: number }>`
   width: ${({ width }) => width}%;
 `
 
-// Streaming progress styled components (for hybrid agent)
-const StreamingContainer = styled.div`
-  padding: 0.75rem 1rem;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
-  border-radius: 0.5rem;
-  margin: 0.5rem 0;
-  max-width: 85%;
-  min-width: 0;
-  width: fit-content;
-  box-sizing: border-box;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  word-break: break-word;
-`
-
-const StreamingHeader = styled.div<{ expanded: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`
-
-const StreamingIcon = styled.span<{ isAnimated?: boolean }>`
-  font-size: 1rem;
-  ${({ isAnimated }) => isAnimated && `
-    animation: pulse 1.5s infinite;
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-  `}
-`
-
-const StreamingTitle = styled.span`
-  font-weight: 500;
-  color: ${({ theme }) => theme.textColor};
-  font-size: 0.875rem;
-  flex: 1;
-`
-
-const ExpandIcon = styled.span<{ expanded: boolean }>`
-  font-size: 0.75rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
-  transform: ${({ expanded }) => expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
-  transition: transform 0.2s ease;
-`
-
-const StreamingContent = styled.div<{ expanded: boolean }>`
-  margin-top: ${({ expanded }) => expanded ? '0.75rem' : '0'};
-  max-height: ${({ expanded }) => expanded ? '200px' : '0'};
-  overflow: hidden;
-  transition: max-height 0.3s ease, margin-top 0.3s ease;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-`
-
-const ThinkingText = styled.div`
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.secondaryTextColor};
-  line-height: 1.4;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  font-family: monospace;
-  background: ${({ theme }) => theme.backgroundColor};
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  max-height: 150px;
-  overflow-y: auto;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-`
-
-const ToolCallsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-`
-
-const ToolCallItem = styled.div<{ status: 'pending' | 'executing' | 'done' }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.5rem;
-  background: ${({ theme }) => theme.backgroundColor};
-  border-radius: 0.25rem;
-  font-size: 0.8rem;
-  color: ${({ theme, status }) =>
-    status === 'done' ? theme.themeColor :
-      status === 'executing' ? theme.yellowColor || '#ffc107' :
-        theme.secondaryTextColor};
-`
-
-const ToolCallName = styled.span`
-  font-weight: 500;
-`
-
-const ToolCallArgs = styled.span`
-  font-family: monospace;
-  font-size: 0.7rem;
-  opacity: 0.7;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`
-
 // Notes display component
 const NotesContainer = styled.div`
   margin-top: 0.75rem;
@@ -430,7 +338,20 @@ const NoteItem = styled.div`
 const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
   // Convert MIDI note number to note name
   const midiNoteToName = (midiNote: number): string => {
-    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    const noteNames = [
+      "C",
+      "C#",
+      "D",
+      "D#",
+      "E",
+      "F",
+      "F#",
+      "G",
+      "G#",
+      "A",
+      "A#",
+      "B",
+    ]
     const octave = Math.floor(midiNote / 12) - 1
     const noteName = noteNames[midiNote % 12]
     return `${noteName}${octave}`
@@ -438,26 +359,49 @@ const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
 
   return (
     <NotesContainer>
-      <NotesHeader>🎵 Detected Notes ({notes.length}):</NotesHeader>
+      <NotesHeader>Detected Notes ({notes.length}):</NotesHeader>
       <NotesList>
         {notes.map((note, i) => (
           <NoteItem key={i}>
-            {midiNoteToName(note.pitch)} - pitch: {note.pitch}, start: {note.start} ticks, duration: {note.duration} ticks, velocity: {note.velocity}
+            {midiNoteToName(note.pitch)} - pitch: {note.pitch}, start:{" "}
+            {note.start} ticks, duration: {note.duration} ticks, velocity:{" "}
+            {note.velocity}
           </NoteItem>
         ))}
       </NotesList>
-      <div style={{ marginTop: "0.5rem", fontSize: "0.7rem", color: "rgba(255,255,255,0.6)", fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
-        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>addNotes tool format:</div>
-        <div style={{ background: "rgba(0,0,0,0.2)", padding: "0.5rem", borderRadius: "0.25rem", overflowX: "auto" }}>
-          {JSON.stringify({
-            trackId: 0, // User will specify track
-            notes: notes.map(n => ({
-              pitch: n.pitch,
-              start: n.start,
-              duration: n.duration,
-              velocity: n.velocity
-            }))
-          }, null, 2)}
+      <div
+        style={{
+          marginTop: "0.5rem",
+          fontSize: "0.7rem",
+          color: "rgba(255,255,255,0.6)",
+          fontFamily: "monospace",
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
+          addNotes tool format:
+        </div>
+        <div
+          style={{
+            background: "rgba(0,0,0,0.2)",
+            padding: "0.5rem",
+            borderRadius: "0.25rem",
+            overflowX: "auto",
+          }}
+        >
+          {JSON.stringify(
+            {
+              trackId: 0, // User will specify track
+              notes: notes.map((n) => ({
+                pitch: n.pitch,
+                start: n.start,
+                duration: n.duration,
+                velocity: n.velocity,
+              })),
+            },
+            null,
+            2,
+          )}
         </div>
       </div>
     </NotesContainer>
@@ -526,8 +470,6 @@ function getStageProgress(stage: GenerationStage): number {
   }
 }
 
-// ChatMessage is now imported from useAIChat hook
-
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
 type AgentType = "llm" | "composition_agent" | "hybrid"
@@ -542,12 +484,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     setMessages,
     isLoading,
     setIsLoading,
-    streamingThinking,
-    setStreamingThinking,
-    streamingToolCalls,
-    setStreamingToolCalls,
-    executedToolIds,
-    setExecutedToolIds,
     generationStage,
     setGenerationStage,
     generationProgress,
@@ -564,19 +500,24 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
   const [agentType, setAgentType] = useState<AgentType>(() => {
     // Load from localStorage or default to hybrid
     const stored = localStorage.getItem(AGENT_TYPE_STORAGE_KEY)
-    return (stored === "llm" || stored === "composition_agent" || stored === "hybrid")
+    return stored === "llm" ||
+      stored === "composition_agent" ||
+      stored === "hybrid"
       ? (stored as AgentType)
       : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
-  const [thinkingExpanded, setThinkingExpanded] = useState(false)
-  const [useStreaming, setUseStreaming] = useState(true) // Toggle for streaming vs non-streaming
+  // Conversation state for multi-turn interactions
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
 
   const loadAISong = useLoadAISong()
   const { setPath } = useRouter()
   const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  // Use a ref to track the streaming message index - this allows callbacks to
+  // access the current value at execution time rather than definition time
+  const streamingMessageIndexRef = useRef<number>(-1)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -598,515 +539,375 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     return () => clearInterval(interval)
   }, [])
 
-  const handleSubmit = useCallback(async (overrideInput?: string) => {
-    const messageToSubmit = overrideInput || input.trim()
-    if (!messageToSubmit || isLoading) return
+  const handleSubmit = useCallback(
+    async (overrideInput?: string) => {
+      const messageToSubmit = overrideInput || input.trim()
+      if (!messageToSubmit) return
 
-    // Find if there are notes in recent messages that should be included as context
-    const recentMessageWithNotes = messages
-      .slice()
-      .reverse()
-      .find((msg) => msg.role === "user" && msg.notes && msg.notes.length > 0)
+      if (isLoading) return
 
-    let userMessage = messageToSubmit
+      // Find if there are notes in recent messages that should be included as context
+      const recentMessageWithNotes = messages
+        .slice()
+        .reverse()
+        .find((msg) => msg.role === "user" && msg.notes && msg.notes.length > 0)
 
-    // If there are notes in a recent message, include them in the exact addNotes tool format
-    if (recentMessageWithNotes?.notes) {
-      const notesData = {
-        trackId: 0, // User will specify which track
-        notes: recentMessageWithNotes.notes.map((n) => ({
-          pitch: n.pitch,
-          start: n.start,
-          duration: n.duration,
-          velocity: n.velocity,
-        })),
-      }
-      const notesJson = JSON.stringify(notesData, null, 2)
-      userMessage = `${messageToSubmit}\n\nHere are the notes to add (in addNotes tool format):\n\`\`\`json\n${notesJson}\n\`\`\``
-    }
+      let userMessage = messageToSubmit
 
-    if (!overrideInput) {
-      setInput("")
-    }
-
-    // Add user message and create placeholder for assistant response
-    setMessages((prev) => {
-      const newMessages = [...prev, { role: "user" as const, content: messageToSubmit }]
-      const assistantIndex = newMessages.length
-      setStreamingMessageIndex(assistantIndex)
-      return [...newMessages, { role: "assistant" as const, content: "" }]
-    })
-
-    // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
-    // This ensures the route is set before any async operations
-    setPath("/arrange")
-    setAIChatOpen(true)
-
-    setIsLoading(true)
-
-    // Branch based on agent type
-    if (agentType === "hybrid") {
-      // Hybrid Agent mode: Run agent loop with frontend tool execution
-      const abortController = new AbortController()
-      abortControllerRef.current = abortController
-
-      // Reset streaming state
-      setStreamingThinking("")
-      setStreamingToolCalls([])
-      setExecutedToolIds(new Set())
-
-      try {
-        if (useStreaming) {
-          // Use streaming agent loop
-          const result = await runAgentStreamLoop(
-            userMessage,
-            songStore.song,
-            {
-              onThinking: (content: string) => {
-                setStreamingThinking((prev) => prev + content)
-                // Accumulate thinking content in message bubble
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    // Append thinking content to the message
-                    updated[index] = {
-                      ...updated[index],
-                      content: updated[index].content + content,
-                    }
-                  }
-                  return updated
-                })
-              },
-              onToolCalls: (toolCalls: ToolCall[]) => {
-                setStreamingToolCalls(toolCalls)
-                // Create separate message bubbles for tool calls
-                setMessages((prev) => {
-                  const toolCallMessages = toolCalls.map((tc) => ({
-                    role: "assistant" as const,
-                    content: `🔧 ${tc.name}(${JSON.stringify(tc.args).slice(0, 200)}${JSON.stringify(tc.args).length > 200 ? "..." : ""})`,
-                  }))
-                  return [...prev, ...toolCallMessages]
-                })
-              },
-              onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
-                // Mark tools as executed
-                setExecutedToolIds((prev: Set<string>) => {
-                  const newSet = new Set(prev)
-                  toolCalls.forEach((tc) => newSet.add(tc.id))
-                  return newSet
-                })
-                // Update message to show tools executed
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    const toolNames = toolCalls.map((tc) => tc.name).join(", ")
-                    const successCount = results.filter((r) => {
-                      try {
-                        const parsed = JSON.parse(r.result)
-                        return !parsed.error
-                      } catch {
-                        return true
-                      }
-                    }).length
-                    updated[index] = {
-                      ...updated[index],
-                      content: updated[index].content + `\n✅ Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
-                    }
-                  }
-                  return updated
-                })
-                // Reset for next round
-                setStreamingThinking("")
-                setStreamingToolCalls([])
-              },
-              onMessage: (message: string) => {
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      ...updated[index],
-                      content: updated[index].content + `\n\n${message}`,
-                    }
-                  }
-                  return updated
-                })
-              },
-              onError: (error: Error) => {
-                // Log full error details to console for debugging
-                console.error("[AIChat] Streaming agent error:", error)
-
-                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    // If the message is empty, replace it with error. Otherwise append.
-                    if (!updated[index].content || updated[index].content.trim() === "") {
-                      updated[index] = {
-                        role: "error",
-                        content: `❌ ${friendlyMessage}`,
-                      }
-                    } else {
-                      updated[index] = {
-                        role: "error",
-                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
-                      }
-                    }
-                  } else {
-                    // If index is invalid, add error as new message
-                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
-                  }
-                  return updated
-                })
-              },
-              onComplete: () => {
-                setStreamingThinking("")
-                setStreamingToolCalls([])
-                setExecutedToolIds(new Set())
-              },
-            },
-            abortController.signal
-          )
-
-          if (result.success) {
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "assistant",
-                  content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
-                }
-              }
-              return updated
-            })
-          } else {
-            // Handle failure case for non-streaming agent
-            const errorMessage = result.message || "The agent encountered an error. Please try again."
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "error",
-                  content: updated[index].content
-                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
-                    : `❌ Error: ${errorMessage}`,
-                }
-              }
-              return updated
-            })
-          }
-        } else {
-          // Use non-streaming agent loop (fallback)
-          const result = await runAgentLoop(
-            userMessage,
-            songStore.song,
-            {
-              onToolsExecuted: (toolCalls: ToolCall[], results: ToolResult[]) => {
-                // Update message to show tools executed
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    const toolNames = toolCalls.map((tc) => tc.name).join(", ")
-                    const successCount = results.filter((r) => {
-                      try {
-                        const parsed = JSON.parse(r.result)
-                        return !parsed.error
-                      } catch {
-                        return true
-                      }
-                    }).length
-                    updated[index] = {
-                      ...updated[index],
-                      content: updated[index].content + `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
-                    }
-                  }
-                  return updated
-                })
-              },
-              onMessage: (message: string) => {
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    updated[index] = {
-                      ...updated[index],
-                      content: updated[index].content + `\n\n${message}`,
-                    }
-                  }
-                  return updated
-                })
-              },
-              onError: (error: Error) => {
-                // Log full error details to console for debugging
-                console.error("[AIChat] Non-streaming agent error:", error)
-
-                const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
-                setMessages((prev) => {
-                  const updated = [...prev]
-                  const index = streamingMessageIndex
-                  if (index >= 0 && index < updated.length) {
-                    // If the message is empty, replace it with error. Otherwise append.
-                    if (!updated[index].content || updated[index].content.trim() === "") {
-                      updated[index] = {
-                        role: "error",
-                        content: `❌ ${friendlyMessage}`,
-                      }
-                    } else {
-                      updated[index] = {
-                        role: "error",
-                        content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
-                      }
-                    }
-                  } else {
-                    // If index is invalid, add error as new message
-                    return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
-                  }
-                  return updated
-                })
-              },
-            },
-            abortController.signal
-          )
-
-          if (result.success) {
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "assistant",
-                  content: updated[index].content + "\n\n✅ Done! The changes have been applied to your song.",
-                }
-              }
-              return updated
-            })
-          } else {
-            // Handle failure case
-            const errorMessage = result.message || "The agent encountered an error. Please try again."
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "error",
-                  content: updated[index].content
-                    ? updated[index].content + `\n\n❌ Error: ${errorMessage}`
-                    : `❌ Error: ${errorMessage}`,
-                }
-              }
-              return updated
-            })
-          }
+      // If there are notes in a recent message, include them in the exact addNotes tool format
+      if (recentMessageWithNotes?.notes) {
+        const notesData = {
+          trackId: 0, // User will specify which track
+          notes: recentMessageWithNotes.notes.map((n) => ({
+            pitch: n.pitch,
+            start: n.start,
+            duration: n.duration,
+            velocity: n.velocity,
+          })),
         }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Generation failed"
-        const friendlyMessage = errorMessage || "An unexpected error occurred. Please try again."
-        setMessages((prev) => {
-          const updated = [...prev]
-          const index = streamingMessageIndex
-          if (index >= 0 && index < updated.length) {
-            // If the message is empty, replace it with error. Otherwise append.
-            if (!updated[index].content || updated[index].content.trim() === "") {
-              updated[index] = {
-                role: "error",
-                content: `❌ ${friendlyMessage}`
-              }
-            } else {
-              updated[index] = {
-                role: "error",
-                content: updated[index].content + `\n\n❌ ${friendlyMessage}`
-              }
-            }
-          } else {
-            // If index is invalid, add error as new message
-            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
-          }
-          return updated
-        })
-      } finally {
-        setStreamingMessageIndex(-1)
-        setIsLoading(false)
-        abortControllerRef.current = null
-        setStreamingThinking("")
-        setStreamingToolCalls([])
-        setExecutedToolIds(new Set())
+        const notesJson = JSON.stringify(notesData, null, 2)
+        userMessage = `${messageToSubmit}\n\nHere are the notes to add (in addNotes tool format):\n\`\`\`json\n${notesJson}\n\`\`\``
       }
-    } else if (agentType === "llm") {
-      // LLM Direct mode: Use streaming with abort controller
-      const abortController = new AbortController()
-      abortControllerRef.current = abortController
 
-      try {
-        await aiBackend.generateStream(
-          { prompt: userMessage, agentType: agentType },
-          (content: string) => {
-            // Update the streaming message
+      if (!overrideInput) {
+        setInput("")
+      }
+
+      // Add user message and create placeholder for assistant response
+      setMessages((prev) => {
+        const newMessages = [
+          ...prev,
+          { role: "user" as const, content: messageToSubmit },
+        ]
+        const assistantIndex = newMessages.length
+        streamingMessageIndexRef.current = assistantIndex
+        return [...newMessages, { role: "assistant" as const, content: "" }]
+      })
+
+      // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
+      setPath("/arrange")
+      setAIChatOpen(true)
+
+      setIsLoading(true)
+
+      // Branch based on agent type
+      if (agentType === "hybrid") {
+        // Hybrid Agent mode: Run agent loop with frontend tool execution
+        const abortController = new AbortController()
+        abortControllerRef.current = abortController
+
+        try {
+          const result = await runAgentLoop(userMessage, songStore.song, {
+            threadId: activeThreadId ?? undefined,
+            abortSignal: abortController.signal,
+            callbacks: {
+              onToolsExecuted: (
+                toolCalls: ToolCall[],
+                results: ToolResult[],
+              ) => {
+                // Capture index BEFORE setMessages to avoid race with finally block
+                const index = streamingMessageIndexRef.current
+                // Update message to show tools executed
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  if (index >= 0 && index < updated.length) {
+                    const toolNames = toolCalls.map((tc) => tc.name).join(", ")
+                    const successCount = results.filter((r) => {
+                      try {
+                        const parsed = JSON.parse(r.result)
+                        return !parsed.error
+                      } catch {
+                        return true
+                      }
+                    }).length
+                    updated[index] = {
+                      ...updated[index],
+                      content:
+                        updated[index].content +
+                        `\n🔧 Executed: ${toolNames} (${successCount}/${results.length} succeeded)`,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onMessage: (message: string) => {
+                // Capture index BEFORE setMessages to avoid race with finally block
+                const index = streamingMessageIndexRef.current
+                // Display the agent's response message
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      ...updated[index],
+                      content: updated[index].content
+                        ? updated[index].content + `\n\n${message}`
+                        : message,
+                    }
+                  }
+                  return updated
+                })
+              },
+              onError: (error: Error) => {
+                // Capture index BEFORE setMessages to avoid race with finally block
+                const index = streamingMessageIndexRef.current
+                console.error("[AIChat] Agent error:", error)
+                setMessages((prev) => {
+                  const updated = [...prev]
+                  if (index >= 0 && index < updated.length) {
+                    updated[index] = {
+                      role: "error",
+                      content: error.message,
+                    }
+                  }
+                  return updated
+                })
+              },
+            },
+          })
+
+          // Save thread ID for multi-turn conversation
+          if (result.threadId) {
+            setActiveThreadId(result.threadId)
+          }
+
+          // Handle error result
+          if (!result.success) {
+            const index = streamingMessageIndexRef.current
             setMessages((prev) => {
               const updated = [...prev]
-              const index = streamingMessageIndex
               if (index >= 0 && index < updated.length) {
                 updated[index] = {
-                  ...updated[index],
-                  content: updated[index].content + content,
+                  role: "error",
+                  content: result.message || "An error occurred",
                 }
               }
               return updated
             })
-          },
-          (response) => {
-            // Load the generated song
-            loadAISong(response)
-
-            // Update the final message
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              if (index >= 0 && index < updated.length) {
-                updated[index] = {
-                  role: "assistant",
-                  content:
-                    prev[index].content +
-                    `\n\n✅ Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
-                }
-              }
-              return updated
-            })
-            setStreamingMessageIndex(-1)
-            setIsLoading(false)
-            abortControllerRef.current = null
-          },
-          (error) => {
-            // Log full error details to console for debugging
-            console.error("[AIChat] LLM generation error:", error)
-
-            const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
-            setMessages((prev) => {
-              const updated = [...prev]
-              const index = streamingMessageIndex
-              // Replace the streaming message with error
-              if (index >= 0 && index < updated.length) {
-                // If the message is empty, replace it with error. Otherwise append.
-                if (!updated[index].content || updated[index].content.trim() === "") {
-                  updated[index] = {
-                    role: "error",
-                    content: `❌ ${friendlyMessage}`,
-                  }
-                } else {
-                  updated[index] = {
-                    role: "error",
-                    content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
-                  }
-                }
-              } else {
-                // If index is invalid, add error as new message
-                return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
-              }
-              return updated
-            })
-            setStreamingMessageIndex(-1)
-            setIsLoading(false)
-            abortControllerRef.current = null
-          },
-          abortController.signal,
-        )
-      } catch (err) {
-        // Log full error details to console for debugging
-        console.error("[AIChat] LLM catch error:", err)
-
-        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
-        setMessages((prev) => {
-          const updated = [...prev]
-          const index = streamingMessageIndex
-          if (index >= 0 && index < updated.length) {
-            // If the message is empty, replace it with error. Otherwise append.
-            if (!updated[index].content || updated[index].content.trim() === "") {
-              updated[index] = {
-                role: "error",
-                content: `❌ ${friendlyMessage}`,
-              }
-            } else {
-              updated[index] = {
-                role: "error",
-                content: updated[index].content + `\n\n❌ ${friendlyMessage}`,
-              }
-            }
-          } else {
-            // If index is invalid, add error as new message
-            return [...updated, { role: "error", content: `❌ ${friendlyMessage}` }]
           }
-          return updated
-        })
-        setStreamingMessageIndex(-1)
-        setIsLoading(false)
-        abortControllerRef.current = null
-      }
-    } else {
-      // Composition Agent mode: Use progress tracking
-      setGenerationStage("planning")
-      setGenerationProgress("Starting generation...")
-      setCurrentAttempt(0)
-
-      try {
-        const response = await aiBackend.generateWithProgress(
-          { prompt: userMessage, agentType: agentType },
-          ((event: ProgressEvent) => {
-            setGenerationStage(event.stage)
-            setGenerationProgress(event.message || "")
-            if (event.attempt) {
-              setCurrentAttempt(event.attempt)
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Generation failed"
+          const index = streamingMessageIndexRef.current
+          setMessages((prev) => {
+            const updated = [...prev]
+            if (index >= 0 && index < updated.length) {
+              updated[index] = { role: "error", content: errorMessage }
             }
-          }) as Parameters<typeof aiBackend.generateWithProgress>[1],
-        )
+            return updated
+          })
+        } finally {
+          streamingMessageIndexRef.current = -1
+          setIsLoading(false)
+          abortControllerRef.current = null
+        }
+      } else if (agentType === "llm") {
+        // LLM Direct mode: Use streaming with abort controller
+        const abortController = new AbortController()
+        abortControllerRef.current = abortController
 
-        // Load the generated song
-        loadAISong(response)
-
-        const attemptInfo =
-          response.attemptLogs.length > 1
-            ? ` (after ${response.attemptLogs.length} attempts)`
-            : ""
-
-        // Remove the placeholder message and add final result
-        setMessages((prev) => {
-          const updated = prev.slice(0, -1) // Remove placeholder
-          return [
-            ...updated,
-            {
-              role: "assistant",
-              content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t: { name: string }) => t.name).join(", ")}${attemptInfo}. Press play to listen!`,
+        try {
+          await aiBackend.generateStream(
+            { prompt: userMessage, agentType: agentType },
+            (content: string) => {
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
+              // Update the streaming message
+              setMessages((prev) => {
+                const updated = [...prev]
+                if (index >= 0 && index < updated.length) {
+                  updated[index] = {
+                    ...updated[index],
+                    content: updated[index].content + content,
+                  }
+                }
+                return updated
+              })
             },
-          ]
-        })
-      } catch (err) {
-        // Log full error details to console for debugging
-        console.error("[AIChat] Composition agent error:", err)
+            (response) => {
+              // Load the generated song
+              loadAISong(response)
 
-        // Remove placeholder and add error message
-        const friendlyMessage = "Oops! We're experiencing an issue. Please try again later!"
-        setMessages((prev) => {
-          const updated = prev.slice(0, -1) // Remove placeholder
-          return [
-            ...updated,
-            {
-              role: "error",
-              content: `❌ ${friendlyMessage}`,
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
+              // Update the final message
+              setMessages((prev) => {
+                const updated = [...prev]
+                if (index >= 0 && index < updated.length) {
+                  updated[index] = {
+                    role: "assistant",
+                    content:
+                      prev[index].content +
+                      `\n\n✅ Generated ${response.tracks.length} tracks: ${response.tracks.map((t) => t.name).join(", ")}. Press play to listen!`,
+                  }
+                }
+                return updated
+              })
+              streamingMessageIndexRef.current = -1
+              setStreamingMessageIndex(-1)
+              setIsLoading(false)
+              abortControllerRef.current = null
             },
-          ]
-        })
-      } finally {
-        setIsLoading(false)
-        setGenerationStage(null)
-        setGenerationProgress("")
-        setStreamingMessageIndex(-1)
+            (error) => {
+              const errorMessage =
+                error instanceof Error ? error.message : "Generation failed"
+              console.error("[AIChat] LLM generation error:", error)
+
+              // Provide user-friendly error messages
+              let friendlyMessage = errorMessage
+              if (
+                errorMessage.includes("fetch") ||
+                errorMessage.includes("network")
+              ) {
+                friendlyMessage =
+                  "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+              } else if (errorMessage.includes("timeout")) {
+                friendlyMessage =
+                  "Generation took too long. Try a simpler prompt or try again."
+              } else if (errorMessage.includes("syntax error")) {
+                friendlyMessage =
+                  "The AI generated invalid code. Please try again with a different prompt."
+              }
+
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
+              setMessages((prev) => {
+                const updated = [...prev]
+                // Replace the streaming message with error
+                if (index >= 0 && index < updated.length) {
+                  updated[index] = {
+                    role: "error",
+                    content: friendlyMessage,
+                  }
+                }
+                return updated
+              })
+              streamingMessageIndexRef.current = -1
+              setStreamingMessageIndex(-1)
+              setIsLoading(false)
+              abortControllerRef.current = null
+            },
+            abortController.signal,
+          )
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Generation failed"
+          console.error("[AIChat] LLM catch error:", err)
+
+          // Capture index from ref BEFORE setMessages
+          const index = streamingMessageIndexRef.current
+          setMessages((prev) => {
+            const updated = [...prev]
+            if (index >= 0 && index < updated.length) {
+              updated[index] = {
+                role: "error",
+                content: errorMessage,
+              }
+            }
+            return updated
+          })
+          streamingMessageIndexRef.current = -1
+          setStreamingMessageIndex(-1)
+          setIsLoading(false)
+          abortControllerRef.current = null
+        }
+      } else {
+        // Composition Agent mode: Use progress tracking
+        setGenerationStage("planning")
+        setGenerationProgress("Starting generation...")
+        setCurrentAttempt(0)
+
+        try {
+          const response = await aiBackend.generateWithProgress(
+            { prompt: userMessage, agentType: agentType },
+            ((event: ProgressEvent) => {
+              setGenerationStage(event.stage)
+              setGenerationProgress(event.message || "")
+              if (event.attempt) {
+                setCurrentAttempt(event.attempt)
+              }
+            }) as Parameters<typeof aiBackend.generateWithProgress>[1],
+          )
+
+          // Load the generated song
+          loadAISong(response)
+
+          const attemptInfo =
+            response.attemptLogs.length > 1
+              ? ` (after ${response.attemptLogs.length} attempts)`
+              : ""
+
+          // Remove the placeholder message and add final result
+          setMessages((prev) => {
+            const updated = prev.slice(0, -1) // Remove placeholder
+            return [
+              ...updated,
+              {
+                role: "assistant",
+                content: `Generated ${response.tracks.length} tracks: ${response.tracks.map((t: { name: string }) => t.name).join(", ")}${attemptInfo}. Press play to listen!`,
+              },
+            ]
+          })
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Generation failed"
+          console.error("[AIChat] Composition agent error:", err)
+
+          // Provide user-friendly error messages
+          let friendlyMessage = errorMessage
+          if (
+            errorMessage.includes("fetch") ||
+            errorMessage.includes("network")
+          ) {
+            friendlyMessage =
+              "Cannot connect to AI backend. Make sure it's running on http://localhost:8000"
+          } else if (errorMessage.includes("timeout")) {
+            friendlyMessage =
+              "Generation took too long. Try a simpler prompt or try again."
+          } else if (errorMessage.includes("syntax error")) {
+            friendlyMessage =
+              "The AI generated invalid code. Please try again with a different prompt."
+          } else if (errorMessage.includes("5 attempts")) {
+            friendlyMessage =
+              "Generation failed after multiple attempts. Try a different prompt or simpler request."
+          }
+
+          // Remove placeholder and add error message
+          setMessages((prev) => {
+            const updated = prev.slice(0, -1) // Remove placeholder
+            return [
+              ...updated,
+              {
+                role: "error",
+                content: friendlyMessage,
+              },
+            ]
+          })
+        } finally {
+          setIsLoading(false)
+          setGenerationStage(null)
+          setGenerationProgress("")
+          setStreamingMessageIndex(-1)
+        }
       }
-    }
-  }, [input, isLoading, loadAISong, agentType, songStore.song, messages])
+    },
+    [
+      input,
+      isLoading,
+      loadAISong,
+      agentType,
+      songStore.song,
+      messages,
+      activeThreadId,
+      setMessages,
+      setIsLoading,
+      setStreamingMessageIndex,
+      setGenerationStage,
+      setGenerationProgress,
+      setCurrentAttempt,
+      setPath,
+      setAIChatOpen,
+    ],
+  )
 
   const handleInterrupt = useCallback(() => {
     if (abortControllerRef.current) {
@@ -1114,16 +915,13 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       abortControllerRef.current.abort()
       abortControllerRef.current = null
       setIsLoading(false)
-
-      // Clean up streaming state for hybrid agent
-      setStreamingThinking("")
-      setStreamingToolCalls([])
-      setExecutedToolIds(new Set())
+      setActiveThreadId(null)
 
       // Update the streaming message to indicate interruption
+      // Capture index from ref BEFORE setMessages
+      const index = streamingMessageIndexRef.current
       setMessages((prev) => {
         const updated = [...prev]
-        const index = streamingMessageIndex
         if (index >= 0 && index < updated.length) {
           updated[index] = {
             role: "error",
@@ -1132,6 +930,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         }
         return updated
       })
+      streamingMessageIndexRef.current = -1
       setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
@@ -1148,9 +947,18 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           },
         ]
       })
+      streamingMessageIndexRef.current = -1
       setStreamingMessageIndex(-1)
     }
-  }, [agentType, isLoading])
+  }, [
+    agentType,
+    isLoading,
+    setMessages,
+    setIsLoading,
+    setStreamingMessageIndex,
+    setGenerationStage,
+    setGenerationProgress,
+  ])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -1162,11 +970,19 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     [handleSubmit],
   )
 
-  const handleAgentTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newAgentType = e.target.value as AgentType
-    setAgentType(newAgentType)
-    localStorage.setItem(AGENT_TYPE_STORAGE_KEY, newAgentType)
-  }, [])
+  const handleAgentTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newAgentType = e.target.value as AgentType
+      setAgentType(newAgentType)
+      localStorage.setItem(AGENT_TYPE_STORAGE_KEY, newAgentType)
+    },
+    [],
+  )
+
+  const handleNewChat = useCallback(() => {
+    setActiveThreadId(null)
+    setMessages([])
+  }, [setMessages])
 
   // Handle notes detected from voice recorder
   const handleNotesDetected = useCallback(
@@ -1174,7 +990,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       if (notes.length === 0) return
 
       // Add a message to the chat with the notes displayed
-      const messageContent = `🎤 Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
+      const messageContent = `Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
 
       setMessages((prev) => [
         ...prev,
@@ -1185,7 +1001,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         },
       ])
     },
-    []
+    [setMessages],
   )
 
   return (
@@ -1204,6 +1020,15 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             <option value="llm">LLM Direct</option>
           </Select>
         </HeaderLeft>
+        {activeThreadId && (
+          <NewChatButton
+            onClick={handleNewChat}
+            disabled={isLoading}
+            title="Start a new conversation"
+          >
+            New Chat
+          </NewChatButton>
+        )}
         <StatusDot
           status={backendStatus}
           title={
@@ -1254,7 +1079,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             </ProgressBar>
           </ProgressContainer>
         )}
-        {/* Streaming content is now shown in message bubbles, no separate container needed */}
         <div ref={messagesEndRef} />
       </MessageList>
       <InputContainer>
@@ -1263,7 +1087,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe your song..."
+            placeholder={
+              activeThreadId
+                ? "Continue the conversation..."
+                : "Describe your song..."
+            }
             disabled={isLoading || backendStatus === "disconnected"}
             style={{ flex: 1 }}
           />
@@ -1276,11 +1104,9 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         ) : (
           <Button
             onClick={() => handleSubmit()}
-            disabled={
-              !input.trim() || backendStatus === "disconnected"
-            }
+            disabled={!input.trim() || backendStatus === "disconnected"}
           >
-            Generate Song
+            {activeThreadId ? "Send" : "Generate"}
           </Button>
         )}
       </InputContainer>

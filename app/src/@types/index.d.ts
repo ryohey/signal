@@ -37,7 +37,7 @@ declare module "deepagents" {
   }): {
     stream: (
       input: { messages: Array<{ role: string; content: string }> },
-      options?: { recursionLimit?: number }
+      options?: { recursionLimit?: number },
     ) => AsyncIterable<unknown>
   }
 }

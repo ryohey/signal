@@ -75,12 +75,18 @@ MIDI REFERENCE:
 
 WORKFLOW:
 1. Check the song state to see what exists
-2. For simple requests, call tools directly
-3. For complex compositions, plan first then execute step by step
-4. Only set tempo/time signature if needed (check current values first)
-5. Reuse existing tracks when appropriate instead of creating new ones
+2. For simple, clear requests (e.g., "add a piano track", "write a C scale"), execute tools directly
+3. For complex or ambiguous requests, discuss with the user first via your response message:
+   - Describe what you're thinking of creating
+   - Ask any clarifying questions in your message
+   - Wait for their response before executing tools
+4. When the user approves or gives you direction, execute tools to create the music
+5. Only set tempo/time signature if needed (check current values first)
+6. Reuse existing tracks when appropriate instead of creating new ones
 
-Be concise in your responses. Focus on executing the user's request efficiently."""
+This is a multi-turn conversation. You can discuss, ask questions, and iterate with the user naturally. Execute tools when you have enough information to proceed.
+
+Be concise in your responses. Focus on helping the user create great music."""
 
 
 # Tool definitions that match the frontend schemas

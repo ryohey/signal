@@ -179,8 +179,8 @@ const ALIASES: Record<string, number> = {
   "clean guitar": 27,
   "jazz guitar": 26,
   "distorted guitar": 30,
-  "distortion": 30,
-  "overdrive": 29,
+  distortion: 30,
+  overdrive: 29,
   // Bass aliases
   bass: 32,
   "acoustic bass": 32,
@@ -189,7 +189,7 @@ const ALIASES: Record<string, number> = {
   "electric bass": 33,
   "finger bass": 33,
   "pick bass": 34,
-  "fretless": 35,
+  fretless: 35,
   "slap bass": 36,
   "synth bass": 38,
   // String aliases

@@ -172,7 +172,9 @@ export class AgentService {
       const agentState = chunkObj.agent as Record<string, unknown>
       if (agentState.messages && Array.isArray(agentState.messages)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const lastMsg = agentState.messages[agentState.messages.length - 1] as any
+        const lastMsg = agentState.messages[
+          agentState.messages.length - 1
+        ] as any
         if (lastMsg?.content) {
           return String(lastMsg.content)
         }

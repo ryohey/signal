@@ -108,7 +108,9 @@ export class ToolExecutor {
       return {
         success: false,
         errors: [
-          error instanceof Error ? error.message : "Unknown error adding tracks",
+          error instanceof Error
+            ? error.message
+            : "Unknown error adding tracks",
         ],
         tracks_added: 0,
       }
@@ -152,14 +154,10 @@ export class ToolExecutor {
           errors.push(`Invalid tick ${noteSpec.tick}. Must be >= 0.`)
         }
         if (noteSpec.duration <= 0) {
-          errors.push(
-            `Invalid duration ${noteSpec.duration}. Must be > 0.`,
-          )
+          errors.push(`Invalid duration ${noteSpec.duration}. Must be > 0.`)
         }
         if (noteSpec.velocity < 1 || noteSpec.velocity > 127) {
-          errors.push(
-            `Invalid velocity ${noteSpec.velocity}. Must be 1-127.`,
-          )
+          errors.push(`Invalid velocity ${noteSpec.velocity}. Must be 1-127.`)
         }
       }
 
@@ -232,7 +230,10 @@ export class ToolExecutor {
           errors.push(`Invalid tick ${effectSpec.tick}. Must be >= 0.`)
         }
 
-        if (effectSpec.effect_type === "volume" || effectSpec.effect_type === "pan") {
+        if (
+          effectSpec.effect_type === "volume" ||
+          effectSpec.effect_type === "pan"
+        ) {
           if (effectSpec.value < 0 || effectSpec.value > 127) {
             errors.push(
               `Invalid ${effectSpec.effect_type} value ${effectSpec.value}. Must be 0-127.`,
@@ -294,11 +295,12 @@ export class ToolExecutor {
       return {
         success: false,
         errors: [
-          error instanceof Error ? error.message : "Unknown error adding effects",
+          error instanceof Error
+            ? error.message
+            : "Unknown error adding effects",
         ],
         effects_added: 0,
       }
     }
   }
 }
-

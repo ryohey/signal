@@ -3,11 +3,21 @@
  *
  * Consumes SSE from /api/agent/step/stream and handles tool execution
  * with stream reconnection for resume operations.
+ *
+ * Supports multi-turn conversations by tracking thread_id. The thread
+ * persists across messages, allowing natural back-and-forth conversation.
  */
 
 import type { Song } from "@signal-app/core"
-import { formatSongStateForPrompt, serializeSongState } from "./songStateSerializer"
-import { executeToolCalls, type ToolCall, type ToolResult } from "./toolExecutor"
+import {
+  executeToolCalls,
+  type ToolCall,
+  type ToolResult,
+} from "./toolExecutor"
+import {
+  serializeSongState,
+  formatSongStateForPrompt,
+} from "./songStateSerializer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 
@@ -29,6 +39,20 @@ interface SSEEvent {
   error?: string
 }
 
+/** Reason why the agent loop ended */
+export type AgentStopReason =
+  | "complete" // Agent finished (may continue in next turn)
+  | "error" // An error occurred
+  | "aborted" // User aborted
+
+/** Result of running the agent loop */
+export interface AgentLoopResult {
+  success: boolean
+  message?: string
+  threadId?: string // Thread ID for continuing the conversation
+  stopReason: AgentStopReason
+}
+
 interface StreamingCallbacks {
   /** Called when agent is thinking/processing (streamed tokens) */
   onThinking?: (content: string) => void
@@ -40,8 +64,8 @@ interface StreamingCallbacks {
   onMessage?: (message: string) => void
   /** Called on any error */
   onError?: (error: Error) => void
-  /** Called when stream completes */
-  onComplete?: () => void
+  /** Called when stream completes (for any reason) */
+  onComplete?: (result: AgentLoopResult) => void
 }
 
 /**
@@ -73,7 +97,7 @@ function parseSSEEvents(text: string): SSEEvent[] {
  */
 async function* consumeSSEStream(
   response: Response,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): AsyncGenerator<SSEEvent> {
   const reader = response.body?.getReader()
   if (!reader) {
@@ -125,7 +149,7 @@ async function startStreamRequest(
   prompt: string,
   context: string,
   threadId?: string,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): Promise<Response> {
   const response = await fetch(`${API_BASE}/api/agent/step/stream`, {
     method: "POST",
@@ -152,7 +176,7 @@ async function startStreamRequest(
 async function resumeStreamRequest(
   threadId: string,
   toolResults: ToolResult[],
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): Promise<Response> {
   const response = await fetch(`${API_BASE}/api/agent/step/stream`, {
     method: "POST",
@@ -177,24 +201,54 @@ async function resumeStreamRequest(
  *
  * Streams events from the backend, executes tool calls on the frontend,
  * and reconnects to stream results until completion.
+ *
+ * @param prompt - The user's message
+ * @param song - The Song object for tool execution
+ * @param options - Configuration options
+ * @param options.threadId - Optional thread ID to continue an existing conversation
+ * @param options.callbacks - Event callbacks
+ * @param options.abortSignal - Signal to abort the operation
  */
 export async function runAgentStreamLoop(
   prompt: string,
   song: Song,
-  callbacks?: StreamingCallbacks,
-  abortSignal?: AbortSignal
-): Promise<{ success: boolean; message?: string }> {
-  let threadId: string | null = null
+  options?: {
+    threadId?: string
+    callbacks?: StreamingCallbacks
+    abortSignal?: AbortSignal
+  },
+): Promise<AgentLoopResult> {
+  const { threadId: existingThreadId, callbacks, abortSignal } = options ?? {}
+  let threadId: string | null = existingThreadId ?? null
   let thinkingBuffer = ""
+
+  const makeResult = (
+    success: boolean,
+    stopReason: AgentStopReason,
+    message?: string,
+  ): AgentLoopResult => {
+    const result: AgentLoopResult = {
+      success,
+      stopReason,
+      message,
+      threadId: threadId ?? undefined,
+    }
+    callbacks?.onComplete?.(result)
+    return result
+  }
 
   try {
     // Serialize current song state for agent context
     const songState = serializeSongState(song)
     const context = formatSongStateForPrompt(songState)
-    console.log(`[AgentStream] Starting with context:`, context)
 
-    // Start initial stream
-    let response = await startStreamRequest(prompt, context, undefined, abortSignal)
+    // Start stream (continue existing thread if threadId provided)
+    let response = await startStreamRequest(
+      prompt,
+      context,
+      threadId ?? undefined,
+      abortSignal,
+    )
 
     while (true) {
       if (abortSignal?.aborted) {
@@ -207,8 +261,6 @@ export async function runAgentStreamLoop(
 
       // Consume the stream
       for await (const event of consumeSSEStream(response, abortSignal)) {
-        console.log(`[AgentStream] Event:`, event)
-
         // Capture thread_id from any event
         if (event.thread_id) {
           threadId = event.thread_id
@@ -230,7 +282,7 @@ export async function runAgentStreamLoop(
             break
 
           case "tool_results_received":
-            console.log(`[AgentStream] Tool results acknowledged: ${event.count}`)
+            // Tool results acknowledged by backend
             break
 
           case "message":
@@ -239,8 +291,7 @@ export async function runAgentStreamLoop(
               callbacks?.onMessage?.(event.content)
             }
             if (event.done) {
-              callbacks?.onComplete?.()
-              return { success: true, message: finalMessage ?? undefined }
+              return makeResult(true, "complete", finalMessage ?? undefined)
             }
             break
 
@@ -248,20 +299,18 @@ export async function runAgentStreamLoop(
             hasError = true
             const error = new Error(event.error ?? "Unknown error")
             callbacks?.onError?.(error)
-            return { success: false, message: event.error }
+            return makeResult(false, "error", event.error)
         }
       }
 
       // Stream ended - check what to do next
       if (hasError) {
-        return { success: false, message: "Stream error" }
+        return makeResult(false, "error", "Stream error")
       }
 
       if (pendingToolCalls && pendingToolCalls.length > 0 && threadId) {
-        // Execute tools and resume stream
-        console.log(`[AgentStream] Executing ${pendingToolCalls.length} tool calls`)
+        // Execute all tool calls
         const toolResults = executeToolCalls(song, pendingToolCalls)
-        console.log(`[AgentStream] Tool results:`, toolResults)
         callbacks?.onToolsExecuted?.(pendingToolCalls, toolResults)
 
         // Reset thinking buffer for next round
@@ -274,18 +323,18 @@ export async function runAgentStreamLoop(
 
       // No more work to do
       if (finalMessage) {
-        return { success: true, message: finalMessage }
+        return makeResult(true, "complete", finalMessage)
       }
 
-      // Unexpected end
-      console.warn("[AgentStream] Stream ended unexpectedly")
-      return { success: true, message: thinkingBuffer || undefined }
+      // Unexpected end - return thinking buffer as fallback message
+      return makeResult(true, "complete", thinkingBuffer || undefined)
     }
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error))
-    if (err.message !== "Aborted") {
-      callbacks?.onError?.(err)
+    if (err.message === "Aborted") {
+      return makeResult(false, "aborted", "Aborted by user")
     }
-    return { success: false, message: err.message }
+    callbacks?.onError?.(err)
+    return makeResult(false, "error", err.message)
   }
 }
