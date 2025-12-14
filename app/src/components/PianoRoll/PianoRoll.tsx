@@ -4,6 +4,7 @@ import { clamp } from "lodash"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
+import { useEditorMode } from "../../hooks/useEditorMode"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoNotesKeyboardShortcut } from "../../hooks/usePianoNotesKeyboardShortcut"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
@@ -14,6 +15,7 @@ import {
   HorizontalScaleScrollBar,
   VerticalScaleScrollBar,
 } from "../inputs/ScaleScrollBar"
+import { BAR_WIDTH } from "../inputs/ScrollBar"
 import { PianoRollStage } from "./PianoRollStage"
 import { StyledSplitPane } from "./StyledSplitPane"
 
@@ -37,6 +39,7 @@ const Beta = styled.div`
 const PianoRollWrapper: FC = () => {
   const { transform, scrollBy, selectedTrackId, setActivePane } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
+  const { isAdvanced } = useEditorMode()
   const {
     contentHeight,
     scrollTop,
@@ -132,12 +135,40 @@ const PianoRollWrapper: FC = () => {
 
   return (
     <Parent ref={ref}>
-      <StyledSplitPane
-        split="horizontal"
-        minSize={50}
-        defaultSize={"60%"}
-        onChange={onChangeSplitPane}
-      >
+      {isAdvanced ? (
+        <StyledSplitPane
+          split="horizontal"
+          minSize={50}
+          defaultSize={"60%"}
+          onChange={onChangeSplitPane}
+        >
+          <Alpha
+            onWheel={onWheel}
+            ref={alphaRef}
+            {...keyboardShortcutProps}
+            onFocus={onFocusNotes}
+            onBlur={onBlurNotes}
+            tabIndex={0}
+          >
+            <PianoRollStage
+              width={size.width}
+              height={alphaHeight}
+              keyWidth={keyWidth}
+            />
+            <VerticalScaleScrollBar
+              scrollOffset={scrollTop}
+              contentLength={contentHeight}
+              onScroll={setScrollTopInPixels}
+              onClickScaleUp={onClickScaleUpVertical}
+              onClickScaleDown={onClickScaleDownVertical}
+              onClickScaleReset={onClickScaleResetVertical}
+            />
+          </Alpha>
+          <Beta>
+            <ControlPane axisWidth={keyWidth} />
+          </Beta>
+        </StyledSplitPane>
+      ) : (
         <Alpha
           onWheel={onWheel}
           ref={alphaRef}
@@ -145,10 +176,11 @@ const PianoRollWrapper: FC = () => {
           onFocus={onFocusNotes}
           onBlur={onBlurNotes}
           tabIndex={0}
+          style={{ height: `calc(100% - ${BAR_WIDTH}px)` }}
         >
           <PianoRollStage
             width={size.width}
-            height={alphaHeight}
+            height={size.height - BAR_WIDTH}
             keyWidth={keyWidth}
           />
           <VerticalScaleScrollBar
@@ -160,10 +192,7 @@ const PianoRollWrapper: FC = () => {
             onClickScaleReset={onClickScaleResetVertical}
           />
         </Alpha>
-        <Beta>
-          <ControlPane axisWidth={keyWidth} />
-        </Beta>
-      </StyledSplitPane>
+      )}
       <HorizontalScaleScrollBar
         scrollOffset={scrollLeft}
         contentLength={contentWidth}

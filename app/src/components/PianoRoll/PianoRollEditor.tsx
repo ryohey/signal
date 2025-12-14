@@ -1,18 +1,19 @@
 import styled from "@emotion/styled"
 import { SplitPaneProps } from "@ryohey/react-split-pane"
 import { FC, ReactNode } from "react"
+import { useAIChat } from "../../hooks/useAIChat"
 import { useAutoFocus } from "../../hooks/useAutoFocus"
+import { useEditorMode } from "../../hooks/useEditorMode"
 import { useEventList } from "../../hooks/useEventList"
 import { PianoRollScope } from "../../hooks/usePianoRoll"
 import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
 import { useTrackList } from "../../hooks/useTrackList"
-import { useAIChat } from "../../hooks/useAIChat"
+import { AIChat } from "../AIChat/AIChat"
 import EventList from "../EventEditor/EventList"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
 import { TrackList } from "../TrackList/TrackList"
 import { PianoRollTransposeDialog } from "../TransposeDialog/PianoRollTransposeDialog"
 import { PianoRollVelocityDialog } from "../VelocityDialog/PianoRollVelocityDialog"
-import { AIChat } from "../AIChat/AIChat"
 import PianoRoll from "./PianoRoll"
 import { StyledSplitPane } from "./StyledSplitPane"
 
@@ -21,12 +22,18 @@ const ColumnContainer = styled.div`
   flex-direction: column;
   flex-grow: 1;
   outline: none;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 `
 
 const MainContainer = styled.div`
   display: flex;
   flex-grow: 1;
   position: relative;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 `
 
 const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
@@ -49,6 +56,7 @@ const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
 const PianoRollPanes: FC = () => {
   const { isOpen: showTrackList } = useTrackList()
   const { isOpen: showEventList } = useEventList()
+  const { isAdvanced } = useEditorMode()
 
   return (
     <div style={{ display: "flex", flexGrow: 1, position: "relative" }}>
@@ -65,7 +73,7 @@ const PianoRollPanes: FC = () => {
           minSize={240}
           pane1Style={{ display: "flex" }}
           pane2Style={{ display: "flex" }}
-          isShow={showEventList}
+          isShow={isAdvanced && showEventList}
           pane={<EventList />}
         >
           <PianoRoll />

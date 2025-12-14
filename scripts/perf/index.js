@@ -14,7 +14,7 @@ const browser = await puppeteer.launch({
   args: ["--autoplay-policy=no-user-gesture-required"],
 })
 const page = await browser.newPage()
-await page.goto("http://localhost:3000/edit?disableFileSystem=true", {
+await page.goto("http://localhost:3000/?disableFileSystem=true", {
   waitUntil: "networkidle0",
 })
 

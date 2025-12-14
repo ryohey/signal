@@ -17,7 +17,7 @@ export const Head: FC = () => {
 
   return (
     <Helmet>
-      <title>{`${songName}${isSaved ? "" : " *"} - signal`}</title>
+      <title>{`${songName}${isSaved ? "" : " *"} - PipeDream 2.0`}</title>
     </Helmet>
   )
 }

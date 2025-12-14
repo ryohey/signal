@@ -81,12 +81,6 @@ export const useGlobalKeyboardShortcut = () => {
         metaKey: true,
         run: () => setPath("/arrange"),
       },
-      // Switch to tempo roll (Meta-3)
-      {
-        code: "Digit3",
-        metaKey: true,
-        run: () => setPath("/tempo"),
-      },
       // Save (Meta-S)
       {
         code: "KeyS",

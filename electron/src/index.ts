@@ -108,7 +108,7 @@ const createWindow = (): void => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    title: `signal v${app.getVersion()}`,
+    title: `PipeDream 2.0 v${app.getVersion()}`,
     titleBarStyle: isMas ? "hidden" : "default",
     trafficLightPosition: { x: 10, y: 17 },
     webPreferences: {
@@ -123,11 +123,11 @@ const createWindow = (): void => {
 
   // and load the index.html of the app.
   if (!app.isPackaged) {
-    mainWindow.loadURL("http://localhost:3000/edit")
+    mainWindow.loadURL("http://localhost:3000/")
     mainWindow.webContents.openDevTools()
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, "..", "dist_renderer", "edit.html"),
+      path.join(__dirname, "..", "dist_renderer", "index.html"),
     )
   }
 

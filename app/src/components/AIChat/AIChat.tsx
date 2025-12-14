@@ -1,6 +1,8 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
+import { useAIChat } from "../../hooks/useAIChat"
+import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
@@ -8,13 +10,18 @@ import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
-const Container = styled.div`
+const Container = styled.div<{ standalone?: boolean }>`
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: ${({ theme }) => theme.backgroundColor};
-  border-left: 1px solid ${({ theme }) => theme.dividerColor};
-  min-width: 300px;
+  border-left: ${({ standalone, theme }) =>
+    standalone ? "none" : `1px solid ${theme.dividerColor}`};
+  overflow: hidden;
 `
 
 const Header = styled.div`
@@ -26,6 +33,10 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
 `
 
 const HeaderLeft = styled.div`
@@ -93,17 +104,23 @@ const StatusDot = styled.span<{
 const MessageList = styled.div`
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   user-select: text;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   max-width: 85%;
+  width: 85%;
+  min-width: 0;
   align-self: ${({ role }) => (role === "user" ? "flex-end" : "flex-start")};
   background: ${({ role, theme }) =>
     role === "user"
@@ -123,7 +140,10 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   -ms-user-select: text;
   white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   cursor: text;
+  box-sizing: border-box;
 `
 
 const InputContainer = styled.div`
@@ -132,12 +152,18 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const InputRow = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 `
 
 const Input = styled.textarea`
@@ -220,6 +246,13 @@ const ProgressContainer = styled.div`
   background: ${({ theme }) => theme.secondaryBackgroundColor};
   border-radius: 0.5rem;
   margin: 0.5rem 0;
+  max-width: 85%;
+  min-width: 0;
+  width: fit-content;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `
 
 const ProgressStage = styled.div`
@@ -326,7 +359,7 @@ const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
 
   return (
     <NotesContainer>
-      <NotesHeader>🎵 Detected Notes ({notes.length}):</NotesHeader>
+      <NotesHeader>Detected Notes ({notes.length}):</NotesHeader>
       <NotesList>
         {notes.map((note, i) => (
           <NoteItem key={i}>
@@ -437,20 +470,30 @@ function getStageProgress(stage: GenerationStage): number {
   }
 }
 
-interface ChatMessage {
-  role: "user" | "assistant" | "error"
-  content: string
-  notes?: DetectedNote[] // Optional notes data for voice recordings
-}
-
 const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
 type AgentType = "llm" | "composition_agent" | "hybrid"
 
-export const AIChat: FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+export interface AIChatProps {
+  standalone?: boolean
+}
+
+export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
+  const {
+    messages,
+    setMessages,
+    isLoading,
+    setIsLoading,
+    generationStage,
+    setGenerationStage,
+    generationProgress,
+    setGenerationProgress,
+    currentAttempt,
+    setCurrentAttempt,
+    streamingMessageIndex,
+    setStreamingMessageIndex,
+  } = useAIChat()
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const [backendStatus, setBackendStatus] = useState<
     "connected" | "disconnected" | "checking"
   >("checking")
@@ -464,17 +507,13 @@ export const AIChat: FC = () => {
       : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
-  // Deep agent progress state
-  const [generationStage, setGenerationStage] =
-    useState<GenerationStage | null>(null)
-  const [generationProgress, setGenerationProgress] = useState<string>("")
-  const [currentAttempt, setCurrentAttempt] = useState<number>(0)
   // Conversation state for multi-turn interactions
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
 
   const loadAISong = useLoadAISong()
+  const { setPath } = useRouter()
+  const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const streamingMessageRef = useRef<number>(-1)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = useCallback(() => {
@@ -538,9 +577,13 @@ export const AIChat: FC = () => {
           { role: "user" as const, content: messageToSubmit },
         ]
         const assistantIndex = newMessages.length
-        streamingMessageRef.current = assistantIndex
+        setStreamingMessageIndex(assistantIndex)
         return [...newMessages, { role: "assistant" as const, content: "" }]
       })
+
+      // Navigate to arrange view and ensure AI chat is open BEFORE starting generation
+      setPath("/arrange")
+      setAIChatOpen(true)
 
       setIsLoading(true)
 
@@ -560,7 +603,7 @@ export const AIChat: FC = () => {
                 results: ToolResult[],
               ) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageRef.current
+                const index = streamingMessageIndex
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
@@ -586,7 +629,7 @@ export const AIChat: FC = () => {
               },
               onMessage: (message: string) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageRef.current
+                const index = streamingMessageIndex
                 // Display the agent's response message
                 setMessages((prev) => {
                   const updated = [...prev]
@@ -603,7 +646,8 @@ export const AIChat: FC = () => {
               },
               onError: (error: Error) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageRef.current
+                const index = streamingMessageIndex
+                console.error("[AIChat] Agent error:", error)
                 setMessages((prev) => {
                   const updated = [...prev]
                   if (index >= 0 && index < updated.length) {
@@ -625,7 +669,7 @@ export const AIChat: FC = () => {
 
           // Handle error result
           if (!result.success) {
-            const index = streamingMessageRef.current
+            const index = streamingMessageIndex
             setMessages((prev) => {
               const updated = [...prev]
               if (index >= 0 && index < updated.length) {
@@ -640,7 +684,7 @@ export const AIChat: FC = () => {
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Generation failed"
-          const index = streamingMessageRef.current
+          const index = streamingMessageIndex
           setMessages((prev) => {
             const updated = [...prev]
             if (index >= 0 && index < updated.length) {
@@ -649,7 +693,7 @@ export const AIChat: FC = () => {
             return updated
           })
         } finally {
-          streamingMessageRef.current = -1
+          setStreamingMessageIndex(-1)
           setIsLoading(false)
           abortControllerRef.current = null
         }
@@ -665,7 +709,7 @@ export const AIChat: FC = () => {
               // Update the streaming message
               setMessages((prev) => {
                 const updated = [...prev]
-                const index = streamingMessageRef.current
+                const index = streamingMessageIndex
                 if (index >= 0 && index < updated.length) {
                   updated[index] = {
                     ...updated[index],
@@ -680,9 +724,9 @@ export const AIChat: FC = () => {
               loadAISong(response)
 
               // Update the final message
+              const index = streamingMessageIndex
               setMessages((prev) => {
                 const updated = [...prev]
-                const index = streamingMessageRef.current
                 if (index >= 0 && index < updated.length) {
                   updated[index] = {
                     role: "assistant",
@@ -693,13 +737,14 @@ export const AIChat: FC = () => {
                 }
                 return updated
               })
-              streamingMessageRef.current = -1
+              setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
             },
             (error) => {
               const errorMessage =
                 error instanceof Error ? error.message : "Generation failed"
+              console.error("[AIChat] LLM generation error:", error)
 
               // Provide user-friendly error messages
               let friendlyMessage = errorMessage
@@ -717,9 +762,9 @@ export const AIChat: FC = () => {
                   "The AI generated invalid code. Please try again with a different prompt."
               }
 
+              const index = streamingMessageIndex
               setMessages((prev) => {
                 const updated = [...prev]
-                const index = streamingMessageRef.current
                 // Replace the streaming message with error
                 if (index >= 0 && index < updated.length) {
                   updated[index] = {
@@ -729,7 +774,7 @@ export const AIChat: FC = () => {
                 }
                 return updated
               })
-              streamingMessageRef.current = -1
+              setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
             },
@@ -738,10 +783,11 @@ export const AIChat: FC = () => {
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Generation failed"
+          console.error("[AIChat] LLM catch error:", err)
 
+          const index = streamingMessageIndex
           setMessages((prev) => {
             const updated = [...prev]
-            const index = streamingMessageRef.current
             if (index >= 0 && index < updated.length) {
               updated[index] = {
                 role: "error",
@@ -750,7 +796,7 @@ export const AIChat: FC = () => {
             }
             return updated
           })
-          streamingMessageRef.current = -1
+          setStreamingMessageIndex(-1)
           setIsLoading(false)
           abortControllerRef.current = null
         }
@@ -794,6 +840,7 @@ export const AIChat: FC = () => {
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Generation failed"
+          console.error("[AIChat] Composition agent error:", err)
 
           // Provide user-friendly error messages
           let friendlyMessage = errorMessage
@@ -829,7 +876,7 @@ export const AIChat: FC = () => {
           setIsLoading(false)
           setGenerationStage(null)
           setGenerationProgress("")
-          streamingMessageRef.current = -1
+          setStreamingMessageIndex(-1)
         }
       }
     },
@@ -841,6 +888,15 @@ export const AIChat: FC = () => {
       songStore.song,
       messages,
       activeThreadId,
+      streamingMessageIndex,
+      setMessages,
+      setIsLoading,
+      setStreamingMessageIndex,
+      setGenerationStage,
+      setGenerationProgress,
+      setCurrentAttempt,
+      setPath,
+      setAIChatOpen,
     ],
   )
 
@@ -853,9 +909,9 @@ export const AIChat: FC = () => {
       setActiveThreadId(null)
 
       // Update the streaming message to indicate interruption
+      const index = streamingMessageIndex
       setMessages((prev) => {
         const updated = [...prev]
-        const index = streamingMessageRef.current
         if (index >= 0 && index < updated.length) {
           updated[index] = {
             role: "error",
@@ -864,7 +920,7 @@ export const AIChat: FC = () => {
         }
         return updated
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
       setIsLoading(false)
@@ -880,9 +936,18 @@ export const AIChat: FC = () => {
           },
         ]
       })
-      streamingMessageRef.current = -1
+      setStreamingMessageIndex(-1)
     }
-  }, [agentType, isLoading])
+  }, [
+    agentType,
+    isLoading,
+    streamingMessageIndex,
+    setMessages,
+    setIsLoading,
+    setStreamingMessageIndex,
+    setGenerationStage,
+    setGenerationProgress,
+  ])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -906,27 +971,30 @@ export const AIChat: FC = () => {
   const handleNewChat = useCallback(() => {
     setActiveThreadId(null)
     setMessages([])
-  }, [])
+  }, [setMessages])
 
   // Handle notes detected from voice recorder
-  const handleNotesDetected = useCallback((notes: DetectedNote[]) => {
-    if (notes.length === 0) return
+  const handleNotesDetected = useCallback(
+    (notes: DetectedNote[]) => {
+      if (notes.length === 0) return
 
-    // Add a message to the chat with the notes displayed
-    const messageContent = `🎤 Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
+      // Add a message to the chat with the notes displayed
+      const messageContent = `Recorded ${notes.length} notes. Specify which track to add them to, or ask me to create a new track.`
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "user" as const,
-        content: messageContent,
-        notes: notes, // Store notes in the message for display and context
-      },
-    ])
-  }, [])
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "user" as const,
+          content: messageContent,
+          notes: notes, // Store notes in the message for display and context
+        },
+      ])
+    },
+    [setMessages],
+  )
 
   return (
-    <Container>
+    <Container standalone={standalone}>
       <Header>
         <HeaderLeft>
           <span>AI Composer</span>

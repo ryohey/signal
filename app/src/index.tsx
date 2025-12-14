@@ -20,7 +20,7 @@ root.render(<App />)
 if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("/service-worker.js", { scope: "/edit" })
+      .register("/service-worker.js", { scope: "/" })
       .then((registration) => {
         console.log("SW registered: ", registration)
       })
