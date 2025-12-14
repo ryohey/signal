@@ -13,7 +13,12 @@ export interface PianoRollStageProps {
   keyWidth: number
 }
 
-const Container = styled.div``
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`
 
 const RulerPosition = styled(Positioned)`
   height: var(--size-ruler-height);

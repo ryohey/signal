@@ -515,6 +515,9 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
   const { setOpen: setAIChatOpen } = useAIChat()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  // Use a ref to track the streaming message index - this allows callbacks to
+  // access the current value at execution time rather than definition time
+  const streamingMessageIndexRef = useRef<number>(-1)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -577,7 +580,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           { role: "user" as const, content: messageToSubmit },
         ]
         const assistantIndex = newMessages.length
-        setStreamingMessageIndex(assistantIndex)
+        streamingMessageIndexRef.current = assistantIndex
         return [...newMessages, { role: "assistant" as const, content: "" }]
       })
 
@@ -603,7 +606,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 results: ToolResult[],
               ) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageIndex
+                const index = streamingMessageIndexRef.current
                 // Update message to show tools executed
                 setMessages((prev) => {
                   const updated = [...prev]
@@ -629,7 +632,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               },
               onMessage: (message: string) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageIndex
+                const index = streamingMessageIndexRef.current
                 // Display the agent's response message
                 setMessages((prev) => {
                   const updated = [...prev]
@@ -646,7 +649,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               },
               onError: (error: Error) => {
                 // Capture index BEFORE setMessages to avoid race with finally block
-                const index = streamingMessageIndex
+                const index = streamingMessageIndexRef.current
                 console.error("[AIChat] Agent error:", error)
                 setMessages((prev) => {
                   const updated = [...prev]
@@ -669,7 +672,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
 
           // Handle error result
           if (!result.success) {
-            const index = streamingMessageIndex
+            const index = streamingMessageIndexRef.current
             setMessages((prev) => {
               const updated = [...prev]
               if (index >= 0 && index < updated.length) {
@@ -684,7 +687,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Generation failed"
-          const index = streamingMessageIndex
+          const index = streamingMessageIndexRef.current
           setMessages((prev) => {
             const updated = [...prev]
             if (index >= 0 && index < updated.length) {
@@ -693,7 +696,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             return updated
           })
         } finally {
-          setStreamingMessageIndex(-1)
+          streamingMessageIndexRef.current = -1
           setIsLoading(false)
           abortControllerRef.current = null
         }
@@ -706,10 +709,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           await aiBackend.generateStream(
             { prompt: userMessage, agentType: agentType },
             (content: string) => {
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
               // Update the streaming message
               setMessages((prev) => {
                 const updated = [...prev]
-                const index = streamingMessageIndex
                 if (index >= 0 && index < updated.length) {
                   updated[index] = {
                     ...updated[index],
@@ -723,8 +727,9 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
               // Load the generated song
               loadAISong(response)
 
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
               // Update the final message
-              const index = streamingMessageIndex
               setMessages((prev) => {
                 const updated = [...prev]
                 if (index >= 0 && index < updated.length) {
@@ -737,6 +742,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 }
                 return updated
               })
+              streamingMessageIndexRef.current = -1
               setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
@@ -762,7 +768,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                   "The AI generated invalid code. Please try again with a different prompt."
               }
 
-              const index = streamingMessageIndex
+              // Capture index from ref BEFORE setMessages
+              const index = streamingMessageIndexRef.current
               setMessages((prev) => {
                 const updated = [...prev]
                 // Replace the streaming message with error
@@ -774,6 +781,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 }
                 return updated
               })
+              streamingMessageIndexRef.current = -1
               setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
@@ -785,7 +793,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             err instanceof Error ? err.message : "Generation failed"
           console.error("[AIChat] LLM catch error:", err)
 
-          const index = streamingMessageIndex
+          // Capture index from ref BEFORE setMessages
+          const index = streamingMessageIndexRef.current
           setMessages((prev) => {
             const updated = [...prev]
             if (index >= 0 && index < updated.length) {
@@ -796,6 +805,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             }
             return updated
           })
+          streamingMessageIndexRef.current = -1
           setStreamingMessageIndex(-1)
           setIsLoading(false)
           abortControllerRef.current = null
@@ -888,7 +898,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       songStore.song,
       messages,
       activeThreadId,
-      streamingMessageIndex,
       setMessages,
       setIsLoading,
       setStreamingMessageIndex,
@@ -909,7 +918,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       setActiveThreadId(null)
 
       // Update the streaming message to indicate interruption
-      const index = streamingMessageIndex
+      // Capture index from ref BEFORE setMessages
+      const index = streamingMessageIndexRef.current
       setMessages((prev) => {
         const updated = [...prev]
         if (index >= 0 && index < updated.length) {
@@ -920,6 +930,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         }
         return updated
       })
+      streamingMessageIndexRef.current = -1
       setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
@@ -936,12 +947,12 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           },
         ]
       })
+      streamingMessageIndexRef.current = -1
       setStreamingMessageIndex(-1)
     }
   }, [
     agentType,
     isLoading,
-    streamingMessageIndex,
     setMessages,
     setIsLoading,
     setStreamingMessageIndex,
