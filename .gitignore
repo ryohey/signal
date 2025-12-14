@@ -8,7 +8,6 @@ logs
 *.log
 npm-debug.log*
 
-
 # Runtime data
 pids
 *.pid
@@ -61,3 +60,5 @@ venv/
 env/
 ENV/
 .env.venv
+
+package.json
