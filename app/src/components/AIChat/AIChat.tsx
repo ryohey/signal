@@ -492,6 +492,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     setCurrentAttempt,
     streamingMessageIndex,
     setStreamingMessageIndex,
+    activeThreadId,
+    setActiveThreadId,
   } = useAIChat()
   const [input, setInput] = useState("")
   const [backendStatus, setBackendStatus] = useState<
@@ -507,8 +509,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       : "hybrid" // Default to hybrid agent
   })
   const { songStore } = useStores()
-  // Conversation state for multi-turn interactions
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
 
   const loadAISong = useLoadAISong()
   const { setPath } = useRouter()
@@ -597,6 +597,8 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         // Hybrid Agent mode: Run agent loop with frontend tool execution
         const abortController = new AbortController()
         abortControllerRef.current = abortController
+
+        console.log(`[AIChat] handleSubmit - activeThreadId: ${activeThreadId}`)
 
         try {
           const result = await runAgentLoop(userMessage, songStore.song, {

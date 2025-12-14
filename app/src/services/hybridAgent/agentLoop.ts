@@ -53,12 +53,15 @@ export async function runAgentLoop(
   const { threadId: existingThreadId, callbacks, abortSignal } = options ?? {}
   let threadId: string | null = existingThreadId ?? null
 
+  console.log(`[HybridAgent] runAgentLoop called with threadId: ${threadId}`)
+
   try {
     // Serialize current song state for agent context
     const songState = serializeSongState(song)
     const context = formatSongStateForPrompt(songState)
 
     // Initial request
+    console.log(`[HybridAgent] Sending request with thread_id: ${threadId}`)
     let response = await fetch(`${API_BASE}/api/agent/step`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

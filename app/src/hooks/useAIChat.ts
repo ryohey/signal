@@ -24,6 +24,7 @@ const aiChatGenerationStageAtom = atom<GenerationStage | null>(null)
 const aiChatGenerationProgressAtom = atom<string>("")
 const aiChatCurrentAttemptAtom = atom<number>(0)
 const aiChatStreamingMessageIndexAtom = atom<number>(-1)
+const aiChatActiveThreadIdAtom = atom<string | null>(null)
 
 export function useAIChat() {
   const isOpen = useAtomValue(aiChatOpenAtom)
@@ -46,6 +47,8 @@ export function useAIChat() {
   const setCurrentAttempt = useSetAtom(aiChatCurrentAttemptAtom)
   const streamingMessageIndex = useAtomValue(aiChatStreamingMessageIndexAtom)
   const setStreamingMessageIndex = useSetAtom(aiChatStreamingMessageIndexAtom)
+  const activeThreadId = useAtomValue(aiChatActiveThreadIdAtom)
+  const setActiveThreadId = useSetAtom(aiChatActiveThreadIdAtom)
 
   return {
     isOpen,
@@ -69,5 +72,7 @@ export function useAIChat() {
     setCurrentAttempt,
     streamingMessageIndex,
     setStreamingMessageIndex,
+    activeThreadId,
+    setActiveThreadId,
   }
 }

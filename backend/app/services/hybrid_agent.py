@@ -84,7 +84,11 @@ WORKFLOW:
 5. Only set tempo/time signature if needed (check current values first)
 6. Reuse existing tracks when appropriate instead of creating new ones
 
-This is a multi-turn conversation. You can discuss, ask questions, and iterate with the user naturally. Execute tools when you have enough information to proceed.
+IMPORTANT - CONVERSATION MEMORY:
+- This is a multi-turn conversation. ALWAYS remember what the user told you earlier.
+- If the user mentioned a style, genre, key, tempo preference, or any other detail earlier in the conversation, REMEMBER IT and apply it to all subsequent actions.
+- NEVER ask the user to repeat information they already provided. If they said "rock song" or "jazz style" earlier, that context applies to the whole session.
+- Reference earlier conversation when relevant: "Based on the rock style you mentioned..."
 
 Be concise in your responses. Focus on helping the user create great music."""
 
@@ -206,14 +210,34 @@ async def start_agent_step(prompt: str, thread_id: Optional[str] = None, context
 
     config = {"configurable": {"thread_id": thread_id}}
 
+    # Load existing conversation history from checkpoint
+    existing_state = await agent.aget_state(config)
+    existing_messages = existing_state.values.get("messages", []) if existing_state.values else []
+
+    # VERY VISIBLE LOGGING
+    print(f"\n{'='*60}")
+    print(f"[HYBRID_AGENT] thread_id: {thread_id}")
+    print(f"[HYBRID_AGENT] existing_messages count: {len(existing_messages)}")
+    print(f"[HYBRID_AGENT] existing_state.values keys: {existing_state.values.keys() if existing_state.values else 'None'}")
+    print(f"{'='*60}\n")
+
     # Build the full message with context if provided
     full_prompt = prompt
     if context:
         full_prompt = f"{context}\n\n---\n\nUser request: {prompt}"
 
+    # Build the message list - include history if continuing conversation
+    new_message = {"role": "user", "content": full_prompt}
+    if existing_messages:
+        messages_to_send = {"messages": existing_messages + [new_message]}
+        print(f"[HYBRID_AGENT] CONTINUING conversation with {len(existing_messages)} + 1 messages")
+    else:
+        messages_to_send = {"messages": [new_message]}
+        print(f"[HYBRID_AGENT] STARTING new conversation")
+
     # Invoke the agent
     result = await agent.ainvoke(
-        {"messages": [{"role": "user", "content": full_prompt}]},
+        messages_to_send,
         config=config,
     )
 
@@ -338,15 +362,33 @@ async def stream_agent_step(prompt: str, thread_id: Optional[str] = None, contex
     agent = get_agent()
 
     # Create or reuse thread ID
+    is_new_thread = thread_id is None
     if thread_id is None:
         thread_id = generate_thread_id()
 
     config = {"configurable": {"thread_id": thread_id}}
 
+    # Load existing conversation history from checkpoint
+    existing_state = await agent.aget_state(config)
+    existing_messages = existing_state.values.get("messages", []) if existing_state.values else []
+    print(f"[DEBUG] Thread {thread_id[:8]}... is_new={is_new_thread}, existing_messages={len(existing_messages)}")
+
     # Build the full message with context if provided
     full_prompt = prompt
     if context:
         full_prompt = f"{context}\n\n---\n\nUser request: {prompt}"
+
+    # Build the message list - include history if continuing conversation
+    new_message = {"role": "user", "content": full_prompt}
+    if existing_messages:
+        # Continue existing conversation - append new message to history
+        # The existing_messages are LangChain message objects, we need to pass them through
+        messages_to_send = {"messages": existing_messages + [new_message]}
+        print(f"[DEBUG] Continuing conversation with {len(existing_messages)} existing + 1 new message")
+    else:
+        # New conversation
+        messages_to_send = {"messages": [new_message]}
+        print(f"[DEBUG] Starting new conversation")
 
     try:
         # Emit thinking event
@@ -357,7 +399,7 @@ async def stream_agent_step(prompt: str, thread_id: Optional[str] = None, contex
 
         # Stream events from the agent
         async for event in agent.astream_events(
-            {"messages": [{"role": "user", "content": full_prompt}]},
+            messages_to_send,
             config=config,
             version="v2",
         ):
@@ -376,6 +418,12 @@ async def stream_agent_step(prompt: str, thread_id: Optional[str] = None, contex
 
         # After streaming completes, check state for tool calls or completion
         state = await agent.aget_state(config)
+        final_messages = state.values.get("messages", []) if state.values else []
+        print(f"[DEBUG stream_agent_step] After stream: thread {thread_id[:8]}... has {len(final_messages)} messages")
+        for i, msg in enumerate(final_messages):
+            role = getattr(msg, 'type', 'unknown')
+            content_preview = str(getattr(msg, 'content', ''))[:80]
+            print(f"[DEBUG stream_agent_step]   [{i}] {role}: {content_preview}...")
 
         if state.next:
             # Agent is paused at interrupt - extract tool calls
