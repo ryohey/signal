@@ -3,7 +3,7 @@ import json
 import asyncio
 from typing import Optional
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, UploadFile, File
 from fastapi.responses import StreamingResponse
 from app.models.schemas import (
     GenerateRequest,
@@ -16,6 +16,9 @@ from app.models.schemas import (
     AgentStepRequest,
     AgentStepResponse,
     ToolCall,
+    PitchDetectionResponse,
+    RhythmInterpretationRequest,
+    RhythmInterpretationResponse,
 )
 from app.services.composition_agent import (
     generate_midi_code as generate_midi_code_composition,
@@ -38,6 +41,8 @@ from app.services.hybrid_agent import (
     stream_agent_step,
     stream_agent_resume,
 )
+from app.services.pitch_detection import detect_pitch
+from app.services.rhythm_interpreter import interpret_rhythm
 
 router = APIRouter()
 
@@ -638,3 +643,65 @@ async def agent_step_stream(request: AgentStepRequest, req: Request):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# ============================================================================
+# Voice-to-MIDI Endpoints
+# ============================================================================
+
+
+@router.post("/detect-pitch", response_model=PitchDetectionResponse)
+async def detect_pitch_endpoint(
+    file: UploadFile = File(...),
+    model_capacity: str = "small",
+):
+    """
+    Detect pitch from uploaded audio file using CREPE.
+
+    Args:
+        file: Audio file (WAV, WebM, MP3, etc.)
+        model_capacity: CREPE model size - 'tiny', 'small', 'medium', 'large', 'full'
+                       Smaller = faster, larger = more accurate
+
+    Returns:
+        PitchDetectionResponse with grouped pitch segments
+    """
+    try:
+        audio_bytes = await file.read()
+
+        if len(audio_bytes) == 0:
+            raise HTTPException(status_code=400, detail="Empty audio file")
+
+        result = await detect_pitch(
+            audio_bytes,
+            model_capacity=model_capacity,
+        )
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Pitch detection failed: {str(e)}")
+
+
+@router.post("/interpret-rhythm", response_model=RhythmInterpretationResponse)
+async def interpret_rhythm_endpoint(
+    request: RhythmInterpretationRequest,
+):
+    """
+    Interpret rhythm from pitch segments using LLM.
+
+    Args:
+        request: RhythmInterpretationRequest with segments and quantize settings
+
+    Returns:
+        RhythmInterpretationResponse with quantized notes and detected tempo
+    """
+    try:
+        if not request.segments:
+            raise HTTPException(status_code=400, detail="No pitch segments provided")
+
+        result = await interpret_rhythm(request)
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Rhythm interpretation failed: {str(e)}")

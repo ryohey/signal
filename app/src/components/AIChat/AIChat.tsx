@@ -6,12 +6,17 @@ import { useLoadAISong } from "../../actions/aiGeneration"
 import { useAIChat } from "../../hooks/useAIChat"
 import { useRouter } from "../../hooks/useRouter"
 import { useStores } from "../../hooks/useStores"
+import { useSong } from "../../hooks/useSong"
+import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
 import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
+import { processVoiceToMidi } from "../../services/voiceToMidi"
 import { Tooltip } from "../ui/Tooltip"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
+import { emptyTrack } from "@signal-app/core"
+import { getInstrumentProgramNumber } from "../../agent/instrumentMapping"
 
 const Container = styled.div<{ standalone?: boolean }>`
   display: flex;
@@ -217,7 +222,7 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
         ? "rgba(255, 69, 58, 0.3)"
         : theme.dividerColor};
   animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -431,6 +436,15 @@ const NoteItem = styled.div`
   background: ${({ theme }) => theme.secondaryBackgroundColor};
   border-radius: 0.25rem;
   color: ${({ theme }) => theme.textColor};
+`
+
+const VoiceProcessingIndicator = styled.div`
+  padding: 0.5rem 1rem;
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border-radius: 0.5rem;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  font-size: 0.8rem;
+  text-align: center;
 `
 
 const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
@@ -679,6 +693,25 @@ const AGENT_TYPE_STORAGE_KEY = "ai_chat_agent_type"
 
 type AgentType = "llm" | "composition_agent" | "hybrid"
 
+const KEY_NAMES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+]
+
+function getKeyDisplayName(key: number, scale: "major" | "minor"): string {
+  return `${KEY_NAMES[key]} ${scale}`
+}
+
 export interface AIChatProps {
   standalone?: boolean
 }
@@ -711,7 +744,11 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       ? (stored as AgentType)
       : "hybrid" // Default to hybrid agent
   })
+  const [voiceProcessing, setVoiceProcessing] = useState(false)
+  const [voiceProgress, setVoiceProgress] = useState("")
   const { songStore } = useStores()
+  const { addTrack, tracks, timebase } = useSong()
+  const { currentTempo } = useConductorTrack()
 
   const loadAISong = useLoadAISong()
   const { setPath } = useRouter()
@@ -1198,7 +1235,7 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     setMessages([])
   }, [setMessages])
 
-  // Handle notes detected from voice recorder
+  // Handle notes detected from voice recorder (fallback)
   const handleNotesDetected = useCallback(
     (notes: DetectedNote[]) => {
       if (notes.length === 0) return
@@ -1216,6 +1253,141 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       ])
     },
     [setMessages],
+  )
+
+  // Handle audio captured from voice recorder (CREPE processing)
+  const handleAudioCaptured = useCallback(
+    async (audioBlob: Blob, fallbackNotes: DetectedNote[]) => {
+      if (voiceProcessing) return
+
+      setVoiceProcessing(true)
+      setVoiceProgress("Starting pitch detection...")
+
+      try {
+        // TODO: Get key signature from song state if available
+        const keyHint: number | undefined = undefined
+        const scaleHint: "major" | "minor" | undefined = undefined
+
+        // Process through CREPE + LLM pipeline
+        const result = await processVoiceToMidi(audioBlob, {
+          quantizeValue: 8,
+          timebase: timebase,
+          projectTempo: currentTempo ?? 120,
+          onProgress: (stage, _progress) => {
+            setVoiceProgress(stage)
+          },
+          keyHint,
+          scaleHint,
+        })
+
+        if (result.notes.length === 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "error" as const,
+              content:
+                "No melody detected. Try humming or singing more clearly, or move closer to the microphone.",
+            },
+          ])
+          return
+        }
+
+        // Create a new track with the detected notes
+        const leadInfo = getInstrumentProgramNumber("lead")
+        const channel = tracks.length < 9 ? tracks.length - 1 : tracks.length
+        const newTrack = emptyTrack(channel)
+        newTrack.setName("Voice Melody")
+        if (leadInfo) {
+          newTrack.setProgramNumber(leadInfo.programNumber)
+        }
+
+        // Convert interpreted notes to MIDI events
+        const noteEvents = result.notes.map((note) => ({
+          type: "channel" as const,
+          subtype: "note" as const,
+          noteNumber: note.note_number,
+          tick: note.tick,
+          duration: note.duration,
+          velocity: note.velocity,
+        }))
+        newTrack.addEvents(noteEvents)
+        addTrack(newTrack)
+
+        // Build success message with key, tempo, and pitch offset info
+        const noteCount = result.notes.length
+        const keyName = getKeyDisplayName(
+          result.detectedKey,
+          result.detectedScale as "major" | "minor",
+        )
+
+        let keyInfo = ""
+        if (result.keySource === "user_provided") {
+          keyInfo = `Using your song's key: ${keyName}.`
+        } else if (result.keySource === "detected_confident") {
+          keyInfo = `Detected key: ${keyName} (high confidence).`
+        } else {
+          keyInfo = `Detected key: ${keyName} (low confidence - you may want to adjust notes).`
+        }
+
+        let offsetInfo = ""
+        if (Math.abs(result.pitchOffsetCents) > 10) {
+          const direction = result.pitchOffsetCents < 0 ? "flat" : "sharp"
+          offsetInfo = ` Your pitch was ${Math.abs(result.pitchOffsetCents).toFixed(0)} cents ${direction} overall - I've corrected for this.`
+        }
+
+        const tempoInfo =
+          result.tempoConfidence === "high"
+            ? `Detected tempo: ${result.detectedTempo.toFixed(0)} BPM.`
+            : ""
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant" as const,
+            content: `✅ Created "Voice Melody" track with ${noteCount} notes! ${keyInfo}${offsetInfo}${tempoInfo ? ` ${tempoInfo}` : ""}\n\nYou can now ask me to generate accompaniment around your melody.`,
+          },
+        ])
+
+        // Navigate to arrange view
+        setPath("/arrange")
+      } catch (error) {
+        console.error("Voice-to-MIDI error:", error)
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error"
+
+        if (fallbackNotes.length > 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "error" as const,
+              content: `CREPE processing failed: ${errorMessage}. Using browser pitch detection instead.`,
+            },
+          ])
+          handleNotesDetected(fallbackNotes)
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "error" as const,
+              content: `Voice processing failed: ${errorMessage}`,
+            },
+          ])
+        }
+      } finally {
+        setVoiceProcessing(false)
+        setVoiceProgress("")
+      }
+    },
+    [
+      voiceProcessing,
+      timebase,
+      currentTempo,
+      tracks,
+      addTrack,
+      setMessages,
+      setPath,
+      handleNotesDetected,
+    ],
   )
 
   return (
@@ -1326,8 +1498,14 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             disabled={isLoading || backendStatus === "disconnected"}
             style={{ flex: 1 }}
           />
-          <VoiceRecorder onNotesDetected={handleNotesDetected} />
+          <VoiceRecorder
+            onNotesDetected={handleNotesDetected}
+            onAudioCaptured={handleAudioCaptured}
+          />
         </InputRow>
+        {voiceProcessing && voiceProgress && (
+          <VoiceProcessingIndicator>{voiceProgress}</VoiceProcessingIndicator>
+        )}
         {isLoading ? (
           <InterruptButton onClick={handleInterrupt}>
             Stop Generation

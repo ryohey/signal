@@ -2,8 +2,6 @@ import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { DEFAULT_TEMPO } from "@signal-app/player"
-import { BasicPitchService } from "../../services/BasicPitchService"
-import { convertBasicPitchNotes } from "../../helpers/basicPitchConverter"
 
 const MicButton = styled.button<{ isRecording: boolean }>`
   width: 40px;
@@ -35,7 +33,7 @@ const MicButton = styled.button<{ isRecording: boolean }>`
     isRecording &&
     `
     animation: pulse 1.5s ease-in-out infinite;
-    
+
     @keyframes pulse {
       0%, 100% {
         transform: scale(1);
@@ -114,6 +112,36 @@ const WaveformContainer = styled.div`
 const WaveformCanvas = styled.canvas`
   width: 100%;
   height: 100%;
+`
+
+const RecordingTimer = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.secondaryTextColor};
+  margin-left: 8px;
+  font-family: monospace;
+`
+
+const MicrophoneSelect = styled.select`
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  color: ${({ theme }) => theme.textColor};
+  max-width: 180px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.themeColor};
+  }
+`
+
+const MicSelectorRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 `
 
 export interface DetectedNote {
@@ -196,35 +224,109 @@ function drawWaveform(
 
 interface VoiceRecorderProps {
   onNotesDetected?: (notes: DetectedNote[]) => void
+  onAudioCaptured?: (audioBlob: Blob, notes: DetectedNote[]) => void
 }
 
-export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
+export const VoiceRecorder: FC<VoiceRecorderProps> = ({
+  onNotesDetected,
+  onAudioCaptured,
+}) => {
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [status, setStatus] = useState<string>("")
   const [audioLevel, setAudioLevel] = useState<number>(0)
+  const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([])
+  const [selectedMicId, setSelectedMicId] = useState<string>("")
   const mediaStreamRef = useRef<MediaStream | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const dataArrayRef = useRef<Float32Array | null>(null)
   const waveformCanvasRef = useRef<HTMLCanvasElement | null>(null)
-  const audioChunksRef = useRef<Float32Array[]>([])
   const animationFrameRef = useRef<number | null>(null)
   const onNotesDetectedRef = useRef<((notes: DetectedNote[]) => void) | null>(
     null,
   )
   const isRecordingRef = useRef<boolean>(false)
+  // Audio recording for CREPE processing
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const [recordingDuration, setRecordingDuration] = useState(0)
+  const recordingTimerRef = useRef<number | null>(null)
+  const MAX_RECORDING_DURATION = 30 // seconds
+  const onAudioCapturedRef = useRef<
+    ((audioBlob: Blob, notes: DetectedNote[]) => void) | null
+  >(null)
   const { currentTempo } = useConductorTrack()
 
-  // Store callback in ref to avoid dependency issues
+  // Store callbacks in refs to avoid dependency issues
   useEffect(() => {
     onNotesDetectedRef.current = onNotesDetected || null
   }, [onNotesDetected])
 
+  useEffect(() => {
+    onAudioCapturedRef.current = onAudioCaptured || null
+  }, [onAudioCaptured])
+
+  // Enumerate available microphones on mount
+  useEffect(() => {
+    const enumerateMics = async () => {
+      try {
+        // Request permission first to get proper device labels
+        await navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => stream.getTracks().forEach((t) => t.stop()))
+          .catch(() => {}) // Ignore permission errors, we'll still enumerate
+
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        const mics = devices.filter((d) => d.kind === "audioinput")
+        setAvailableMics(mics)
+
+        // Try to find a real microphone (not virtual)
+        const realMic = mics.find(
+          (m) =>
+            !m.label.toLowerCase().includes("blackhole") &&
+            !m.label.toLowerCase().includes("virtual") &&
+            !m.label.toLowerCase().includes("soundflower"),
+        )
+        if (realMic) {
+          setSelectedMicId(realMic.deviceId)
+        } else if (mics.length > 0) {
+          setSelectedMicId(mics[0].deviceId)
+        }
+      } catch (err) {
+        console.error("[VoiceRecorder] Error enumerating devices:", err)
+      }
+    }
+    enumerateMics()
+
+    // Re-enumerate when devices change
+    navigator.mediaDevices.addEventListener("devicechange", enumerateMics)
+    return () =>
+      navigator.mediaDevices.removeEventListener("devicechange", enumerateMics)
+  }, [])
+
   // Get current tempo or use default
   const tempo = currentTempo ?? DEFAULT_TEMPO
 
+  const getAudioBlob = useCallback((): Blob | null => {
+    if (audioChunksRef.current.length === 0) return null
+    return new Blob(audioChunksRef.current, { type: "audio/webm" })
+  }, [])
+
   const stopRecording = useCallback(async () => {
+    // Stop MediaRecorder and collect audio blob
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      mediaRecorderRef.current.stop()
+    }
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current)
+      recordingTimerRef.current = null
+    }
+    setRecordingDuration(0)
+
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop())
       mediaStreamRef.current = null
@@ -290,9 +392,6 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
         const canvas = waveformCanvasRef.current
         drawWaveform(canvas, dataArrayRef.current, canvas.width, canvas.height)
       }
-
-      // Buffer audio chunks for later processing
-      audioChunksRef.current.push(new Float32Array(dataArrayRef.current))
     } catch (error) {
       console.error("Error in processAudio:", error)
     }
@@ -315,14 +414,19 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       setStatus("Requesting microphone access...")
 
       // Request microphone with better error handling
+      // Use selected device if available
       let stream: MediaStream
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      }
+      if (selectedMicId) {
+        audioConstraints.deviceId = { exact: selectedMicId }
+      }
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-          },
+          audio: audioConstraints,
         })
       } catch (err) {
         const error = err as Error
@@ -372,16 +476,25 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
 
       mediaStreamRef.current = stream
 
-      // Create audio context
+      // Create audio context with explicit sample rate
       const audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)()
+        window.webkitAudioContext)({
+        sampleRate: 44100, // Standard sample rate
+      })
+      audioContextRef.current = audioContext
 
-      // Resume audio context if suspended (required in some browsers)
+      // Resume AudioContext if suspended (required by browser autoplay policies)
       if (audioContext.state === "suspended") {
         await audioContext.resume()
       }
 
-      audioContextRef.current = audioContext
+      // Wait a moment for context to fully initialize
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      // Double-check context is running
+      if (audioContext.state !== "running") {
+        await audioContext.resume()
+      }
 
       const source = audioContext.createMediaStreamSource(stream)
       const analyser = audioContext.createAnalyser()
@@ -393,6 +506,42 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
 
       analyserRef.current = analyser
       dataArrayRef.current = new Float32Array(analyser.fftSize)
+
+      // Set up MediaRecorder for audio capture
+      try {
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: "audio/webm;codecs=opus",
+        })
+        mediaRecorderRef.current = mediaRecorder
+        audioChunksRef.current = []
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data)
+          }
+        }
+
+        mediaRecorder.start(1000) // Collect data every second
+
+        // Start recording timer
+        setRecordingDuration(0)
+        recordingTimerRef.current = window.setInterval(() => {
+          setRecordingDuration((prev) => {
+            if (prev >= MAX_RECORDING_DURATION - 1) {
+              // Auto-stop at max duration - use timeout to avoid setState during render
+              setTimeout(() => {
+                if (isRecordingRef.current) {
+                  stopRecording()
+                }
+              }, 0)
+              return prev
+            }
+            return prev + 1
+          })
+        }, 1000)
+      } catch (err) {
+        console.warn("MediaRecorder not supported, pitch detection only:", err)
+      }
 
       // Monitor track state changes
       activeTrack.addEventListener("ended", () => {
@@ -419,7 +568,6 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
         }
       }
 
-      audioChunksRef.current = []
       setAudioLevel(0)
 
       // Set recording state in both ref and state
@@ -441,82 +589,38 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       )
       await stopRecording()
     }
-  }, [processAudio, stopRecording])
+  }, [processAudio, stopRecording, selectedMicId])
 
   const handleToggleRecording = useCallback(async () => {
     if (isRecording) {
       await stopRecording()
 
-      if (audioChunksRef.current.length === 0) {
-        setStatus("No audio recorded")
-        setTimeout(() => setStatus(""), 3000)
-        return
-      }
-
-      setIsProcessing(true)
-      setStatus("Processing audio with Basic Pitch...")
-
-      try {
-        // Concatenate audio chunks
-        const totalLength = audioChunksRef.current.reduce(
-          (sum, chunk) => sum + chunk.length,
-          0,
+      // After finalizing notes, also pass audio blob for CREPE processing
+      const audioBlob = getAudioBlob()
+      if (audioBlob) {
+        console.log(
+          `Audio blob captured: ${(audioBlob.size / 1024).toFixed(1)} KB`,
         )
-        const fullAudio = new Float32Array(totalLength)
-        let offset = 0
-        for (const chunk of audioChunksRef.current) {
-          fullAudio.set(chunk, offset)
-          offset += chunk.length
-        }
-
-        // Create AudioBuffer from recorded data
-        const sampleRate = audioContextRef.current?.sampleRate ?? 48000
-        const audioBuffer = new AudioBuffer({
-          length: fullAudio.length,
-          numberOfChannels: 1,
-          sampleRate: sampleRate,
-        })
-        audioBuffer.copyToChannel(fullAudio, 0)
-
-        // Transcribe with Basic Pitch
-        const service = new BasicPitchService()
-        const basicPitchNotes = await service.transcribeAudio(audioBuffer, {
-          onsetThreshold: 0.5,
-          frameThreshold: 0.3,
-          minimumNoteDuration: 0.1,
-        })
-
-        // Convert to DetectedNote format with quantization
-        const detectedNotes = convertBasicPitchNotes(basicPitchNotes, tempo, {
-          pitchCorrectionStrength: 100, // Full quantization for voice
-          minimumNoteDuration: 0.1,
-          velocitySensitivity: 80,
-        })
-
-        if (detectedNotes.length > 0) {
-          setStatus(
-            `Detected ${detectedNotes.length} notes, sending to chat...`,
-          )
-
-          if (onNotesDetectedRef.current) {
-            onNotesDetectedRef.current(detectedNotes)
-            setStatus(`✅ ${detectedNotes.length} notes added to chat!`)
-          }
-        } else {
-          setStatus("No notes detected. Try humming a clear melody!")
-        }
-      } catch (error) {
-        console.error("Transcription failed:", error)
-        setStatus("Transcription failed. Please try again.")
-      } finally {
-        setIsProcessing(false)
-        audioChunksRef.current = []
+      }
+      if (audioBlob && onAudioCapturedRef.current) {
+        setStatus(`Processing audio with CREPE...`)
+        onAudioCapturedRef.current(audioBlob, [])
+        setStatus(`✅ Audio captured! Processing melody...`)
+        setTimeout(() => setStatus(""), 3000)
+      } else if (audioBlob) {
+        // Audio blob captured but no handler - still show success
+        setStatus(
+          `✅ Audio captured (${(audioBlob.size / 1024).toFixed(1)} KB)`,
+        )
+        setTimeout(() => setStatus(""), 3000)
+      } else {
+        setStatus("No audio recorded")
         setTimeout(() => setStatus(""), 3000)
       }
     } else {
       await startRecording()
     }
-  }, [isRecording, startRecording, stopRecording, tempo])
+  }, [isRecording, startRecording, stopRecording, tempo, getAudioBlob])
 
   useEffect(() => {
     return () => {
@@ -526,6 +630,21 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
 
   return (
     <Container>
+      {!isRecording && availableMics.length > 1 && (
+        <MicSelectorRow>
+          <MicrophoneSelect
+            value={selectedMicId}
+            onChange={(e) => setSelectedMicId(e.target.value)}
+            title="Select microphone"
+          >
+            {availableMics.map((mic) => (
+              <option key={mic.deviceId} value={mic.deviceId}>
+                {mic.label || `Microphone ${mic.deviceId.slice(0, 8)}`}
+              </option>
+            ))}
+          </MicrophoneSelect>
+        </MicSelectorRow>
+      )}
       <MicButton
         isRecording={isRecording}
         onClick={handleToggleRecording}
@@ -540,6 +659,11 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       >
         {isProcessing ? "⏳" : isRecording ? "⏹" : "🎤"}
       </MicButton>
+      {isRecording && (
+        <RecordingTimer>
+          {recordingDuration}s / {MAX_RECORDING_DURATION}s
+        </RecordingTimer>
+      )}
       {isRecording && (
         <AudioVisualizer>
           <LevelMeter>

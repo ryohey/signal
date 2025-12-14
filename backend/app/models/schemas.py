@@ -201,3 +201,63 @@ class AgentStepResponse(BaseModel):
     tool_calls: list[ToolCall]
     done: bool
     message: Optional[str] = None
+
+
+# ============================================================================
+# Pitch Detection Models (for voice-to-MIDI feature)
+# ============================================================================
+
+
+class PitchSegment(BaseModel):
+    """A segment of detected pitch from audio."""
+
+    start_time: float  # seconds
+    end_time: float  # seconds
+    avg_frequency: float  # Hz
+    avg_confidence: float  # 0-1
+    midi_note: int  # MIDI note number (0-127)
+
+
+class PitchDetectionResponse(BaseModel):
+    """Response from pitch detection endpoint."""
+
+    segments: list[PitchSegment]
+    duration_seconds: float
+    sample_rate: int
+    model_used: str  # 'tiny', 'small', 'medium', 'large', 'full'
+
+
+class RhythmInterpretationRequest(BaseModel):
+    """Request for rhythm interpretation."""
+
+    segments: list[PitchSegment]
+    quantize_value: int  # 4=quarter, 8=eighth, 16=sixteenth
+    timebase: int  # ticks per quarter note (usually 480)
+    project_tempo: float  # current project BPM as fallback
+    # New fields for key quantization
+    key_hint: Optional[int] = None  # 0-11 (C=0), if user has key set
+    scale_hint: Optional[str] = None  # "major" or "minor", if user has key set
+
+
+class InterpretedNote(BaseModel):
+    """A note with interpreted rhythm."""
+
+    note_number: int  # MIDI note 0-127
+    tick: int  # start position in ticks
+    duration: int  # duration in ticks
+    velocity: int  # 1-127
+
+
+class RhythmInterpretationResponse(BaseModel):
+    """Response from rhythm interpretation endpoint."""
+
+    notes: list[InterpretedNote]
+    detected_tempo: float  # BPM
+    tempo_confidence: str  # 'high', 'medium', 'low'
+    time_signature: tuple[int, int]  # e.g., (4, 4)
+    # New fields for key detection results
+    detected_key: int = 0  # 0-11 (C=0)
+    detected_scale: str = "major"  # "major" or "minor"
+    key_confidence: str = "low"  # 'high', 'medium', 'low'
+    pitch_offset_cents: float = 0.0  # how flat/sharp the singer was
+    key_source: str = "detected_low_confidence"  # 'user_provided', 'detected_confident', 'detected_low_confidence'
