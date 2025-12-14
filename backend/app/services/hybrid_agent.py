@@ -57,6 +57,10 @@ Track Operation Tools:
 - setTrackVolume: Set track volume (0-127)
 - setTrackPan: Set stereo pan position (0=left, 64=center, 127=right)
 
+Advanced Controller Tools:
+- setController: Set any MIDI CC value (sustain pedal, modulation, reverb, etc.)
+- setPitchBend: Set pitch bend (0-16383, center=8192)
+
 IMPORTANT: When calling tools, you must use the exact parameter names and formats specified.
 
 SONG STATE CONTEXT:
@@ -94,6 +98,19 @@ MIDI REFERENCE:
 - Common scales from C: Major [60,62,64,65,67,69,71,72], Minor [60,62,63,65,67,68,70,72]
 - Quantize grid sizes: 480 (quarter), 240 (eighth), 120 (sixteenth), 60 (32nd)
 
+CONTROLLER REFERENCE (for setController):
+- "modulation" (CC1): Vibrato/tremolo depth, 0-127
+- "volume" (CC7): Track volume, 0-127
+- "pan" (CC10): Stereo position, 0=left, 64=center, 127=right
+- "expression" (CC11): Dynamic expression, 0-127
+- "sustain" (CC64): Sustain pedal, 0=off, 64+=on
+- "reverb" (CC91): Reverb depth, 0-127
+- "chorus" (CC93): Chorus depth, 0-127
+- "brightness" (CC74): Filter cutoff, 0-127
+- "attack" (CC73): Attack time, 0-127
+- "release" (CC72): Release time, 0-127
+Or use any CC number directly: "CC1", "CC64", "7", etc.
+
 WORKFLOW:
 1. Check the song state to see what exists
 2. For simple, clear requests (e.g., "add a piano track", "transpose up an octave"), execute tools directly
@@ -110,6 +127,12 @@ EDITING TIPS:
 - To move to different octave: use transposeNotes with semitones=12 or -12
 - To extend/repeat a phrase: use duplicateNotes
 - To fix timing issues: use quantizeNotes with appropriate grid size
+
+CONTROLLER TIPS:
+- For piano sustain: setController with "sustain", value=127 (on) or 0 (off)
+- For vibrato: setController with "modulation", value 0-127
+- For pitch slides: use setPitchBend at different ticks (8192=center, 0=down, 16383=up)
+- Controllers can change over time: call setController at different tick positions
 
 IMPORTANT - CONVERSATION MEMORY:
 - This is a multi-turn conversation. ALWAYS remember what the user told you earlier.
@@ -333,6 +356,64 @@ def setTrackPan(trackId: int, pan: int, tick: int = 0) -> str:
     return '{"status": "pending_frontend_execution"}'
 
 
+# ============================================================================
+# ADVANCED CONTROLLER TOOLS
+# ============================================================================
+
+@tool
+def setController(trackId: int, controllerType: str, value: int, tick: int = 0) -> str:
+    """Sets any MIDI controller (CC) value on a track.
+
+    This is a generic tool for all 128 MIDI CC controllers. Use friendly names
+    or CC numbers directly.
+
+    Args:
+        trackId: The track ID to modify
+        controllerType: Controller name or CC number. Common names:
+            - "modulation" or "mod" (CC1) - vibrato/modulation depth
+            - "breath" (CC2) - breath controller
+            - "foot" (CC4) - foot controller
+            - "volume" (CC7) - main volume
+            - "pan" (CC10) - stereo position
+            - "expression" (CC11) - dynamic expression
+            - "sustain" or "hold" (CC64) - sustain pedal (0=off, 64+=on)
+            - "soft" (CC67) - soft pedal
+            - "reverb" (CC91) - reverb depth
+            - "chorus" (CC93) - chorus depth
+            - "brightness" (CC74) - filter cutoff
+            - "attack" (CC73) - attack time
+            - "release" (CC72) - release time
+            Or use CC numbers: "CC1", "CC64", "7", etc.
+        value: Controller value 0-127
+        tick: Position in ticks where controller takes effect. Default: 0
+
+    Returns:
+        JSON with trackId, controllerType, controllerNumber, value, and tick
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def setPitchBend(trackId: int, value: int, tick: int = 0) -> str:
+    """Sets pitch bend on a track.
+
+    Pitch bend allows smooth pitch changes between notes. The range is 14-bit
+    for fine control.
+
+    Args:
+        trackId: The track ID to modify
+        value: Pitch bend value 0-16383. Center (no bend) = 8192.
+            - 0 = maximum downward bend (typically -2 semitones)
+            - 8192 = center/no bend
+            - 16383 = maximum upward bend (typically +2 semitones)
+        tick: Position in ticks where pitch bend takes effect. Default: 0
+
+    Returns:
+        JSON with trackId, value, and tick
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
 # All available tools
 TOOLS = [
     # Creation tools
@@ -352,6 +433,9 @@ TOOLS = [
     setTrackInstrument,
     setTrackVolume,
     setTrackPan,
+    # Advanced controller tools
+    setController,
+    setPitchBend,
 ]
 
 

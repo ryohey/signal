@@ -5,11 +5,14 @@
 
 import type { NoteEvent, Song, TrackId } from "@signal-app/core"
 import {
+  controllerMidiEvent,
   emptyTrack,
   isNoteEvent,
+  pitchBendMidiEvent,
   timeSignatureMidiEvent,
   toTrackEvents,
 } from "@signal-app/core"
+import { getControllerNumber } from "../../agent/controllerMapping"
 import { getInstrumentProgramNumber } from "../../agent/instrumentMapping"
 
 export interface ToolCall {
@@ -96,34 +99,90 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
 
     case "addNotes": {
       const trackId = args.trackId as number
-      const notes = args.notes as Array<{
-        pitch: number
-        start: number
-        duration: number
-        velocity?: number
-      }>
+      const notes = args.notes as Array<Record<string, unknown>>
+
+      // Validate trackId
+      if (typeof trackId !== "number" || isNaN(trackId)) {
+        return JSON.stringify({
+          error: `Invalid trackId: expected number, got ${typeof trackId}`,
+        })
+      }
 
       const track = song.tracks[trackId]
       if (!track) {
         return JSON.stringify({
-          error: `Track ${trackId} not found`,
+          error: `Track ${trackId} not found. Available tracks: 0-${song.tracks.length - 1}`,
         })
       }
 
-      const noteEvents = notes.map((note) => ({
+      // Validate notes array
+      if (!Array.isArray(notes)) {
+        return JSON.stringify({
+          error: `Invalid notes: expected array, got ${typeof notes}`,
+        })
+      }
+
+      if (notes.length === 0) {
+        return JSON.stringify({
+          error: `Notes array is empty`,
+        })
+      }
+
+      // Validate each note and provide helpful error for wrong field names
+      const validatedNotes: Array<{
+        pitch: number
+        start: number
+        duration: number
+        velocity: number
+      }> = []
+
+      for (let i = 0; i < notes.length; i++) {
+        const note = notes[i]
+
+        // Check for common field name mistakes
+        const pitch = note.pitch ?? note.noteNumber ?? note.note
+        const start = note.start ?? note.tick ?? note.position
+        const duration = note.duration ?? note.length
+        const velocity = note.velocity ?? 100
+
+        if (typeof pitch !== "number" || isNaN(pitch)) {
+          return JSON.stringify({
+            error: `Note ${i}: invalid pitch. Use "pitch" field (0-127). Got: ${JSON.stringify(note)}`,
+          })
+        }
+        if (typeof start !== "number" || isNaN(start)) {
+          return JSON.stringify({
+            error: `Note ${i}: invalid start. Use "start" field (ticks). Got: ${JSON.stringify(note)}`,
+          })
+        }
+        if (typeof duration !== "number" || isNaN(duration) || duration <= 0) {
+          return JSON.stringify({
+            error: `Note ${i}: invalid duration. Use "duration" field (ticks > 0). Got: ${JSON.stringify(note)}`,
+          })
+        }
+
+        validatedNotes.push({
+          pitch: Math.round(pitch),
+          start: Math.round(start),
+          duration: Math.round(duration),
+          velocity: Math.round(Math.max(1, Math.min(127, velocity as number))),
+        })
+      }
+
+      const noteEvents = validatedNotes.map((note) => ({
         type: "channel" as const,
         subtype: "note" as const,
         noteNumber: note.pitch,
         tick: note.start,
         duration: note.duration,
-        velocity: note.velocity ?? 100,
+        velocity: note.velocity,
       }))
 
       track.addEvents(noteEvents)
 
       return JSON.stringify({
         trackId,
-        noteCount: notes.length,
+        noteCount: validatedNotes.length,
       })
     }
 
@@ -446,6 +505,81 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
       return JSON.stringify({
         trackId,
         pan: clampedPan,
+        tick,
+      })
+    }
+
+    // ========================================================================
+    // ADVANCED CONTROLLER TOOLS
+    // ========================================================================
+
+    case "setController": {
+      const trackId = args.trackId as number
+      const controllerType = args.controllerType as string
+      const value = args.value as number
+      const tick = (args.tick as number) ?? 0
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Resolve controller name/number to CC number
+      const controllerInfo = getControllerNumber(controllerType)
+      if (!controllerInfo) {
+        return JSON.stringify({
+          error: `Unknown controller: "${controllerType}". Use names like "sustain", "modulation", "reverb" or CC numbers like "CC64", "1", etc.`,
+        })
+      }
+
+      // Clamp value to valid MIDI range
+      const clampedValue = Math.max(0, Math.min(127, value))
+
+      // Create controller event and add to track
+      const [controllerEvent] = toTrackEvents([
+        controllerMidiEvent(0, track.channel ?? 0, controllerInfo.controllerNumber, clampedValue),
+      ])
+
+      track.addEvent({
+        ...controllerEvent,
+        tick,
+      })
+
+      return JSON.stringify({
+        trackId,
+        controllerType: controllerInfo.controllerName,
+        controllerNumber: controllerInfo.controllerNumber,
+        value: clampedValue,
+        tick,
+      })
+    }
+
+    case "setPitchBend": {
+      const trackId = args.trackId as number
+      const value = args.value as number
+      const tick = (args.tick as number) ?? 0
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Clamp value to valid pitch bend range (14-bit: 0-16383)
+      const clampedValue = Math.max(0, Math.min(16383, value))
+
+      // Create pitch bend event and add to track
+      const [pitchBendEvent] = toTrackEvents([
+        pitchBendMidiEvent(0, track.channel ?? 0, clampedValue),
+      ])
+
+      track.addEvent({
+        ...pitchBendEvent,
+        tick,
+      })
+
+      return JSON.stringify({
+        trackId,
+        value: clampedValue,
         tick,
       })
     }
