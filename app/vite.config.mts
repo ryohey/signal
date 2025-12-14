@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
     publicDir: "public",
     server: {
       port: 3000,
-      open: "/edit",
+      open: "/",
     },
     resolve: {
       alias: {
