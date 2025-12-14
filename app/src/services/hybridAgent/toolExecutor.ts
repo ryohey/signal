@@ -3,9 +3,10 @@
  * Maps backend tool calls to MobX store operations.
  */
 
-import type { Song } from "@signal-app/core"
+import type { NoteEvent, Song, TrackId } from "@signal-app/core"
 import {
   emptyTrack,
+  isNoteEvent,
   timeSignatureMidiEvent,
   toTrackEvents,
 } from "@signal-app/core"
@@ -164,6 +165,289 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
       })
 
       return JSON.stringify({ numerator, denominator, tick })
+    }
+
+    // ========================================================================
+    // NOTE EDITING TOOLS
+    // ========================================================================
+
+    case "deleteNotes": {
+      const trackId = args.trackId as number
+      const noteIds = args.noteIds as number[]
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      track.removeEvents(noteIds)
+
+      return JSON.stringify({
+        trackId,
+        deletedCount: noteIds.length,
+      })
+    }
+
+    case "updateNotes": {
+      const trackId = args.trackId as number
+      const updates = args.updates as Array<{
+        id: number
+        pitch?: number
+        tick?: number
+        duration?: number
+        velocity?: number
+      }>
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      const updateEvents = updates.map((update) => ({
+        id: update.id,
+        ...(update.pitch !== undefined && { noteNumber: update.pitch }),
+        ...(update.tick !== undefined && { tick: update.tick }),
+        ...(update.duration !== undefined && { duration: update.duration }),
+        ...(update.velocity !== undefined && { velocity: update.velocity }),
+      }))
+
+      track.updateEvents(updateEvents)
+
+      return JSON.stringify({
+        trackId,
+        updatedCount: updates.length,
+      })
+    }
+
+    case "transposeNotes": {
+      const trackId = args.trackId as number
+      const noteIds = args.noteIds as number[]
+      const semitones = args.semitones as number
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Get notes and transpose them
+      const updates = noteIds
+        .map((id) => {
+          const event = track.getEventById(id)
+          if (!event || !isNoteEvent(event)) return null
+          const newPitch = Math.max(0, Math.min(127, event.noteNumber + semitones))
+          return { id, noteNumber: newPitch }
+        })
+        .filter((u): u is { id: number; noteNumber: number } => u !== null)
+
+      track.updateEvents(updates)
+
+      return JSON.stringify({
+        trackId,
+        transposedCount: updates.length,
+        semitones,
+      })
+    }
+
+    case "duplicateNotes": {
+      const trackId = args.trackId as number
+      const noteIds = args.noteIds as number[]
+      const offsetTicks = (args.offsetTicks as number) ?? 0
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Get the notes to duplicate
+      const notesToDuplicate = noteIds
+        .map((id) => track.getEventById(id))
+        .filter((e): e is NoteEvent => e !== undefined && isNoteEvent(e))
+
+      if (notesToDuplicate.length === 0) {
+        return JSON.stringify({
+          trackId,
+          duplicatedCount: 0,
+          newNoteIds: [],
+          actualOffset: 0,
+        })
+      }
+
+      // Calculate offset - if 0, place immediately after the last note
+      let actualOffset = offsetTicks
+      if (actualOffset === 0) {
+        const minTick = Math.min(...notesToDuplicate.map((n) => n.tick))
+        const maxEnd = Math.max(...notesToDuplicate.map((n) => n.tick + n.duration))
+        actualOffset = maxEnd - minTick
+      }
+
+      // Create duplicated notes
+      const newNotes = notesToDuplicate.map((note) => ({
+        type: "channel" as const,
+        subtype: "note" as const,
+        noteNumber: note.noteNumber,
+        tick: note.tick + actualOffset,
+        duration: note.duration,
+        velocity: note.velocity,
+      }))
+
+      const addedEvents = track.addEvents(newNotes)
+
+      return JSON.stringify({
+        trackId,
+        duplicatedCount: addedEvents.length,
+        newNoteIds: addedEvents.map((e) => e.id),
+        actualOffset,
+      })
+    }
+
+    case "quantizeNotes": {
+      const trackId = args.trackId as number
+      const noteIds = args.noteIds as number[]
+      const gridSize = args.gridSize as number
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Quantize function: round to nearest grid
+      const quantize = (tick: number) => Math.round(tick / gridSize) * gridSize
+
+      const updates = noteIds
+        .map((id) => {
+          const event = track.getEventById(id)
+          if (!event || !isNoteEvent(event)) return null
+          return { id, tick: quantize(event.tick) }
+        })
+        .filter((u): u is { id: number; tick: number } => u !== null)
+
+      track.updateEvents(updates)
+
+      return JSON.stringify({
+        trackId,
+        quantizedCount: updates.length,
+      })
+    }
+
+    // ========================================================================
+    // TRACK OPERATION TOOLS
+    // ========================================================================
+
+    case "deleteTrack": {
+      const trackId = args.trackId as number
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Don't allow deleting conductor track
+      if (track.isConductorTrack) {
+        return JSON.stringify({ error: "Cannot delete conductor track" })
+      }
+
+      song.removeTrack(track.id as TrackId)
+
+      return JSON.stringify({
+        deletedTrackId: trackId,
+        success: true,
+      })
+    }
+
+    case "renameTrack": {
+      const trackId = args.trackId as number
+      const name = args.name as string
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      track.setName(name)
+
+      return JSON.stringify({
+        trackId,
+        newName: name,
+      })
+    }
+
+    case "setTrackInstrument": {
+      const trackId = args.trackId as number
+      const instrumentName = args.instrumentName as string
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      const instrumentInfo = getInstrumentProgramNumber(instrumentName)
+      if (!instrumentInfo) {
+        return JSON.stringify({ error: `Unknown instrument: "${instrumentName}"` })
+      }
+
+      // Don't change drums to non-drums or vice versa
+      if (track.isRhythmTrack && !instrumentInfo.isDrums) {
+        return JSON.stringify({
+          error: "Cannot change drum track to non-drum instrument",
+        })
+      }
+
+      if (!track.isRhythmTrack && instrumentInfo.isDrums) {
+        return JSON.stringify({
+          error: "Cannot change non-drum track to drum instrument. Create a new drum track instead.",
+        })
+      }
+
+      track.setProgramNumber(instrumentInfo.programNumber)
+      track.setName(instrumentInfo.instrumentName)
+
+      return JSON.stringify({
+        trackId,
+        instrumentName: instrumentInfo.instrumentName,
+        programNumber: instrumentInfo.programNumber,
+      })
+    }
+
+    case "setTrackVolume": {
+      const trackId = args.trackId as number
+      const volume = args.volume as number
+      const tick = (args.tick as number) ?? 0
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Clamp volume to valid MIDI range
+      const clampedVolume = Math.max(0, Math.min(127, volume))
+      track.setVolume(clampedVolume, tick)
+
+      return JSON.stringify({
+        trackId,
+        volume: clampedVolume,
+        tick,
+      })
+    }
+
+    case "setTrackPan": {
+      const trackId = args.trackId as number
+      const pan = args.pan as number
+      const tick = (args.tick as number) ?? 0
+
+      const track = song.tracks[trackId]
+      if (!track) {
+        return JSON.stringify({ error: `Track ${trackId} not found` })
+      }
+
+      // Clamp pan to valid MIDI range
+      const clampedPan = Math.max(0, Math.min(127, pan))
+      track.setPan(clampedPan, tick)
+
+      return JSON.stringify({
+        trackId,
+        pan: clampedPan,
+        tick,
+      })
     }
 
     default:

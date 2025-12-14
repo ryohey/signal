@@ -8,6 +8,26 @@ import type { Song } from "@signal-app/core"
 import { isNoteEvent, isTimeSignatureEvent } from "@signal-app/core"
 import { getInstrumentName } from "../../agent/instrumentMapping"
 
+const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+
+/**
+ * Convert MIDI note number to pitch name (e.g., 60 -> "C4")
+ */
+function midiNoteToPitchName(noteNumber: number): string {
+  const octave = Math.floor(noteNumber / 12) - 1
+  const noteName = NOTE_NAMES[noteNumber % 12]
+  return `${noteName}${octave}`
+}
+
+export interface NoteSummary {
+  id: number
+  pitch: number
+  pitchName: string
+  tick: number
+  duration: number
+  velocity: number
+}
+
 export interface TrackSummary {
   id: number
   name: string | undefined
@@ -17,6 +37,7 @@ export interface TrackSummary {
   isDrums: boolean
   isConductor: boolean
   noteCount: number
+  notes: NoteSummary[]
 }
 
 export interface SongState {
@@ -56,10 +77,20 @@ export function serializeSongState(song: Song): SongState {
 
   // Summarize each track
   const tracks: TrackSummary[] = song.tracks.map((track, index) => {
-    const noteCount = track.events.filter(isNoteEvent).length
+    const noteEvents = track.events.filter(isNoteEvent)
     const programNumber = track.programNumber
     const instrumentName =
       programNumber !== undefined ? getInstrumentName(programNumber) : undefined
+
+    // Include note details for editing
+    const notes: NoteSummary[] = noteEvents.map((note) => ({
+      id: note.id,
+      pitch: note.noteNumber,
+      pitchName: midiNoteToPitchName(note.noteNumber),
+      tick: note.tick,
+      duration: note.duration,
+      velocity: note.velocity,
+    }))
 
     return {
       id: index,
@@ -69,7 +100,8 @@ export function serializeSongState(song: Song): SongState {
       instrumentName,
       isDrums: track.isRhythmTrack,
       isConductor: track.isConductorTrack,
-      noteCount,
+      noteCount: noteEvents.length,
+      notes,
     }
   })
 
@@ -84,6 +116,7 @@ export function serializeSongState(song: Song): SongState {
 
 /**
  * Format song state as a human-readable string for the agent prompt.
+ * Includes note IDs for editing operations.
  */
 export function formatSongStateForPrompt(state: SongState): string {
   const lines: string[] = []
@@ -108,6 +141,33 @@ export function formatSongStateForPrompt(state: SongState): string {
         lines.push(
           `  [${track.id}] ${instrument}${drums} - channel ${track.channel}, ${track.noteCount} notes`,
         )
+
+        // Include note details if there are notes (limit to avoid huge prompts)
+        if (track.notes.length > 0) {
+          const MAX_NOTES_TO_SHOW = 50
+          const notesToShow = track.notes.slice(0, MAX_NOTES_TO_SHOW)
+          const noteStrings = notesToShow.map(
+            (n) => `[id:${n.id} ${n.pitchName}@${n.tick}]`,
+          )
+
+          // Show notes on multiple lines if many
+          if (notesToShow.length <= 10) {
+            lines.push(`    Notes: ${noteStrings.join(", ")}`)
+          } else {
+            lines.push(`    Notes:`)
+            // Group notes by 8 per line for readability
+            for (let i = 0; i < noteStrings.length; i += 8) {
+              const chunk = noteStrings.slice(i, i + 8)
+              lines.push(`      ${chunk.join(", ")}`)
+            }
+          }
+
+          if (track.notes.length > MAX_NOTES_TO_SHOW) {
+            lines.push(
+              `      ... and ${track.notes.length - MAX_NOTES_TO_SHOW} more notes`,
+            )
+          }
+        }
       }
     }
   }

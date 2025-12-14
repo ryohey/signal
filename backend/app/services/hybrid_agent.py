@@ -33,13 +33,29 @@ model = ChatOpenAI(
 checkpointer = MemorySaver()
 
 # System prompt for the hybrid agent
-HYBRID_SYSTEM_PROMPT = """You are a music composition assistant that creates MIDI compositions by calling tools.
+HYBRID_SYSTEM_PROMPT = """You are a music composition assistant that creates and edits MIDI compositions by calling tools.
 
-You have access to tools that manipulate a MIDI sequencer:
+AVAILABLE TOOLS:
+
+Creation Tools:
 - createTrack: Create a new track with an instrument
 - addNotes: Add notes to an existing track
 - setTempo: Set the tempo in BPM
 - setTimeSignature: Set the time signature
+
+Note Editing Tools:
+- deleteNotes: Remove notes by their IDs
+- updateNotes: Modify note properties (pitch, timing, duration, velocity)
+- transposeNotes: Shift notes up/down by semitones
+- duplicateNotes: Copy notes with optional time offset
+- quantizeNotes: Snap notes to a grid
+
+Track Operation Tools:
+- deleteTrack: Remove a track from the song
+- renameTrack: Change a track's name
+- setTrackInstrument: Change a track's instrument
+- setTrackVolume: Set track volume (0-127)
+- setTrackPan: Set stereo pan position (0=left, 64=center, 127=right)
 
 IMPORTANT: When calling tools, you must use the exact parameter names and formats specified.
 
@@ -49,8 +65,11 @@ You will receive the current song state before each request. This tells you:
 - Existing tracks with their IDs, instruments, channels, and note counts
 - Track [0] is usually the conductor track (tempo/time signature only)
 
+The song state also includes note IDs that you can use for editing operations.
+
 Use this context to:
-- Reference existing tracks by their ID when adding notes
+- Reference existing tracks by their ID when adding or editing notes
+- Reference note IDs when editing, deleting, transposing, or duplicating notes
 - Avoid creating duplicate tracks (e.g., if a piano track exists, use it)
 - Understand what's already in the song before making changes
 
@@ -64,6 +83,7 @@ Current song state:
 Track details:
   [0] Conductor track (tempo/time signature)
   [1] Acoustic Grand Piano - channel 0, 16 notes
+    Notes: [id:5 C4@0], [id:6 E4@480], [id:7 G4@960]...
 ```
 
 MIDI REFERENCE:
@@ -72,17 +92,24 @@ MIDI REFERENCE:
 - Durations: whole=1920, half=960, quarter=480, eighth=240, sixteenth=120
 - Velocity: 1-127 (loudness), typical range 60-100
 - Common scales from C: Major [60,62,64,65,67,69,71,72], Minor [60,62,63,65,67,68,70,72]
+- Quantize grid sizes: 480 (quarter), 240 (eighth), 120 (sixteenth), 60 (32nd)
 
 WORKFLOW:
 1. Check the song state to see what exists
-2. For simple, clear requests (e.g., "add a piano track", "write a C scale"), execute tools directly
-3. For complex or ambiguous requests, discuss with the user first via your response message:
-   - Describe what you're thinking of creating
-   - Ask any clarifying questions in your message
-   - Wait for their response before executing tools
-4. When the user approves or gives you direction, execute tools to create the music
-5. Only set tempo/time signature if needed (check current values first)
-6. Reuse existing tracks when appropriate instead of creating new ones
+2. For simple, clear requests (e.g., "add a piano track", "transpose up an octave"), execute tools directly
+3. For complex or ambiguous requests, discuss with the user first via your response message
+4. When editing notes, always reference the note IDs from the song state
+5. Use editing tools to refine existing music rather than recreating from scratch
+6. Only set tempo/time signature if needed (check current values first)
+7. Reuse existing tracks when appropriate instead of creating new ones
+
+EDITING TIPS:
+- To change wrong notes: use updateNotes to fix pitch, or deleteNotes + addNotes
+- To shift timing: use updateNotes with new tick values
+- To make louder/softer: use updateNotes to change velocity
+- To move to different octave: use transposeNotes with semitones=12 or -12
+- To extend/repeat a phrase: use duplicateNotes
+- To fix timing issues: use quantizeNotes with appropriate grid size
 
 IMPORTANT - CONVERSATION MEMORY:
 - This is a multi-turn conversation. ALWAYS remember what the user told you earlier.
@@ -154,8 +181,178 @@ def setTimeSignature(numerator: int, denominator: int, tick: int = 0) -> str:
     return '{"status": "pending_frontend_execution"}'
 
 
+# ============================================================================
+# NOTE EDITING TOOLS
+# ============================================================================
+
+@tool
+def deleteNotes(trackId: int, noteIds: list[int]) -> str:
+    """Deletes notes from a track by their IDs.
+
+    Args:
+        trackId: The track ID containing the notes
+        noteIds: Array of note IDs to delete
+
+    Returns:
+        JSON with trackId and deletedCount
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def updateNotes(trackId: int, updates: list[dict]) -> str:
+    """Updates properties of existing notes.
+
+    Args:
+        trackId: The track ID containing the notes
+        updates: Array of update objects, each with: id (required), and optional: pitch (0-127), tick (position), duration (ticks), velocity (1-127)
+
+    Returns:
+        JSON with trackId and updatedCount
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def transposeNotes(trackId: int, noteIds: list[int], semitones: int) -> str:
+    """Transposes notes by a number of semitones.
+
+    Args:
+        trackId: The track ID containing the notes
+        noteIds: Array of note IDs to transpose
+        semitones: Number of semitones to transpose (positive = up, negative = down). Range: -127 to 127
+
+    Returns:
+        JSON with trackId, transposedCount, and semitones
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def duplicateNotes(trackId: int, noteIds: list[int], offsetTicks: int = 0) -> str:
+    """Duplicates notes with an optional time offset.
+
+    Args:
+        trackId: The track ID containing the notes
+        noteIds: Array of note IDs to duplicate
+        offsetTicks: Tick offset for the duplicated notes. Default 0 places them immediately after the originals.
+
+    Returns:
+        JSON with trackId, duplicatedCount, newNoteIds, and actualOffset
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def quantizeNotes(trackId: int, noteIds: list[int], gridSize: int) -> str:
+    """Quantizes notes to snap to a grid.
+
+    Args:
+        trackId: The track ID containing the notes
+        noteIds: Array of note IDs to quantize
+        gridSize: Grid size in ticks. Common values: 480 (quarter), 240 (eighth), 120 (sixteenth), 60 (32nd)
+
+    Returns:
+        JSON with trackId and quantizedCount
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+# ============================================================================
+# TRACK OPERATION TOOLS
+# ============================================================================
+
+@tool
+def deleteTrack(trackId: int) -> str:
+    """Deletes a track from the song.
+
+    Args:
+        trackId: The track ID to delete. Cannot delete the conductor track (track 0).
+
+    Returns:
+        JSON with deletedTrackId and success status
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def renameTrack(trackId: int, name: str) -> str:
+    """Renames a track.
+
+    Args:
+        trackId: The track ID to rename
+        name: The new name for the track
+
+    Returns:
+        JSON with trackId and newName
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def setTrackInstrument(trackId: int, instrumentName: str) -> str:
+    """Changes the instrument of a track.
+
+    Args:
+        trackId: The track ID to modify
+        instrumentName: The instrument to use. GM names like "Acoustic Grand Piano" or aliases like "piano", "guitar", "strings"
+
+    Returns:
+        JSON with trackId, instrumentName, and programNumber
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def setTrackVolume(trackId: int, volume: int, tick: int = 0) -> str:
+    """Sets the volume of a track.
+
+    Args:
+        trackId: The track ID to modify
+        volume: Volume level 0-127 (0 = silent, 127 = max). Typical range: 80-100
+        tick: Position in ticks where volume takes effect. Default: 0 (start)
+
+    Returns:
+        JSON with trackId, volume, and tick
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
+@tool
+def setTrackPan(trackId: int, pan: int, tick: int = 0) -> str:
+    """Sets the stereo pan position of a track.
+
+    Args:
+        trackId: The track ID to modify
+        pan: Pan position 0-127 (0 = full left, 64 = center, 127 = full right)
+        tick: Position in ticks where pan takes effect. Default: 0 (start)
+
+    Returns:
+        JSON with trackId, pan, and tick
+    """
+    return '{"status": "pending_frontend_execution"}'
+
+
 # All available tools
-TOOLS = [createTrack, addNotes, setTempo, setTimeSignature]
+TOOLS = [
+    # Creation tools
+    createTrack,
+    addNotes,
+    setTempo,
+    setTimeSignature,
+    # Note editing tools
+    deleteNotes,
+    updateNotes,
+    transposeNotes,
+    duplicateNotes,
+    quantizeNotes,
+    # Track operation tools
+    deleteTrack,
+    renameTrack,
+    setTrackInstrument,
+    setTrackVolume,
+    setTrackPan,
+]
 
 
 def create_agent():
