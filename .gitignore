@@ -61,4 +61,4 @@ env/
 ENV/
 .env.venv
 
-package.json
+package-lock.json
