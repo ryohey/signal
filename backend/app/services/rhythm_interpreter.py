@@ -13,11 +13,15 @@ from app.models.schemas import (
     RhythmInterpretationResponse,
 )
 from app.services.key_detection import (
-    detect_key,
-    calculate_pitch_offset,
-    quantize_note_to_key,
     PITCH_CLASS_NAMES,
 )
+from app.services.interval_processing import (
+    process_segments_with_intervals,
+    create_new_logger,
+    get_logger,
+    set_logger,
+)
+from app.services.pitch_detection import get_last_raw_crepe_data, clear_raw_crepe_data
 
 
 settings = get_settings()
@@ -137,7 +141,7 @@ async def interpret_rhythm(
 ) -> RhythmInterpretationResponse:
     """
     Use LLM to interpret rhythm from pitch segments.
-    Now includes key detection and pitch quantization.
+    Now uses interval-based pitch processing to preserve melodic relationships.
 
     Args:
         request: RhythmInterpretationRequest with segments and quantize settings
@@ -145,37 +149,107 @@ async def interpret_rhythm(
     Returns:
         RhythmInterpretationResponse with quantized notes and tempo
     """
-    # Step 1: Determine key (from hint or detection)
+    # Create a new logger for this request
+    logger = create_new_logger()
+    logger.log_section("VOICE-TO-MIDI PROCESSING LOG")
+    logger.log(f"Request: quantize={request.quantize_value}, tempo={request.project_tempo}, timebase={request.timebase}")
+
+    # Get raw CREPE data if available
+    raw_data = get_last_raw_crepe_data()
+    log_raw = raw_data is not None
+
+    if log_raw:
+        logger.log_subsection("Amplitude Trimming Info")
+        logger.log(f"  Singing detected from {raw_data['amplitude_start_time']:.3f}s to {raw_data['amplitude_end_time']:.3f}s")
+        logger.log(f"  Total raw frames: {len(raw_data['raw_time'])}")
+        logger.log(f"  Frames after trim: {len(raw_data['filtered_time'])}")
+
+        # Log RMS amplitude data
+        rms = raw_data.get('rms')
+        if rms is not None:
+            logger.log_subsection("RMS Amplitude Data (10ms frames)")
+            logger.log(f"  Total RMS frames: {len(rms)}")
+            logger.log(f"  Min RMS: {rms.min():.6f}, Max RMS: {rms.max():.6f}, Mean RMS: {rms.mean():.6f}")
+            logger.log(f"  {'Frame':>6s}  {'Time':>8s}  {'RMS':>10s}  {'Rel Δ':>10s}")
+            logger.log(f"  {'-'*6}  {'-'*8}  {'-'*10}  {'-'*10}")
+            hop_size_ms = 10.0
+            for i, rms_val in enumerate(rms):
+                time_sec = i * hop_size_ms / 1000.0
+                if i > 0 and rms[i-1] > 0:
+                    rel_change = (rms_val - rms[i-1]) / rms[i-1]
+                    rel_str = f"{rel_change:+.4f}"
+                else:
+                    rel_str = "N/A"
+                logger.log(f"  {i:6d}  {time_sec:8.3f}  {rms_val:10.6f}  {rel_str:>10s}")
+
+        # Log onset detection results
+        onsets = raw_data.get('onsets', [])
+        logger.log_subsection("Onset Detection")
+        logger.log(f"  Parameters: threshold_ratio=1.5 (150%), min_rms=0.02, min_onset_gap=100ms")
+        logger.log(f"  Detected {len(onsets)} onsets")
+        if onsets:
+            logger.log(f"  Onset timestamps: {', '.join(f'{t:.3f}s' for t in onsets[:20])}" +
+                      (f" ... (+{len(onsets)-20} more)" if len(onsets) > 20 else ""))
+
+    # Step 1: Process segments using interval-based approach
+    # This filters short notes, absorbs transitions, merges same-pitch segments,
+    # and derives MIDI notes from intervals rather than absolute frequencies
+    processed_segments = process_segments_with_intervals(
+        request.segments,
+        min_duration_ms=75.0,
+        log_raw_frames=log_raw,
+        raw_time=raw_data['filtered_time'] if log_raw else None,
+        raw_frequency=raw_data['filtered_frequency'] if log_raw else None,
+        raw_confidence=raw_data['filtered_confidence'] if log_raw else None,
+        onsets=raw_data.get('onsets') if raw_data else None,
+    )
+
+    if not processed_segments:
+        # No valid segments after processing - return empty response
+        logger.log_section("NO VALID SEGMENTS")
+        logger.log("All segments were filtered out - returning empty response")
+        log_path = logger.save("logs")
+        print(f"Voice-to-MIDI log saved: {log_path}")
+        clear_raw_crepe_data()
+
+        return RhythmInterpretationResponse(
+            notes=[],
+            detected_tempo=request.project_tempo,
+            tempo_confidence="low",
+            time_signature=(4, 4),
+            detected_key=0,
+            detected_scale="major",
+            key_confidence="low",
+            pitch_offset_cents=0.0,
+            key_source="none",
+        )
+
+    # Step 2: Determine key from anchor note (first note after processing)
+    # The anchor note's MIDI number tells us the key
+    anchor_midi = processed_segments[0].midi_note
+    anchor_pitch_class = anchor_midi % 12
+
+    # If user provided key hint, use it; otherwise use anchor note as key
     if request.key_hint is not None and request.scale_hint is not None:
-        # User provided key - use it directly
         key = request.key_hint
         scale = request.scale_hint
         key_confidence = "high"
         key_source = "user_provided"
-        is_confident = True
     else:
-        # Detect key from pitch segments
-        key, scale, confidence, is_confident = detect_key(request.segments)
-        key_confidence = "high" if confidence >= 0.7 else "medium" if confidence >= 0.5 else "low"
-        key_source = "detected_confident" if is_confident else "detected_low_confidence"
+        # Use anchor pitch class as key, default to major
+        key = anchor_pitch_class
+        scale = "major"  # Default assumption
+        key_confidence = "medium"
+        key_source = "anchor_note"
 
-    # Step 2: Calculate pitch offset
-    pitch_offset = calculate_pitch_offset(request.segments, key)
+    # Step 3: No pitch offset needed with interval approach
+    # (intervals preserve relative pitch, so global offset is implicit)
+    pitch_offset = 0.0
 
-    # Step 3: Quantize all segment pitches to the key
-    quantized_segments = []
-    for seg in request.segments:
-        qnote = quantize_note_to_key(seg.midi_note, key, scale, pitch_offset)
-        # Create a modified segment with quantized note
-        quantized_segments.append(PitchSegment(
-            start_time=seg.start_time,
-            end_time=seg.end_time,
-            avg_frequency=seg.avg_frequency,
-            avg_confidence=seg.avg_confidence,
-            midi_note=qnote,  # Use quantized note
-        ))
+    # Use processed segments for rhythm interpretation
+    quantized_segments = processed_segments
 
-    # Build the prompt with quantized notes
+    # Build the prompt with processed notes
     segments_text = format_segments_for_prompt(quantized_segments)
 
     key_name = PITCH_CLASS_NAMES[key]
@@ -241,6 +315,23 @@ Convert these segments to quantized MIDI notes. Remember:
         # Enforce quantize grid as a safety net
         notes = enforce_quantize_grid(notes, request.timebase, request.quantize_value)
 
+        # Log final rhythm interpretation results
+        logger.log_section("RHYTHM INTERPRETATION RESULTS")
+        logger.log(f"Detected tempo: {result['detected_tempo']} BPM")
+        logger.log(f"Tempo confidence: {result.get('tempo_confidence', 'medium')}")
+        logger.log(f"Time signature: {result.get('time_signature', [4, 4])}")
+        logger.log(f"Key: {PITCH_CLASS_NAMES[key]} {scale} ({key_source})")
+        logger.log_subsection("Final MIDI Notes")
+        for i, note in enumerate(notes):
+            from app.services.interval_processing import midi_to_note_name
+            note_name = midi_to_note_name(note.note_number)
+            logger.log(f"  {i+1}. {note_name} (MIDI {note.note_number}) tick={note.tick} dur={note.duration} vel={note.velocity}")
+
+        # Save log file
+        log_path = logger.save("logs")
+        print(f"Voice-to-MIDI log saved: {log_path}")
+        clear_raw_crepe_data()
+
         return RhythmInterpretationResponse(
             notes=notes,
             detected_tempo=result["detected_tempo"],
@@ -256,7 +347,24 @@ Convert these segments to quantized MIDI notes. Remember:
     except (json.JSONDecodeError, KeyError, TypeError) as e:
         # Fallback: simple quantization without LLM
         print(f"LLM response parsing failed: {e}, using fallback")
-        return fallback_rhythm_interpretation(request, key, scale, key_confidence, pitch_offset, key_source)
+        fallback_result = fallback_rhythm_interpretation(request, key, scale, key_confidence, pitch_offset, key_source)
+
+        # Log fallback results
+        logger.log_section("FALLBACK RHYTHM INTERPRETATION")
+        logger.log(f"LLM parsing failed: {e}")
+        logger.log(f"Using project tempo: {request.project_tempo} BPM")
+        logger.log_subsection("Final MIDI Notes (fallback)")
+        for i, note in enumerate(fallback_result.notes):
+            from app.services.interval_processing import midi_to_note_name
+            note_name = midi_to_note_name(note.note_number)
+            logger.log(f"  {i+1}. {note_name} (MIDI {note.note_number}) tick={note.tick} dur={note.duration} vel={note.velocity}")
+
+        # Save log file
+        log_path = logger.save("logs")
+        print(f"Voice-to-MIDI log saved: {log_path}")
+        clear_raw_crepe_data()
+
+        return fallback_result
 
 
 def fallback_rhythm_interpretation(
@@ -269,8 +377,27 @@ def fallback_rhythm_interpretation(
 ) -> RhythmInterpretationResponse:
     """
     Simple fallback rhythm interpretation without LLM.
-    Uses project tempo and basic quantization with key quantization.
+    Uses project tempo and basic quantization with interval-based pitch processing.
     """
+    # Process segments with interval approach
+    processed_segments = process_segments_with_intervals(
+        request.segments,
+        min_duration_ms=75.0,
+    )
+
+    if not processed_segments:
+        return RhythmInterpretationResponse(
+            notes=[],
+            detected_tempo=request.project_tempo,
+            tempo_confidence="low",
+            time_signature=(4, 4),
+            detected_key=key,
+            detected_scale=scale,
+            key_confidence=key_confidence,
+            pitch_offset_cents=pitch_offset,
+            key_source=key_source,
+        )
+
     notes = []
     timebase = request.timebase
     quantize_ticks = (timebase * 4) // request.quantize_value
@@ -278,10 +405,7 @@ def fallback_rhythm_interpretation(
     # Calculate ticks per second at project tempo
     ticks_per_second = (request.project_tempo / 60) * timebase
 
-    for seg in request.segments:
-        # Quantize pitch to key
-        quantized_pitch = quantize_note_to_key(seg.midi_note, key, scale, pitch_offset)
-
+    for seg in processed_segments:
         # Convert time to ticks
         start_tick = int(seg.start_time * ticks_per_second)
         end_tick = int(seg.end_time * ticks_per_second)
@@ -293,7 +417,7 @@ def fallback_rhythm_interpretation(
         duration = max(quantize_ticks, round((end_tick - start_tick) / quantize_ticks) * quantize_ticks)
 
         notes.append(InterpretedNote(
-            note_number=quantized_pitch,  # Use quantized pitch
+            note_number=seg.midi_note,  # Already processed by interval approach
             tick=start_tick,
             duration=duration,
             velocity=100,
@@ -305,6 +429,11 @@ def fallback_rhythm_interpretation(
         for note in notes:
             note.tick -= offset
 
+    # Update key from anchor if not provided
+    if key_source != "user_provided" and processed_segments:
+        key = processed_segments[0].midi_note % 12
+        key_source = "anchor_note"
+
     return RhythmInterpretationResponse(
         notes=notes,
         detected_tempo=request.project_tempo,
@@ -313,6 +442,6 @@ def fallback_rhythm_interpretation(
         detected_key=key,
         detected_scale=scale,
         key_confidence=key_confidence,
-        pitch_offset_cents=pitch_offset,
+        pitch_offset_cents=0.0,  # No offset with interval approach
         key_source=key_source,
     )
