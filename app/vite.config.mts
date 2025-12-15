@@ -24,6 +24,9 @@ export default defineConfig(({ mode }) => {
         name: "rewrite-path",
         configureServer(server) {
           server.middlewares.use((req, _res, next) => {
+            if (req.url === "/") {
+              req.url = "/edit.html"
+            }
             if (req.url === "/home") {
               req.url = "/community"
             }

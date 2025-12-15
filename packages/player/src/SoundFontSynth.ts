@@ -1,15 +1,14 @@
-import { SynthEvent } from "@ryohey/wavelet"
+import { WorkletSynthesizer } from "spessasynth_lib"
 import { SoundFont } from "./SoundFont.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
-export class SoundFontSynth implements SynthOutput {
-  private synth: AudioWorkletNode | null = null
+// Default send levels when effects are enabled (0-127)
+const DEFAULT_REVERB_LEVEL = 40
+const DEFAULT_CHORUS_LEVEL = 30
 
-  // Reverb effect nodes
-  private convolver: ConvolverNode | null = null
-  private dryGain: GainNode | null = null
-  private wetGain: GainNode | null = null
-  private _reverbMix: number = 0.2 // 20% wet by default
+export class SoundFontSynth implements SynthOutput {
+  private synth: WorkletSynthesizer | null = null
+  private _effectsEnabled: boolean = false
 
   private _loadedSoundFont: SoundFont | null = null
   get loadedSoundFont(): SoundFont | null {
@@ -29,138 +28,120 @@ export class SoundFontSynth implements SynthOutput {
     )
   }
 
-  get reverbMix(): number {
-    return this._reverbMix
+  /** Whether reverb/chorus effects are enabled */
+  get effectsEnabled(): boolean {
+    return this._effectsEnabled
   }
-
-  private sequenceNumber = 0
 
   constructor(private readonly context: AudioContext) {}
 
-  /**
-   * Creates a synthetic impulse response for reverb effect.
-   * This simulates a medium-sized hall with ~2 second decay.
-   */
-  private createImpulseResponse(
-    duration: number = 2.0,
-    decay: number = 2.0,
-  ): AudioBuffer {
-    const sampleRate = this.context.sampleRate
-    const length = sampleRate * duration
-    const impulse = this.context.createBuffer(2, length, sampleRate)
-
-    for (let channel = 0; channel < 2; channel++) {
-      const channelData = impulse.getChannelData(channel)
-      for (let i = 0; i < length; i++) {
-        // Exponential decay with random noise
-        channelData[i] =
-          (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay)
-      }
-    }
-    return impulse
-  }
-
-  /**
-   * Sets up the reverb effect chain.
-   * Call this after the synth node is created.
-   */
-  private setupReverb() {
-    // Create nodes
-    this.convolver = this.context.createConvolver()
-    this.dryGain = this.context.createGain()
-    this.wetGain = this.context.createGain()
-
-    // Load impulse response
-    this.convolver.buffer = this.createImpulseResponse()
-
-    // Set initial mix levels
-    this.setReverbMix(this._reverbMix)
-  }
-
-  /**
-   * Sets the reverb wet/dry mix.
-   * @param mix 0.0 = fully dry (no reverb), 1.0 = fully wet (all reverb)
-   */
-  setReverbMix(mix: number) {
-    this._reverbMix = Math.max(0, Math.min(1, mix))
-    if (this.dryGain && this.wetGain) {
-      this.dryGain.gain.value = 1 - this._reverbMix
-      this.wetGain.gain.value = this._reverbMix
-    }
-  }
-
   async setup() {
-    const url = new URL("@ryohey/wavelet/dist/processor.js", import.meta.url)
-    await this.context.audioWorklet.addModule(url)
+    // Load the spessasynth worklet processor from public folder
+    await this.context.audioWorklet.addModule("/spessasynth_processor.min.js")
   }
 
   async loadSoundFont(soundFont: SoundFont) {
     if (this.synth !== null) {
-      this.synth.disconnect()
+      this.synth.destroy()
     }
 
-    // create new node
-    this.synth = new AudioWorkletNode(this.context, "synth-processor", {
-      numberOfInputs: 0,
-      outputChannelCount: [2],
-    } as any)
+    // Create new WorkletSynthesizer with reverb/chorus enabled
+    this.synth = new WorkletSynthesizer(this.context, {
+      initializeReverbProcessor: true,
+      initializeChorusProcessor: true,
+    })
 
-    // Set up reverb effect chain
-    this.setupReverb()
-
-    // Connect synth through reverb chain:
-    // synth → dryGain → destination (clean signal)
-    // synth → convolver → wetGain → destination (reverb signal)
-    if (this.dryGain && this.wetGain && this.convolver) {
-      this.synth.connect(this.dryGain)
-      this.synth.connect(this.convolver)
-      this.dryGain.connect(this.context.destination)
-      this.convolver.connect(this.wetGain)
-      this.wetGain.connect(this.context.destination)
-    } else {
-      // Fallback: direct connection if reverb setup failed
-      this.synth.connect(this.context.destination)
-    }
-
-    this.sequenceNumber = 0
+    // Connect to destination
+    this.synth.connect(this.context.destination)
 
     this._loadedSoundFont = soundFont
 
-    for (const e of soundFont.sampleEvents) {
-      this.postSynthMessage(
-        e.event,
-        e.transfer, // transfer instead of copy
-      )
-    }
-  }
+    // Load the soundfont data
+    await this.synth.soundBankManager.addSoundBank(soundFont.data, "main")
 
-  private postSynthMessage(e: SynthEvent, transfer?: Transferable[]) {
-    if (this.synth === null) {
-      console.warn(
-        "SoundFontSynth: Cannot send message - synth not initialized. SoundFont may not be loaded.",
-      )
-      return
+    // Set default reverb/chorus send levels to 0 for clean sound
+    // Songs can override via CC91 (reverb) and CC93 (chorus)
+    for (let ch = 0; ch < 16; ch++) {
+      this.synth.controllerChange(ch, 91 as any, 0) // CC91 = Reverb send
+      this.synth.controllerChange(ch, 93 as any, 0) // CC93 = Chorus send
     }
-    this.synth.port.postMessage(
-      { ...e, sequenceNumber: this.sequenceNumber++ },
-      transfer ?? [],
-    )
+    this._effectsEnabled = false
   }
 
   sendEvent(event: SendableEvent, delayTime: number = 0) {
+    if (this.synth === null) {
+      console.warn(
+        "SoundFontSynth: Cannot send event - synth not initialized. SoundFont may not be loaded.",
+      )
+      return
+    }
     if (this.context.state !== "running") {
       console.warn(
         `SoundFontSynth: AudioContext state is "${this.context.state}", not "running". Audio may not play.`,
       )
     }
-    this.postSynthMessage({
-      type: "midi",
-      midi: event,
-      delayTime: delayTime * this.context.sampleRate,
-    })
+
+    const channel = event.channel
+
+    // Translate MIDI events to spessasynth method calls
+    switch (event.subtype) {
+      case "noteOn":
+        if (event.velocity === 0) {
+          // velocity 0 noteOn is equivalent to noteOff
+          this.synth.noteOff(channel, event.noteNumber)
+        } else {
+          this.synth.noteOn(channel, event.noteNumber, event.velocity)
+        }
+        break
+      case "noteOff":
+        this.synth.noteOff(channel, event.noteNumber)
+        break
+      case "programChange":
+        this.synth.programChange(channel, event.value)
+        break
+      case "controller":
+        this.synth.controllerChange(channel, event.controllerType as any, event.value)
+        break
+      case "pitchBend":
+        this.synth.pitchWheel(channel, event.value)
+        break
+      case "channelAftertouch":
+        this.synth.channelPressure(channel, event.amount)
+        break
+      case "noteAftertouch":
+        this.synth.polyPressure(channel, event.noteNumber, event.amount)
+        break
+      default:
+        // Log unhandled event types for debugging
+        console.warn(
+          `SoundFontSynth: Unhandled event subtype: ${(event as any).subtype}`,
+        )
+    }
   }
 
   activate() {
     this.context.resume()
+  }
+
+  /** Enable or disable reverb/chorus effects */
+  setEffectsEnabled(enabled: boolean) {
+    if (this.synth === null) {
+      console.warn("SoundFontSynth: Cannot set effects - synth not initialized")
+      return
+    }
+
+    this._effectsEnabled = enabled
+    const reverbLevel = enabled ? DEFAULT_REVERB_LEVEL : 0
+    const chorusLevel = enabled ? DEFAULT_CHORUS_LEVEL : 0
+
+    for (let ch = 0; ch < 16; ch++) {
+      this.synth.controllerChange(ch, 91 as any, reverbLevel) // CC91 = Reverb send
+      this.synth.controllerChange(ch, 93 as any, chorusLevel) // CC93 = Chorus send
+    }
+  }
+
+  /** Toggle reverb/chorus effects on/off */
+  toggleEffects() {
+    this.setEffectsEnabled(!this._effectsEnabled)
   }
 }
