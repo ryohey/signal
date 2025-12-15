@@ -9,6 +9,7 @@ const DEFAULT_CHORUS_LEVEL = 30
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null
   private _effectsEnabled: boolean = false
+  private _hasWarnedAboutUninitialized: boolean = false
 
   private _loadedSoundFont: SoundFont | null = null
   get loadedSoundFont(): SoundFont | null {
@@ -50,6 +51,8 @@ export class SoundFontSynth implements SynthOutput {
       initializeReverbProcessor: true,
       initializeChorusProcessor: true,
     })
+    // Reset warning flag when synth is initialized
+    this._hasWarnedAboutUninitialized = false
 
     // Connect to destination
     this.synth.connect(this.context.destination)
@@ -70,10 +73,17 @@ export class SoundFontSynth implements SynthOutput {
 
   sendEvent(event: SendableEvent, delayTime: number = 0) {
     if (this.synth === null) {
-      console.warn(
-        "SoundFontSynth: Cannot send event - synth not initialized. SoundFont may not be loaded.",
-      )
+      if (!this._hasWarnedAboutUninitialized) {
+        console.warn(
+          "SoundFontSynth: Cannot send event - synth not initialized. SoundFont may not be loaded.",
+        )
+        this._hasWarnedAboutUninitialized = true
+      }
       return
+    }
+    // Reset warning flag once synth is initialized
+    if (this._hasWarnedAboutUninitialized) {
+      this._hasWarnedAboutUninitialized = false
     }
     if (this.context.state !== "running") {
       console.warn(
