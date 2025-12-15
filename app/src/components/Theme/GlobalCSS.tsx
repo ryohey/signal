@@ -6,6 +6,9 @@ export const GlobalCSS = () => {
   return (
     <Global
       styles={css`
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
         /* theme */
         :root {
           --font-sans: ${theme.font};
@@ -39,6 +42,12 @@ export const GlobalCSS = () => {
           --color-yellow: ${theme.yellowColor};
           --size-key-height: ${Layout.keyHeight}px;
           --size-ruler-height: ${Layout.rulerHeight}px;
+          
+          /* Animation variables */
+          --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+          --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+          --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+          --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         html {
@@ -49,20 +58,32 @@ export const GlobalCSS = () => {
         body {
           height: 100%;
           margin: 0;
-          padding: 0 !important; /* Remove unnecessary padding added by RemoveScroll in radix-ui/react-dialog */
+          padding: 0 !important;
         }
 
         body {
-          -webkit-font-smoothing: subpixel-antialiased;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
           color: ${theme.textColor};
           background-color: ${theme.backgroundColor};
           overscroll-behavior: none;
           font-family: ${theme.font};
-          font-size: 0.75rem;
+          font-size: 0.8125rem;
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          line-height: 1.5;
         }
 
         #root {
           height: 100%;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
         }
 
         div,
@@ -81,52 +102,187 @@ export const GlobalCSS = () => {
           -webkit-user-drag: none;
         }
 
-        /* ScrollBar */
-
-        .ScrollBar {
-          background-color: ${theme.backgroundColor};
+        /* Interactive elements with smooth transitions - hand cursor */
+        button,
+        a,
+        input,
+        select,
+        textarea,
+        label,
+        canvas,
+        [role="button"],
+        [role="slider"],
+        [role="checkbox"],
+        [role="radio"],
+        [role="menuitem"],
+        [role="option"],
+        [role="tab"],
+        [role="listbox"],
+        [role="combobox"],
+        [role="switch"],
+        [role="spinbutton"],
+        [role="scrollbar"],
+        [tabindex]:not([tabindex="-1"]),
+        [onclick],
+        [onmousedown],
+        [data-clickable],
+        .clickable,
+        summary {
+          cursor: pointer !important;
+          transition: all var(--transition-fast);
         }
 
-        .ScrollBar .thumb {
-          border: 1px solid ${theme.backgroundColor};
-          background: ${theme.secondaryTextColor};
-          opacity: 0.2;
+        /* Ensure divs with click handlers show hand cursor */
+        div[onclick],
+        div[onmousedown],
+        span[onclick],
+        span[onmousedown] {
+          cursor: pointer !important;
         }
 
-        .ScrollBar .thumb:hover {
-          opacity: 0.3;
+        /* Buttons with hover lift effect */
+        button:not(:disabled):hover,
+        [role="button"]:not([aria-disabled="true"]):hover {
+          transform: translateY(-1px);
         }
 
-        .ScrollBar .thumb:active {
+        button:not(:disabled):active,
+        [role="button"]:not([aria-disabled="true"]):active {
+          transform: translateY(0) scale(0.98);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
+          cursor: text;
+          transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+          outline: none;
+          border-color: var(--color-theme);
+          box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+        }
+
+        input:disabled,
+        button:disabled,
+        select:disabled,
+        textarea:disabled,
+        [disabled] {
+          cursor: not-allowed;
           opacity: 0.5;
         }
 
-        .ScrollBar .button-backward:active,
-        .ScrollBar .button-backward:hover,
-        .ScrollBar .button-forward:active,
-        .ScrollBar .button-forward:hover {
-          background: ${theme.secondaryBackgroundColor};
+        /* Modern Scrollbar */
+        .ScrollBar {
+          background-color: transparent;
         }
 
-        /* Native Scrollbar */
-
-        &::-webkit-scrollbar {
-          width: 12px;
+        .ScrollBar .thumb {
+          border: none;
+          background: var(--color-text-secondary);
+          opacity: 0.15;
+          border-radius: 4px;
+          transition: opacity var(--transition-fast);
         }
 
-        &::-webkit-scrollbar-track,
-        &::-webkit-scrollbar-corner {
-          background-color: ${theme.backgroundColor};
+        .ScrollBar .thumb:hover {
+          opacity: 0.25;
         }
 
-        &::-webkit-scrollbar-thumb {
-          background-color: ${theme.secondaryBackgroundColor};
-          border: 3px solid ${theme.backgroundColor};
-          border-radius: 6px;
+        .ScrollBar .thumb:active {
+          opacity: 0.4;
         }
 
-        &::-webkit-scrollbar-thumb:hover {
-          background-color: ${theme.tertiaryTextColor};
+        .ScrollBar .button-backward,
+        .ScrollBar .button-forward {
+          display: none;
+        }
+
+        /* Native Scrollbar - Minimal */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        ::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          transition: background-color var(--transition-fast);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Selection styling */
+        ::selection {
+          background: rgba(0, 212, 170, 0.3);
+          color: inherit;
+        }
+
+        /* Focus visible for accessibility */
+        :focus-visible {
+          outline: 2px solid var(--color-theme);
+          outline-offset: 2px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+          from { 
+            opacity: 0;
+            transform: translateY(8px);
+        }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes scaleIn {
+          from { 
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to { 
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+
+        /* Utility classes */
+        .animate-fade-in {
+          animation: fadeIn var(--transition-normal) var(--ease-out-expo);
+        }
+
+        .animate-slide-up {
+          animation: slideUp var(--transition-normal) var(--ease-out-expo);
+        }
+
+        .animate-scale-in {
+          animation: scaleIn var(--transition-fast) var(--ease-out-expo);
         }
 
         /* firebase */

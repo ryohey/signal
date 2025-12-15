@@ -8,6 +8,7 @@ import { aiBackend, GenerationStage } from "../../services/aiBackend"
 import type { ProgressEvent } from "../../services/aiBackend/types"
 import { runAgentLoop, type ToolCall } from "../../services/hybridAgent"
 import type { ToolResult } from "../../services/hybridAgent/toolExecutor"
+import { Tooltip } from "../ui/Tooltip"
 import { VoiceRecorder, type DetectedNote } from "./VoiceRecorder"
 
 const Container = styled.div<{ standalone?: boolean }>`
@@ -47,17 +48,25 @@ const HeaderLeft = styled.div`
 `
 
 const NewChatButton = styled.button`
-  padding: 0.25rem 0.5rem;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
-  border-radius: 0.25rem;
-  background: transparent;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
   color: ${({ theme }) => theme.secondaryTextColor};
   font-size: 0.75rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: ${({ theme }) => theme.highlightColor};
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
     color: ${({ theme }) => theme.textColor};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
   }
 
   &:disabled {
@@ -68,17 +77,25 @@ const NewChatButton = styled.button`
 
 const Select = styled.select`
   padding: 0.375rem 0.75rem;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
-  border-radius: 0.375rem;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
   color: ${({ theme }) => theme.textColor};
   font-size: 0.75rem;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.themeColor};
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
   &:disabled {
@@ -93,12 +110,19 @@ const StatusDot = styled.span<{
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  transition: all 150ms;
+  box-shadow: ${({ status }) =>
+    status === "connected"
+      ? "0 0 8px rgba(48, 209, 88, 0.6)"
+      : status === "disconnected"
+        ? "0 0 8px rgba(255, 69, 58, 0.6)"
+        : "0 0 8px rgba(255, 214, 10, 0.6)"};
   background: ${({ status }) =>
     status === "connected"
-      ? "#4caf50"
+      ? "#30d158"
       : status === "disconnected"
-        ? "#f44336"
-        : "#ff9800"};
+        ? "#ff453a"
+        : "#ffd60a"};
 `
 
 const MessageList = styled.div`
@@ -116,8 +140,8 @@ const MessageList = styled.div`
 `
 
 const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
   max-width: 85%;
   width: 85%;
   min-width: 0;
@@ -126,14 +150,17 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
     role === "user"
       ? theme.themeColor
       : role === "error"
-        ? theme.redColor
-        : theme.secondaryBackgroundColor};
+        ? "rgba(255, 69, 58, 0.15)"
+        : "rgba(255, 255, 255, 0.04)"};
   color: ${({ role, theme }) =>
-    role === "user" || role === "error"
+    role === "user"
       ? theme.onSurfaceColor
+      : role === "error"
+        ? "#ff453a"
       : theme.textColor};
-  font-size: 0.875rem;
-  line-height: 1.4;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
@@ -144,6 +171,24 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   word-break: break-word;
   cursor: text;
   box-sizing: border-box;
+  border: 1px solid ${({ role }) =>
+    role === "user"
+      ? "transparent"
+      : role === "error"
+        ? "rgba(255, 69, 58, 0.3)"
+        : "rgba(255, 255, 255, 0.06)"};
+  animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `
 
 const InputContainer = styled.div`
@@ -168,20 +213,24 @@ const InputRow = styled.div`
 
 const Input = styled.textarea`
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid ${({ theme }) => theme.dividerColor};
-  border-radius: 0.5rem;
-  background: ${({ theme }) => theme.secondaryBackgroundColor};
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
   color: ${({ theme }) => theme.textColor};
   resize: none;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
   min-height: 80px;
   box-sizing: border-box;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.themeColor};
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   &:disabled {
@@ -189,29 +238,39 @@ const Input = styled.textarea`
   }
 
   &::placeholder {
-    color: ${({ theme }) => theme.secondaryTextColor};
+    color: ${({ theme }) => theme.tertiaryTextColor};
   }
 `
 
 const Button = styled.button`
   width: 100%;
   margin-top: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.875rem;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   background: ${({ theme }) => theme.themeColor};
   color: ${({ theme }) => theme.onSurfaceColor};
   font-weight: 600;
   cursor: pointer;
   font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    filter: brightness(1.1);
+    box-shadow: 0 0 24px rgba(0, 212, 170, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
   }
 `
 
@@ -1028,28 +1087,26 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       <Header>
         <HeaderLeft>
           <span>AI Composer</span>
+          <Tooltip title="Choose generation method">
           <Select
             value={agentType}
             onChange={handleAgentTypeChange}
             disabled={isLoading}
-            title="Select AI agent type"
           >
             <option value="hybrid">Hybrid Agent</option>
             <option value="composition_agent">Deep Agent</option>
             <option value="llm">LLM Direct</option>
           </Select>
+          </Tooltip>
         </HeaderLeft>
         {activeThreadId && (
-          <NewChatButton
-            onClick={handleNewChat}
-            disabled={isLoading}
-            title="Start a new conversation"
-          >
+          <Tooltip title="Start fresh conversation">
+            <NewChatButton onClick={handleNewChat} disabled={isLoading}>
             New Chat
           </NewChatButton>
+          </Tooltip>
         )}
-        <StatusDot
-          status={backendStatus}
+        <Tooltip
           title={
             backendStatus === "connected"
               ? "Backend connected"
@@ -1057,7 +1114,9 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 ? "Backend not available"
                 : "Checking connection..."
           }
-        />
+        >
+          <StatusDot status={backendStatus} />
+        </Tooltip>
       </Header>
       {backendStatus === "disconnected" && (
         <WarningBanner>

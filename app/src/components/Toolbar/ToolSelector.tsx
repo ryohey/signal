@@ -33,13 +33,7 @@ export const ToolSelector: FC<ToolSelectorProps> = ({
         onMouseDown={useCallback(() => onSelect("pencil"), [onSelect])}
         selected={mouseMode === "pencil"}
       >
-        <Tooltip
-          title={
-            <>
-              <Localized name="pencil-tool" /> [1]
-            </>
-          }
-        >
+        <Tooltip title="Draw and edit notes [1]">
           <IconWrapper>
             <PencilIcon
               style={{
@@ -56,13 +50,7 @@ export const ToolSelector: FC<ToolSelectorProps> = ({
         onMouseDown={useCallback(() => onSelect("selection"), [onSelect])}
         selected={mouseMode === "selection"}
       >
-        <Tooltip
-          title={
-            <>
-              <Localized name="selection-tool" /> [2]
-            </>
-          }
-        >
+        <Tooltip title="Select and move notes [2]">
           <IconWrapper>
             <SelectionIcon
               style={{

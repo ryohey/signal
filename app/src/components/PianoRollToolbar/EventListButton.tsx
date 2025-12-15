@@ -9,7 +9,7 @@ export const EventListButton: FC = () => {
   const { setOpen, isOpen } = useEventList()
 
   return (
-    <Tooltip title={<Localized name="event-list" />}>
+    <Tooltip title="View and edit MIDI events">
       <ToolbarButton
         selected={isOpen}
         onMouseDown={useCallback(

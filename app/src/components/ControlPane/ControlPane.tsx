@@ -26,7 +26,7 @@ const TabButtonBase = styled.div`
   color: var(--color-text-secondary);
   outline: none;
   font-size: 0.75rem;
-  cursor: default;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;

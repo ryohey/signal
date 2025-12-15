@@ -22,9 +22,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   background: var(--color-background-dark);
-  height: 3rem;
+  height: 3.25rem;
   flex-shrink: 0;
   -webkit-app-region: drag;
+  border-bottom: 1px solid var(--color-divider);
   padding: ${() => {
     if (isRunningInElectron()) {
       const platform = getPlatform()
@@ -42,26 +43,50 @@ export const Tab = styled.div<{ isActive?: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.75rem;
-  border-top: solid 0.1rem transparent;
+  padding: 0 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  position: relative;
   color: ${({ isActive }) =>
     isActive ? "var(--color-text)" : "var(--color-text-secondary)"};
-  background: ${({ isActive }) =>
-    isActive ? "var(--color-background)" : "transparent"};
-  border-top-color: ${({ isActive }) =>
-    isActive ? "var(--color-theme)" : "transparent"};
+  background: transparent;
   cursor: pointer;
   -webkit-app-region: none;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(${({ isActive }) => isActive ? 1 : 0});
+    width: calc(100% - 1.5rem);
+    height: 2px;
+    background: var(--color-theme);
+    border-radius: 1px 1px 0 0;
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   &.active {
     color: var(--color-text);
-    background: var(--color-background);
-    border-top-color: var(--color-theme);
+  }
+
+  &.active::after {
+    transform: translateX(-50%) scaleX(1);
   }
 
   &:hover {
-    background: var(--color-highlight);
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  &:hover::after {
+    transform: translateX(-50%) scaleX(0.6);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   a {
@@ -71,7 +96,7 @@ export const Tab = styled.div<{ isActive?: boolean }>`
 `
 
 export const TabTitle = styled.span`
-  margin-left: 0.5rem;
+  margin-left: 0.625rem;
 
   @media (max-width: 850px) {
     display: none;
@@ -80,6 +105,47 @@ export const TabTitle = styled.span`
 
 const FlexibleSpacer = styled.div`
   flex-grow: 1;
+`
+
+const ModeToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem;
+  padding: 0.1875rem;
+  margin: 0 0.5rem;
+  -webkit-app-region: none;
+  cursor: pointer;
+`
+
+const ModeToggleOption = styled.button<{ isActive: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: ${({ isActive }) => isActive ? "var(--color-theme)" : "transparent"};
+  color: ${({ isActive }) => isActive ? "var(--color-on-surface)" : "var(--color-text-secondary)"};
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: none;
+
+  &:hover {
+    color: ${({ isActive }) => isActive ? "var(--color-on-surface)" : "var(--color-text)"};
+    background: ${({ isActive }) => isActive ? "var(--color-theme)" : "rgba(255, 255, 255, 0.06)"};
+  }
+
+  svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    fill: currentColor;
+  }
 `
 
 export const IconStyle: CSSProperties = {
@@ -92,7 +158,7 @@ export const Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
   const { isOpen: isAIChatOpen, toggle: toggleAIChat } = useAIChat()
-  const { mode, toggle: toggleEditorMode, isAdvanced } = useEditorMode()
+  const { toggle: toggleEditorMode, isAdvanced } = useEditorMode()
 
   const onClickPianoRollTab = useCallback(
     (e: MouseEvent) => {
@@ -134,25 +200,13 @@ export const Navigation: FC = () => {
     [toggleAIChat],
   )
 
-  const onClickModeToggle = useCallback(
-    (e: MouseEvent) => {
-      e.preventDefault()
-      toggleEditorMode()
-    },
-    [toggleEditorMode],
-  )
-
   return (
     <Container>
       {!isRunningInElectron() && <FileMenuButton />}
       {!isRunningInElectron() && <EditMenuButton />}
 
       <Tooltip
-        title={
-          <>
-            <Localized name="switch-tab" /> [{envString.cmdOrCtrl}+1]
-          </>
-        }
+        title={`Edit notes for a single track [${envString.cmdOrCtrl}+1]`}
         delayDuration={500}
       >
         <Tab
@@ -167,11 +221,7 @@ export const Navigation: FC = () => {
       </Tooltip>
 
       <Tooltip
-        title={
-          <>
-            <Localized name="switch-tab" /> [{envString.cmdOrCtrl}+2]
-          </>
-        }
+        title={`View and arrange all tracks [${envString.cmdOrCtrl}+2]`}
         delayDuration={500}
       >
         <Tab
@@ -187,17 +237,25 @@ export const Navigation: FC = () => {
 
       <FlexibleSpacer />
 
-      <Tooltip
-        title={isAdvanced ? "Advanced Mode" : "Basic Mode"}
-        delayDuration={500}
-      >
-        <Tab isActive={isAdvanced} onClick={onClickModeToggle}>
-          <CodeTags style={IconStyle} />
-          <TabTitle>{mode === "advanced" ? "Advanced" : "Basic"}</TabTitle>
-        </Tab>
+      <Tooltip title="Toggle between basic and advanced editing modes" delayDuration={500}>
+        <ModeToggleContainer>
+          <ModeToggleOption
+            isActive={!isAdvanced}
+            onClick={() => isAdvanced && toggleEditorMode()}
+          >
+            Basic
+          </ModeToggleOption>
+          <ModeToggleOption
+            isActive={isAdvanced}
+            onClick={() => !isAdvanced && toggleEditorMode()}
+          >
+            <CodeTags />
+            Pro
+          </ModeToggleOption>
+        </ModeToggleContainer>
       </Tooltip>
 
-      <Tooltip title="Toggle AI Composer" delayDuration={500}>
+      <Tooltip title="AI-powered music generation assistant" delayDuration={500}>
         <Tab isActive={isAIChatOpen} onClick={onClickAI}>
           <Robot style={IconStyle} />
           <TabTitle>AI</TabTitle>
@@ -206,19 +264,23 @@ export const Navigation: FC = () => {
 
       {!isRunningInElectron() && (
         <>
-          <Tab onClick={onClickSettings}>
-            <Settings style={IconStyle} />
-            <TabTitle>
-              <Localized name="settings" />
-            </TabTitle>
-          </Tab>
+          <Tooltip title="App preferences and audio settings" delayDuration={500}>
+            <Tab onClick={onClickSettings}>
+              <Settings style={IconStyle} />
+              <TabTitle>
+                <Localized name="settings" />
+              </TabTitle>
+            </Tab>
+          </Tooltip>
 
-          <Tab onClick={onClickHelp}>
-            <Help style={IconStyle} />
-            <TabTitle>
-              <Localized name="help" />
-            </TabTitle>
-          </Tab>
+          <Tooltip title="Keyboard shortcuts and documentation" delayDuration={500}>
+            <Tab onClick={onClickHelp}>
+              <Help style={IconStyle} />
+              <TabTitle>
+                <Localized name="help" />
+              </TabTitle>
+            </Tab>
+          </Tooltip>
         </>
       )}
 

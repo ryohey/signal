@@ -3,6 +3,7 @@ import { FC } from "react"
 import { usePanSlider } from "../../hooks/usePanSlider"
 import { Localized } from "../../localize/useLocalization"
 import { Slider } from "../ui/Slider"
+import { Tooltip } from "../ui/Tooltip"
 
 const Container = styled.div`
   display: flex;
@@ -25,6 +26,7 @@ export const PanSlider: FC = () => {
     usePanSlider()
 
   return (
+    <Tooltip title="Stereo position (left/right)">
     <Container>
       <Label>
         <Localized name="pan" />
@@ -42,5 +44,6 @@ export const PanSlider: FC = () => {
         marks={[defaultValue]}
       ></Slider>
     </Container>
+    </Tooltip>
   )
 }
