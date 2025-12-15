@@ -32,7 +32,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref,
   ) => {
-    const handleValueChange: NumericFormatProps["onValueChange"] = ({ floatValue }) => {
+    const handleValueChange: NumericFormatProps["onValueChange"] = ({
+      floatValue,
+    }) => {
       if (floatValue !== undefined && floatValue !== null) {
         onChange(floatValue)
       }

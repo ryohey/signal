@@ -1,14 +1,18 @@
 import { FC } from "react"
+import { useOpenAudioFile } from "../../actions/audioImport"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
+import { useAudioImport } from "../../providers/AudioImportProvider"
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
   const { fileHandle } = useSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
+  const openAudioFile = useOpenAudioFile()
+  const { openAudioImportDialog } = useAudioImport()
 
   const onClickNew = async () => {
     close()
@@ -35,6 +39,14 @@ export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
     await downloadSong()
   }
 
+  const onClickImportAudio = async () => {
+    close()
+    const file = await openAudioFile()
+    if (file) {
+      openAudioImportDialog(file)
+    }
+  }
+
   return (
     <>
       <MenuItem onClick={onClickNew}>
@@ -47,6 +59,10 @@ export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
       <MenuItem onClick={onClickOpen}>
         <Localized name="open-song" />
         <HotKey>{envString.cmdOrCtrl}+O</HotKey>
+      </MenuItem>
+
+      <MenuItem onClick={onClickImportAudio}>
+        <Localized name="import-audio" />
       </MenuItem>
 
       <MenuItem onClick={onClickSave} disabled={fileHandle === null}>

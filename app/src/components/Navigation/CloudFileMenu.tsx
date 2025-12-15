@@ -1,8 +1,10 @@
 import { ChangeEvent, FC } from "react"
 import { hasFSAccess } from "../../actions/file"
+import { useOpenAudioFile } from "../../actions/audioImport"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
+import { useAudioImport } from "../../providers/AudioImportProvider"
 import { MenuDivider, MenuItem } from "../ui/Menu"
 import { FileInput } from "./LegacyFileMenu"
 
@@ -20,6 +22,8 @@ export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
     exportSong,
     publishSong,
   } = useCloudFile()
+  const openAudioFile = useOpenAudioFile()
+  const { openAudioImportDialog } = useAudioImport()
 
   const onClickNew = async () => {
     close()
@@ -66,6 +70,14 @@ export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
     await publishSong()
   }
 
+  const onClickImportAudio = async () => {
+    close()
+    const file = await openAudioFile()
+    if (file) {
+      openAudioImportDialog(file)
+    }
+  }
+
   return (
     <>
       <MenuItem onClick={onClickNew}>
@@ -76,6 +88,10 @@ export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
 
       <MenuItem onClick={onClickOpen}>
         <Localized name="open-song" />
+      </MenuItem>
+
+      <MenuItem onClick={onClickImportAudio}>
+        <Localized name="import-audio" />
       </MenuItem>
 
       <MenuItem onClick={onClickSave} disabled={isSaved}>
