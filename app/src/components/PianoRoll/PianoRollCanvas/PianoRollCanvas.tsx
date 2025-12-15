@@ -87,7 +87,7 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
       <GLCanvas
         width={width}
         height={height}
-        cursor={mouseMode === "pencil" ? "auto" : "crosshair"}
+        cursor="pointer"
         style={style}
         onContextMenu={handleContextMenu}
         onMouseDown={mouseHandler.onMouseDown}

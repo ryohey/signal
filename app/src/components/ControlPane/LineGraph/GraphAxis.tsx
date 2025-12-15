@@ -19,10 +19,10 @@ const Value = styled.div`
   padding: 0.3em;
   font-size: 90%;
   color: var(--color-text-secondary);
+  cursor: pointer;
 
   &:hover {
     background: var(--color-highlight);
-    cursor: default;
   }
 `
 

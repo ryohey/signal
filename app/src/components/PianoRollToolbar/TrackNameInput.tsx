@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { FC, useState } from "react"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTrack } from "../../hooks/useTrack"
+import { Tooltip } from "../ui/Tooltip"
 import { TrackName } from "../TrackList/TrackName"
 
 const TrackNameWrapper = styled.span`
@@ -55,9 +56,11 @@ export const TrackNameInput: FC = () => {
           onBlur={() => setEditing(false)}
         />
       ) : (
+        <Tooltip title="Double-click to rename track">
         <TrackNameWrapper onDoubleClick={() => setEditing(true)}>
           <TrackName trackId={selectedTrackId} />
         </TrackNameWrapper>
+        </Tooltip>
       )}
     </>
   )

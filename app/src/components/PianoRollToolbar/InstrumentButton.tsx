@@ -4,6 +4,7 @@ import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTrack } from "../../hooks/useTrack"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
+import { Tooltip } from "../ui/Tooltip"
 import { InstrumentName } from "../TrackList/InstrumentName"
 
 export const InstrumentButton: FC = () => {
@@ -24,6 +25,7 @@ export const InstrumentButton: FC = () => {
     : categoryEmojis[getCategoryIndex(programNumber ?? 0)]
 
   return (
+    <Tooltip title="Change instrument sound">
     <ToolbarButton
       onMouseDown={(e) => {
         e.preventDefault()
@@ -38,5 +40,6 @@ export const InstrumentButton: FC = () => {
         />
       </span>
     </ToolbarButton>
+    </Tooltip>
   )
 }

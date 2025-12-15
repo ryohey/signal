@@ -1,22 +1,16 @@
 import { useTheme } from "@emotion/react"
 import ChevronRight from "mdi-react/ChevronRightIcon"
-import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
 import { FC, useCallback, useState } from "react"
 import { hasFSAccess } from "../../actions/file"
-import { useAuth } from "../../hooks/useAuth"
 import { useExport } from "../../hooks/useExport"
-import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { Menu, MenuDivider, MenuItem, SubMenu } from "../ui/Menu"
-import { CloudFileMenu } from "./CloudFileMenu"
 import { FileMenu } from "./FileMenu"
 import { LegacyFileMenu } from "./LegacyFileMenu"
 import { Tab } from "./Navigation"
 
 export const FileMenuButton: FC = () => {
-  const { authUser: user } = useAuth()
-  const { setOpenSignInDialog } = useRootView()
   const { exportSong } = useExport()
   const theme = useTheme()
   const [isOpen, setOpen] = useState(false)
@@ -46,26 +40,7 @@ export const FileMenuButton: FC = () => {
         </Tab>
       }
     >
-      {user === null && hasFSAccess && <FileMenu close={handleClose} />}
-
-      {user === null && !hasFSAccess && <LegacyFileMenu close={handleClose} />}
-
-      {user && <CloudFileMenu close={handleClose} />}
-
-      {user === null && (
-        <>
-          <MenuDivider />
-          <MenuItem
-            onClick={() => {
-              handleClose()
-              setOpenSignInDialog(true)
-            }}
-          >
-            <CloudOutlined style={{ marginRight: "0.5em" }} />
-            <Localized name="please-sign-up" />
-          </MenuItem>
-        </>
-      )}
+      {hasFSAccess ? <FileMenu close={handleClose} /> : <LegacyFileMenu close={handleClose} />}
 
       <MenuDivider />
 

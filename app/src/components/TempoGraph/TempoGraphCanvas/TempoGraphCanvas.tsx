@@ -65,7 +65,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
     () =>
       mouseMode === "pencil"
         ? `url("./cursor-pencil.svg") 0 20, pointer`
-        : "auto",
+        : "pointer",
     [mouseMode],
   )
 

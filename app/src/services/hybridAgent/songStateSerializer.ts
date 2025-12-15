@@ -8,7 +8,20 @@ import type { Song } from "@signal-app/core"
 import { isNoteEvent, isTimeSignatureEvent } from "@signal-app/core"
 import { getInstrumentName } from "../../agent/instrumentMapping"
 
-const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+const NOTE_NAMES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+]
 
 /**
  * Convert MIDI note number to pitch name (e.g., 60 -> "C4")

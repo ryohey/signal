@@ -49,7 +49,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   const { onContextMenu, menuProps } = useContextMenu()
 
   const cursor =
-    mouseMode === "pencil" ? `url("./cursor-pencil.svg") 0 20, pointer` : "auto"
+    mouseMode === "pencil" ? `url("./cursor-pencil.svg") 0 20, pointer` : "pointer"
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),

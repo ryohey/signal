@@ -1,7 +1,6 @@
 import { useProgress } from "dialog-hooks"
 import { FC, useEffect, useState } from "react"
 import { useSetSong } from "../../actions"
-import { useLoadSongFromExternalMidiFile } from "../../actions/cloudSong"
 import { songFromArrayBuffer } from "../../actions/file"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useAutoSave } from "../../hooks/useAutoSave"
@@ -13,7 +12,6 @@ import { InitializeErrorDialog } from "./InitializeErrorDialog"
 export const OnInit: FC = () => {
   const rootStore = useStores()
   const setSong = useSetSong()
-  const loadSongFromExternalMidiFile = useLoadSongFromExternalMidiFile()
 
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -31,24 +29,6 @@ export const OnInit: FC = () => {
       setErrorMessage((e as Error).message)
     } finally {
       closeProgress()
-    }
-  }
-
-  const loadExternalMidiIfNeeded = async () => {
-    const params = new URLSearchParams(window.location.search)
-    const openParam = params.get("open")
-
-    if (openParam) {
-      const closeProgress = showProgress(localized["loading-external-midi"])
-      try {
-        const song = await loadSongFromExternalMidiFile(openParam)
-        setSong(song)
-      } catch (e) {
-        setIsErrorDialogOpen(true)
-        setErrorMessage((e as Error).message)
-      } finally {
-        closeProgress()
-      }
     }
   }
 
@@ -101,7 +81,6 @@ export const OnInit: FC = () => {
   useEffect(() => {
     ;(async () => {
       await init()
-      await loadExternalMidiIfNeeded()
       await loadArgumentFileIfNeeded()
       await checkAutoSave()
     })()

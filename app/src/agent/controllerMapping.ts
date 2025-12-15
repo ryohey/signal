@@ -218,7 +218,8 @@ export function getControllerNumber(
     const controllerNumber = CONTROLLER_ALIASES[normalized]
     return {
       controllerNumber,
-      controllerName: MIDI_CONTROLLERS[controllerNumber] ?? `CC${controllerNumber}`,
+      controllerName:
+        MIDI_CONTROLLERS[controllerNumber] ?? `CC${controllerNumber}`,
     }
   }
 
@@ -235,7 +236,10 @@ export function getControllerNumber(
 
   // Partial match on MIDI controller names
   for (const [numStr, name] of Object.entries(MIDI_CONTROLLERS)) {
-    if (name.toLowerCase().includes(normalized) || normalized.includes(name.toLowerCase())) {
+    if (
+      name.toLowerCase().includes(normalized) ||
+      normalized.includes(name.toLowerCase())
+    ) {
       const num = parseInt(numStr, 10)
       return {
         controllerNumber: num,
@@ -264,16 +268,32 @@ export function getControllerName(controllerNumber: number): string {
  * Returns the commonly used controllers with their names.
  * Useful for documentation in the agent system prompt.
  */
-export function getCommonControllers(): Array<{ name: string; cc: number; description: string }> {
+export function getCommonControllers(): Array<{
+  name: string
+  cc: number
+  description: string
+}> {
   return [
     { name: "volume", cc: 7, description: "Track volume (0-127)" },
-    { name: "pan", cc: 10, description: "Stereo position (0=left, 64=center, 127=right)" },
+    {
+      name: "pan",
+      cc: 10,
+      description: "Stereo position (0=left, 64=center, 127=right)",
+    },
     { name: "expression", cc: 11, description: "Dynamic expression (0-127)" },
-    { name: "modulation", cc: 1, description: "Vibrato/modulation depth (0-127)" },
+    {
+      name: "modulation",
+      cc: 1,
+      description: "Vibrato/modulation depth (0-127)",
+    },
     { name: "sustain", cc: 64, description: "Sustain pedal (0=off, 127=on)" },
     { name: "reverb", cc: 91, description: "Reverb depth (0-127)" },
     { name: "chorus", cc: 93, description: "Chorus depth (0-127)" },
-    { name: "brightness", cc: 74, description: "Filter cutoff/brightness (0-127)" },
+    {
+      name: "brightness",
+      cc: 74,
+      description: "Filter cutoff/brightness (0-127)",
+    },
     { name: "attack", cc: 73, description: "Attack time (0-127)" },
     { name: "release", cc: 72, description: "Release time (0-127)" },
   ]

@@ -2,6 +2,8 @@ import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { DEFAULT_TEMPO } from "@signal-app/player"
+import { BasicPitchService } from "../../services/BasicPitchService"
+import { convertBasicPitchNotes } from "../../helpers/basicPitchConverter"
 
 const MicButton = styled.button<{ isRecording: boolean }>`
   width: 40px;
@@ -99,14 +101,6 @@ const FrequencyDisplay = styled.div`
   font-family: monospace;
 `
 
-const NoteName = styled.div`
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.themeColor};
-  text-align: center;
-  margin-top: 0.25rem;
-`
-
 const WaveformContainer = styled.div`
   width: 100%;
   height: 40px;
@@ -127,93 +121,6 @@ export interface DetectedNote {
   start: number // Start time in ticks
   duration: number // Duration in ticks
   velocity: number // 1-127
-}
-
-/**
- * Convert frequency (Hz) to MIDI note number
- */
-function frequencyToMidiNote(frequency: number): number {
-  if (frequency <= 0) return -1
-  // A4 = 440 Hz = MIDI note 69
-  const midiNote = 69 + 12 * Math.log2(frequency / 440)
-  return Math.round(midiNote)
-}
-
-/**
- * Simple autocorrelation-based pitch detection
- */
-function detectPitch(
-  audioBuffer: Float32Array,
-  sampleRate: number,
-): number | null {
-  const minPeriod = Math.floor(sampleRate / 2000) // Max frequency ~2000 Hz
-  const maxPeriod = Math.floor(sampleRate / 80) // Min frequency ~80 Hz
-  const bufferSize = audioBuffer.length
-
-  if (bufferSize < maxPeriod * 2) {
-    return null
-  }
-
-  let bestPeriod = 0
-  let bestCorrelation = 0
-
-  // Autocorrelation
-  for (let period = minPeriod; period < maxPeriod; period++) {
-    let correlation = 0
-    for (let i = 0; i < bufferSize - period; i++) {
-      correlation += audioBuffer[i] * audioBuffer[i + period]
-    }
-    correlation /= bufferSize - period
-
-    if (correlation > bestCorrelation) {
-      bestCorrelation = correlation
-      bestPeriod = period
-    }
-  }
-
-  // Only return if correlation is strong enough (lowered threshold for better detection)
-  if (bestCorrelation < 0.05 || bestPeriod === 0) {
-    return null
-  }
-
-  const frequency = sampleRate / bestPeriod
-
-  // Validate frequency is in a reasonable range for voice/music
-  if (frequency < 80 || frequency > 2000) {
-    return null
-  }
-
-  return frequency
-}
-
-/**
- * Quantize note to nearest MIDI note
- */
-function quantizeToNearestNote(midiNote: number): number {
-  return Math.round(midiNote)
-}
-
-/**
- * Convert MIDI note number to note name
- */
-function midiNoteToName(midiNote: number): string {
-  const noteNames = [
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B",
-  ]
-  const octave = Math.floor(midiNote / 12) - 1
-  const noteName = noteNames[midiNote % 12]
-  return `${noteName}${octave}`
 }
 
 /**
@@ -293,35 +200,26 @@ interface VoiceRecorderProps {
 
 export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
   const [isRecording, setIsRecording] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   const [status, setStatus] = useState<string>("")
   const [audioLevel, setAudioLevel] = useState<number>(0)
-  const [currentFrequency, setCurrentFrequency] = useState<number | null>(null)
-  const [currentNoteName, setCurrentNoteName] = useState<string | null>(null)
   const mediaStreamRef = useRef<MediaStream | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const dataArrayRef = useRef<Float32Array | null>(null)
   const waveformCanvasRef = useRef<HTMLCanvasElement | null>(null)
-  const recordingStartTimeRef = useRef<number>(0)
-  const notesRef = useRef<DetectedNote[]>([])
-  const currentNoteRef = useRef<{ pitch: number; startTime: number } | null>(
-    null,
-  )
+  const audioChunksRef = useRef<Float32Array[]>([])
   const animationFrameRef = useRef<number | null>(null)
   const onNotesDetectedRef = useRef<((notes: DetectedNote[]) => void) | null>(
     null,
   )
-  const isRecordingRef = useRef<boolean>(false) // Use ref to track recording state immediately
+  const isRecordingRef = useRef<boolean>(false)
   const { currentTempo } = useConductorTrack()
 
   // Store callback in ref to avoid dependency issues
   useEffect(() => {
     onNotesDetectedRef.current = onNotesDetected || null
   }, [onNotesDetected])
-
-  const TICKS_PER_QUARTER = 480
-  const ANALYSIS_INTERVAL_MS = 100 // Analyze every 100ms
-  const MIN_NOTE_DURATION_TICKS = 120 // Minimum 16th note
 
   // Get current tempo or use default
   const tempo = currentTempo ?? DEFAULT_TEMPO
@@ -347,12 +245,9 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
     isRecordingRef.current = false
     setIsRecording(false)
     setAudioLevel(0)
-    setCurrentFrequency(null)
-    setCurrentNoteName(null)
   }, [])
 
   const processAudio = useCallback(() => {
-    // Use ref instead of state to avoid closure issues
     if (
       !analyserRef.current ||
       !dataArrayRef.current ||
@@ -383,97 +278,21 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
     }
 
     try {
+      // Get audio data
       analyserRef.current.getFloatTimeDomainData(dataArrayRef.current)
 
-      // Calculate audio level (RMS)
+      // Calculate audio level (RMS) - keep for visual feedback
       const rms = calculateRMS(dataArrayRef.current)
       setAudioLevel(rms)
 
-      // Visual feedback only - no console logging
-
-      // Draw waveform
+      // Draw waveform - keep for visual feedback
       if (waveformCanvasRef.current) {
         const canvas = waveformCanvasRef.current
         drawWaveform(canvas, dataArrayRef.current, canvas.width, canvas.height)
       }
 
-      const frequency = detectPitch(
-        dataArrayRef.current,
-        audioContext.sampleRate,
-      )
-
-      // Update frequency display
-      if (frequency && frequency > 0) {
-        setCurrentFrequency(frequency)
-        const midiNote = frequencyToMidiNote(frequency)
-        const quantizedNote = quantizeToNearestNote(midiNote)
-        if (quantizedNote >= 0 && quantizedNote <= 127) {
-          setCurrentNoteName(midiNoteToName(quantizedNote))
-        } else {
-          setCurrentNoteName(null)
-        }
-      } else {
-        setCurrentFrequency(null)
-        setCurrentNoteName(null)
-      }
-
-      const currentTime = Date.now()
-      const elapsedMs = currentTime - recordingStartTimeRef.current
-      // Convert milliseconds to ticks: (ms / 1000) * (BPM / 60) * TICKS_PER_QUARTER
-      const elapsedTicks = Math.floor(
-        (elapsedMs / 1000) * (tempo / 60) * TICKS_PER_QUARTER,
-      )
-
-      if (frequency && frequency > 0) {
-        const midiNote = frequencyToMidiNote(frequency)
-        const quantizedNote = quantizeToNearestNote(midiNote)
-
-        if (quantizedNote >= 0 && quantizedNote <= 127) {
-          // Check if we have a current note
-          if (currentNoteRef.current) {
-            // If pitch changed significantly, end the previous note
-            if (Math.abs(currentNoteRef.current.pitch - quantizedNote) > 2) {
-              // End previous note
-              const noteDuration =
-                elapsedTicks - currentNoteRef.current.startTime
-              if (noteDuration >= MIN_NOTE_DURATION_TICKS) {
-                notesRef.current.push({
-                  pitch: currentNoteRef.current.pitch,
-                  start: currentNoteRef.current.startTime,
-                  duration: noteDuration,
-                  velocity: 100,
-                })
-              }
-              // Start new note
-              currentNoteRef.current = {
-                pitch: quantizedNote,
-                startTime: elapsedTicks,
-              }
-            }
-            // Otherwise, continue the current note
-          } else {
-            // Start a new note
-            currentNoteRef.current = {
-              pitch: quantizedNote,
-              startTime: elapsedTicks,
-            }
-          }
-        }
-      } else {
-        // No pitch detected - end current note if exists
-        if (currentNoteRef.current) {
-          const noteDuration = elapsedTicks - currentNoteRef.current.startTime
-          if (noteDuration >= MIN_NOTE_DURATION_TICKS) {
-            notesRef.current.push({
-              pitch: currentNoteRef.current.pitch,
-              start: currentNoteRef.current.startTime,
-              duration: noteDuration,
-              velocity: 100,
-            })
-          }
-          currentNoteRef.current = null
-        }
-      }
+      // Buffer audio chunks for later processing
+      audioChunksRef.current.push(new Float32Array(dataArrayRef.current))
     } catch (error) {
       console.error("Error in processAudio:", error)
     }
@@ -482,7 +301,7 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
     if (isRecordingRef.current) {
       animationFrameRef.current = requestAnimationFrame(processAudio)
     }
-  }, [tempo])
+  }, [])
 
   const startRecording = useCallback(async () => {
     try {
@@ -600,12 +419,8 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
         }
       }
 
-      recordingStartTimeRef.current = Date.now()
-      notesRef.current = []
-      currentNoteRef.current = null
+      audioChunksRef.current = []
       setAudioLevel(0)
-      setCurrentFrequency(null)
-      setCurrentNoteName(null)
 
       // Set recording state in both ref and state
       isRecordingRef.current = true
@@ -632,39 +447,70 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
     if (isRecording) {
       await stopRecording()
 
-      // Finalize the last note if exists
-      if (currentNoteRef.current) {
-        const elapsedMs = Date.now() - recordingStartTimeRef.current
-        const elapsedTicks = Math.floor(
-          (elapsedMs / 1000) * (tempo / 60) * TICKS_PER_QUARTER,
-        )
-        const noteDuration = elapsedTicks - currentNoteRef.current.startTime
-        if (noteDuration >= MIN_NOTE_DURATION_TICKS) {
-          notesRef.current.push({
-            pitch: currentNoteRef.current.pitch,
-            start: currentNoteRef.current.startTime,
-            duration: noteDuration,
-            velocity: 100,
-          })
-        }
+      if (audioChunksRef.current.length === 0) {
+        setStatus("No audio recorded")
+        setTimeout(() => setStatus(""), 3000)
+        return
       }
 
-      // Pass notes to agent via callback
-      if (notesRef.current.length > 0) {
-        setStatus(
-          `Detected ${notesRef.current.length} notes, sending to chat...`,
-        )
+      setIsProcessing(true)
+      setStatus("Processing audio with Basic Pitch...")
 
-        // Call the callback to pass notes to parent (AIChat)
-        if (onNotesDetectedRef.current) {
-          onNotesDetectedRef.current(notesRef.current)
-          setStatus(`✅ ${notesRef.current.length} notes added to chat!`)
-        } else {
-          setStatus("No agent handler available")
+      try {
+        // Concatenate audio chunks
+        const totalLength = audioChunksRef.current.reduce(
+          (sum, chunk) => sum + chunk.length,
+          0,
+        )
+        const fullAudio = new Float32Array(totalLength)
+        let offset = 0
+        for (const chunk of audioChunksRef.current) {
+          fullAudio.set(chunk, offset)
+          offset += chunk.length
         }
-        setTimeout(() => setStatus(""), 3000)
-      } else {
-        setStatus("No notes detected. Try humming a clear melody!")
+
+        // Create AudioBuffer from recorded data
+        const sampleRate = audioContextRef.current?.sampleRate ?? 48000
+        const audioBuffer = new AudioBuffer({
+          length: fullAudio.length,
+          numberOfChannels: 1,
+          sampleRate: sampleRate,
+        })
+        audioBuffer.copyToChannel(fullAudio, 0)
+
+        // Transcribe with Basic Pitch
+        const service = new BasicPitchService()
+        const basicPitchNotes = await service.transcribeAudio(audioBuffer, {
+          onsetThreshold: 0.5,
+          frameThreshold: 0.3,
+          minimumNoteDuration: 0.1,
+        })
+
+        // Convert to DetectedNote format with quantization
+        const detectedNotes = convertBasicPitchNotes(basicPitchNotes, tempo, {
+          pitchCorrectionStrength: 100, // Full quantization for voice
+          minimumNoteDuration: 0.1,
+          velocitySensitivity: 80,
+        })
+
+        if (detectedNotes.length > 0) {
+          setStatus(
+            `Detected ${detectedNotes.length} notes, sending to chat...`,
+          )
+
+          if (onNotesDetectedRef.current) {
+            onNotesDetectedRef.current(detectedNotes)
+            setStatus(`✅ ${detectedNotes.length} notes added to chat!`)
+          }
+        } else {
+          setStatus("No notes detected. Try humming a clear melody!")
+        }
+      } catch (error) {
+        console.error("Transcription failed:", error)
+        setStatus("Transcription failed. Please try again.")
+      } finally {
+        setIsProcessing(false)
+        audioChunksRef.current = []
         setTimeout(() => setStatus(""), 3000)
       }
     } else {
@@ -683,33 +529,32 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({ onNotesDetected }) => {
       <MicButton
         isRecording={isRecording}
         onClick={handleToggleRecording}
-        title={isRecording ? "Stop recording" : "Record voice melody"}
+        disabled={isProcessing}
+        title={
+          isProcessing
+            ? "Processing..."
+            : isRecording
+              ? "Stop recording"
+              : "Record voice melody"
+        }
       >
-        {isRecording ? "⏹" : "🎤"}
+        {isProcessing ? "⏳" : isRecording ? "⏹" : "🎤"}
       </MicButton>
       {isRecording && (
         <AudioVisualizer>
           <LevelMeter>
             <LevelBar level={audioLevel} />
           </LevelMeter>
-          {currentFrequency !== null ? (
-            <>
-              <FrequencyDisplay>
-                {currentFrequency.toFixed(1)} Hz
-              </FrequencyDisplay>
-              {currentNoteName && <NoteName>{currentNoteName}</NoteName>}
-            </>
-          ) : (
-            <FrequencyDisplay style={{ color: "rgba(255,255,255,0.5)" }}>
-              {audioLevel > 0.01 ? "Detecting pitch..." : "No audio detected"}
-            </FrequencyDisplay>
-          )}
+          <FrequencyDisplay style={{ color: "rgba(255,255,255,0.5)" }}>
+            {audioLevel > 0.01 ? "Recording..." : "No audio detected"}
+          </FrequencyDisplay>
           <WaveformContainer>
             <WaveformCanvas ref={waveformCanvasRef} />
           </WaveformContainer>
         </AudioVisualizer>
       )}
       {status && <StatusText>{status}</StatusText>}
+      {isProcessing && <StatusText>⏳ Processing...</StatusText>}
     </Container>
   )
 }

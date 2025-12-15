@@ -293,7 +293,10 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
         .map((id) => {
           const event = track.getEventById(id)
           if (!event || !isNoteEvent(event)) return null
-          const newPitch = Math.max(0, Math.min(127, event.noteNumber + semitones))
+          const newPitch = Math.max(
+            0,
+            Math.min(127, event.noteNumber + semitones),
+          )
           return { id, noteNumber: newPitch }
         })
         .filter((u): u is { id: number; noteNumber: number } => u !== null)
@@ -335,7 +338,9 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
       let actualOffset = offsetTicks
       if (actualOffset === 0) {
         const minTick = Math.min(...notesToDuplicate.map((n) => n.tick))
-        const maxEnd = Math.max(...notesToDuplicate.map((n) => n.tick + n.duration))
+        const maxEnd = Math.max(
+          ...notesToDuplicate.map((n) => n.tick + n.duration),
+        )
         actualOffset = maxEnd - minTick
       }
 
@@ -441,7 +446,9 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
 
       const instrumentInfo = getInstrumentProgramNumber(instrumentName)
       if (!instrumentInfo) {
-        return JSON.stringify({ error: `Unknown instrument: "${instrumentName}"` })
+        return JSON.stringify({
+          error: `Unknown instrument: "${instrumentName}"`,
+        })
       }
 
       // Don't change drums to non-drums or vice versa
@@ -453,7 +460,8 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
 
       if (!track.isRhythmTrack && instrumentInfo.isDrums) {
         return JSON.stringify({
-          error: "Cannot change non-drum track to drum instrument. Create a new drum track instead.",
+          error:
+            "Cannot change non-drum track to drum instrument. Create a new drum track instead.",
         })
       }
 
@@ -537,7 +545,12 @@ function executeToolCall(song: Song, toolCall: ToolCall): string {
 
       // Create controller event and add to track
       const [controllerEvent] = toTrackEvents([
-        controllerMidiEvent(0, track.channel ?? 0, controllerInfo.controllerNumber, clampedValue),
+        controllerMidiEvent(
+          0,
+          track.channel ?? 0,
+          controllerInfo.controllerNumber,
+          clampedValue,
+        ),
       ])
 
       track.addEvent({

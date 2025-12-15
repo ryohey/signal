@@ -10,7 +10,6 @@ import { useSong } from "../../hooks/useSong"
 import { useStores } from "../../hooks/useStores"
 import { ArrangeEditor } from "../ArrangeView/ArrangeEditor"
 import { BuildInfo } from "../BuildInfo"
-import { CloudFileDialog } from "../CloudFileDialog/CloudFileDialog"
 import { ControlSettingDialog } from "../ControlSettingDialog/ControlSettingDialog"
 import { ExportProgressDialog } from "../ExportDialog/ExportProgressDialog"
 import { Head } from "../Head/Head"
@@ -20,12 +19,8 @@ import { Navigation } from "../Navigation/Navigation"
 import { OnBeforeUnload } from "../OnBeforeUnload/OnBeforeUnload"
 import { OnInit } from "../OnInit/OnInit"
 import { PianoRollEditor } from "../PianoRoll/PianoRollEditor"
-import { PublishDialog } from "../PublishDialog/PublishDialog"
 import { SettingDialog } from "../SettingDialog/SettingDialog"
-import { SignInDialog } from "../SignInDialog/SignInDialog"
 import { TransportPanel } from "../TransportPanel/TransportPanel"
-import { DeleteAccountDialog } from "../UserSettingsDialog/DeleteAccountDialog"
-import { UserSettingsDialog } from "../UserSettingsDialog/UserSettingsDialog"
 import { DropZone } from "./DropZone"
 
 const fadeOut = keyframes`
@@ -67,10 +62,12 @@ const Column = styled.div`
 `
 
 const ViewContainer = styled.div<{ isTransitioning: boolean }>`
-  position: ${({ isTransitioning }) => (isTransitioning ? "relative" : "static")};
+  position: ${({ isTransitioning }) =>
+    isTransitioning ? "relative" : "static"};
   width: ${({ isTransitioning }) => (isTransitioning ? "100vw" : "100%")};
   height: ${({ isTransitioning }) => (isTransitioning ? "100vh" : "100%")};
-  overflow: ${({ isTransitioning }) => (isTransitioning ? "hidden" : "visible")};
+  overflow: ${({ isTransitioning }) =>
+    isTransitioning ? "hidden" : "visible"};
 `
 
 const AnimatedInitialView = styled.div<{ isExiting: boolean }>`
@@ -92,7 +89,8 @@ const AnimatedMainView = styled.div<{ isEntering: boolean }>`
   opacity: ${({ isEntering }) => (isEntering ? 0 : 1)};
   animation: ${({ isEntering }) => (isEntering ? fadeIn : "none")} 0.4s
     cubic-bezier(0.4, 0, 0.2, 1);
-  animation-fill-mode: ${({ isEntering }) => (isEntering ? "forwards" : "none")};
+  animation-fill-mode: ${({ isEntering }) =>
+    isEntering ? "forwards" : "none"};
 `
 
 const Routes: FC = () => {
@@ -131,7 +129,10 @@ export const RootView: FC = () => {
       // Reset to initial view state
       setShowInitialView(true)
       setIsTransitioning(false)
-    } else if ((hasSongContent || path === "/arrange" || path === "/track") && showInitialView) {
+    } else if (
+      (hasSongContent || path === "/arrange" || path === "/track") &&
+      showInitialView
+    ) {
       // Start transition when moving away from initial view
       setIsTransitioning(true)
       // After fade out completes, hide initial view
@@ -147,8 +148,13 @@ export const RootView: FC = () => {
     }
   }, [hasSongContent, path, showInitialView])
 
-  const shouldShowInitialView = !hasSongContent && path === "/" && showInitialView
-  const shouldShowMainView = hasSongContent || path === "/arrange" || path === "/track" || isTransitioning
+  const shouldShowInitialView =
+    !hasSongContent && path === "/" && showInitialView
+  const shouldShowMainView =
+    hasSongContent ||
+    path === "/arrange" ||
+    path === "/track" ||
+    isTransitioning
 
   return (
     <>
@@ -187,15 +193,10 @@ export const RootView: FC = () => {
       <HelpDialog />
       <ExportProgressDialog />
       <Head />
-      <SignInDialog />
-      <CloudFileDialog />
       <SettingDialog />
       <ControlSettingDialog />
       <OnInit />
       <OnBeforeUnload />
-      <PublishDialog />
-      <UserSettingsDialog />
-      <DeleteAccountDialog />
     </>
   )
 }

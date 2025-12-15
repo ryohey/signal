@@ -28,7 +28,7 @@ const AutoScrollButtonContent: FC<AutoScrollButtonProps> = ({
     [onClick],
   )
   return (
-    <Tooltip title={<Localized name="auto-scroll" />}>
+    <Tooltip title="Follow playback position">
       <ToolbarButton onMouseDown={onMouseDown} selected={selected}>
         <AutoScrollIcon />
       </ToolbarButton>
