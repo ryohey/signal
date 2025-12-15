@@ -137,6 +137,111 @@ MIDI_FREQUENCIES = {
 # 12th roots of 2 for interval detection
 SEMITONE_RATIOS = [2 ** (i / 12) for i in range(25)]  # 0 to 24 semitones (2 octaves)
 
+# Scale patterns (semitones from root)
+# Major scale: W W H W W W H (0, 2, 4, 5, 7, 9, 11)
+# Minor scale: W H W W H W W (0, 2, 3, 5, 7, 8, 10)
+SCALE_PATTERNS = {
+    'major': {0, 2, 4, 5, 7, 9, 11},
+    'minor': {0, 2, 3, 5, 7, 8, 10},
+    'chromatic': {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},  # All notes
+}
+
+# Global key context (will be set per request)
+_current_key: Optional[tuple[int, str]] = None  # (root_midi_pitch_class, scale_type)
+
+
+def set_key(root_note: str, scale_type: str = 'major'):
+    """
+    Set the musical key for interval snapping.
+
+    Args:
+        root_note: Root note name (e.g., 'C#', 'G', 'Bb')
+        scale_type: 'major', 'minor', or 'chromatic'
+    """
+    global _current_key
+
+    # Parse root note to pitch class (0-11)
+    note_to_pc = {
+        'C': 0, 'C#': 1, 'Db': 1,
+        'D': 2, 'D#': 3, 'Eb': 3,
+        'E': 4, 'Fb': 4, 'E#': 5,
+        'F': 5, 'F#': 6, 'Gb': 6,
+        'G': 7, 'G#': 8, 'Ab': 8,
+        'A': 9, 'A#': 10, 'Bb': 10,
+        'B': 11, 'Cb': 11, 'B#': 0,
+    }
+
+    root_pc = note_to_pc.get(root_note)
+    if root_pc is None:
+        raise ValueError(f"Unknown root note: {root_note}")
+
+    if scale_type not in SCALE_PATTERNS:
+        raise ValueError(f"Unknown scale type: {scale_type}. Use 'major', 'minor', or 'chromatic'")
+
+    _current_key = (root_pc, scale_type)
+
+    logger = get_logger()
+    logger.log(f"  Key set to: {root_note} {scale_type}")
+
+
+def get_key() -> Optional[tuple[int, str]]:
+    """Get the current key context."""
+    return _current_key
+
+
+def clear_key():
+    """Clear the key context (revert to chromatic/no key awareness)."""
+    global _current_key
+    _current_key = None
+
+
+def is_note_in_key(midi_note: int, key: Optional[tuple[int, str]] = None) -> bool:
+    """
+    Check if a MIDI note is in the current key.
+
+    Args:
+        midi_note: MIDI note number
+        key: Optional key override (root_pc, scale_type). Uses global if not provided.
+
+    Returns:
+        True if note is in key, False otherwise. Always True if no key is set.
+    """
+    if key is None:
+        key = _current_key
+
+    if key is None:
+        return True  # No key set = all notes valid
+
+    root_pc, scale_type = key
+    scale_pattern = SCALE_PATTERNS.get(scale_type, SCALE_PATTERNS['chromatic'])
+
+    # Get pitch class of the note (0-11)
+    note_pc = midi_note % 12
+
+    # Calculate interval from root
+    interval_from_root = (note_pc - root_pc) % 12
+
+    return interval_from_root in scale_pattern
+
+
+def get_scale_notes_in_key(key: Optional[tuple[int, str]] = None) -> set[int]:
+    """
+    Get all pitch classes (0-11) that are in the current key.
+
+    Returns:
+        Set of pitch classes in the key
+    """
+    if key is None:
+        key = _current_key
+
+    if key is None:
+        return set(range(12))  # All notes
+
+    root_pc, scale_type = key
+    scale_pattern = SCALE_PATTERNS.get(scale_type, SCALE_PATTERNS['chromatic'])
+
+    return {(root_pc + interval) % 12 for interval in scale_pattern}
+
 
 def frequency_to_nearest_midi(frequency: float) -> int:
     """
@@ -156,15 +261,26 @@ def frequency_to_nearest_midi(frequency: float) -> int:
     return int(round(midi))
 
 
-def calculate_interval_semitones(freq1: float, freq2: float) -> int:
+def calculate_interval_semitones(freq1: float, freq2: float, source_midi: Optional[int] = None) -> int:
     """
-    Calculate the interval in semitones between two frequencies.
+    Calculate the interval in semitones between two frequencies using key-aware snapping.
 
-    Rounds to the nearest 12th root of 2 (nearest semitone).
+    Uses intelligent rounding that prioritizes landing on in-key notes:
+    1. First checks if we're in a confident zone (close to an integer)
+    2. If we have key context, checks if the nearest note is in key
+       - If yes, use it
+       - If no, check if the other candidate is in key and within tolerance
+    3. Falls back to musical interval preference for ambiguous cases
+
+    The key insight: singers tend to sing in tune with themselves (consistent relative
+    pitch) even if their absolute pitch drifts. When we know the key, we should trust
+    it strongly - a singer might be a bit flat on F4 but they're not trying to sing E4
+    if E isn't in the key.
 
     Args:
         freq1: First frequency (Hz)
         freq2: Second frequency (Hz)
+        source_midi: MIDI note of the source (freq1). If provided, enables key-aware snapping.
 
     Returns:
         Interval in semitones (positive = up, negative = down)
@@ -174,10 +290,89 @@ def calculate_interval_semitones(freq1: float, freq2: float) -> int:
 
     ratio = freq2 / freq1
 
-    # Calculate semitones using logarithm
-    # This handles both ascending (ratio > 1) and descending (ratio < 1) intervals
-    semitones = 12 * np.log2(ratio)
-    return int(round(semitones))
+    # Calculate raw semitones using logarithm
+    raw_semitones = 12 * np.log2(ratio)
+
+    # Get the two candidate intervals (floor and ceil)
+    lower = int(np.floor(raw_semitones))
+    upper = lower + 1
+
+    # Calculate fractional part (how far from lower integer)
+    fraction = raw_semitones - lower
+    # Distance to nearest integer
+    dist_to_lower = fraction
+    dist_to_upper = 1 - fraction
+
+    # Determine the "nearest" candidate by simple rounding
+    nearest = lower if fraction < 0.5 else upper
+    other = upper if fraction < 0.5 else lower
+
+    # KEY-AWARE SNAPPING (only when one candidate is in key and the other isn't)
+    key = get_key()
+    if key is not None and source_midi is not None:
+        nearest_target = source_midi + nearest
+        other_target = source_midi + other
+
+        nearest_in_key = is_note_in_key(nearest_target, key)
+        other_in_key = is_note_in_key(other_target, key)
+
+        # Key can only help when exactly ONE candidate is in key
+        if nearest_in_key != other_in_key:
+            # Case 1: Nearest is in key, other is not -> use nearest (confident)
+            if nearest_in_key:
+                return nearest
+
+            # Case 2: Nearest is NOT in key, other IS in key
+            # Be generous here! When the key clearly tells us one note is wrong
+            # and the other is right, trust the key even if the singer is quite
+            # flat/sharp. Singers often drift but rarely sing accidentals by accident.
+            # Allow correction up to 0.85 semitones (almost a full semitone) from
+            # the in-key note - this covers singers who are significantly flat/sharp.
+            dist_to_other = dist_to_upper if other == upper else dist_to_lower
+            if dist_to_other <= 0.85:  # Generous tolerance when key definitively helps
+                return other
+
+        # If both or neither are in key, fall through to standard logic
+
+    # CONFIDENT ZONE: Within 0.35 of an integer, just round to it
+    if fraction <= 0.35:
+        return lower
+    if fraction >= 0.65:
+        return upper
+
+    # AMBIGUOUS ZONE (0.35-0.65): Use musical interval preference
+    interval_preference = {
+        0: 10,   # Unison - very common (repeated notes)
+        1: 8,    # Minor 2nd - common (chromatic movement)
+        2: 9,    # Major 2nd - very common (scale steps)
+        3: 6,    # Minor 3rd - less common
+        4: 7,    # Major 3rd - moderately common
+        5: 8,    # Perfect 4th - common
+        6: 3,    # Tritone - rare
+        7: 7,    # Perfect 5th - moderately common
+        8: 4,    # Minor 6th - less common
+        9: 5,    # Major 6th - less common
+        10: 3,   # Minor 7th - less common
+        11: 4,   # Major 7th - less common
+        12: 8,   # Octave - common
+    }
+
+    def get_preference(interval: int) -> int:
+        """Get preference score for an interval (works for negative intervals too)."""
+        abs_interval = abs(interval)
+        if abs_interval > 12:
+            abs_interval = abs_interval % 12
+        return interval_preference.get(abs_interval, 2)
+
+    lower_pref = get_preference(lower)
+    upper_pref = get_preference(upper)
+
+    if lower_pref > upper_pref:
+        return lower
+    elif upper_pref > lower_pref:
+        return upper
+    else:
+        return int(round(raw_semitones))
 
 
 def filter_by_duration(
@@ -374,6 +569,8 @@ def segment_by_onsets(
     all_boundaries = list(onsets)  # Start with amplitude onsets
 
     if detect_pitch_boundaries:
+        # Use shorter min_gap to catch faster singing tempos
+        # 40ms is roughly a 32nd note at 180 BPM - fast enough for most singing
         confidence_valleys = detect_confidence_valleys(
             raw_time=raw_time,
             raw_frequency=raw_frequency,
@@ -381,16 +578,31 @@ def segment_by_onsets(
             dip_threshold=0.5,
             recovery_threshold=0.6,
             min_semitone_change=1.5,
-            min_gap_ms=100.0,
+            min_gap_ms=40.0,  # Reduced from 100ms to catch faster tempos
         )
 
         # Merge confidence valleys with onsets, avoiding duplicates
+        # Be more conservative about valleys close to amplitude onsets - they may just be
+        # pitch stabilization during the attack phase, not real note changes
         for valley_time in confidence_valleys:
-            # Only add if not too close to an existing boundary
-            min_dist = min(abs(valley_time - onset) for onset in all_boundaries) if all_boundaries else float('inf')
-            if min_dist >= 0.1:  # At least 100ms apart
-                all_boundaries.append(valley_time)
-                logger.log(f"  Added confidence valley at {valley_time:.3f}s as note boundary")
+            # Check distance to nearest amplitude onset (stricter - must be outside attack phase)
+            min_dist_to_onset = min(abs(valley_time - onset) for onset in onsets) if onsets else float('inf')
+
+            # Check distance to other confidence valleys (can be closer)
+            other_valleys = [b for b in all_boundaries if b not in onsets]
+            min_dist_to_valley = min(abs(valley_time - v) for v in other_valleys) if other_valleys else float('inf')
+
+            # Valley must be at least 100ms from amplitude onsets (outside attack phase)
+            # but only 50ms from other valleys
+            if min_dist_to_onset >= 0.10:  # 100ms from amplitude onsets
+                # Also check it's not too close to existing valleys
+                if min_dist_to_valley >= 0.05:  # 50ms from other valleys
+                    all_boundaries.append(valley_time)
+                    logger.log(f"  Added confidence valley at {valley_time:.3f}s as note boundary")
+                else:
+                    logger.log(f"  Skipped valley at {valley_time:.3f}s: too close to existing valley ({min_dist_to_valley*1000:.0f}ms)")
+            else:
+                logger.log(f"  Skipped valley at {valley_time:.3f}s: within attack phase of onset ({min_dist_to_onset*1000:.0f}ms from onset)")
 
         # Sort all boundaries
         all_boundaries = sorted(all_boundaries)
@@ -593,22 +805,37 @@ def merge_same_pitch_segments(
     return merged
 
 
-def extract_intervals(segments: list[PitchSegment]) -> list[int]:
+def extract_intervals(segments: list[PitchSegment], anchor_midi: Optional[int] = None) -> list[int]:
     """
-    Extract semitone intervals between consecutive segments.
+    Extract semitone intervals between consecutive segments using key-aware snapping.
+
+    This function tracks the "running" MIDI note as it applies intervals, so that
+    key-aware snapping can check if candidate notes are in the key.
 
     Args:
         segments: List of pitch segments (must have at least 2)
+        anchor_midi: MIDI note of the first segment (anchor). If None, uses segment's midi_note.
 
     Returns:
         List of intervals in semitones (length = len(segments) - 1)
     """
     logger = get_logger()
-    logger.log_subsection("Interval Extraction")
+    key = get_key()
+    key_str = f" in key" if key else " (no key set)"
+    logger.log_subsection(f"Interval Extraction (key-aware snapping{key_str})")
 
     if len(segments) < 2:
         logger.log("  Not enough segments for intervals")
         return []
+
+    # Track the running MIDI note for key-aware snapping
+    # Start with the anchor (first note's rounded MIDI)
+    if anchor_midi is not None:
+        current_midi = anchor_midi
+    else:
+        current_midi = frequency_to_nearest_midi(segments[0].avg_frequency)
+
+    logger.log(f"  Starting from: {midi_to_note_name(current_midi)} (MIDI {current_midi})")
 
     intervals = []
     for i in range(len(segments) - 1):
@@ -616,18 +843,59 @@ def extract_intervals(segments: list[PitchSegment]) -> list[int]:
         freq2 = segments[i + 1].avg_frequency
         ratio = freq2 / freq1 if freq1 > 0 else 0
         raw_semitones = 12 * np.log2(ratio) if ratio > 0 else 0
-        interval = calculate_interval_semitones(freq1, freq2)
 
-        note1 = midi_to_note_name(segments[i].midi_note)
-        note2 = midi_to_note_name(segments[i + 1].midi_note)
+        # Use key-aware interval calculation with the current (corrected) MIDI note
+        interval = calculate_interval_semitones(freq1, freq2, source_midi=current_midi)
+
+        # Calculate what the next MIDI note will be
+        next_midi = current_midi + interval
+
+        # Determine what kind of snapping was applied
+        fraction = raw_semitones - np.floor(raw_semitones)
+        simple_round = int(round(raw_semitones))
+        lower = int(np.floor(raw_semitones))
+        upper = lower + 1
+        nearest = lower if fraction < 0.5 else upper
+        snap_note = ""
+
+        # Check if key snapping was applied
+        if key is not None:
+            lower_target = current_midi + lower
+            upper_target = current_midi + upper
+            lower_in_key = is_note_in_key(lower_target, key)
+            upper_in_key = is_note_in_key(upper_target, key)
+
+            # Key snapping only applies when exactly one candidate is in key
+            if lower_in_key != upper_in_key:
+                in_key_interval = lower if lower_in_key else upper
+                if interval == in_key_interval and interval != nearest:
+                    # Key overrode the nearest rounding
+                    dist = abs(raw_semitones - interval)
+                    snap_note = f" [KEY SNAP dist={dist:.2f}]"
+                elif interval == in_key_interval:
+                    snap_note = " [KEY->nearest]"
+            elif 0.35 < fraction < 0.65:
+                # Both in key or neither - check if musical preference was used
+                if interval != simple_round:
+                    snap_note = " [MUSICAL PREF]"
+                else:
+                    snap_note = " [ambiguous]"
+        elif 0.35 < fraction < 0.65:
+            # No key, in ambiguous zone
+            if interval != simple_round:
+                snap_note = " [MUSICAL PREF]"
+            else:
+                snap_note = " [ambiguous]"
 
         interval_name = f"+{interval}" if interval >= 0 else str(interval)
         logger.log(
-            f"  {i+1}->{i+2}: {note1} ({freq1:.1f}Hz) -> {note2} ({freq2:.1f}Hz) "
-            f"| ratio={ratio:.4f} | raw={raw_semitones:.2f} | rounded={interval_name} semitones"
+            f"  {i+1}->{i+2}: {midi_to_note_name(current_midi)} ({freq1:.1f}Hz) -> "
+            f"{midi_to_note_name(next_midi)} ({freq2:.1f}Hz) "
+            f"| raw={raw_semitones:.2f} -> {interval_name}{snap_note}"
         )
 
         intervals.append(interval)
+        current_midi = next_midi  # Update running MIDI for next iteration
 
     return intervals
 
@@ -678,16 +946,18 @@ def process_segments_with_intervals(
     raw_frequency: Optional[np.ndarray] = None,
     raw_confidence: Optional[np.ndarray] = None,
     onsets: Optional[list[float]] = None,
+    key: Optional[tuple[str, str]] = None,
 ) -> list[PitchSegment]:
     """
-    Main function: Process segments using interval-based approach.
+    Main function: Process segments using interval-based approach with key-aware snapping.
 
     1. Filter by minimum duration
     1.5. Absorb transitions (segments without onsets)
     2. Merge same-pitch segments
-    3. Extract intervals
-    4. Round first note to nearest semitone (anchor)
-    5. Apply intervals to get final MIDI notes
+    3. Set key context if provided
+    4. Calculate anchor note
+    5. Extract intervals (with key-aware snapping)
+    6. Apply intervals to get final MIDI notes
 
     Args:
         segments: Raw pitch segments from CREPE
@@ -697,6 +967,8 @@ def process_segments_with_intervals(
         raw_frequency: Raw CREPE frequency array (for logging)
         raw_confidence: Raw CREPE confidence array (for logging)
         onsets: Onset timestamps in seconds (for transition absorption)
+        key: Optional tuple of (root_note, scale_type) e.g. ('C#', 'major')
+             If provided, enables key-aware interval snapping.
 
     Returns:
         Processed segments with interval-derived MIDI notes
@@ -705,6 +977,17 @@ def process_segments_with_intervals(
     logger.log_section("INTERVAL-BASED PITCH PROCESSING")
     logger.log(f"Timestamp: {datetime.now().isoformat()}")
     logger.log(f"Input: {len(segments)} segments, min_duration={min_duration_ms}ms")
+
+    # Set up key context if provided
+    if key is not None:
+        root_note, scale_type = key
+        set_key(root_note, scale_type)
+        scale_notes = get_scale_notes_in_key()
+        note_names = [MIDI_NOTE_NAMES[pc] for pc in sorted(scale_notes)]
+        logger.log(f"Key context: {root_note} {scale_type} -> {', '.join(note_names)}")
+    else:
+        clear_key()
+        logger.log("Key context: None (chromatic/no key awareness)")
 
     # Log raw CREPE frames if provided
     if log_raw_frames and raw_time is not None and raw_frequency is not None and raw_confidence is not None:
@@ -739,12 +1022,13 @@ def process_segments_with_intervals(
         logger.log(f"\n  Using ONSET-BASED segmentation ({len(onsets)} onsets detected)")
 
         # Create segments directly from onsets
+        # Use 50ms attack skip (reduced from 100ms) to handle faster tempos
         onset_segments = segment_by_onsets(
             onsets=onsets,
             raw_time=raw_time,
             raw_frequency=raw_frequency,
             raw_confidence=raw_confidence,
-            attack_skip_ms=100.0,  # Skip first 100ms after onset for pitch to stabilize
+            attack_skip_ms=50.0,  # Skip first 50ms after onset for pitch to stabilize
             min_confidence=0.5,
         )
 
@@ -772,10 +1056,7 @@ def process_segments_with_intervals(
         logger.log("  No segments after processing - returning empty")
         return []
 
-    # Step 3: Extract intervals
-    intervals = extract_intervals(merged)
-
-    # Step 4: Determine anchor from first note
+    # Step 3: Determine anchor from first note (needed for key-aware interval extraction)
     anchor_freq = merged[0].avg_frequency
     anchor_midi = frequency_to_nearest_midi(anchor_freq)
     raw_midi = 69 + 12 * np.log2(anchor_freq / 440.0)
@@ -784,6 +1065,9 @@ def process_segments_with_intervals(
     logger.log(f"  First segment frequency: {anchor_freq:.1f}Hz")
     logger.log(f"  Raw MIDI (unrounded): {raw_midi:.2f}")
     logger.log(f"  Rounded MIDI: {anchor_midi} ({midi_to_note_name(anchor_midi)})")
+
+    # Step 4: Extract intervals (with key-aware snapping using anchor)
+    intervals = extract_intervals(merged, anchor_midi=anchor_midi)
 
     # Step 5: Apply intervals to get all MIDI notes
     midi_notes = apply_intervals_from_anchor(anchor_midi, intervals)

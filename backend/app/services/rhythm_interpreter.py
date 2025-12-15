@@ -194,6 +194,14 @@ async def interpret_rhythm(
     # Step 1: Process segments using interval-based approach
     # This filters short notes, absorbs transitions, merges same-pitch segments,
     # and derives MIDI notes from intervals rather than absolute frequencies
+
+    # Build key tuple if key_hint and scale_hint are provided
+    key_tuple = None
+    if request.key_hint is not None and request.scale_hint is not None:
+        root_note = PITCH_CLASS_NAMES[request.key_hint]
+        key_tuple = (root_note, request.scale_hint)
+        logger.log(f"Using key from request: {root_note} {request.scale_hint}")
+
     processed_segments = process_segments_with_intervals(
         request.segments,
         min_duration_ms=75.0,
@@ -202,6 +210,7 @@ async def interpret_rhythm(
         raw_frequency=raw_data['filtered_frequency'] if log_raw else None,
         raw_confidence=raw_data['filtered_confidence'] if log_raw else None,
         onsets=raw_data.get('onsets') if raw_data else None,
+        key=key_tuple,
     )
 
     if not processed_segments:
@@ -379,10 +388,21 @@ def fallback_rhythm_interpretation(
     Simple fallback rhythm interpretation without LLM.
     Uses project tempo and basic quantization with interval-based pitch processing.
     """
+    # Build key tuple for interval processing
+    # Prefer request key_hint/scale_hint if provided, otherwise use detected key
+    key_tuple = None
+    if request.key_hint is not None and request.scale_hint is not None:
+        root_note = PITCH_CLASS_NAMES[request.key_hint]
+        key_tuple = (root_note, request.scale_hint)
+    elif key is not None and scale is not None:
+        root_note = PITCH_CLASS_NAMES[key]
+        key_tuple = (root_note, scale)
+
     # Process segments with interval approach
     processed_segments = process_segments_with_intervals(
         request.segments,
         min_duration_ms=75.0,
+        key=key_tuple,
     )
 
     if not processed_segments:
