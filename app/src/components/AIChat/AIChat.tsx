@@ -549,8 +549,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
     setGenerationProgress,
     currentAttempt,
     setCurrentAttempt,
-    streamingMessageIndex,
-    setStreamingMessageIndex,
     activeThreadId,
     setActiveThreadId,
   } = useAIChat()
@@ -816,7 +814,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 return updated
               })
               streamingMessageIndexRef.current = -1
-              setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
             },
@@ -855,7 +852,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
                 return updated
               })
               streamingMessageIndexRef.current = -1
-              setStreamingMessageIndex(-1)
               setIsLoading(false)
               abortControllerRef.current = null
             },
@@ -879,7 +875,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             return updated
           })
           streamingMessageIndexRef.current = -1
-          setStreamingMessageIndex(-1)
           setIsLoading(false)
           abortControllerRef.current = null
         }
@@ -964,7 +959,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           setIsLoading(false)
           setGenerationStage(null)
           setGenerationProgress("")
-          setStreamingMessageIndex(-1)
         }
       }
     },
@@ -978,7 +972,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
       activeThreadId,
       setMessages,
       setIsLoading,
-      setStreamingMessageIndex,
       setGenerationStage,
       setGenerationProgress,
       setCurrentAttempt,
@@ -1009,7 +1002,6 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         return updated
       })
       streamingMessageIndexRef.current = -1
-      setStreamingMessageIndex(-1)
     } else if (agentType === "composition_agent" && isLoading) {
       // Composition agent mode: just stop and clean up
       setIsLoading(false)
@@ -1026,14 +1018,12 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
         ]
       })
       streamingMessageIndexRef.current = -1
-      setStreamingMessageIndex(-1)
     }
   }, [
     agentType,
     isLoading,
     setMessages,
     setIsLoading,
-    setStreamingMessageIndex,
     setGenerationStage,
     setGenerationProgress,
   ])

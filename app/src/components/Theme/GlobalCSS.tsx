@@ -284,11 +284,6 @@ export const GlobalCSS = () => {
         .animate-scale-in {
           animation: scaleIn var(--transition-fast) var(--ease-out-expo);
         }
-
-        /* firebase */
-        .firebase-emulator-warning {
-          display: none !important;
-        }
       `}
     />
   )
