@@ -111,9 +111,16 @@ export const RootView: FC = () => {
   useDisableBrowserContextMenu()
   const { songStore } = useStores()
   const { tracks } = useSong()
-  const { path } = useRouter()
+  const { path, setPath } = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showInitialView, setShowInitialView] = useState(true)
+
+  // Auto-redirect homepage to /arrange
+  useEffect(() => {
+    if (path === "/") {
+      setPath("/arrange")
+    }
+  }, [path, setPath])
 
   // Check if song has any non-conductor tracks with note events (i.e., has musical content)
   const hasSongContent = useMemo(() => {
