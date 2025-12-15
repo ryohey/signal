@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC, PropsWithChildren } from "react"
+import { FC, PropsWithChildren } from "react"
 import { BottomPlayer } from "../components/BottomPlayer.js"
 import { Navigation } from "../components/Navigation.js"
 
@@ -28,7 +28,11 @@ export const PageTitle = styled.h1`
   margin-bottom: 2rem;
 `
 
-export const PageLayout: FC<PropsWithChildren> = ({ children }) => {
+export interface PageLayoutProps {}
+
+export const PageLayout: FC<PropsWithChildren<PageLayoutProps>> = ({
+  children,
+}) => {
   return (
     <Container>
       <Navigation />

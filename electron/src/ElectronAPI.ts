@@ -1,4 +1,4 @@
-import type { FirebaseCredential } from "./FirebaseCredential"
+import { FirebaseCredential } from "./FirebaseCredential"
 
 export type Unsubscribe = () => void
 
@@ -30,7 +30,7 @@ export type ElectronAPI = {
   onOpenSetting: (callback: () => void) => Unsubscribe
   onOpenHelp: (callback: () => void) => Unsubscribe
   onBrowserSignInCompleted: (
-    callback: (params: { credential: FirebaseCredential }) => void
+    callback: (params: { credential: FirebaseCredential }) => void,
   ) => Unsubscribe
   // tell to main process that the renderer process is ready
   ready: () => void

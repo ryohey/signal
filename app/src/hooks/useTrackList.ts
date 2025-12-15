@@ -1,4 +1,4 @@
-import type { TrackId } from "@signal-app/core"
+import { TrackId } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
 import { useSong } from "./useSong"
@@ -26,7 +26,7 @@ export function useTrackList() {
         const toIndex = tracks.indexOf(overTrack)
         moveTrack(fromIndex, toIndex)
       },
-      [tracks, getTrack, moveTrack]
+      [tracks, getTrack, moveTrack],
     ),
   }
 }

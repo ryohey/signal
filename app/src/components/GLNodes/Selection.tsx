@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react"
 import { BorderedRectangles } from "@ryohey/webgl-react"
 import Color from "color"
-import { type FC, useMemo } from "react"
-import type { Rect } from "../../entities/geometry/Rect"
+import { FC, useMemo } from "react"
+import { Rect } from "../../entities/geometry/Rect"
 import { colorToVec4 } from "../../gl/color"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 
@@ -18,18 +18,18 @@ export const Selection: FC<{ rect: Rect | null; zIndex: number }> = ({
       isActive
         ? colorToVec4(Color(theme.themeColor).fade(0.9))
         : colorToVec4(Color(theme.themeColor).fade(0.95)),
-    [isActive, theme]
+    [isActive, theme],
   )
   const strokeColor = useMemo(
     () =>
       isActive
         ? colorToVec4(Color(theme.themeColor))
         : colorToVec4(Color(theme.themeColor).fade(0.7)),
-    [isActive, theme]
+    [isActive, theme],
   )
 
   if (rect === null) {
-    return null
+    return <></>
   }
 
   return (

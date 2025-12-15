@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 
-import type { FC } from "react"
+import { FC } from "react"
 import {
   EmailIcon,
   EmailShareButton,

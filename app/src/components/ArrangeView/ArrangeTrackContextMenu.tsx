@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import {
   useDuplicateTrack,
   useInsertTrack,
@@ -7,7 +7,7 @@ import {
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
-import { ContextMenu, type ContextMenuProps } from "../ContextMenu/ContextMenu"
+import { ContextMenu, ContextMenuProps } from "../ContextMenu/ContextMenu"
 import { MenuItem } from "../ui/Menu"
 
 export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {

@@ -1,7 +1,7 @@
-import type { TrackId } from "@signal-app/core"
+import { TrackId } from "@signal-app/core"
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
-import { useAtomCallback } from "jotai/utils"
 import { atomEffect } from "jotai-effect"
+import { useAtomCallback } from "jotai/utils"
 import { useCallback, useMemo } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
 import { usePlayer } from "./usePlayer"
@@ -19,7 +19,7 @@ export function useTrackMute() {
       atomEffect((get) => {
         synthGroup.trackMute = get(trackMuteAtom)
       }),
-    [synthGroup]
+    [synthGroup],
   )
 
   useAtom(syncToSynthEffectAtom)
@@ -48,8 +48,8 @@ export function useTrackMute() {
             allSoundsOffChannel(channel)
           }
         },
-        [getTrack, allSoundsOffChannel]
-      )
+        [getTrack, allSoundsOffChannel],
+      ),
     ),
     toggleSolo: useAtomCallback(
       useCallback(
@@ -67,8 +67,8 @@ export function useTrackMute() {
             allSoundsOffExclude(channel)
           }
         },
-        [getTrack, allSoundsOffChannel, allSoundsOffExclude]
-      )
+        [getTrack, allSoundsOffChannel, allSoundsOffExclude],
+      ),
     ),
   }
 }
@@ -78,15 +78,15 @@ const trackMuteAtom = atom<TrackMute>(TrackMute.empty)
 
 // actions
 const muteAtom = atom(null, (_get, set, trackId: TrackId) =>
-  set(trackMuteAtom, TrackMute.mute(trackId))
+  set(trackMuteAtom, TrackMute.mute(trackId)),
 )
 const unmuteAtom = atom(null, (_get, set, trackId: TrackId) =>
-  set(trackMuteAtom, TrackMute.unmute(trackId))
+  set(trackMuteAtom, TrackMute.unmute(trackId)),
 )
 const soloAtom = atom(null, (_get, set, trackId: TrackId) =>
-  set(trackMuteAtom, TrackMute.solo(trackId))
+  set(trackMuteAtom, TrackMute.solo(trackId)),
 )
 const unsoloAtom = atom(null, (_get, set, trackId: TrackId) =>
-  set(trackMuteAtom, TrackMute.unsolo(trackId))
+  set(trackMuteAtom, TrackMute.unsolo(trackId)),
 )
 const resetAtom = atom(null, (_get, set) => set(trackMuteAtom, TrackMute.empty))

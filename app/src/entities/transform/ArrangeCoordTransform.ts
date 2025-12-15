@@ -1,11 +1,11 @@
-import type { Point } from "../geometry/Point"
-import type { TickTransform } from "./TickTransform"
-import type { TrackTransform } from "./TrackTransform"
+import { Point } from "../geometry/Point"
+import { TickTransform } from "./TickTransform"
+import { TrackTransform } from "./TrackTransform"
 
 export class ArrangeCoordTransform {
   constructor(
     private readonly tickTransform: TickTransform,
-    private readonly trackTransform: TrackTransform
+    private readonly trackTransform: TrackTransform,
   ) {}
 
   getY(trackIndex: number): number {

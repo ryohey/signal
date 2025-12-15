@@ -1,8 +1,8 @@
-import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
 import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
-import type { Rect } from "../../../../entities/geometry/Rect"
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { Rect } from "../../../../entities/geometry/Rect"
+import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
@@ -61,12 +61,12 @@ export const useMoveSelectionGesture = (): MouseGesture<
             point = ArrangePoint.clamp(
               point,
               tracks.length -
-                (selection.toTrackIndex - selection.fromTrackIndex)
+                (selection.toTrackIndex - selection.fromTrackIndex),
             )
 
             const delta = ArrangePoint.sub(
               point,
-              ArrangeSelection.start(selection)
+              ArrangeSelection.start(selection),
             )
 
             if (delta.tick === 0 && delta.trackIndex === 0) {
@@ -78,7 +78,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
 
             selectedEventIds = commands.arrange.moveEventsBetweenTracks(
               selectedEventIds,
-              delta
+              delta,
             )
 
             setSelection(selection)
@@ -93,7 +93,7 @@ export const useMoveSelectionGesture = (): MouseGesture<
         setSelection,
         _selection,
         commands,
-      ]
+      ],
     ),
   }
 }

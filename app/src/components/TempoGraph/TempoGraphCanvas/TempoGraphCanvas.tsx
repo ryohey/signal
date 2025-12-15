@@ -1,5 +1,5 @@
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { type CSSProperties, type FC, useCallback, useMemo } from "react"
+import { CSSProperties, FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
@@ -38,7 +38,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       x: e.offsetX + scrollLeft,
       y: e.offsetY,
     }),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const currentGesture =
@@ -53,12 +53,12 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       const local = getLocal(e.nativeEvent)
       currentGesture.onMouseDown(e.nativeEvent, local, transform)
     },
-    [currentGesture, transform, getLocal]
+    [currentGesture, transform, getLocal],
   )
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const cursor = useMemo(
@@ -66,7 +66,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       mouseMode === "pencil"
         ? `url("./cursor-pencil.svg") 0 20, pointer`
         : "auto",
-    [mouseMode]
+    [mouseMode],
   )
 
   return (

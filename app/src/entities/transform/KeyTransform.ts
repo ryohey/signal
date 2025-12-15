@@ -1,7 +1,7 @@
 export class KeyTransform {
   constructor(
     readonly pixelsPerKey: number,
-    private readonly maxNoteNumber: number
+    private readonly maxNoteNumber: number,
   ) {}
 
   getY(noteNumber: number) {

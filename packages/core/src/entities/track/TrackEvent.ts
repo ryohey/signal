@@ -1,6 +1,6 @@
-import type { AnyEvent } from "midifile-ts"
-import type { DistributiveOmit } from "../../types"
-import type { AnySignalEvent } from "./signalEvents"
+import { AnyEvent } from "midifile-ts"
+import { DistributiveOmit } from "../../types"
+import { AnySignalEvent } from "./signalEvents"
 
 export interface TickProvider {
   tick: number

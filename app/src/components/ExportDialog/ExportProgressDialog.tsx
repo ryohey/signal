@@ -1,4 +1,4 @@
-import { type FC, useCallback } from "react"
+import { FC, useCallback } from "react"
 import { useExport } from "../../hooks/useExport"
 import { Localized } from "../../localize/useLocalization"
 import {

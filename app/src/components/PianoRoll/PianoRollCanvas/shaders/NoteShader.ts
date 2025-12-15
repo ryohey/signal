@@ -1,12 +1,12 @@
 import {
-  type InstancedBuffer,
+  InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformMat4,
   uniformVec4,
-  type VertexArray,
+  VertexArray,
 } from "@ryohey/webgl-react"
-import type { Rect } from "../../../../entities/geometry/Rect"
+import { Rect } from "../../../../entities/geometry/Rect"
 
 export interface INoteData {
   velocity: number
@@ -22,11 +22,11 @@ export class NoteBuffer
   private stateBuffer = new Float32Array(0)
 
   constructor(
-    readonly vertexArray: VertexArray<"position" | "bounds" | "state">
+    readonly vertexArray: VertexArray<"position" | "bounds" | "state">,
   ) {
     this.vertexArray.updateBuffer(
       "position",
-      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 }))
+      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 })),
     )
   }
 
@@ -53,11 +53,11 @@ export class NoteBuffer
 
     this.vertexArray.updateBuffer(
       "bounds",
-      this.boundsBuffer.subarray(0, rects.length * 4)
+      this.boundsBuffer.subarray(0, rects.length * 4),
     )
     this.vertexArray.updateBuffer(
       "state",
-      this.stateBuffer.subarray(0, rects.length * 2)
+      this.stateBuffer.subarray(0, rects.length * 2),
     )
 
     this._instanceCount = rects.length
@@ -144,5 +144,5 @@ export const NoteShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
-    (vertexArray) => new NoteBuffer(vertexArray)
+    (vertexArray) => new NoteBuffer(vertexArray),
   )

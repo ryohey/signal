@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC } from "react"
+import { FC } from "react"
 import { useAutoFocus } from "../../hooks/useAutoFocus"
 import { TempoEditorScope } from "../../hooks/useTempoEditor"
 import { useTempoEditorKeyboardShortcut } from "../../hooks/useTempoEditorKeyboardShortcut"

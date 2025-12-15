@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react"
 
 // A hook that creates a disposable resource and disposes it when the component unmounts
 export function useDisposable<T extends { dispose: () => void }>(
-  factory: () => T
+  factory: () => T,
 ) {
   const eventViewRef = useRef<T | null>(null)
 

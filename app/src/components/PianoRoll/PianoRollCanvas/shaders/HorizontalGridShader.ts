@@ -1,14 +1,14 @@
 import {
-  type Buffer,
+  Buffer,
   rectToTriangles,
   Shader,
   uniformFloat,
   uniformMat4,
   uniformVec4,
-  type VertexArray,
+  VertexArray,
 } from "@ryohey/webgl-react"
 import isEqual from "lodash/isEqual"
-import type { Rect } from "../../../../entities/geometry/Rect"
+import { Rect } from "../../../../entities/geometry/Rect"
 
 export class HorizontalGridBuffer implements Buffer<Rect, "position"> {
   constructor(readonly vertexArray: VertexArray<"position">) {}
@@ -120,5 +120,5 @@ export const HorizontalGridShader = (gl: WebGL2RenderingContext) =>
       },
       height: uniformFloat(),
     },
-    (vertexArray) => new HorizontalGridBuffer(vertexArray)
+    (vertexArray) => new HorizontalGridBuffer(vertexArray),
   )

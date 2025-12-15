@@ -6,11 +6,5 @@ configure({
   enforceActions: "never",
 })
 
-const rootElement = document.createElement("div")
-
-if (!rootElement) {
-  throw new Error("Root element not found")
-}
-
-const root = createRoot(rootElement)
+const root = createRoot(document.querySelector("#root")!)
 root.render(<App />)

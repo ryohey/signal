@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC } from "react"
+import { ChangeEvent, FC } from "react"
 import { useSongFile } from "../../hooks/useSongFile"
 import { Localized } from "../../localize/useLocalization"
 import { MenuDivider, MenuItem } from "../ui/Menu"

@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
-import type { VelocityTransform } from "../../../entities/transform/VelocityTransform"
+import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useCommands } from "../../../hooks/useCommands"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
@@ -46,7 +46,7 @@ export const useVelocityPaintGesture = ({
               lastTick,
               lastValue,
               tick,
-              value
+              value,
             )
             lastTick = tick
             lastValue = value
@@ -60,7 +60,7 @@ export const useVelocityPaintGesture = ({
         selectedNoteIds,
         transform,
         velocityTransform,
-      ]
+      ],
     ),
   }
 }

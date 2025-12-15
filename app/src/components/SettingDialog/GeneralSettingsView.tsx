@@ -1,12 +1,12 @@
 import styled from "@emotion/styled"
-import { type FC, useCallback } from "react"
+import { FC, useCallback } from "react"
 import { useSettings } from "../../hooks/useSettings"
 import {
-  type Language,
+  Language,
   Localized,
   useCurrentLanguage,
 } from "../../localize/useLocalization"
-import { type ThemeType, themes } from "../../theme/Theme"
+import { themes, ThemeType } from "../../theme/Theme"
 import { ThemeName } from "../../theme/ThemeName"
 import { DialogContent, DialogTitle } from "../Dialog/Dialog"
 import { Checkbox } from "../ui/Checkbox"
@@ -73,7 +73,7 @@ const ShowNoteLabelCheckbox: FC = () => {
     (checked: boolean) => {
       setShowNoteLabels(checked)
     },
-    [setShowNoteLabels]
+    [setShowNoteLabels],
   )
 
   return (

@@ -1,7 +1,7 @@
-import type { AnyChannelEvent } from "midifile-ts"
+import { AnyChannelEvent } from "midifile-ts"
 import { deassemble as deassembleNote } from "../../midi/noteAssembler"
-import type { Track, TrackId } from "../track/Track"
-import type { TrackEvent } from "../track/TrackEvent"
+import { Track, TrackId } from "../track/Track"
+import { TrackEvent } from "../track/TrackEvent"
 
 type CollectableEvent = AnyChannelEvent & {
   tick: number
@@ -16,7 +16,7 @@ type CollectableEventOf<T extends AnyChannelEvent> = T & {
 export const convertTrackEvents = (
   events: readonly TrackEvent[],
   channel: number | undefined,
-  trackId: TrackId
+  trackId: TrackId,
 ) =>
   events
     .filter((e) => !(e.isRecording === true))
@@ -27,10 +27,10 @@ export const convertTrackEvents = (
           ...e,
           channel,
           trackId,
-        }) as CollectableEventOf<AnyChannelEvent>
+        }) as CollectableEventOf<AnyChannelEvent>,
     )
 
 export const collectAllEvents = (
-  tracks: readonly Track[]
+  tracks: readonly Track[],
 ): CollectableEvent[] =>
   tracks.flatMap((t) => convertTrackEvents(t.events, t.channel, t.id))

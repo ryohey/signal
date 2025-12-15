@@ -1,5 +1,5 @@
-import type { ColorInstance } from "color"
-import type { vec4 } from "gl-matrix"
+import { ColorInstance } from "color"
+import { vec4 } from "gl-matrix"
 
 export const colorToVec4 = (color: ColorInstance): vec4 => {
   const rgb = color.rgb().array()
@@ -9,7 +9,7 @@ export const colorToVec4 = (color: ColorInstance): vec4 => {
 export const enhanceContrast = (
   color: ColorInstance,
   isLightContent: boolean,
-  amount: number
+  amount: number,
 ): ColorInstance => {
   return isLightContent ? color.lighten(amount) : color.darken(amount)
 }

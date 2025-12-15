@@ -2,13 +2,13 @@ import { Range } from "@signal-app/core"
 import { transaction } from "mobx"
 import { Point } from "../../../../entities/geometry/Point"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import {
-  type DraggableArea,
-  type PianoRollDraggable,
+  DraggableArea,
+  PianoRollDraggable,
   usePianoRollDraggable,
 } from "../../../../hooks/usePianoRollDraggable"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
@@ -18,7 +18,7 @@ const MIN_LENGTH = 10
 export interface MoveDraggableCallback {
   onChange?: (
     e: MouseEvent,
-    changes: { oldPosition: NotePoint; newPosition: NotePoint }
+    changes: { oldPosition: NotePoint; newPosition: NotePoint },
   ) => void
   onMouseUp?: (e: MouseEvent) => void
   onClick?: (e: MouseEvent) => void
@@ -26,7 +26,7 @@ export interface MoveDraggableCallback {
 
 const constraintToDraggableArea = (
   point: NotePoint,
-  draggableArea: DraggableArea
+  draggableArea: DraggableArea,
 ) => {
   return {
     tick:
@@ -69,7 +69,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
       const offset = NotePoint.sub(draggablePosition, notePoint)
 
       const subDraggablePositions = subDraggables.map((subDraggable) =>
-        getDraggablePosition(subDraggable)
+        getDraggablePosition(subDraggable),
       )
 
       observeDrag2(e, {
@@ -93,7 +93,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
             const local = Point.add(startPos, d)
             const notePoint = NotePoint.add(
               transform.getNotePoint(local),
-              offset
+              offset,
             )
             const position = quantize
               ? {
@@ -126,7 +126,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
 
               const position = NotePoint.add(subDraggablePosition, delta)
               return constraintToDraggableArea(position, subDraggableArea)
-            }
+            },
           )
 
           if (!isChanged) {

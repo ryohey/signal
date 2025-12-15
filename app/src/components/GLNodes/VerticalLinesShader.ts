@@ -1,11 +1,11 @@
 import {
-  type InstancedBuffer,
+  InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformFloat,
   uniformMat4,
   uniformVec4,
-  type VertexArray,
+  VertexArray,
 } from "@ryohey/webgl-react"
 
 class VerticalLinesBuffer
@@ -16,7 +16,7 @@ class VerticalLinesBuffer
   constructor(readonly vertexArray: VertexArray<"position" | "x">) {
     this.vertexArray.updateBuffer(
       "position",
-      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 }))
+      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 })),
     )
   }
 
@@ -69,5 +69,5 @@ export const VerticalLinesShader = (gl: WebGL2RenderingContext) =>
       height: uniformFloat(),
       lineWidth: uniformFloat(),
     },
-    (gl) => new VerticalLinesBuffer(gl)
+    (gl) => new VerticalLinesBuffer(gl),
   )

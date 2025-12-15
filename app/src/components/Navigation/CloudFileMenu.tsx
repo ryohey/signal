@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC } from "react"
+import { ChangeEvent, FC } from "react"
 import { hasFSAccess } from "../../actions/file"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"

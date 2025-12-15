@@ -3,7 +3,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
 import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { useSetTrackInstrument } from "../actions"
-import type { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
+import { InstrumentSetting } from "../components/InstrumentBrowser/InstrumentBrowser"
 import { isNotUndefined } from "../helpers/array"
 import { getCategoryIndex } from "../midi/GM"
 import { usePianoRoll } from "./usePianoRoll"
@@ -38,7 +38,7 @@ export function useInstrumentBrowser() {
             .map((t) => t.channel)
           const availableChannel =
             Math.min(
-              ...difference(channels, usedChannels).filter(isNotUndefined)
+              ...difference(channels, usedChannels).filter(isNotUndefined),
             ) || 0
           setChannel(availableChannel)
         }
@@ -56,7 +56,7 @@ export function useInstrumentBrowser() {
       tracks,
       setSetting,
       setTrackInstrumentAction,
-    ]
+    ],
   )
 
   const onClickOK = useCallback(() => {
@@ -113,13 +113,13 @@ export function useInstrumentBrowser() {
           isRhythmTrack: setting.isRhythmTrack,
         })
       },
-      [setSetting, setting, channel, previewNoteOn, sendEvent, isPlaying]
+      [setSetting, setting, channel, previewNoteOn, sendEvent, isPlaying],
     ),
     onChangeRhythmTrack: useCallback(
       (state: boolean) => {
         changeRhythmTrack(state)
       },
-      [changeRhythmTrack]
+      [changeRhythmTrack],
     ),
     onClickOK,
   }

@@ -1,6 +1,6 @@
 import {
+  TrackEvent,
   bpmToUSecPerBeat,
-  type TrackEvent,
   uSecPerBeatToBPM,
 } from "@signal-app/core"
 import { clamp, flow } from "lodash"
@@ -24,7 +24,7 @@ export type EventController = {
 }
 
 export function getEventController<T extends TrackEvent>(
-  e: T
+  e: T,
 ): EventController {
   switch (e.type) {
     case "channel":
@@ -106,7 +106,7 @@ export function getEventController<T extends TrackEvent>(
                 bpmToUSecPerBeat,
                 Math.floor,
                 nanToNull,
-                optional((microsecondsPerBeat) => ({ microsecondsPerBeat }))
+                optional((microsecondsPerBeat) => ({ microsecondsPerBeat })),
               ),
             },
           }
@@ -143,5 +143,5 @@ const optional =
 const intConverter = <T>(
   minValue: number,
   maxValue: number,
-  fn: (value: number) => T
+  fn: (value: number) => T,
 ) => flow(parseInt, createClamp(minValue, maxValue), nanToNull, optional(fn))

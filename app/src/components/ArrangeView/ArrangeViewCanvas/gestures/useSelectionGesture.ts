@@ -1,6 +1,6 @@
-import { type MouseEvent, useCallback } from "react"
-import type { Point } from "../../../../entities/geometry/Point"
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseEvent, useCallback } from "react"
+import { Point } from "../../../../entities/geometry/Point"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { useTrackScroll } from "../../../../hooks/useTrackScroll"
@@ -20,7 +20,7 @@ export const useSelectionGesture = (): MouseGesture<[], MouseEvent> => {
       const startClientPos = getClientPos(e.nativeEvent)
       createSelectionGesture.onMouseDown(e, startClientPos, startPosPx)
     },
-    [scrollLeft, scrollTop, createSelectionGesture]
+    [scrollLeft, scrollTop, createSelectionGesture],
   )
 
   return {

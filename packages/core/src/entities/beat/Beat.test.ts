@@ -1,6 +1,6 @@
 import { Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
-import type { Measure } from "../measure/Measure"
+import { Measure } from "../measure/Measure"
 import { Beat } from "./Beat"
 
 describe("createBeatsInRange", () => {
@@ -16,7 +16,7 @@ describe("createBeatsInRange", () => {
     const beats = Beat.createInRange(
       measures,
       timebase,
-      Range.create(0, timebase * 15)
+      Range.create(0, timebase * 15),
     )
 
     expect(beats).toStrictEqual([
@@ -62,7 +62,7 @@ describe("createBeatsInRange", () => {
     const beats = Beat.createInRange(
       measures,
       timebase,
-      Range.create(0, timebase * 4)
+      Range.create(0, timebase * 4),
     )
     expect(beats).toStrictEqual([
       { measure: 0, beat: 0, tick: 0 },

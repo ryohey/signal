@@ -50,7 +50,7 @@ export const useControlPaneKeyboardShortcut = () => {
       copyControlSelection,
       pasteControlSelection,
       cutControlSelection,
-    ]
+    ],
   )
 
   return useKeyboardShortcut({

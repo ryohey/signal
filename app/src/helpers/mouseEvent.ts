@@ -1,4 +1,4 @@
-import type { Point } from "../entities/geometry/Point"
+import { Point } from "../entities/geometry/Point"
 
 export const getClientPos = (e: MouseEvent): Point => ({
   x: e.clientX,

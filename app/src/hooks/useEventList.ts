@@ -14,13 +14,13 @@ export function useEventList() {
         () => {
           if (selectedNoteIds.length > 0) {
             return trackEvents.filter(
-              (event) => selectedNoteIds.indexOf(event.id) >= 0
+              (event) => selectedNoteIds.indexOf(event.id) >= 0,
             )
           }
           return toJS(trackEvents)
         },
         [trackEvents, selectedNoteIds],
-        isEqual
+        isEqual,
       )
     },
     get isOpen() {

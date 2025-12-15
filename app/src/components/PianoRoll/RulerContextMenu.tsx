@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from "react"
+import { FC, useCallback, useState } from "react"
 import { useAddTimeSignature } from "../../actions"
 import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { usePlayer } from "../../hooks/usePlayer"
@@ -7,7 +7,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import {
   ContextMenu,
-  type ContextMenuProps,
+  ContextMenuProps,
   ContextMenuHotKey as HotKey,
 } from "../ContextMenu/ContextMenu"
 import { MenuItem } from "../ui/Menu"
@@ -65,7 +65,7 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
     }) => {
       addTimeSignature(tick, numerator, denominator)
     },
-    [tick, addTimeSignature]
+    [tick, addTimeSignature],
   )
 
   return (

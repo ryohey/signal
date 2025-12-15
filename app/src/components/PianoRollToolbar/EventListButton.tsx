@@ -1,5 +1,5 @@
 import FormatListBulleted from "mdi-react/FormatListBulletedIcon"
-import { type FC, type MouseEvent, useCallback } from "react"
+import { FC, MouseEvent, useCallback } from "react"
 import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
 import { ToolbarButton } from "../Toolbar/ToolbarButton"
@@ -17,7 +17,7 @@ export const EventListButton: FC = () => {
             e.preventDefault()
             setOpen((prev) => !prev)
           },
-          [setOpen]
+          [setOpen],
         )}
       >
         <FormatListBulleted

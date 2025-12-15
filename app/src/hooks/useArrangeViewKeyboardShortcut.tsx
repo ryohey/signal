@@ -68,7 +68,7 @@ export const useArrangeViewKeyboardShortcut = () => {
       arrangeCopySelection,
       arrangePasteSelection,
       arrangeCutSelection,
-    ]
+    ],
   )
 
   return useKeyboardShortcut({

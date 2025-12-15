@@ -1,5 +1,5 @@
 import { useToast } from "dialog-hooks"
-import { type ChangeEvent, useCallback } from "react"
+import { ChangeEvent, useCallback } from "react"
 import { useCreateSong, useOpenSong, useSaveSong } from "../actions"
 import { saveFile, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"
@@ -41,7 +41,7 @@ export const useSongFile = () => {
           toast.error((e as Error).message)
         }
       },
-      [isSaved, localized, openSong, toast]
+      [isSaved, localized, openSong, toast],
     ),
     saveSong: useCallback(async () => {
       await saveFile(getSong())

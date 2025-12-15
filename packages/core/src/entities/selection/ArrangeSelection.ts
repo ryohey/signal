@@ -1,4 +1,4 @@
-import type { ArrangePoint } from "../transform/ArrangePoint"
+import { ArrangePoint } from "../transform/ArrangePoint"
 
 export interface ArrangeSelection {
   readonly fromTick: number
@@ -15,7 +15,7 @@ export namespace ArrangeSelection {
       quantizeFloor(tick: number): number
       quantizeCeil(tick: number): number
     },
-    maxTrackIndex: number
+    maxTrackIndex: number,
   ): ArrangeSelection {
     const startSelection = fromPoint(start, quantizer)
     const endSelection = fromPoint(end, quantizer)
@@ -30,7 +30,7 @@ export namespace ArrangeSelection {
     }: {
       quantizeFloor(tick: number): number
       quantizeCeil(tick: number): number
-    }
+    },
   ): ArrangeSelection => {
     const fromTick = quantizeFloor(point.tick)
     const toTick = quantizeCeil(point.tick)
@@ -44,7 +44,7 @@ export namespace ArrangeSelection {
 
   export const union = (
     a: ArrangeSelection,
-    b: ArrangeSelection
+    b: ArrangeSelection,
   ): ArrangeSelection => {
     return {
       fromTick: Math.min(a.fromTick, b.fromTick),
@@ -56,20 +56,20 @@ export namespace ArrangeSelection {
 
   export const clamp = (
     selection: ArrangeSelection,
-    maxTrackIndex: number
+    maxTrackIndex: number,
   ): ArrangeSelection => ({
     fromTick: Math.max(0, selection.fromTick),
     toTick: Math.max(0, selection.toTick),
     fromTrackIndex: Math.min(
       maxTrackIndex,
-      Math.max(0, selection.fromTrackIndex)
+      Math.max(0, selection.fromTrackIndex),
     ),
     toTrackIndex: Math.min(maxTrackIndex, Math.max(0, selection.toTrackIndex)),
   })
 
   export const moved = (
     selection: ArrangeSelection,
-    delta: ArrangePoint
+    delta: ArrangePoint,
   ): ArrangeSelection => ({
     fromTick: selection.fromTick + delta.tick,
     toTick: selection.toTick + delta.tick,

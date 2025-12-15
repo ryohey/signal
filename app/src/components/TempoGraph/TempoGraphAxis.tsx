@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import range from "lodash/range"
-import type { FC } from "react"
-import type { TempoCoordTransform } from "../../entities/transform/TempoCoordTransform"
+import { FC } from "react"
+import { TempoCoordTransform } from "../../entities/transform/TempoCoordTransform"
 import { Positioned } from "../ui/Positioned"
 
 const Container = styled(Positioned)`

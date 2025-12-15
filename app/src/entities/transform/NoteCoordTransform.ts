@@ -1,13 +1,13 @@
-import type { NoteEvent } from "@signal-app/core"
-import type { Point } from "../../entities/geometry/Point"
-import type { KeyTransform } from "./KeyTransform"
-import type { NotePoint } from "./NotePoint"
-import type { TickTransform } from "./TickTransform"
+import { NoteEvent } from "@signal-app/core"
+import { Point } from "../../entities/geometry/Point"
+import { KeyTransform } from "./KeyTransform"
+import { NotePoint } from "./NotePoint"
+import { TickTransform } from "./TickTransform"
 
 export class NoteCoordTransform {
   constructor(
     private readonly tickTransform: TickTransform,
-    private readonly keyTransform: KeyTransform
+    private readonly keyTransform: KeyTransform,
   ) {}
 
   // pixels

@@ -1,9 +1,9 @@
-import { existsSync } from "node:fs"
-import fs from "node:fs/promises"
-import path, { dirname } from "node:path"
+import { existsSync } from "fs"
+import fs from "fs/promises"
 import { setTimeout } from "node:timers/promises"
-import { fileURLToPath } from "node:url"
+import path, { dirname } from "path"
 import puppeteer from "puppeteer"
+import { fileURLToPath } from "url"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

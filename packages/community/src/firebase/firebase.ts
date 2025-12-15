@@ -1,13 +1,13 @@
-import { type FirebaseApp, initializeApp } from "firebase/app"
-import { type Auth, connectAuthEmulator, getAuth } from "firebase/auth"
+import { FirebaseApp, initializeApp } from "firebase/app"
+import { Auth, connectAuthEmulator, getAuth } from "firebase/auth"
 import {
+  Firestore,
   connectFirestoreEmulator,
-  type Firestore,
   getFirestore,
 } from "firebase/firestore"
 import {
+  Functions,
   connectFunctionsEmulator,
-  type Functions,
   getFunctions,
 } from "firebase/functions"
 

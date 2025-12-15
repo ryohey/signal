@@ -1,8 +1,8 @@
-import type { TrackEventOf } from "@signal-app/core"
-import type { SetTempoEvent } from "midifile-ts"
+import { TrackEventOf } from "@signal-app/core"
+import { SetTempoEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
-import type { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../gesture/MouseGesture"
 import { isNotUndefined } from "../../../helpers/array"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
@@ -38,7 +38,7 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
 
         const events = selectedEventIds
           .map(
-            (id) => getEventById(id) as unknown as TrackEventOf<SetTempoEvent>
+            (id) => getEventById(id) as unknown as TrackEventOf<SetTempoEvent>,
           )
           .filter(isNotUndefined)
           .map((e) => ({ ...e })) // copy
@@ -72,7 +72,7 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
               selectedEventIds,
               quantizedDeltaTick - lastDeltaTick,
               deltaValue - lastDeltaValue,
-              transform.maxBPM
+              transform.maxBPM,
             )
 
             lastDeltaTick = quantizedDeltaTick
@@ -81,7 +81,7 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
           onMouseUp: () => {
             // Find events with the same tick and remove it
             commands.conductorTrack.removeRedundantEventsForEventIds(
-              selectedEventIds
+              selectedEventIds,
             )
           },
         })
@@ -95,7 +95,7 @@ export const useDragSelectionGesture = (): MouseGesture<[number]> => {
         getEventById,
         quantizeRound,
         commands.conductorTrack,
-      ]
+      ],
     ),
   }
 }

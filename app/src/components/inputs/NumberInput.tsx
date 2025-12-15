@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { NumericFormat } from "react-number-format"
 
 export interface NumberInputProps {

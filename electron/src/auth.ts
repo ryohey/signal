@@ -1,6 +1,6 @@
-import { app, BrowserWindow } from "electron"
+import { BrowserWindow, app } from "electron"
 import log from "electron-log"
-import type { FirebaseCredential } from "./FirebaseCredential"
+import { FirebaseCredential } from "./FirebaseCredential"
 import { authCallbackUrl } from "./scheme"
 
 const authURL = (redirectUri: string) => {
@@ -28,7 +28,7 @@ export const signInWithBrowser = async (): Promise<FirebaseCredential> => {
 
     let isResolved = false
 
-    window.webContents.on("will-navigate", (_event, url) => {
+    window.webContents.on("will-navigate", (event, url) => {
       log.info("will-navigate", url)
       if (url.startsWith(authCallbackUrl)) {
         log.info("authCallbackUrl", url)

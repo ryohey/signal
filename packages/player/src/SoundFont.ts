@@ -14,7 +14,7 @@ export class SoundFont {
     readonly data: ArrayBuffer,
     readonly sampleEvents: Awaited<
       ReturnType<typeof getSampleEventsFromSoundFont>
-    >
+    >,
   ) {}
 
   getDrumKitPresets() {
@@ -44,11 +44,7 @@ export class SoundFont {
           })
         }
 
-        const preset = drumKitPresets.get(programNumber)
-
-        if (!preset) {
-          continue // This should not happen
-        }
+        const preset = drumKitPresets.get(programNumber)!
 
         // Add sample metadata for each key in the range
         for (let key = keyStart; key <= keyEnd; key++) {
@@ -60,7 +56,7 @@ export class SoundFont {
             name: parameter.name,
           }
 
-          preset.samples.get(key)?.push(sampleMeta)
+          preset.samples.get(key)!.push(sampleMeta)
         }
       }
     }
@@ -70,7 +66,7 @@ export class SoundFont {
   static async loadFromURL(url: string) {
     const response = await fetch(url)
     const data = await response.arrayBuffer()
-    return await SoundFont.load(data)
+    return await this.load(data)
   }
 
   static async load(data: ArrayBuffer) {

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import Warning from "mdi-react/AlertIcon"
 import Info from "mdi-react/InformationIcon"
-import type { CSSProperties, FC } from "react"
+import { CSSProperties, FC } from "react"
 
 const Wrapper = styled.div`
   background: var(--color-background-secondary);

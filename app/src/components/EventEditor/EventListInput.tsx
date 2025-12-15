@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { type FC, useCallback, useState } from "react"
-import type { EventInputProp } from "./EventController"
+import { FC, useCallback, useState } from "react"
+import { EventInputProp } from "./EventController"
 
 type EventListInputProps = EventInputProp & {
   type: "number" | "text"
@@ -44,8 +44,8 @@ export const EventListInput: FC<EventListInputProps> = ({
       if (e.key === "Enter") {
         const inputs = Array.from(
           e.currentTarget?.parentElement?.parentElement?.parentElement?.querySelectorAll(
-            "input"
-          ) ?? []
+            "input",
+          ) ?? [],
         ).filter((e) => !e.disabled)
         const index = inputs.indexOf(e.currentTarget)
         const elm = inputs[index + 1]
@@ -63,7 +63,7 @@ export const EventListInput: FC<EventListInputProps> = ({
         sendChange()
       }
     },
-    [sendChange]
+    [sendChange],
   )
 
   return (
@@ -84,7 +84,7 @@ export const EventListInput: FC<EventListInputProps> = ({
             setInputValue(e.target.value)
           }
         },
-        [isFocus]
+        [isFocus],
       )}
       disabled={value === null}
       onKeyDown={onKeyDown}

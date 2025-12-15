@@ -1,13 +1,13 @@
 import {
-  type NoteEvent,
-  type TrackEvent,
-  type TrackId,
+  NoteEvent,
+  TrackEvent,
+  TrackId,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
-import type { Player } from "@signal-app/player"
+import { Player } from "@signal-app/player"
 import { deserializeSingleEvent, Stream } from "midifile-ts"
 import { makeObservable, observable, observe } from "mobx"
-import type { SongStore } from "../stores/SongStore"
+import { SongStore } from "../stores/SongStore"
 
 export class MIDIRecorder {
   private recordedNotes: NoteEvent[] = []
@@ -16,7 +16,7 @@ export class MIDIRecorder {
 
   constructor(
     private readonly songStore: SongStore,
-    private readonly player: Player
+    private readonly player: Player,
   ) {
     makeObservable(this, {
       isRecording: observable,
@@ -100,7 +100,7 @@ export class MIDIRecorder {
           })
 
         this.recordedNotes = this.recordedNotes.filter(
-          (n) => n.noteNumber !== message.noteNumber
+          (n) => n.noteNumber !== message.noteNumber,
         )
         break
       }

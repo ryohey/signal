@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
-import { type CheckboxProps, Indicator, Root } from "@radix-ui/react-checkbox"
+import { CheckboxProps, Indicator, Root } from "@radix-ui/react-checkbox"
 import Check from "mdi-react/CheckIcon"
-import type { FC, ReactNode } from "react"
+import { FC, ReactNode } from "react"
 import { Label } from "./Label"
 
 const StyledRoot = styled(Root)`

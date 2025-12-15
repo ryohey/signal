@@ -1,35 +1,35 @@
-import type { Auth } from "firebase/auth"
+import { Auth } from "firebase/auth"
 import {
+  DocumentReference,
+  Firestore,
+  FirestoreDataConverter,
+  QueryDocumentSnapshot,
+  Timestamp,
   collection,
-  type DocumentReference,
   doc,
-  type Firestore,
-  type FirestoreDataConverter,
   getDoc,
   getDocs,
   increment,
   orderBy,
-  type QueryDocumentSnapshot,
   query,
   runTransaction,
   serverTimestamp,
-  type Timestamp,
   where,
 } from "firebase/firestore"
 import { songDataCollection } from "./CloudSongDataRepository.js"
-import type { CloudSong, ICloudSongRepository } from "./ICloudSongRepository.js"
-import type { User } from "./IUserRepository.js"
-import { convertUser, type FirestoreUser } from "./UserRepository.js"
+import { CloudSong, ICloudSongRepository } from "./ICloudSongRepository.js"
+import { User } from "./IUserRepository.js"
+import { FirestoreUser, convertUser } from "./UserRepository.js"
 
 export const createCloudSongRepository = (
   firestore: Firestore,
-  auth: Auth
+  auth: Auth,
 ): ICloudSongRepository => new CloudSongRepository(firestore, auth)
 
 class CloudSongRepository implements ICloudSongRepository {
   constructor(
     private readonly firestore: Firestore,
-    private readonly auth: Auth
+    private readonly auth: Auth,
   ) {}
 
   private get songCollection() {
@@ -121,8 +121,8 @@ class CloudSongRepository implements ICloudSongRepository {
       query(
         this.songCollection,
         where("userId", "==", this.auth.currentUser.uid),
-        orderBy("updatedAt", "desc")
-      )
+        orderBy("updatedAt", "desc"),
+      ),
     )
 
     return res.docs.map(toSong)
@@ -133,7 +133,7 @@ class CloudSongRepository implements ICloudSongRepository {
     const publicSongsQuery = query(
       this.songCollection,
       where("isPublic", "==", true),
-      orderBy("publishedAt", "desc")
+      orderBy("publishedAt", "desc"),
     )
 
     const docs = await getDocs(publicSongsQuery)
@@ -145,7 +145,7 @@ class CloudSongRepository implements ICloudSongRepository {
       this.songCollection,
       where("isPublic", "==", true),
       where("userId", "==", userId),
-      orderBy("publishedAt", "desc")
+      orderBy("publishedAt", "desc"),
     )
 
     const docs = await getDocs(publicSongsQuery)

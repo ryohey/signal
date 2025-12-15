@@ -1,4 +1,4 @@
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const useAddNoteToSelectionGesture = (): MouseGesture<[number]> => {

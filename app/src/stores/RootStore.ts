@@ -1,5 +1,5 @@
-import { CommandService } from "@signal-app/core"
 import { Player, SoundFont, SoundFontSynth } from "@signal-app/player"
+import { CommandService } from "@signal-app/core"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { AutoSaveService } from "../services/AutoSaveService"
@@ -67,7 +67,7 @@ export default class RootStore {
 async function loadMetronomeSoundFontData() {
   if (isRunningInElectron()) {
     return await window.electronAPI.readFile(
-      "./assets/soundfonts/A320U_drums.sf2"
+      "./assets/soundfonts/A320U_drums.sf2",
     )
   }
   const soundFontURL =

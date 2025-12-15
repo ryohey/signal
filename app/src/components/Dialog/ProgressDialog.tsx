@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { LoadingDialog } from "./LoadingDialog"
 
 export const ProgressDialog: FC<{ open: boolean; message: string }> = ({

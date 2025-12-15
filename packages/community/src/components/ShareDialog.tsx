@@ -1,7 +1,7 @@
-import type { CloudSong } from "@signal-app/api"
+import { CloudSong } from "@signal-app/api"
 import { observer } from "mobx-react-lite"
-import type { FC } from "react"
-import { Localized } from "../localize/useLocalization.js"
+import { FC } from "react"
+import { Localized, useLocalization } from "../localize/useLocalization.js"
 import { Button } from "./Button.js"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "./Dialog.js"
 import { LinkShare } from "./LinkShare.js"
@@ -14,6 +14,8 @@ export interface ShareDialogProps {
 
 export const ShareDialog: FC<ShareDialogProps> = observer(
   ({ song, open, onClose }) => {
+    const localized = useLocalization()
+
     return (
       <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
         <DialogTitle>
@@ -32,7 +34,7 @@ export const ShareDialog: FC<ShareDialogProps> = observer(
         </DialogActions>
       </Dialog>
     )
-  }
+  },
 )
 
 const getCloudSongUrl = (cloudSongId: string) =>

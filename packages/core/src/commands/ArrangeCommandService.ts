@@ -1,17 +1,13 @@
 import { mapValues } from "lodash"
 import { transaction } from "mobx"
-import {
-  type ArrangeNotesClipboardData,
-  Range,
-  type TrackEvent,
-} from "../entities"
-import type { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-import type { ArrangePoint } from "../entities/transform/ArrangePoint"
+import { ArrangeNotesClipboardData, Range, TrackEvent } from "../entities"
+import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
+import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
-import type { ISongStore } from "./interfaces"
+import { ISongStore } from "./interfaces"
 import {
-  type BatchUpdateOperation,
+  BatchUpdateOperation,
   TrackCommandService,
 } from "./TrackCommandService"
 
@@ -25,13 +21,13 @@ export class ArrangeCommandService {
   // returns moved event ids
   moveEventsBetweenTracks = (
     eventIdForTrackIndex: { [trackIndex: number]: number[] },
-    delta: ArrangePoint
+    delta: ArrangePoint,
   ) => {
     const { tracks } = this.songStore.song
     return transaction(() => {
       const updates = []
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
-        eventIdForTrackIndex
+        eventIdForTrackIndex,
       )) {
         const trackIndex = parseInt(trackIndexStr, 10)
         const track = tracks[trackIndex]
@@ -44,7 +40,7 @@ export class ArrangeCommandService {
             events.map((e) => ({
               id: e.id,
               tick: e.tick + delta.tick,
-            }))
+            })),
           )
         } else {
           updates.push({
@@ -73,20 +69,20 @@ export class ArrangeCommandService {
 
   batchUpdateNotesVelocity = (
     selection: ArrangeSelection,
-    operation: BatchUpdateOperation
+    operation: BatchUpdateOperation,
   ) => {
     const { tracks } = this.songStore.song
     const eventIdForTrackIndex = this.getEventsInSelection(selection)
     transaction(() => {
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
-        eventIdForTrackIndex
+        eventIdForTrackIndex,
       )) {
         const trackIndex = parseInt(trackIndexStr, 10)
         const track = tracks[trackIndex]
         this.trackCommands.batchUpdateNotesVelocity(
           track.id,
           selectedEventIdsValue,
-          operation
+          operation,
         )
       }
     })
@@ -100,7 +96,7 @@ export class ArrangeCommandService {
 
     transaction(() => {
       for (const [trackIndexStr, eventIds] of Object.entries(
-        selectedEventIds
+        selectedEventIds,
       )) {
         const trackIndex = parseInt(trackIndexStr, 10)
         const track = tracks[trackIndex]
@@ -112,7 +108,7 @@ export class ArrangeCommandService {
           events.map((e) => ({
             ...e,
             tick: e.tick + deltaTick,
-          }))
+          })),
         )
       }
     })
@@ -141,7 +137,7 @@ export class ArrangeCommandService {
 
     transaction(() => {
       for (const trackIndexStr in selectedEventIds) {
-        const trackIndex = parseInt(trackIndexStr, 10)
+        const trackIndex = parseInt(trackIndexStr)
         const eventIds = selectedEventIds[trackIndex]
         const track = tracks[trackIndex]
         if (track === undefined) {
@@ -153,7 +149,7 @@ export class ArrangeCommandService {
   }
 
   getClipboardDataForSelection = (
-    selection: ArrangeSelection
+    selection: ArrangeSelection,
   ): ArrangeNotesClipboardData => {
     const selectedEventIds = this.getEventsInSelection(selection)
     const { tracks } = this.songStore.song
@@ -178,7 +174,7 @@ export class ArrangeCommandService {
   pasteClipboardDataAt = (
     data: ArrangeNotesClipboardData,
     position: number,
-    selectedTrackIndex: number
+    selectedTrackIndex: number,
   ) => {
     const { tracks } = this.songStore.song
 
@@ -194,7 +190,7 @@ export class ArrangeCommandService {
           ? 0
           : -data.selectedTrackIndex + selectedTrackIndex
 
-        const destTrackIndex = parseInt(trackIndex, 10) + trackNumberOffset
+        const destTrackIndex = parseInt(trackIndex) + trackNumberOffset
 
         if (destTrackIndex < tracks.length) {
           tracks[destTrackIndex].addEvents(notes)
@@ -214,7 +210,7 @@ export class ArrangeCommandService {
     ) {
       const track = tracks[trackIndex]
       const events = track.events.filter(
-        isEventInRange(Range.create(selection.fromTick, selection.toTick))
+        isEventInRange(Range.create(selection.fromTick, selection.toTick)),
       )
       ids[trackIndex] = events.map((e: TrackEvent) => e.id)
     }

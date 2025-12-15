@@ -1,7 +1,7 @@
 import { Measure } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
+import { Store } from "jotai/vanilla/store"
 import { useCallback, useEffect, useMemo } from "react"
 import { useStores } from "./useStores"
 
@@ -38,14 +38,14 @@ function useQuantizeCalc(store: Store, fn: (tick: number) => number) {
       const measureStart = Measure.getMeasureStart(
         songStore.song.measures,
         tick,
-        songStore.song.timebase
+        songStore.song.timebase,
       )
       const beats = quantize === 1 ? (measureStart.numerator ?? 4) : 4
       const u = (songStore.song.timebase * beats) / quantize
       const offset = measureStart?.tick ?? 0
       return fn((tick - offset) / u) * u + offset
     },
-    [songStore, quantize, fn]
+    [songStore, quantize, fn],
   )
 }
 
@@ -59,7 +59,7 @@ export function useQuantizer(store = useStore()) {
       const quantize = useAtomValue(quantizeAtom, { store })
       return useMemo(
         () => (songStore.song.timebase * 4) / quantize,
-        [songStore, quantize]
+        [songStore, quantize],
       )
     },
     get isQuantizeEnabled() {

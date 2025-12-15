@@ -1,5 +1,5 @@
-import type { TrackId } from "@signal-app/core"
-import type { FC } from "react"
+import { TrackId } from "@signal-app/core"
+import { FC } from "react"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
 
@@ -11,7 +11,11 @@ export const TrackName: FC<{ trackId: TrackId }> = ({ trackId }) => {
     return <>{name}</>
   }
   if (channel === undefined) {
-    return <Localized name="conductor-track" />
+    return (
+      <>
+        <Localized name="conductor-track" />
+      </>
+    )
   }
   return (
     <>

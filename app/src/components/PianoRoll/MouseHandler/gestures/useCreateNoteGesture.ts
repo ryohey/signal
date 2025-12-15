@@ -1,6 +1,6 @@
-import { type NoteEvent, NoteNumber } from "@signal-app/core"
+import { NoteEvent, NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
@@ -32,7 +32,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
         const local = getLocal(e)
         const { tick, noteNumber } = transform.getNotePoint(local)
 
-        if (channel === undefined || !NoteNumber.isValid(noteNumber)) {
+        if (channel == undefined || !NoteNumber.isValid(noteNumber)) {
           return
         }
 
@@ -75,7 +75,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
         addEvent,
         pushHistory,
         dragNoteCenterAction,
-      ]
+      ],
     ),
   }
 }

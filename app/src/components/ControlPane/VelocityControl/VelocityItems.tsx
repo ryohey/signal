@@ -2,17 +2,17 @@ import { useTheme } from "@emotion/react"
 import { GLFallback, GLNode, HitArea, useTransform } from "@ryohey/webgl-react"
 import { isNoteEvent } from "@signal-app/core"
 import Color from "color"
-import { type FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { useChangeNotesVelocity } from "../../../actions"
-import type { Rect } from "../../../entities/geometry/Rect"
-import type { VelocityTransform } from "../../../entities/transform/VelocityTransform"
+import { Rect } from "../../../entities/geometry/Rect"
+import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { colorToVec4, enhanceContrast } from "../../../gl/color"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useEventView } from "../../../hooks/useEventView"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { LegacyVelocityItems } from "../../GLNodes/legacy/LegacyVelocityItems"
-import { type IVelocityData, VelocityShader } from "./VelocityShader"
+import { IVelocityData, VelocityShader } from "./VelocityShader"
 
 export interface VelocityItemsProps {
   velocityTransform: VelocityTransform
@@ -42,7 +42,7 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
           isSelected: selectedNoteIds.includes(note.id),
         }
       }),
-    [windowedEvents, velocityTransform, transform, selectedNoteIds]
+    [windowedEvents, velocityTransform, transform, selectedNoteIds],
   )
 
   const onMouseDown = useCallback(
@@ -60,7 +60,7 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
         onMouseMove: (e) => changeNotesVelocity([noteId], calcValue(e)),
       })
     },
-    [changeNotesVelocity, velocityTransform]
+    [changeNotesVelocity, velocityTransform],
   )
 
   return (
@@ -92,12 +92,12 @@ const _VelocityItems: FC<{
   const theme = useTheme()
   const baseColor = Color(theme.themeColor)
   const strokeColor = colorToVec4(
-    enhanceContrast(baseColor, theme.isLightContent, 0.3)
+    enhanceContrast(baseColor, theme.isLightContent, 0.3),
   )
   const activeColor = useMemo(() => colorToVec4(baseColor), [baseColor])
   const selectedColor = useMemo(
     () => colorToVec4(baseColor.lighten(0.7)),
-    [baseColor]
+    [baseColor],
   )
 
   return (
@@ -131,7 +131,7 @@ const VelocityHitArea = ({
       e.stopPropagation()
       onMouseDown(e, rect.id)
     },
-    [onMouseDown, rect.id]
+    [onMouseDown, rect.id],
   )
   const bounds = useMemo(
     () => ({
@@ -140,7 +140,7 @@ const VelocityHitArea = ({
       width: rect.width,
       height: height,
     }),
-    [rect.x, rect.width, height]
+    [rect.x, rect.width, height],
   )
   return (
     <HitArea bounds={bounds} zIndex={zIndex} onMouseDown={handleMouseDown} />

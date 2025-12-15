@@ -154,7 +154,7 @@ export const useGlobalKeyboardShortcut = () => {
       openSong,
       openLegacy,
       createNewSong,
-    ]
+    ],
   )
 
   return useKeyboardShortcut({

@@ -1,6 +1,6 @@
-import type { SynthEvent } from "@ryohey/wavelet"
-import type { SoundFont } from "./SoundFont.js"
-import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import { SynthEvent } from "@ryohey/wavelet"
+import { SoundFont } from "./SoundFont.js"
+import { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: AudioWorkletNode | null = null
@@ -41,7 +41,7 @@ export class SoundFontSynth implements SynthOutput {
     for (const e of soundFont.sampleEvents) {
       this.postSynthMessage(
         e.event,
-        e.transfer // transfer instead of copy
+        e.transfer, // transfer instead of copy
       )
     }
   }
@@ -49,7 +49,7 @@ export class SoundFontSynth implements SynthOutput {
   private postSynthMessage(e: SynthEvent, transfer?: Transferable[]) {
     this.synth?.port.postMessage(
       { ...e, sequenceNumber: this.sequenceNumber++ },
-      transfer ?? []
+      transfer ?? [],
     )
   }
 

@@ -1,10 +1,10 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { isEventInRange, Range, type TrackEventOf } from "@signal-app/core"
-import type { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { type MouseEventHandler, useCallback, useMemo } from "react"
-import type { ValueEventType } from "../../../entities/event/ValueEventType"
-import type { Point } from "../../../entities/geometry/Point"
+import { Range, TrackEventOf, isEventInRange } from "@signal-app/core"
+import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import { MouseEventHandler, useCallback, useMemo } from "react"
+import { ValueEventType } from "../../../entities/event/ValueEventType"
+import { Point } from "../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
@@ -53,7 +53,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
 
   const controlTransform = useMemo(
     () => new ControlCoordTransform(tickTransform, maxValue, height, lineWidth),
-    [tickTransform, maxValue, height, lineWidth]
+    [tickTransform, maxValue, height, lineWidth],
   )
 
   const items = events.map((e) => ({
@@ -63,7 +63,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-Math.floor(scrollLeft), 0),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const getLocal = useCallback(
@@ -71,7 +71,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
       x: e.offsetX + scrollLeft,
       y: e.offsetY,
     }),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const pencilMouseDown: MouseEventHandler = useCallback(
@@ -80,7 +80,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
 
       handlePencilMouseDown.onMouseDown(ev.nativeEvent, local, controlTransform)
     },
-    [controlTransform, handlePencilMouseDown, getLocal]
+    [controlTransform, handlePencilMouseDown, getLocal],
   )
 
   const selectionMouseDown: MouseEventHandler = useCallback(
@@ -94,10 +94,10 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
         (s) =>
           events
             .filter(isEventInRange(Range.create(s.fromTick, s.toTick)))
-            .map((e) => e.id)
+            .map((e) => e.id),
       )
     },
-    [controlTransform, events, createSelectionGesture, getLocal]
+    [controlTransform, events, createSelectionGesture, getLocal],
   )
 
   const onMouseDown =
@@ -105,7 +105,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
 
   const style = useMemo(
     () => ({ backgroundColor: theme.editorBackgroundColor }),
-    [theme]
+    [theme],
   )
 
   return (

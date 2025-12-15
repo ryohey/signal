@@ -1,4 +1,4 @@
-import type { Track, TrackColor, TrackEvent, TrackId } from "@signal-app/core"
+import { Track, TrackColor, TrackEvent, TrackId } from "@signal-app/core"
 import { useCallback } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
@@ -48,13 +48,13 @@ export function useTrack(id: TrackId) {
       (color: TrackColor | null) => {
         track?.setColor(color)
       },
-      [track]
+      [track],
     ),
     setName: useCallback(
       (name: string) => {
         track?.setName(name)
       },
-      [track]
+      [track],
     ),
     setChannel: useCallback(
       (channel: number | undefined) => {
@@ -62,25 +62,25 @@ export function useTrack(id: TrackId) {
           track.channel = channel
         }
       },
-      [track]
+      [track],
     ),
     setPan: useCallback(
       (pan: number, tick: number) => {
         track?.setPan(pan, tick)
       },
-      [track]
+      [track],
     ),
     setVolume: useCallback(
       (volume: number, tick: number) => {
         track?.setVolume(volume, tick)
       },
-      [track]
+      [track],
     ),
     setProgramNumber: useCallback(
       (programNumber: number) => {
         track?.setProgramNumber(programNumber)
       },
-      [track]
+      [track],
     ),
     ...useTrackEvents(track),
   }
@@ -90,14 +90,14 @@ export function useTrackEvents(track: Track | undefined) {
   return {
     addEvent: useCallback(
       <T extends TrackEvent>(
-        event: Omit<T, "id"> & { subtype?: string }
+        event: Omit<T, "id"> & { subtype?: string },
       ): T | undefined => {
         if (track) {
           return track.addEvent(event)
         }
         return undefined
       },
-      [track]
+      [track],
     ),
     addEvents: useCallback(
       <T extends TrackEvent>(events: Omit<T, "id">[]) => {
@@ -105,7 +105,7 @@ export function useTrackEvents(track: Track | undefined) {
           return track.addEvents(events)
         }
       },
-      [track]
+      [track],
     ),
     removeEvent: useCallback(
       (eventId: number) => {
@@ -113,7 +113,7 @@ export function useTrackEvents(track: Track | undefined) {
           track.removeEvent(eventId)
         }
       },
-      [track]
+      [track],
     ),
     removeEvents: useCallback(
       (eventIds: number[]) => {
@@ -121,17 +121,17 @@ export function useTrackEvents(track: Track | undefined) {
           track.removeEvents(eventIds)
         }
       },
-      [track]
+      [track],
     ),
     createOrUpdate: useCallback(
       <T extends TrackEvent>(
-        newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number }
+        newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
       ) => {
         if (track) {
           return track.createOrUpdate(newEvent)
         }
       },
-      [track]
+      [track],
     ),
     updateEvent: useCallback(
       <T extends TrackEvent>(id: number, obj: Partial<T>): T | null => {
@@ -140,7 +140,7 @@ export function useTrackEvents(track: Track | undefined) {
         }
         return null
       },
-      [track]
+      [track],
     ),
     updateEvents: useCallback(
       (events: Partial<TrackEvent>[]) => {
@@ -148,13 +148,13 @@ export function useTrackEvents(track: Track | undefined) {
           track.updateEvents(events)
         }
       },
-      [track]
+      [track],
     ),
     getEventById: useCallback(
       (eventId: number) => {
         return track?.getEventById(eventId)
       },
-      [track]
+      [track],
     ),
   }
 }

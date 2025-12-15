@@ -1,14 +1,14 @@
 import { clamp, min } from "lodash"
-import type { SetTempoEvent } from "midifile-ts"
+import { SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import {
   isSetTempoEvent,
-  type TempoEventsClipboardData,
-  type TrackEventOf,
+  TempoEventsClipboardData,
+  TrackEventOf,
 } from "../entities"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers"
 import { isNotUndefined } from "../helpers/array"
-import type { ISongStore } from "./interfaces"
+import { ISongStore } from "./interfaces"
 import { TrackCommandService } from "./TrackCommandService"
 
 export class ConductorTrackCommandService {
@@ -30,7 +30,7 @@ export class ConductorTrackCommandService {
     eventIds: number[],
     deltaTick: number,
     deltaValue: number,
-    maxBPM: number
+    maxBPM: number,
   ) => {
     const conductorTrack = this.songStore.song.conductorTrack
     if (!conductorTrack) {
@@ -40,8 +40,8 @@ export class ConductorTrackCommandService {
       .map(
         (id) =>
           conductorTrack.getEventById(
-            id
-          ) as unknown as TrackEventOf<SetTempoEvent>
+            id,
+          ) as unknown as TrackEventOf<SetTempoEvent>,
       )
       .filter(isNotUndefined)
 
@@ -54,11 +54,11 @@ export class ConductorTrackCommandService {
             clamp(
               uSecPerBeatToBPM(ev.microsecondsPerBeat) + deltaValue,
               0,
-              maxBPM
-            )
-          )
+              maxBPM,
+            ),
+          ),
         ),
-      }))
+      })),
     )
   }
 
@@ -69,7 +69,7 @@ export class ConductorTrackCommandService {
     }
     return this.trackCommands.removeRedundantEventsForEventIds(
       conductorTrack.id,
-      eventIds
+      eventIds,
     )
   }
 
@@ -112,9 +112,7 @@ export class ConductorTrackCommandService {
       tick: e.tick + tick,
     }))
     transaction(() => {
-      for (const e of events) {
-        conductorTrack.createOrUpdate(e)
-      }
+      events.forEach((e) => conductorTrack.createOrUpdate(e))
     })
   }
 }

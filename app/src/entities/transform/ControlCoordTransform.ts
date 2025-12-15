@@ -1,15 +1,15 @@
-import type { ItemValue } from "../../components/ControlPane/LineGraph/LineGraph"
-import type { Point } from "../geometry/Point"
-import type { Rect } from "../geometry/Rect"
-import type { ControlSelection } from "../selection/ControlSelection"
-import type { TickTransform } from "./TickTransform"
+import { ItemValue } from "../../components/ControlPane/LineGraph/LineGraph"
+import { Point } from "../geometry/Point"
+import { Rect } from "../geometry/Rect"
+import { ControlSelection } from "../selection/ControlSelection"
+import { TickTransform } from "./TickTransform"
 
 export class ControlCoordTransform {
   constructor(
     private readonly transform: TickTransform,
     readonly maxValue: number,
     readonly height: number,
-    readonly lineWidth: number
+    readonly lineWidth: number,
   ) {}
 
   getX(tick: number) {
@@ -30,7 +30,7 @@ export class ControlCoordTransform {
   getValue(y: number) {
     return Math.floor(
       (1 - (y - this.lineWidth) / (this.height - this.lineWidth * 2)) *
-        this.maxValue
+        this.maxValue,
     )
   }
 

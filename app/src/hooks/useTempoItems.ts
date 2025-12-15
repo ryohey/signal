@@ -10,7 +10,7 @@ export function useTempoItems() {
   const { canvasWidth, scrollLeft } = useTickScroll()
   const items = useMemo(
     () => transformEvents(tempoEvents, transform, canvasWidth + scrollLeft),
-    [tempoEvents, transform, canvasWidth, scrollLeft]
+    [tempoEvents, transform, canvasWidth, scrollLeft],
   )
 
   return {

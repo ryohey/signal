@@ -13,7 +13,7 @@ export function useNoteColor() {
   const baseColor = Color(
     trackColor !== undefined
       ? trackColorToCSSColor(trackColor)
-      : theme.themeColor
+      : theme.themeColor,
   )
 
   return {
@@ -21,7 +21,7 @@ export function useNoteColor() {
     backgroundColor: Color(theme.backgroundColor), // for LegacyNotes
     selectedColor: colorToVec4(baseColor.lighten(0.7)),
     borderColor: colorToVec4(
-      enhanceContrast(baseColor, theme.isLightContent, 0.3)
+      enhanceContrast(baseColor, theme.isLightContent, 0.3),
     ),
     inactiveColor: colorToVec4(Color(theme.backgroundColor)),
     activeColor: colorToVec4(baseColor),

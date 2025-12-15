@@ -1,12 +1,12 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
-import { atomWithStorage } from "jotai/utils"
 import { focusAtom } from "jotai-optics"
+import { atomWithStorage } from "jotai/utils"
 import { cloneDeep } from "lodash"
 import {
-  type ControlMode,
+  ControlMode,
   defaultControlModes,
 } from "../entities/control/ControlMode"
-import type { ControlSelection } from "../entities/selection/ControlSelection"
+import { ControlSelection } from "../entities/selection/ControlSelection"
 
 export function useControlPane() {
   return {
@@ -40,10 +40,10 @@ const storageAtom = atomWithStorage<{ controlModes: ControlMode[] }>(
   "ControlStore",
   {
     controlModes: defaultControlModes,
-  }
+  },
 )
 const controlModesAtom = focusAtom(storageAtom, (optic) =>
-  optic.prop("controlModes")
+  optic.prop("controlModes"),
 )
 
 // actions
@@ -69,10 +69,10 @@ const restoreAtom = atom(
       controlModes: ControlMode[]
       selection: ControlSelection | null
       selectedEventIds: number[]
-    }
+    },
   ) => {
     set(controlModesAtom, controlModes)
     set(selectionAtom, selection)
     set(selectedEventIdsAtom, selectedEventIds)
-  }
+  },
 )

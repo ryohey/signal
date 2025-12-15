@@ -1,4 +1,4 @@
-import { DialogContext, type DialogProps } from "dialog-hooks"
+import { DialogContext, DialogProps } from "dialog-hooks"
 import { useContext } from "react"
 import { Button } from "../ui/Button"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "./Dialog"

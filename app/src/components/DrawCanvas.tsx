@@ -1,5 +1,5 @@
 import { isNumber } from "lodash"
-import { type CanvasHTMLAttributes, Component } from "react"
+import { CanvasHTMLAttributes, Component } from "react"
 
 export interface DrawCanvasProps
   extends CanvasHTMLAttributes<HTMLCanvasElement> {
@@ -33,14 +33,10 @@ export default class DrawCanvas extends Component<DrawCanvasProps> {
   }
 
   render() {
-    const { width, height, draw: _draw, style, ...props } = this.props
+    const { width, height, draw, style, ...props } = this.props
     return (
       <canvas
-        ref={(c) => {
-          if (c) {
-            this.canvas = c
-          }
-        }}
+        ref={(c) => c && (this.canvas = c)}
         {...props}
         width={isNumber(width) ? width * window.devicePixelRatio : undefined}
         height={isNumber(height) ? height * window.devicePixelRatio : undefined}
