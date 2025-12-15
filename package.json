@@ -14,14 +14,7 @@
     "clean:backend": "pkill -f 'uvicorn.*app.main' 2>/dev/null || echo 'No backend processes found'",
     "clean": "npm run clean:ports && npm run clean:backend",
     "firebase": "npm --prefix functions run build && firebase emulators:start",
-    "firebase:deploy": "firebase deploy",
-    "dev:electron": "concurrently \"npm run dev -w app\" \"npm run dev --prefix electron\"",
-    "build:electron": "npm run build:electron -w app && rimraf electron/dist_renderer && cpy \"app/dist/**/*\" electron/dist_renderer --parents",
-    "package:electron:darwin": "npm run build:electron && npm run package:darwin --prefix electron",
-    "package:electron": "npm run build:electron && npm run package --prefix electron",
-    "make:electron": "npm run build:electron && npm run make:mas --prefix electron",
-    "make:darwin": "npm run build:electron && npm run make:darwin --prefix electron",
-    "make:win": "npm run build:electron && npm run make:win --prefix electron"
+    "firebase:deploy": "firebase deploy"
   },
   "repository": {
     "type": "git",

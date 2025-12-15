@@ -16,7 +16,6 @@ import { Localized } from "../../localize/useLocalization"
 import { Tooltip } from "../ui/Tooltip"
 import { EditMenuButton } from "./EditMenuButton"
 import { FileMenuButton } from "./FileMenuButton"
-import { UserButton } from "./UserButton"
 
 const Container = styled.div`
   display: flex;
@@ -283,8 +282,6 @@ export const Navigation: FC = () => {
           </Tooltip>
         </>
       )}
-
-      <UserButton />
     </Container>
   )
 }

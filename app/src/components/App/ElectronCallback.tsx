@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { ElectronAPI } from "../../../../electron/src/ElectronAPI"
-import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
+import { ElectronAPI } from "../../electron/types"
 
 declare global {
   interface Window {
@@ -35,7 +34,6 @@ export interface ElectronCallbackProps {
   onVelocity: () => void
   onOpenSetting: () => void
   onOpenHelp: () => void
-  onBrowserSignInCompleted: (param: { credential: FirebaseCredential }) => void
 }
 
 export const ElectronCallback: FC<ElectronCallbackProps> = ({
@@ -65,7 +63,6 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
   onVelocity,
   onOpenSetting,
   onOpenHelp,
-  onBrowserSignInCompleted,
 }) => {
   const [isInitialized, setIsInitialized] = useState(false)
 
@@ -113,10 +110,6 @@ export const ElectronCallback: FC<ElectronCallbackProps> = ({
     [onOpenSetting],
   )
   useEffect(() => window.electronAPI.onOpenHelp(onOpenHelp), [onOpenHelp])
-  useEffect(
-    () => window.electronAPI.onBrowserSignInCompleted(onBrowserSignInCompleted),
-    [onBrowserSignInCompleted],
-  )
 
   useEffect(() => {
     if (!isInitialized) {

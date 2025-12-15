@@ -1,5 +1,3 @@
-import { FirebaseCredential } from "./FirebaseCredential"
-
 export type Unsubscribe = () => void
 
 export type ElectronAPI = {
@@ -29,9 +27,6 @@ export type ElectronAPI = {
   onVelocity: (callback: () => void) => Unsubscribe
   onOpenSetting: (callback: () => void) => Unsubscribe
   onOpenHelp: (callback: () => void) => Unsubscribe
-  onBrowserSignInCompleted: (
-    callback: (params: { credential: FirebaseCredential }) => void,
-  ) => Unsubscribe
   // tell to main process that the renderer process is ready
   ready: () => void
   // returns the index of the button clicked
@@ -48,7 +43,6 @@ export type ElectronAPI = {
   searchSoundFonts: (path: string) => Promise<string[]>
   addRecentDocument: (path: string) => void
   getArgument: () => Promise<string | null>
-  openAuthWindow: () => Promise<void>
-  authStateChanged: (isLoggedIn: boolean) => void
   closeMainWindow: () => void
 }
+

@@ -31,7 +31,7 @@ const StyledContent = styled(Content)`
   background: rgba(30, 30, 30, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: var(--color-text);
+  color: rgba(255, 255, 255, 0.95);
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   font-size: 0.75rem;
