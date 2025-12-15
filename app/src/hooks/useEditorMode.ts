@@ -16,4 +16,3 @@ export function useEditorMode() {
     isBasic: mode === "basic",
   }
 }
-
