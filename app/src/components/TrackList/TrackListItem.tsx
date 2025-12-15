@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
-import { type TrackId, trackColorToCSSColor } from "@signal-app/core"
+import { trackColorToCSSColor, TrackId } from "@signal-app/core"
 import Headset from "mdi-react/HeadphonesIcon"
 import Layers from "mdi-react/LayersIcon"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import VolumeOff from "mdi-react/VolumeOffIcon"
-import { type FC, type MouseEventHandler, useCallback, useState } from "react"
+import { FC, MouseEventHandler, useCallback, useState } from "react"
 import {
   useSelectTrack,
   useToggleAllGhostTracks,
@@ -189,7 +189,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
       e.stopPropagation()
       toggleMuteTrack(trackId)
     },
-    [trackId, toggleMuteTrack]
+    [trackId, toggleMuteTrack],
   )
 
   const onClickSolo: MouseEventHandler = useCallback(
@@ -197,7 +197,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
       e.stopPropagation()
       toggleSoloTrack(trackId)
     },
-    [trackId, toggleSoloTrack]
+    [trackId, toggleSoloTrack],
   )
 
   const onClickGhostTrack: MouseEventHandler = useCallback(
@@ -209,7 +209,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
         toggleGhostTrack(trackId)
       }
     },
-    [trackId, toggleAllGhostTracks, toggleGhostTrack]
+    [trackId, toggleAllGhostTracks, toggleGhostTrack],
   )
 
   const onSelectTrack = useCallback(() => {

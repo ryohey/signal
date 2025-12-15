@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react"
+import { FC, useMemo } from "react"
 import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 import { Selection } from "../../GLNodes/Selection"
@@ -15,7 +15,7 @@ export const TempoGraphSelection: FC<TempoGraphSelectionProps> = ({
   const selectionRect = useMemo(
     () =>
       selection != null ? TempoSelection.getBounds(selection, transform) : null,
-    [selection, transform]
+    [selection, transform],
   )
 
   return <Selection rect={selectionRect} zIndex={zIndex} />

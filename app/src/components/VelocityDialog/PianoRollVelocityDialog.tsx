@@ -1,4 +1,4 @@
-import type { BatchUpdateOperation } from "@signal-app/core"
+import { BatchUpdateOperation } from "@signal-app/core"
 import { useCallback } from "react"
 import { useBatchUpdateSelectedNotesVelocity } from "../../actions"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
@@ -11,7 +11,7 @@ export const PianoRollVelocityDialog = () => {
 
   const onClose = useCallback(
     () => setOpenVelocityDialog(false),
-    [setOpenVelocityDialog]
+    [setOpenVelocityDialog],
   )
 
   const onClickOK = useCallback(
@@ -22,7 +22,7 @@ export const PianoRollVelocityDialog = () => {
       })
       setOpenVelocityDialog(false)
     },
-    [setOpenVelocityDialog, batchUpdateSelectedNotesVelocity]
+    [setOpenVelocityDialog, batchUpdateSelectedNotesVelocity],
   )
 
   return (

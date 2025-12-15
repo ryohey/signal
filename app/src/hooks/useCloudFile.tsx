@@ -1,9 +1,9 @@
-import type { CloudSong } from "@signal-app/api"
+import { CloudSong } from "@signal-app/api"
 import { emptySong } from "@signal-app/core"
 import { useDialog, useProgress, usePrompt, useToast } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { orderBy } from "lodash"
-import { type ChangeEvent, useCallback } from "react"
+import { ChangeEvent } from "react"
 import { useOpenSong, useSaveSong, useSetSong } from "../actions"
 import { useCreateSong, useUpdateSong } from "../actions/cloudSong"
 import { hasFSAccess, saveFileAs, useOpenFile } from "../actions/file"
@@ -85,9 +85,9 @@ export const useCloudFile = () => {
     const res = await dialog.show({
       title: localized["save-changes"],
       actions: [
-        { title: localized.yes, key: "yes" },
-        { title: localized.no, key: "no" },
-        { title: localized.cancel, key: "cancel" },
+        { title: localized["yes"], key: "yes" },
+        { title: localized["no"], key: "no" },
+        { title: localized["cancel"], key: "cancel" },
       ],
     })
     switch (res) {
@@ -167,7 +167,7 @@ export const useCloudFile = () => {
     async renameSong() {
       try {
         const text = await prompt.show({
-          title: localized.rename,
+          title: localized["rename"],
         })
         if (text !== null && text.length > 0) {
           setName(text)
@@ -251,7 +251,7 @@ const sortedFilesAtom = atom((get) => {
           }
       }
     },
-    sortAscending ? "asc" : "desc"
+    sortAscending ? "asc" : "desc",
   )
 })
 
@@ -259,29 +259,26 @@ function useDeleteSong() {
   const { songStore } = useStores()
   const loadFiles = useLoadFiles()
 
-  return useCallback(
-    async (song: CloudSong) => {
-      await cloudSongDataRepository.delete(song.songDataId)
-      await cloudSongRepository.delete(song.id)
+  return async (song: CloudSong) => {
+    await cloudSongDataRepository.delete(song.songDataId)
+    await cloudSongRepository.delete(song.id)
 
-      if (songStore.song.cloudSongId === song.id) {
-        songStore.song.cloudSongId = null
-        songStore.song.cloudSongDataId = null
-      }
-      await loadFiles()
-    },
-    [loadFiles, songStore]
-  )
+    if (songStore.song.cloudSongId === song.id) {
+      songStore.song.cloudSongId = null
+      songStore.song.cloudSongDataId = null
+    }
+    await loadFiles()
+  }
 }
 
 function useLoadFiles() {
   const setIsLoading = useSetAtom(isLoadingAtom)
   const setFiles = useSetAtom(filesAtom)
 
-  return useCallback(async () => {
+  return async () => {
     setIsLoading(true)
     const files = await cloudSongRepository.getMySongs()
     setFiles(files)
     setIsLoading(false)
-  }, [setFiles, setIsLoading])
+  }
 }

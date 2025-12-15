@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC, PropsWithChildren } from "react"
+import { FC, PropsWithChildren } from "react"
 import { CircularProgress } from "../ui/CircularProgress"
 import { Dialog, DialogContent } from "./Dialog"
 

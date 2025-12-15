@@ -1,7 +1,7 @@
 import { MIDIControlEvents } from "midifile-ts"
-import React, { type FC, useMemo } from "react"
-import type { ValueEventType } from "../../../entities/event/ValueEventType"
-import type { Size } from "../../../entities/geometry/Size"
+import React, { FC, useMemo } from "react"
+import { ValueEventType } from "../../../entities/event/ValueEventType"
+import { Size } from "../../../entities/geometry/Size"
 import { useControlValueEvents } from "../../../hooks/useControlValueEvents"
 import LineGraphControl from "../LineGraph/LineGraph"
 
@@ -29,7 +29,7 @@ const maxValueForType = (type: ValueEventType) => {
 }
 
 const labelFormatterForType = (
-  type: ValueEventType
+  type: ValueEventType,
 ): ((v: number) => string) => {
   switch (type.type) {
     case "controller":
@@ -66,5 +66,5 @@ export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
         axisLabelFormatter={labelFormatter}
       />
     )
-  }
+  },
 )

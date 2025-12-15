@@ -1,4 +1,4 @@
-import type { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../gesture/MouseGesture"
 import { useCreateNoteGesture } from "./gestures/useCreateNoteGesture"
 import { useSelectNoteGesture } from "./gestures/useSelectNoteGesture"
 

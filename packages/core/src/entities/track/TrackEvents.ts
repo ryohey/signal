@@ -1,12 +1,12 @@
 import { isEqual, omit } from "lodash"
-import type {
+import {
   ControllerEvent,
   ProgramChangeEvent,
   SetTempoEvent,
   TrackNameEvent,
 } from "midifile-ts"
 import { transaction } from "mobx"
-import type { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
+import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
 import { bpmToUSecPerBeat } from "../../helpers/bpm"
 import {
   programChangeMidiEvent,
@@ -21,12 +21,9 @@ import {
   getTrackNameEvent,
   isTickBefore,
 } from "./selector"
-import {
-  isSignalTrackColorEvent,
-  type SignalTrackColorEvent,
-} from "./signalEvents"
-import type { TrackColor } from "./TrackColor"
-import type { TrackEvent, TrackEventOf } from "./TrackEvent"
+import { isSignalTrackColorEvent, SignalTrackColorEvent } from "./signalEvents"
+import { TrackColor } from "./TrackColor"
+import { TrackEvent, TrackEventOf } from "./TrackEvent"
 import { validateMidiEvent } from "./validate"
 
 export namespace TrackEvents {
@@ -56,7 +53,7 @@ export namespace TrackEvents {
   export const addEvent =
     <T extends TrackEvent>(e: Omit<T, "id"> & { subtype?: string }) =>
     (events: TickOrderedArray<TrackEvent>): T => {
-      if (!("tick" in e) || Number.isNaN(e.tick)) {
+      if (!("tick" in e) || isNaN(e.tick)) {
         throw new Error("invalid event is added")
       }
       if ("subtype" in e && e.subtype === "endOfTrack") {
@@ -69,7 +66,7 @@ export namespace TrackEvents {
 
   export const getRedundantEvents =
     <T extends TrackEvent>(
-      event: Omit<T, "id"> & { subtype?: string; controllerType?: number }
+      event: Omit<T, "id"> & { subtype?: string; controllerType?: number },
     ) =>
     (events: readonly TrackEvent[]): TrackEvent[] => {
       return events.filter(
@@ -81,13 +78,13 @@ export namespace TrackEvents {
             : true) &&
           ("controllerType" in e && "controllerType" in event
             ? e.controllerType === event.controllerType
-            : true)
+            : true),
       )
     }
 
   export const createOrUpdate =
     <T extends TrackEvent>(
-      newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number }
+      newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
     ) =>
     (anEvents: TickOrderedArray<TrackEvent>): T => {
       const events = getRedundantEvents(newEvent)(anEvents.getArray())
@@ -121,7 +118,7 @@ export namespace TrackEvents {
         events
           .getArray()
           .filter(isControllerEventWithType(controllerType))
-          .filter(isTickBefore(tick))
+          .filter(isTickBefore(tick)),
       )
       if (e !== undefined) {
         updateEvent<TrackEventOf<ControllerEvent>>(e.id, {
@@ -190,7 +187,7 @@ export namespace TrackEvents {
     }
 
   export const getColorEvent = (
-    events: readonly TrackEvent[]
+    events: readonly TrackEvent[],
   ): SignalTrackColorEvent | undefined => {
     return events.filter(isSignalTrackColorEvent)[0]
   }

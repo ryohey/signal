@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 
 const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({
@@ -262,7 +262,7 @@ const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({
     case 127:
       return <Localized name="Gunshot" />
   }
-  return null
+  return <></>
 }
 
 const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
@@ -288,7 +288,7 @@ const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
     case 56:
       return <Localized name="SFX Drum Kit" />
     default:
-      return null
+      return <></>
   }
 }
 

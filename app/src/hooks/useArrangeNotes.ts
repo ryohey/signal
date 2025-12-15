@@ -18,6 +18,6 @@ export function useArrangeNotes() {
           y: trackTransform.getY(e.trackIndex) + rect.y,
         }
       }),
-    [events, transform, trackTransform]
+    [events, transform, trackTransform],
   )
 }

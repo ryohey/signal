@@ -1,12 +1,12 @@
 import {
-  type InstancedBuffer,
+  InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformMat4,
   uniformVec4,
-  type VertexArray,
+  VertexArray,
 } from "@ryohey/webgl-react"
-import type { Rect } from "../../../../entities/geometry/Rect"
+import { Rect } from "../../../../entities/geometry/Rect"
 
 export interface INoteLabelData {
   velocity: number // 0-127
@@ -29,11 +29,11 @@ export class NoteLabelBuffer
   constructor(
     readonly vertexArray: VertexArray<
       "position" | "bounds" | "a_noteNumber" | "state"
-    >
+    >,
   ) {
     this.vertexArray.updateBuffer(
       "position",
-      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 }))
+      new Float32Array(rectToTriangles({ x: 0, y: 0, width: 1, height: 1 })),
     )
   }
 
@@ -55,15 +55,15 @@ export class NoteLabelBuffer
 
     this.vertexArray.updateBuffer(
       "bounds",
-      this.bounds.subarray(0, rects.length * 4)
+      this.bounds.subarray(0, rects.length * 4),
     )
     this.vertexArray.updateBuffer(
       "a_noteNumber",
-      this.noteNumbers.subarray(0, rects.length)
+      this.noteNumbers.subarray(0, rects.length),
     )
     this.vertexArray.updateBuffer(
       "state",
-      this.state.subarray(0, rects.length * 2)
+      this.state.subarray(0, rects.length * 2),
     )
     this._instanceCount = rects.length
   }
@@ -164,7 +164,7 @@ export const NoteLabelShader = (gl: WebGL2RenderingContext) =>
       color: uniformVec4(),
       selectedColor: uniformVec4(),
     },
-    (vertexArray) => new NoteLabelBuffer(vertexArray)
+    (vertexArray) => new NoteLabelBuffer(vertexArray),
   )
 
 function uniformSampler2D(texture: WebGLTexture | null = null) {
@@ -174,7 +174,7 @@ function uniformSampler2D(texture: WebGLTexture | null = null) {
     upload: (
       gl: WebGL2RenderingContext,
       location: WebGLUniformLocation,
-      value: WebGLTexture | null
+      value: WebGLTexture | null,
     ) => {
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, value)

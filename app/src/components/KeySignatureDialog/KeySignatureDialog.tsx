@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC } from "react"
+import { FC } from "react"
 import { Scale } from "../../entities/scale/Scale"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
@@ -68,7 +68,7 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
             <Select
               value={keySignature?.key}
               onChange={(e) => {
-                const key = parseInt(e.target.value, 10)
+                const key = parseInt(e.target.value)
                 setKeySignature({
                   scale: keySignature?.scale ?? "major",
                   key,
@@ -76,7 +76,7 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
               }}
             >
               {keyNames.map((name, i) => (
-                <option key={name} value={i}>
+                <option key={i} value={i}>
                   {name}
                 </option>
               ))}
@@ -96,8 +96,8 @@ export const KeySignatureDialog: FC<KeySignatureDialogProps> = ({
                 })
               }}
             >
-              {Scale.values.map((name) => (
-                <option key={name} value={name}>
+              {Scale.values.map((name, i) => (
+                <option key={i} value={name}>
                   <ScaleName scale={name} />
                 </option>
               ))}

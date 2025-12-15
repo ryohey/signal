@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { type FC, type ReactNode, useCallback, useEffect } from "react"
-import type { Point } from "../../entities/geometry/Point"
+import { FC, ReactNode, useCallback, useEffect } from "react"
+import { Point } from "../../entities/geometry/Point"
 import { Positioned } from "../ui/Positioned"
 
 export const ContextMenuHotKey = styled.div`
@@ -52,11 +52,10 @@ export const ContextMenu: FC<ContextMenuProps> = ({
 }) => {
   const onClickContent = useCallback(
     (e: React.MouseEvent) => e.stopPropagation(),
-    []
+    [],
   )
 
   // Menu cannot handle keydown while disabling focus, so we deal with global keydown event
-  // biome-ignore lint/correctness/useExhaustiveDependencies: to work correctly if passed not memoized handleClose, we should not add it to dependency array
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (isOpen && e.key === "Escape") {
@@ -68,10 +67,11 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     return () => {
       document.removeEventListener("keydown", onKeyDown)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   if (!isOpen) {
-    return null
+    return <></>
   }
 
   // fix position to avoid placing menu outside of the screen

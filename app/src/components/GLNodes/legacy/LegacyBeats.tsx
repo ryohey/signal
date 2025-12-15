@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react"
-import { type IRect, Rectangles } from "@ryohey/webgl-react"
+import { IRect, Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import type { FC } from "react"
-import type { BeatWithX } from "../../../entities/beat/BeatWithX"
+import { FC } from "react"
+import { BeatWithX } from "../../../entities/beat/BeatWithX"
 import { colorToVec4 } from "../../../gl/color"
 
 export const LegacyBeats: FC<{
@@ -22,7 +22,7 @@ export const LegacyBeats: FC<{
 
   const [highlightedBeats, nonHighlightedBeats] = partition(
     beats,
-    (b) => b.beat === 0
+    (b) => b.beat === 0,
   )
 
   const lines = nonHighlightedBeats.map((b) => vline(b.x))

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import type { FC } from "react"
+import { FC } from "react"
 import { Route } from "wouter"
 import { EditProfilePage } from "../pages/EditProfilePage.js"
 import { HomePage } from "../pages/HomePage.js"

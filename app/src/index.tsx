@@ -14,12 +14,7 @@ configure({
   enforceActions: "never",
 })
 
-const rootElement = document.getElementById("root")
-if (!rootElement) {
-  throw new Error("Root element not found")
-}
-
-const root = createRoot(rootElement)
+const root = createRoot(document.querySelector("#root")!)
 root.render(<App />)
 
 if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {

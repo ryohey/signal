@@ -1,29 +1,29 @@
-import type { Auth } from "firebase/auth"
+import { Auth } from "firebase/auth"
 import {
   Bytes,
+  Firestore,
+  FirestoreDataConverter,
+  Timestamp,
   collection,
   doc,
-  type Firestore,
-  type FirestoreDataConverter,
   getDoc,
   runTransaction,
   serverTimestamp,
-  type Timestamp,
 } from "firebase/firestore"
-import type {
+import {
   CloudSongData,
   ICloudSongDataRepository,
 } from "./ICloudSongDataRepository.js"
 
 export const createCloudSongDataRepository = (
   firestore: Firestore,
-  auth: Auth
+  auth: Auth,
 ): ICloudSongDataRepository => new CloudSongDataRepository(firestore, auth)
 
 export class CloudSongDataRepository implements ICloudSongDataRepository {
   constructor(
     private readonly firestore: Firestore,
-    private readonly auth: Auth
+    private readonly auth: Auth,
   ) {}
 
   private get songDataCollection() {

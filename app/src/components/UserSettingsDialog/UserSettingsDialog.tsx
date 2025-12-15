@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import type { FC } from "react"
+import { FC } from "react"
 import { useAuth } from "../../hooks/useAuth"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
@@ -25,7 +25,7 @@ const UserCard = () => {
   const { authUser: user } = useAuth()
 
   if (user === null) {
-    return null
+    return <></>
   }
 
   return (

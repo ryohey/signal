@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { ChangeEvent, FC } from "react"
+import { ChangeEvent, FC } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"

@@ -17,7 +17,7 @@ export function usePanSlider() {
 
   const currentPan = useMobxSelector(
     () => selectedTrack?.getPan(position),
-    [selectedTrack, position]
+    [selectedTrack, position],
   )
 
   const setTrackPan = useCallback(
@@ -33,7 +33,7 @@ export function usePanSlider() {
         sendEvent(panMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, setPan, position, sendEvent, channel, isDragging]
+    [pushHistory, setPan, position, sendEvent, channel, isDragging],
   )
 
   return {

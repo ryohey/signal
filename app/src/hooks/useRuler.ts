@@ -1,4 +1,4 @@
-import { isEventInRange, Range } from "@signal-app/core"
+import { Range, isEventInRange } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { findLast } from "lodash"
@@ -30,7 +30,7 @@ export function useRuler() {
   const beats = useBeats()
   const { quantizeRound } = useQuantizer()
   const selectedTimeSignatureEventIds = useAtomValue(
-    selectedTimeSignatureEventIdsAtom
+    selectedTimeSignatureEventIdsAtom,
   )
 
   const rulerBeats = useMemo(() => {
@@ -63,9 +63,9 @@ export function useRuler() {
         isEventInRange(
           Range.fromLength(
             transform.getTick(scrollLeft),
-            transform.getTick(canvasWidth)
-          )
-        )
+            transform.getTick(canvasWidth),
+          ),
+        ),
       )
       .map((e) => {
         const x = transform.getX(e.tick)
@@ -89,20 +89,20 @@ export function useRuler() {
       const x = offsetX + scrollLeft
       return findLast(
         rulerTimeSignatures,
-        (e) => e.x < x && e.x + TIME_SIGNATURE_HIT_WIDTH >= x
+        (e) => e.x < x && e.x + TIME_SIGNATURE_HIT_WIDTH >= x,
       )
     },
-    [rulerTimeSignatures, scrollLeft]
+    [rulerTimeSignatures, scrollLeft],
   )
 
   const getTick = useCallback(
     (offsetX: number) => transform.getTick(offsetX + scrollLeft),
-    [transform, scrollLeft]
+    [transform, scrollLeft],
   )
 
   const getQuantizedTick = useCallback(
     (offsetX: number) => quantizeRound(getTick(offsetX)),
-    [quantizeRound, getTick]
+    [quantizeRound, getTick],
   )
 
   return {
@@ -121,8 +121,8 @@ export function useRuler() {
             updateTimeSignature(id, numerator, denominator)
           })
         },
-        [updateTimeSignature]
-      )
+        [updateTimeSignature],
+      ),
     ),
     getQuantizedTick,
   }

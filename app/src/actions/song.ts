@@ -1,8 +1,8 @@
 import {
   emptySong,
   emptyTrack,
-  type Song,
-  type TrackId,
+  Song,
+  TrackId,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
 import { useCallback } from "react"
@@ -54,7 +54,7 @@ export const useSetSong = () => {
       setSelectedNoteIds([])
       setSelectedTrackId(
         newSong.tracks.find((t) => !t.isConductorTrack)?.id ??
-          UNASSIGNED_TRACK_ID
+          UNASSIGNED_TRACK_ID,
       )
 
       setArrangeSelection(null)
@@ -79,7 +79,7 @@ export const useSetSong = () => {
       setSelectedNoteIds,
       setSelectedTrackId,
       setArrangeSelection,
-    ]
+    ],
   )
 }
 
@@ -118,7 +118,7 @@ export const useOpenSong = () => {
       onUserExplicitAction()
       setSong(song)
     },
-    [setSong, onUserExplicitAction]
+    [setSong, onUserExplicitAction],
   )
 }
 
@@ -158,10 +158,10 @@ export const useRemoveTrack = () => {
       removeTrack(trackId)
       const maxTrackIndex = trackCount - 2
       setSelectedTrackIndex(
-        Math.min(pianoRollSelectedTrackIndex, maxTrackIndex)
+        Math.min(pianoRollSelectedTrackIndex, maxTrackIndex),
       )
       setArrangeSelectedTrackIndex(
-        Math.min(arrangeSelectedTrackIndex, maxTrackIndex)
+        Math.min(arrangeSelectedTrackIndex, maxTrackIndex),
       )
     },
     [
@@ -172,7 +172,7 @@ export const useRemoveTrack = () => {
       setSelectedTrackIndex,
       arrangeSelectedTrackIndex,
       setArrangeSelectedTrackIndex,
-    ]
+    ],
   )
 }
 
@@ -190,7 +190,7 @@ export const useInsertTrack = () => {
       pushHistory()
       insertTrack(emptyTrack(tracks.length - 1), trackIndex)
     },
-    [pushHistory, insertTrack, tracks]
+    [pushHistory, insertTrack, tracks],
   )
 }
 
@@ -210,6 +210,6 @@ export const useDuplicateTrack = () => {
       pushHistory()
       insertTrack(newTrack, trackIndex + 1)
     },
-    [getTrack, tracks, insertTrack, pushHistory]
+    [getTrack, tracks, insertTrack, pushHistory],
   )
 }

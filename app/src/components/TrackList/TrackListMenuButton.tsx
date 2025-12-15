@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import ArrowLeft from "mdi-react/MenuLeftIcon"
-import { type FC, useCallback, useRef } from "react"
+import { FC, useCallback, useRef } from "react"
 import { useTrackList } from "../../hooks/useTrackList"
 
 const NavBackButton = styled.button`
@@ -37,15 +37,17 @@ export const TrackListMenuButton: FC = () => {
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
-    <NavBackButton
-      ref={ref}
-      tabIndex={-1}
-      onMouseDown={(e) => {
-        e.preventDefault()
-        onClickNavBack()
-      }}
-    >
-      <ArrowIcon isOpen={isOpen} />
-    </NavBackButton>
+    <>
+      <NavBackButton
+        ref={ref}
+        tabIndex={-1}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          onClickNavBack()
+        }}
+      >
+        <ArrowIcon isOpen={isOpen} />
+      </NavBackButton>
+    </>
   )
 }

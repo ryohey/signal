@@ -67,5 +67,5 @@ export const DrumNoteShader = (gl: WebGL2RenderingContext) =>
       activeColor: uniformVec4(),
       selectedColor: uniformVec4(),
     },
-    (vertexArray) => new NoteBuffer(vertexArray)
+    (vertexArray) => new NoteBuffer(vertexArray),
   )

@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
-import type { CloudSong } from "@signal-app/api"
+import { CloudSong } from "@signal-app/api"
 import { useToast } from "dialog-hooks"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import type { FC } from "react"
+import { FC } from "react"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { Localized, useLocalization } from "../../localize/useLocalization"
 import { IconButton } from "../ui/IconButton"
@@ -72,7 +72,7 @@ export const CloudFileRow: FC<CloudFileRowProps> = ({
     }
   })()
   const songName = song.name.length > 0 ? song.name : localized["untitled-song"]
-  const dateStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+  const dateStr = date.toLocaleDateString() + " " + date.toLocaleTimeString()
   return (
     <Container onClick={onClick}>
       <NameCell>

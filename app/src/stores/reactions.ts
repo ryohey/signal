@@ -1,12 +1,12 @@
 import { autorun, observe, reaction } from "mobx"
 import MIDIOutput from "../services/MIDIOutput"
-import type RootStore from "./RootStore"
+import RootStore from "./RootStore"
 
 export const registerReactions = (rootStore: RootStore) => {
   observe(
     rootStore.midiDeviceStore,
     "enabledOutputs",
-    updateOutputDevices(rootStore)
+    updateOutputDevices(rootStore),
   )
 
   autorun(updateInputDevices(rootStore))
@@ -15,7 +15,7 @@ export const registerReactions = (rootStore: RootStore) => {
   observe(
     rootStore.midiRecorder,
     "isRecording",
-    disableSeekWhileRecording(rootStore)
+    disableSeekWhileRecording(rootStore),
   )
 
   observe(rootStore.player, "isPlaying", stopRecordingWhenStopPlayer(rootStore))
@@ -27,7 +27,7 @@ export const registerReactions = (rootStore: RootStore) => {
       if (!isSaved) {
         rootStore.autoSaveService.onSongChanged()
       }
-    }
+    },
   )
 }
 
@@ -68,9 +68,8 @@ const updateInputDevices: Reaction =
 
 const disableSeekWhileRecording: Reaction =
   ({ player, midiRecorder }) =>
-  () => {
-    player.disableSeek = midiRecorder.isRecording
-  }
+  () =>
+    (player.disableSeek = midiRecorder.isRecording)
 
 const stopRecordingWhenStopPlayer: Reaction =
   ({ player, midiRecorder }) =>

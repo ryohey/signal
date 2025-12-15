@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { type FC, type PropsWithChildren, useCallback } from "react"
+import { FC, PropsWithChildren, useCallback } from "react"
 import { useSetSong } from "../../actions"
 import { songFromFile } from "../../actions/file"
 import { useSong } from "../../hooks/useSong"
@@ -34,7 +34,7 @@ export const DropZone: FC<PropsWithChildren> = ({ children }) => {
         setSong(newSong)
       }
     },
-    [isSaved, setSong, localized]
+    [isSaved, setSong, localized],
   )
 
   return (

@@ -1,4 +1,4 @@
-import { emptySong, type Song } from "@signal-app/core"
+import { Song, emptySong } from "@signal-app/core"
 import { makeObservable, observable } from "mobx"
 
 export class SongStore {

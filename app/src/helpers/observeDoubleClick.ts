@@ -4,9 +4,7 @@ const DOUBLE_CLICK_INTERVAL = 500
 export const observeDoubleClick = (onDoubleClick: () => void) => {
   let isMoved = false
 
-  const onGlobalMouseMove = () => {
-    isMoved = true
-  }
+  const onGlobalMouseMove = () => (isMoved = true)
 
   const onGlobalMouseDown = () => {
     if (!isMoved) {

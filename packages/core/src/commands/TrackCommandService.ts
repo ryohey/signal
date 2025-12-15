@@ -1,18 +1,18 @@
 import { clamp, max, maxBy, min, minBy } from "lodash"
-import type { AnyEvent } from "midifile-ts"
+import { AnyEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import {
   isNoteEvent,
-  type NoteEvent,
+  NoteEvent,
   Range,
-  type TrackEvent,
+  TrackEvent,
   TrackEvents,
-  type TrackId,
+  TrackId,
 } from "../entities"
 import { NoteNumber } from "../entities/unit/NoteNumber"
 import { closedRange, isNotNull, isNotUndefined } from "../helpers/array"
 import { isEventInRange } from "../helpers/filterEvents"
-import type { ISongStore } from "./interfaces"
+import { ISongStore } from "./interfaces"
 
 export interface BatchUpdateOperation {
   readonly type: "set" | "add" | "multiply"
@@ -25,7 +25,7 @@ export class TrackCommandService {
   batchUpdateNotesVelocity = (
     trackId: TrackId,
     noteIds: number[],
-    operation: BatchUpdateOperation
+    operation: BatchUpdateOperation,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
 
@@ -43,16 +43,16 @@ export class TrackCommandService {
         velocity: clamp(
           Math.floor(applyOperation(operation, note.velocity)),
           1,
-          127
+          127,
         ),
-      }))
+      })),
     )
   }
 
   transposeNotes = (
     trackId: TrackId,
     noteIds: number[],
-    deltaPitch: number
+    deltaPitch: number,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
 
@@ -64,7 +64,7 @@ export class TrackCommandService {
       noteIds
         .map((id) => {
           const n = track.getEventById(id)
-          if (n === undefined || !isNoteEvent(n)) {
+          if (n == undefined || !isNoteEvent(n)) {
             return null
           }
           return {
@@ -72,7 +72,7 @@ export class TrackCommandService {
             noteNumber: NoteNumber.clamp(n.noteNumber + deltaPitch),
           }
         })
-        .filter(isNotNull)
+        .filter(isNotNull),
     )
   }
 
@@ -143,7 +143,7 @@ export class TrackCommandService {
     startTick: number,
     startValue: number,
     endTick: number,
-    endValue: number
+    endValue: number,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
 
@@ -163,9 +163,9 @@ export class TrackCommandService {
             minValue,
             ((tick - startTick) / (endTick - startTick)) *
               (endValue - startValue) +
-              startValue
-          )
-        )
+              startValue,
+          ),
+        ),
       )
 
     const notes =
@@ -180,21 +180,21 @@ export class TrackCommandService {
         events.map((e: TrackEvent) => ({
           id: e.id,
           velocity: getValue(e.tick),
-        }))
+        })),
       )
     })
   }
 
   removeRedundantEvents = <T extends TrackEvent>(
     trackId: TrackId,
-    event: T & { subtype?: string; controllerType?: number }
+    event: T & { subtype?: string; controllerType?: number },
   ) => {
     const track = this.songStore.song.getTrack(trackId)
     if (!track) {
       return
     }
     const eventsIdsToRemove = TrackEvents.getRedundantEvents(event)(
-      track.events
+      track.events,
     )
       .filter((e) => e.id !== event.id)
       .map((e) => e.id)
@@ -207,19 +207,19 @@ export class TrackCommandService {
       return
     }
     const controllerEvents = track.events.filter((e: TrackEvent) =>
-      eventIds.includes(e.id)
+      eventIds.includes(e.id),
     )
-    transaction(() => {
-      for (const e of controllerEvents) {
-        this.removeRedundantEvents(trackId, e)
-      }
-    })
+    transaction(() =>
+      controllerEvents.forEach((e: TrackEvent) =>
+        this.removeRedundantEvents(trackId, e),
+      ),
+    )
   }
 
   quantizeNotes = (
     trackId: TrackId,
     noteIds: number[],
-    quantizeRound: (tick: number) => number
+    quantizeRound: (tick: number) => number,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
     if (!track) {
@@ -247,7 +247,7 @@ export class TrackCommandService {
     startValue: number,
     endValue: number,
     startTick: number,
-    endTick: number
+    endTick: number,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
 
@@ -275,9 +275,9 @@ export class TrackCommandService {
                   minValue,
                   ((tick - startTick) / (endTick - startTick)) *
                     (endValue - startValue) +
-                    startValue
-                )
-              )
+                    startValue,
+                ),
+              ),
             )
 
     // Delete events in the dragged area
@@ -286,7 +286,7 @@ export class TrackCommandService {
         // to prevent remove the event created previously, do not remove the event placed at startTick
         e.tick !== startTick &&
         e.tick >= Math.min(minTick, _startTick) &&
-        e.tick <= Math.max(maxTick, _endTick)
+        e.tick <= Math.max(maxTick, _endTick),
     )
 
     transaction(() => {
@@ -296,7 +296,7 @@ export class TrackCommandService {
         (tick) => ({
           ...createEvent(getValue(tick)),
           tick,
-        })
+        }),
       )
 
       track.addEvents(newEvents)

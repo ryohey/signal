@@ -1,12 +1,6 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import {
-  type FC,
-  type MouseEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react"
+import { FC, MouseEventHandler, useCallback, useEffect, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
 import { useContextMenu } from "../../../hooks/useContextMenu"
@@ -19,8 +13,8 @@ import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
 import { Lines } from "./Lines"
-import { NoteSelection } from "./NoteSelection"
 import { Notes } from "./Notes"
+import { NoteSelection } from "./NoteSelection"
 
 export interface PianoRollCanvasProps {
   width: number
@@ -55,7 +49,7 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
         return
       }
     },
-    [mouseMode, onContextMenu]
+    [mouseMode, onContextMenu],
   )
 
   useEffect(() => {
@@ -68,24 +62,24 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const scrollYMatrix = useMemo(
     () => matrixFromTranslation(0, -scrollTop),
-    [scrollTop]
+    [scrollTop],
   )
 
   const scrollXYMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, -scrollTop),
-    [scrollLeft, scrollTop]
+    [scrollLeft, scrollTop],
   )
 
   const style = useMemo(
     () => ({
       backgroundColor: theme.editorBackgroundColor,
     }),
-    [theme]
+    [theme],
   )
 
   return (

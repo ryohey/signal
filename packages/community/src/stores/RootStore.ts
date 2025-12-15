@@ -16,7 +16,7 @@ export default class RootStore {
   readonly cloudSongRepository = createCloudSongRepository(firestore, auth)
   readonly cloudSongDataRepository = createCloudSongDataRepository(
     firestore,
-    auth
+    auth,
   )
   readonly songStore = new SongStore(this.cloudSongDataRepository)
   readonly authStore = new AuthStore(this.userRepository)

@@ -1,12 +1,4 @@
-import {
-  createContext,
-  type FC,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react"
+import { createContext, FC, ReactNode, useContext, useState } from "react"
 
 export interface ProgressMessage {
   message: string
@@ -30,23 +22,16 @@ export const ProgressProvider: FC<{
 }> = ({ children, component: Progress }) => {
   const [messages, setMessages] = useState<ProgressMessage[]>([])
 
-  const removeMessage = useCallback(
-    (key: number) => setMessages((arr) => arr.filter((m) => m.key !== key)),
-    []
-  )
-
-  const addMessage = useCallback(
-    (message: ProgressMessage) => {
-      setMessages((arr) => [...arr, message])
-      return () => removeMessage(message.key)
-    },
-    [removeMessage]
-  )
+  const removeMessage = (key: number) =>
+    setMessages((arr) => arr.filter((m) => m.key !== key))
 
   return (
     <ProgressContext.Provider
       value={{
-        addMessage,
+        addMessage(message) {
+          setMessages((arr) => [...arr, message])
+          return () => removeMessage(message.key)
+        },
       }}
     >
       {children}
@@ -60,19 +45,9 @@ export const ProgressProvider: FC<{
 export const useProgress = () => {
   const { addMessage } = useContext(ProgressContext)
 
-  const show = useCallback(
-    (message: string) => {
-      return addMessage({ message, key: Date.now() })
+  return {
+    show(message: string) {
+      return addMessage({ message, key: new Date().getTime() })
     },
-    [addMessage]
-  )
-
-  const progress = useMemo(
-    () => ({
-      show,
-    }),
-    [show]
-  )
-
-  return progress
+  }
 }

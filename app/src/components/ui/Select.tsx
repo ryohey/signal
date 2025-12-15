@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import ArrowDropDown from "mdi-react/ArrowDropDownIcon"
-import type { DetailedHTMLProps, FC } from "react"
+import { DetailedHTMLProps, FC } from "react"
 
 const StyledSelect = styled.select`
   display: block;

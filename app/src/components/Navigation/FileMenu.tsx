@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { envString } from "../../localize/envString"

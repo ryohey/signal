@@ -1,6 +1,6 @@
-import * as fs from "node:fs"
-import * as path from "node:path"
 import { emptyTrack } from "@signal-app/core"
+import * as fs from "fs"
+import * as path from "path"
 import { deserialize, serialize } from "serializr"
 import { describe, expect, it } from "vitest"
 import { songFromMidi } from "../../midi"
@@ -10,9 +10,10 @@ import { emptySong } from "./SongFactory"
 describe("Song", () => {
   const song = songFromMidi(
     new DataView(
-      fs.readFileSync(path.join(__dirname, "../../../testdata/tracks.mid"))
-        .buffer
-    )
+      fs.readFileSync(
+        path.join(__dirname, "../../../testdata/tracks.mid"),
+      ).buffer,
+    ),
   )
 
   it("fromMidi", () => {

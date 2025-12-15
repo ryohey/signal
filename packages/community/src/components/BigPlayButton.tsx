@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import Pause from "mdi-react/PauseIcon.js"
 import PlayArrow from "mdi-react/PlayArrowIcon.js"
-import type { FC } from "react"
+import { FC } from "react"
 import { CircleButton } from "./CircleButton.js"
 
 export const StyledButton = styled(CircleButton)`

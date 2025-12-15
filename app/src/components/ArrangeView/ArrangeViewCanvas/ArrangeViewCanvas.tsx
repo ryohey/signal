@@ -1,18 +1,18 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { type FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
-import type { AbstractMouseEvent } from "../../../hooks/useContextMenu"
+import { AbstractMouseEvent } from "../../../hooks/useContextMenu"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { useTrackScroll } from "../../../hooks/useTrackScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { ArrangeViewSelection } from "./ArrangeViewSelection"
-import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
-import { useSelectionGesture } from "./gestures/useSelectionGesture"
 import { Lines } from "./Lines"
 import { Notes } from "./Notes"
+import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
+import { useSelectionGesture } from "./gestures/useSelectionGesture"
 
 export interface ArrangeViewCanvasProps {
   width: number
@@ -33,17 +33,17 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
-    [scrollLeft]
+    [scrollLeft],
   )
 
   const scrollYMatrix = useMemo(
     () => matrixFromTranslation(0, -scrollTop),
-    [scrollTop]
+    [scrollTop],
   )
 
   const scrollXYMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, -scrollTop),
-    [scrollLeft, scrollTop]
+    [scrollLeft, scrollTop],
   )
 
   const onMouseDown = useCallback(
@@ -62,7 +62,7 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
           break
       }
     },
-    [selectionGesture, dragScrollGesture, onContextMenu]
+    [selectionGesture, dragScrollGesture, onContextMenu],
   )
 
   return (

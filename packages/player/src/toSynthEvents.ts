@@ -1,5 +1,5 @@
-import type { SynthEvent } from "@ryohey/wavelet"
-import type { PlayerEvent } from "./PlayerEvent.js"
+import { SynthEvent } from "@ryohey/wavelet"
+import { PlayerEvent } from "./PlayerEvent.js"
 import { tickToMillisec } from "./tick.js"
 
 interface Keyframe {
@@ -11,7 +11,7 @@ interface Keyframe {
 export const toSynthEvents = (
   events: PlayerEvent[],
   timebase: number,
-  sampleRate: number
+  sampleRate: number,
 ): SynthEvent[] => {
   events = events.sort((a, b) => a.tick - b.tick)
 
@@ -36,7 +36,6 @@ export const toSynthEvents = (
           midi: e,
           delayTime,
         })
-        break
       case "meta":
         switch (e.subtype) {
           case "setTempo":

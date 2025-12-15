@@ -1,5 +1,5 @@
 import { DialogTitle } from "@radix-ui/react-dialog"
-import type { FC } from "react"
+import { FC } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { userRepository } from "../../services/repositories"

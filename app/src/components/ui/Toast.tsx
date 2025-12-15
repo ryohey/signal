@@ -1,13 +1,13 @@
 import { keyframes, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import * as Portal from "@radix-ui/react-portal"
-import type { ToastSeverity } from "dialog-hooks"
-import ErrorIcon from "mdi-react/AlertCircleIcon"
+import { ToastSeverity } from "dialog-hooks"
+import Error from "mdi-react/AlertCircleIcon"
 import Warning from "mdi-react/AlertIcon"
 import CheckCircle from "mdi-react/CheckCircleIcon"
 import Info from "mdi-react/InformationIcon"
-import { type FC, useEffect, useState } from "react"
-import type { Theme } from "../../theme/Theme"
+import { FC, useEffect, useState } from "react"
+import { Theme } from "../../theme/Theme"
 
 export interface ToastProps {
   message: string
@@ -56,7 +56,7 @@ const Content = styled.div`
   align-items: center;
 
   animation: ${({ show }: { show: boolean }) =>
-    show ? contentShow : contentHide}
+      show ? contentShow : contentHide}
     500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 `
 
@@ -65,7 +65,7 @@ const SeverityIcon: FC<{ severity: ToastSeverity }> = ({ severity }) => {
   const fill = colorForSeverity(severity, theme)
   switch (severity) {
     case "error":
-      return <ErrorIcon style={{ fill }} />
+      return <Error style={{ fill }} />
     case "info":
       return <Info style={{ fill }} />
     case "success":

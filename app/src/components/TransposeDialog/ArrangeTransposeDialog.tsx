@@ -9,7 +9,7 @@ export const ArrangeTransposeDialog = () => {
 
   const onClose = useCallback(
     () => setOpenTransposeDialog(false),
-    [setOpenTransposeDialog]
+    [setOpenTransposeDialog],
   )
 
   const onClickOK = useCallback(
@@ -17,7 +17,7 @@ export const ArrangeTransposeDialog = () => {
       arrangeTransposeSelection(value)
       setOpenTransposeDialog(false)
     },
-    [setOpenTransposeDialog, arrangeTransposeSelection]
+    [setOpenTransposeDialog, arrangeTransposeSelection],
   )
 
   return (

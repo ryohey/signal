@@ -7,7 +7,6 @@ export const OnBeforeUnload = () => {
   const { getSong } = useSong()
   const localized = useLocalization()
 
-  // wantfix: use useEffectEvent
   useEffect(() => {
     const listener = (e: BeforeUnloadEvent) => {
       if (!getSong().isSaved) {
@@ -20,7 +19,7 @@ export const OnBeforeUnload = () => {
             .showMessageBox({
               type: "question",
               message,
-              buttons: [localized.close, localized.cancel],
+              buttons: [localized["close"], localized["cancel"]],
             })
             .then((button) => {
               if (button === 0) {
@@ -37,6 +36,7 @@ export const OnBeforeUnload = () => {
     return () => {
       window.removeEventListener("beforeunload", listener)
     }
-  }, [getSong, localized.cancel, localized.close, localized["confirm-close"]])
-  return null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return <></>
 }

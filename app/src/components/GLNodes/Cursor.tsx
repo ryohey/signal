@@ -1,6 +1,6 @@
 import { Rectangles } from "@ryohey/webgl-react"
 import { vec4 } from "gl-matrix"
-import type { FC } from "react"
+import { FC } from "react"
 
 export const Cursor: FC<{ x: number; height: number; zIndex: number }> = ({
   x,

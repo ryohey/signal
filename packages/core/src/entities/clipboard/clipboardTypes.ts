@@ -13,7 +13,7 @@ export const ArrangeNotesClipboardDataSchema = z.object({
   type: z.literal("arrange_notes"),
   notes: z.record(
     z.union([z.number(), z.string()]).describe("trackIndex"),
-    z.array(z.any().describe("TrackEvent"))
+    z.array(z.any().describe("TrackEvent")),
   ),
   selectedTrackIndex: z.number(),
 })

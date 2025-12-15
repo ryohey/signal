@@ -4,12 +4,12 @@ import {
   Portal,
   Provider,
   Root,
-  type TooltipContentProps,
-  type TooltipProviderProps,
+  TooltipContentProps,
+  TooltipProviderProps,
   Trigger,
 } from "@radix-ui/react-tooltip"
 import Color from "color"
-import type { FC, ReactNode } from "react"
+import { FC, ReactNode } from "react"
 
 export type TooltipProps = TooltipProviderProps & {
   title: ReactNode

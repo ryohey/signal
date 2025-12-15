@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron"
-import type { ElectronAPI } from "./ElectronAPI"
+import { ElectronAPI } from "./ElectronAPI"
 import type { IpcEvent, ParamsForEvent } from "./ipc"
 import type { IpcMainAPI } from "./ipcMain"
 
@@ -10,7 +10,7 @@ const register =
   (callback: (params: ParamsForEvent<T>) => void) => {
     const listener = (
       _event: Electron.IpcRendererEvent,
-      value: ParamsForEvent<T>
+      value: ParamsForEvent<T>,
     ) => {
       callback(value)
     }

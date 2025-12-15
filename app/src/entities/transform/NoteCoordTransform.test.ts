@@ -6,7 +6,7 @@ import { TickTransform } from "./TickTransform"
 describe("NoteCoordTransform", () => {
   const t = new NoteCoordTransform(
     new TickTransform(100),
-    new KeyTransform(30, 127)
+    new KeyTransform(30, 127),
   )
 
   it("constructor", () => {

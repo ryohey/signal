@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
 
@@ -37,7 +37,7 @@ const CategoryName: FC<{ programNumber: number }> = ({ programNumber }) => {
     case 15:
       return <Localized name="Sound Effects" />
   }
-  return null
+  return <></>
 }
 
 export const FancyCategoryName: FC<{ programNumber: number }> = ({

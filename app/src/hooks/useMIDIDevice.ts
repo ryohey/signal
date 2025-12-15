@@ -20,7 +20,7 @@ export function useMIDIDevice() {
 
   const isFactorySoundEnabled = useMobxGetter(
     midiDeviceStore,
-    "isFactorySoundEnabled"
+    "isFactorySoundEnabled",
   )
 
   const inputDevices: Device[] = inputs.map((device) => ({
@@ -62,7 +62,7 @@ export function useMIDIDevice() {
           midiDeviceStore.setOutputEnable(deviceId, isEnabled)
         }
       },
-      [midiDeviceStore]
+      [midiDeviceStore],
     ),
   }
 }

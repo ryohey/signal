@@ -4,10 +4,10 @@ import {
   Content,
   Overlay,
   Portal,
-  type DialogProps as Props,
+  DialogProps as Props,
   Root,
 } from "@radix-ui/react-dialog"
-import type { FC } from "react"
+import { FC } from "react"
 
 const overlayShow = keyframes`
   from {

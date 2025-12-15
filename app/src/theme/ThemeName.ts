@@ -1,5 +1,5 @@
-import type { FC } from "react"
-import type { ThemeType } from "./Theme"
+import { FC } from "react"
+import { ThemeType } from "./Theme"
 
 export const ThemeName: FC<{ themeType: ThemeType }> = ({ themeType }) => {
   switch (themeType) {

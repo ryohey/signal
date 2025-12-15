@@ -9,7 +9,7 @@ export const PianoRollTransposeDialog = () => {
 
   const onClose = useCallback(
     () => setOpenTransposeDialog(false),
-    [setOpenTransposeDialog]
+    [setOpenTransposeDialog],
   )
 
   const onClickOK = useCallback(
@@ -17,7 +17,7 @@ export const PianoRollTransposeDialog = () => {
       transposeSelection(value)
       setOpenTransposeDialog(false)
     },
-    [setOpenTransposeDialog, transposeSelection]
+    [setOpenTransposeDialog, transposeSelection],
   )
 
   return (

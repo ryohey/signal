@@ -9,7 +9,7 @@ describe("EventScheduler", () => {
       () => [],
       0,
       480,
-      100
+      100,
     )
 
     // The first event is read within the look ahead time
@@ -41,5 +41,5 @@ describe("EventScheduler", () => {
 const filterEventsWithRange = <T extends { tick: number }>(
   events: T[],
   start: number,
-  end: number
+  end: number,
 ): T[] => events.filter((e) => e.tick >= start && e.tick < end)

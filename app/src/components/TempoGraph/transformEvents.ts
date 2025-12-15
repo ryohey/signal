@@ -1,12 +1,12 @@
-import type { TrackEventOf } from "@signal-app/core"
-import type { SetTempoEvent } from "midifile-ts"
-import type { TempoCoordTransform } from "../../entities/transform/TempoCoordTransform"
-import type { TempoGraphItem } from "./TempoGraphItem"
+import { TrackEventOf } from "@signal-app/core"
+import { SetTempoEvent } from "midifile-ts"
+import { TempoCoordTransform } from "../../entities/transform/TempoCoordTransform"
+import { TempoGraphItem } from "./TempoGraphItem"
 
 export const transformEvents = (
   events: TrackEventOf<SetTempoEvent>[],
   transform: TempoCoordTransform,
-  maxX: number
+  maxX: number,
 ): TempoGraphItem[] => {
   // まず位置だけ計算する
   // Calculate only position

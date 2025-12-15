@@ -1,4 +1,4 @@
-import { type Song, songFromMidi, songToMidi } from "@signal-app/core"
+import { Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { writeFile } from "../services/fs-helper"
 import { useSetSong } from "./song"
@@ -48,7 +48,7 @@ export const songFromFile = async (file: File) =>
   songFromArrayBuffer(
     await file.arrayBuffer(),
     "path" in file ? (file.path as string) : undefined,
-    file.name
+    file.name,
   )
 
 // Use the file name without extension as the song title
@@ -59,7 +59,7 @@ const getNameFromPathOrName = (pathOrName: string) => {
 export const songFromArrayBuffer = (
   content: ArrayBuffer,
   filePath?: string,
-  name?: string
+  name?: string,
 ) => {
   const song = songFromMidi(new Uint8Array(content))
   const pathOrName = filePath ?? name
@@ -92,7 +92,7 @@ export const saveFile = async (song: Song) => {
 }
 
 export const saveFileAs = async (song: Song) => {
-  let fileHandle: FileSystemFileHandle
+  let fileHandle
   try {
     fileHandle = await window.showSaveFilePicker({
       types: [

@@ -49,7 +49,7 @@ export const storeMidiFile = functions.https.onCall(async (data) => {
     console.error("An error occurred", error)
     throw new functions.https.HttpsError(
       "internal",
-      "An error occurred while processing the MIDI file."
+      "An error occurred while processing the MIDI file.",
     )
   }
 })

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { useToast } from "dialog-hooks"
-import { type FC, useCallback } from "react"
+import { FC, useCallback } from "react"
 import { Localized, useLocalization } from "../localize/useLocalization.js"
 import { PrimaryButton } from "./Button.js"
 
@@ -27,8 +27,8 @@ export const CopyTextForm: FC<{ text: string }> = ({ text }) => {
 
   const onClick = useCallback(() => {
     navigator.clipboard.writeText(text)
-    toast.success(localized.copied)
-  }, [text, localized.copied, toast.success])
+    toast.success(localized["copied"])
+  }, [text])
 
   return (
     <Form>

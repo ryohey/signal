@@ -60,7 +60,7 @@ export const useTempoEditorKeyboardShortcut = () => {
       duplicateTempoSelection,
       pasteTempoSelection,
       cutTempoSelection,
-    ]
+    ],
   )
 
   const onCut = useCallback(() => {

@@ -2,10 +2,10 @@ import styled from "@emotion/styled"
 import { composeEventHandlers } from "@radix-ui/primitive"
 import * as Popover from "@radix-ui/react-popover"
 import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
+  ComponentPropsWithoutRef,
+  ElementRef,
   forwardRef,
-  type ReactNode,
+  ReactNode,
   useRef,
 } from "react"
 import { Localized } from "../../../localize/useLocalization"

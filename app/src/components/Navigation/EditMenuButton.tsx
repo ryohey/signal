@@ -1,5 +1,5 @@
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
-import type { FC } from "react"
+import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { EditMenu } from "./EditMenu"
 import { Tab } from "./Navigation"

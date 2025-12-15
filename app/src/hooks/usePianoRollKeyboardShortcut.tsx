@@ -76,7 +76,7 @@ export const usePianoRollKeyboardShortcut = () => {
       toggleSolo,
       toggleMute,
       toggleGhost,
-    ]
+    ],
   )
 
   return useKeyboardShortcut({

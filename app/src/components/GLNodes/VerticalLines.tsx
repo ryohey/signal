@@ -1,6 +1,6 @@
 import { GLNode, useTransform } from "@ryohey/webgl-react"
-import type { vec4 } from "gl-matrix"
-import type { FC } from "react"
+import { vec4 } from "gl-matrix"
+import { FC } from "react"
 import { VerticalLinesShader } from "./VerticalLinesShader"
 
 export interface VerticalLinesProps {

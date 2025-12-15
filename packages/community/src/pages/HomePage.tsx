@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { FC } from "react"
 import { RecentSongList } from "../components/RecentSongList.js"
 import { PageLayout, PageTitle } from "../layouts/PageLayout.js"
 import { Localized } from "../localize/useLocalization.js"

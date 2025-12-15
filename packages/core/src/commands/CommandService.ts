@@ -1,7 +1,7 @@
 import { ArrangeCommandService } from "./ArrangeCommandService"
 import { ConductorTrackCommandService } from "./ConductorTrackCommandService"
 import { ControlCommandService } from "./ControlCommandService"
-import type { ISongStore } from "./interfaces"
+import { ISongStore } from "./interfaces"
 import { TrackCommandService } from "./TrackCommandService"
 
 export class CommandService {

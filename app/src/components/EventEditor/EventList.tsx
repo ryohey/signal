@@ -1,7 +1,9 @@
 import styled from "@emotion/styled"
-import type { TrackEvent } from "@signal-app/core"
-import type { FC } from "react"
-import { List, type RowComponentProps } from "react-window"
+import useComponentSize from "@rehooks/component-size"
+import { TrackEvent } from "@signal-app/core"
+import React, { FC, useCallback, useRef } from "react"
+import { FixedSizeList, ListChildComponentProps } from "react-window"
+import { Layout } from "../../Constants"
 import { useEventList } from "../../hooks/useEventList"
 import { Localized } from "../../localize/useLocalization"
 import { EventListItem } from "./EventListItem"
@@ -38,9 +40,11 @@ export const Cell = styled.div`
 
 const EventList: FC = () => {
   const { events } = useEventList()
+  const ref = useRef<HTMLDivElement>(null)
+  const size = useComponentSize(ref)
 
   return (
-    <Container>
+    <Container ref={ref}>
       <Header>
         <Row>
           <Cell>
@@ -57,24 +61,38 @@ const EventList: FC = () => {
           </Cell>
         </Row>
       </Header>
-      <List
-        rowComponent={ItemRenderer}
-        rowCount={events.length}
-        rowHeight={35}
-        rowProps={{ events }}
-      />
+      <FixedSizeList
+        height={size.height - Layout.rulerHeight}
+        itemCount={events.length}
+        itemSize={35}
+        width={size.width}
+        itemData={{ events }}
+        itemKey={(index) => events[index].id}
+      >
+        {ItemRenderer}
+      </FixedSizeList>
     </Container>
   )
 }
 
-const ItemRenderer = ({
-  index,
-  style,
-  events,
-}: RowComponentProps<{ events: readonly TrackEvent[] }>) => {
+const ItemRenderer = ({ index, style, data }: ListChildComponentProps) => {
+  const { events, setSelectedEventIds } = data
   const e = events[index]
 
-  return <EventListItem style={style} item={e} key={e.id} />
+  const onClickRow = useCallback(
+    (e: React.MouseEvent, ev: TrackEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        setSelectedEventIds?.((ids: number[]) => [...ids, ev.id])
+      } else {
+        setSelectedEventIds?.([ev.id])
+      }
+    },
+    [setSelectedEventIds],
+  )
+
+  return (
+    <EventListItem style={style} item={e} key={e.id} onClick={onClickRow} />
+  )
 }
 
 export default EventList

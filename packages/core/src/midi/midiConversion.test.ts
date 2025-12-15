@@ -1,25 +1,25 @@
-import * as fs from "node:fs"
-import * as path from "node:path"
-import type { AnyEvent } from "midifile-ts"
+import * as fs from "fs"
+import { AnyEvent } from "midifile-ts"
+import * as path from "path"
 import { describe, expect, it } from "vitest"
-import { emptySong, type NoteEvent, type Track } from "../entities"
-import {
-  noteOffMidiEvent,
-  noteOnMidiEvent,
-  setTempoMidiEvent,
-  timeSignatureMidiEvent,
-} from "./MidiEvent"
+import { emptySong, NoteEvent, Track } from "../entities"
 import {
   createConductorTrackIfNeeded,
   songFromMidi,
   songToMidi,
   songToMidiEvents,
 } from "./midiConversion"
+import {
+  noteOffMidiEvent,
+  noteOnMidiEvent,
+  setTempoMidiEvent,
+  timeSignatureMidiEvent,
+} from "./MidiEvent"
 
 // id for each event will not be serialized in midi file
 // we change ids sorted by order in events array
 const reassignIDs = (track: Track) => {
-  track.events.forEach((_e, i) => {
+  track.events.forEach((e, i) => {
     track.events[i].id = i
   })
 }
@@ -46,8 +46,8 @@ describe("SongFile", () => {
       for (const track of tracks) {
         expect(
           track.findIndex(
-            (e) => e.type === "meta" && e.subtype === "endOfTrack"
-          )
+            (e) => e.type === "meta" && e.subtype === "endOfTrack",
+          ),
         ).toBe(track.length - 1)
       }
     }
@@ -55,9 +55,10 @@ describe("SongFile", () => {
     const openFile = (fileName: string): AnyEvent[][] => {
       const song = songFromMidi(
         new DataView(
-          fs.readFileSync(path.join(__dirname, "../../testdata/", fileName))
-            .buffer
-        )
+          fs.readFileSync(
+            path.join(__dirname, "../../testdata/", fileName),
+          ).buffer,
+        ),
       )
       return songToMidiEvents(song)
     }

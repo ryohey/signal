@@ -1,4 +1,4 @@
-import { atom, type SetStateAction, useAtomValue, useSetAtom } from "jotai"
+import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
 import { clamp } from "lodash"
 import { Layout } from "../Constants"
 import { KeyTransform } from "../entities/transform/KeyTransform"
@@ -41,7 +41,7 @@ const scrollTopKeysAtom = atom(70) // Default to middle of the piano roll
 
 // derived atoms
 const transformAtom = atom(
-  (get) => new KeyTransform(Layout.keyHeight * get(scaleYAtom), 127)
+  (get) => new KeyTransform(Layout.keyHeight * get(scaleYAtom), 127),
 )
 const scrollTopInPixelsAtom = atom(
   (get) => Math.round(get(transformAtom).getY(get(scrollTopKeysAtom))),
@@ -53,7 +53,7 @@ const scrollTopInPixelsAtom = atom(
     const maxY = transform.getMaxY() - canvasHeight
     const scrollTop = clamp(y, 0, maxY)
     set(scrollTopKeysAtom, transform.getNoteNumberFractional(scrollTop))
-  }
+  },
 )
 const contentHeightAtom = atom((get) => get(transformAtom).getMaxY())
 
@@ -65,14 +65,14 @@ const scaleAroundPointYAtom = atom(
     const scrollTop = get(scrollTopInPixelsAtom)
     const pixelYInKeys0 = transform.getNoteNumberFractional(scrollTop + pixelY)
     set(scaleYAtom, (prev) =>
-      clamp(prev * (1 + scaleYDelta), SCALE_Y_MIN, SCALE_Y_MAX)
+      clamp(prev * (1 + scaleYDelta), SCALE_Y_MIN, SCALE_Y_MAX),
     )
     const updatedTransform = get(transformAtom)
     const updatedScrollTop = get(scrollTopInPixelsAtom)
     const pixelYInKeys1 = updatedTransform.getNoteNumberFractional(
-      updatedScrollTop + pixelY
+      updatedScrollTop + pixelY,
     )
     const scrollInKeys = pixelYInKeys1 - pixelYInKeys0
     set(scrollTopKeysAtom, (prev) => prev - scrollInKeys)
-  }
+  },
 )

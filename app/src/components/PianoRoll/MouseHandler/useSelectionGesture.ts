@@ -1,4 +1,4 @@
-import type { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../gesture/MouseGesture"
 import { useCreateSelectionGesture } from "./gestures/useCreateSelectionGesture"
 
 export const useSelectionGesture = (): MouseGesture => {

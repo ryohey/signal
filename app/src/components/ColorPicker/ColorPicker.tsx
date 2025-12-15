@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import range from "lodash/range"
-import type { FC } from "react"
+import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
@@ -47,8 +47,8 @@ export const ColorPicker: FC<ColorPickerProps> = ({
           ${hues[x].toFixed()}deg
           ${saturation}%
           ${luminances[y].toFixed()}%
-        )`
-    )
+        )`,
+    ),
   )
 
   return (

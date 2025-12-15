@@ -1,4 +1,4 @@
-import { SoundFont, type SoundFontSynth } from "@signal-app/player"
+import { SoundFont, SoundFontSynth } from "@signal-app/player"
 import { makeObservable, observable } from "mobx"
 import { makePersistable } from "mobx-persist-store"
 import { basename } from "../helpers/path"
@@ -150,7 +150,7 @@ export class SoundFontStore {
     const itemsInScanPaths = Object.entries(list)
       .filter(
         ([, f]) =>
-          f.scanPath !== undefined && this.scanPaths.includes(f.scanPath)
+          f.scanPath !== undefined && this.scanPaths.includes(f.scanPath),
       )
       .map(([id]) => Number(id))
     await this.storage.deleteMany(itemsInScanPaths)

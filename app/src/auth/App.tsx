@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react"
-import type { FC } from "react"
+import { FC } from "react"
 import { GlobalCSS } from "../components/Theme/GlobalCSS"
 import { LocalizationContext } from "../localize/useLocalization"
 import { themes } from "../theme/Theme"

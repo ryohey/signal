@@ -92,7 +92,7 @@ export const useToggleSolo = () => {
 
   return useCallback(
     () => toggleSolo(selectedTrackId),
-    [toggleSolo, selectedTrackId]
+    [toggleSolo, selectedTrackId],
   )
 }
 
@@ -102,7 +102,7 @@ export const useToggleMute = () => {
 
   return useCallback(
     () => toggleMute(selectedTrackId),
-    [toggleMute, selectedTrackId]
+    [toggleMute, selectedTrackId],
   )
 }
 
@@ -112,7 +112,7 @@ export const useToggleGhost = () => {
 
   return useCallback(
     () => toggleGhostTrack(selectedTrackId),
-    [toggleGhostTrack, selectedTrackId]
+    [toggleGhostTrack, selectedTrackId],
   )
 }
 
@@ -131,12 +131,12 @@ export const useStartNote = () => {
         velocity: number
         channel: number
       },
-      delayTime = 0
+      delayTime = 0,
     ) => {
       synthGroup.activate()
       sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
     },
-    [synthGroup, sendEvent]
+    [synthGroup, sendEvent],
   )
 }
 
@@ -152,10 +152,10 @@ export const useStopNote = () => {
         noteNumber: number
         channel: number
       },
-      delayTime = 0
+      delayTime = 0,
     ) => {
       sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
     },
-    [sendEvent]
+    [sendEvent],
   )
 }

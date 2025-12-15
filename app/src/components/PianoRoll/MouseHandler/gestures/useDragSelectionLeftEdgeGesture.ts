@@ -1,4 +1,4 @@
-import type { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 export const useDragSelectionLeftEdgeGesture = (): MouseGesture<[number[]]> => {
@@ -16,7 +16,7 @@ export const useDragSelectionLeftEdgeGesture = (): MouseGesture<[number[]]> => {
           type: "note",
           position: "left",
           noteId,
-        }))
+        })),
       )
     },
   }

@@ -1,6 +1,6 @@
-import { ArrangeSelection, type Range } from "@signal-app/core"
-import { type MouseEvent, useCallback } from "react"
-import type { MouseGesture } from "../../gesture/MouseGesture"
+import { ArrangeSelection, Range } from "@signal-app/core"
+import { MouseEvent, useCallback } from "react"
+import { MouseGesture } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useQuantizer } from "../../hooks/useQuantizer"
@@ -8,7 +8,7 @@ import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 
 export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const { resetSelection, setSelection } = useArrangeView()
+  const { trackTransform, resetSelection, setSelection } = useArrangeView()
   const { quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
@@ -25,9 +25,9 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           trackIndex: tracks.length,
         },
         { quantizeFloor, quantizeCeil },
-        tracks.length
+        tracks.length,
       ),
-    [quantizeFloor, quantizeCeil, tracks.length]
+    [quantizeFloor, quantizeCeil, tracks.length],
   )
 
   let selection: ArrangeSelection | null = null
@@ -49,6 +49,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
           const deltaPx = e.clientX - startClientX
           const selectionToPx = startPosX + deltaPx
           const endTick = transform.getTick(selectionToPx)
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           selection = selectionFromTickRange([startTick, endTick])
           setSelection(selection)
         },
@@ -57,11 +58,11 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
     [
       scrollLeft,
       transform,
+      trackTransform,
       selectionFromTickRange,
+      tracks,
       resetSelection,
-      selection,
-      setSelection,
-    ]
+    ],
   )
 
   return {

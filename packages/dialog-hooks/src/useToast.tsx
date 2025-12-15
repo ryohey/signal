@@ -1,12 +1,4 @@
-import {
-  createContext,
-  type FC,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react"
+import { createContext, FC, ReactNode, useContext, useState } from "react"
 
 export type ToastSeverity = "warning" | "error" | "info" | "success"
 
@@ -32,19 +24,15 @@ export const ToastProvider: FC<{
 }> = ({ children, component: Toast }) => {
   const [messages, setMessages] = useState<ToastMessage[]>([])
 
-  const removeMessage = useCallback(
-    (key: number) => setMessages((arr) => arr.filter((m) => m.key !== key)),
-    []
-  )
-
-  const addMessage = useCallback((message: ToastMessage) => {
-    setMessages((arr) => [...arr, message])
-  }, [])
+  const removeMessage = (key: number) =>
+    setMessages((arr) => arr.filter((m) => m.key !== key))
 
   return (
     <ToastContext.Provider
       value={{
-        addMessage,
+        addMessage(message) {
+          setMessages((arr) => [...arr, message])
+        },
       }}
     >
       {children}
@@ -63,51 +51,23 @@ export const ToastProvider: FC<{
 export const useToast = () => {
   const { addMessage } = useContext(ToastContext)
 
-  const show = useCallback(
-    (message: string, options: { severity: ToastSeverity }) => {
-      addMessage({ message, ...options, key: Date.now() })
-    },
-    [addMessage]
-  )
+  const show = (message: string, options: { severity: ToastSeverity }) => {
+    addMessage({ message, ...options, key: new Date().getTime() })
+  }
 
-  const info = useCallback(
-    (message: string) => {
+  return {
+    show,
+    info(message: string) {
       show(message, { severity: "info" })
     },
-    [show]
-  )
-
-  const success = useCallback(
-    (message: string) => {
+    success(message: string) {
       show(message, { severity: "success" })
     },
-    [show]
-  )
-
-  const warning = useCallback(
-    (message: string) => {
+    warning(message: string) {
       show(message, { severity: "warning" })
     },
-    [show]
-  )
-
-  const error = useCallback(
-    (message: string) => {
+    error(message: string) {
       show(message, { severity: "error" })
     },
-    [show]
-  )
-
-  const toast = useMemo(
-    () => ({
-      show,
-      info,
-      success,
-      warning,
-      error,
-    }),
-    [show, info, success, warning, error]
-  )
-
-  return toast
+  }
 }

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC } from "react"
+import { FC } from "react"
 import { usePanSlider } from "../../hooks/usePanSlider"
 import { Localized } from "../../localize/useLocalization"
 import { Slider } from "../ui/Slider"

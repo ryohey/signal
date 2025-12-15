@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import type { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseGesture } from "../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useChangeToolGesture } from "./gestures/useChangeToolGesture"
 import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
@@ -37,7 +37,7 @@ export const useNoteMouseGesture = (): MouseGesture<[], React.MouseEvent> => {
 
       return currentGesture
     },
-    [changeToolAction, currentGesture, dragScrollAction]
+    [changeToolAction, currentGesture, dragScrollAction],
   )
 
   return {
@@ -46,7 +46,7 @@ export const useNoteMouseGesture = (): MouseGesture<[], React.MouseEvent> => {
         const e = ev.nativeEvent
         getGestureForMouseDown(e).onMouseDown(e)
       },
-      [getGestureForMouseDown]
+      [getGestureForMouseDown],
     ),
   }
 }

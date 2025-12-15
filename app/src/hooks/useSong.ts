@@ -1,4 +1,4 @@
-import type { Track, TrackId } from "@signal-app/core"
+import { Track, TrackId } from "@signal-app/core"
 import { useCallback } from "react"
 import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
 import { useStores } from "./useStores"
@@ -47,37 +47,37 @@ export const useSong = () => {
       (track: Track) => {
         song.addTrack(track)
       },
-      [song]
+      [song],
     ),
     insertTrack: useCallback(
       (track: Track, index: number) => {
         song.insertTrack(track, index)
       },
-      [song]
+      [song],
     ),
     moveTrack: useCallback(
       (from: number, to: number) => {
         song.moveTrack(from, to)
       },
-      [song]
+      [song],
     ),
     removeTrack: useCallback(
       (trackId: TrackId) => {
         song.removeTrack(trackId)
       },
-      [song]
+      [song],
     ),
     getTrack: useCallback(
       (trackId: TrackId) => {
         return song.getTrack(trackId)
       },
-      [song]
+      [song],
     ),
     getChannelForTrack: useCallback(
       (trackId: TrackId) => {
         return song.getTrack(trackId)?.channel
       },
-      [song]
+      [song],
     ),
     updateEndOfSong: useCallback(() => {
       song.updateEndOfSong()

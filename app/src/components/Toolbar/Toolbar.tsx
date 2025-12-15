@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import type { FC } from "react"
+import { FC } from "react"
 
 export const Toolbar: FC<React.PropsWithChildren<unknown>> = styled.div`
   display: flex;

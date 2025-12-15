@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from "react"
+import { FC, useCallback, useState } from "react"
 import {
   useCopySelection,
   useDeleteSelection,

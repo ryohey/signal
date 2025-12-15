@@ -1,6 +1,6 @@
 import {
   ArrangeNotesClipboardDataSchema,
-  type BatchUpdateOperation,
+  BatchUpdateOperation,
 } from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeView } from "../hooks/useArrangeView"
@@ -43,7 +43,7 @@ export const useArrangePasteSelection = () => {
       pushHistory()
       commands.arrange.pasteClipboardDataAt(data, position, selectedTrackIndex)
     },
-    [commands, position, pushHistory, selectedTrackIndex]
+    [commands, position, pushHistory, selectedTrackIndex],
   )
 }
 
@@ -85,7 +85,7 @@ export const useArrangeTransposeSelection = () => {
       pushHistory()
       commands.arrange.transposeSelection(selection, deltaPitch)
     },
-    [commands, pushHistory, selection]
+    [commands, pushHistory, selection],
   )
 }
 
@@ -117,6 +117,6 @@ export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
       pushHistory()
       commands.arrange.batchUpdateNotesVelocity(selection, operation)
     },
-    [commands, pushHistory, selection]
+    [commands, pushHistory, selection],
   )
 }

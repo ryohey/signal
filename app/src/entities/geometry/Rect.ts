@@ -1,4 +1,4 @@
-import type { Point } from "./Point"
+import { Point } from "./Point"
 
 export interface Rect extends Point {
   readonly width: number

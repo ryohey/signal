@@ -1,12 +1,12 @@
 import range from "lodash/range.js"
 import throttle from "lodash/throttle.js"
-import { type AnyEvent, MIDIControlEvents } from "midifile-ts"
+import { AnyEvent, MIDIControlEvents } from "midifile-ts"
 import { computed, makeObservable, observable } from "mobx"
 import { EventScheduler } from "./EventScheduler.js"
 import { controllerMidiEvent } from "./MidiEventFactory.js"
-import type { PlayerEvent } from "./PlayerEvent.js"
-import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
-import type { DistributiveOmit } from "./types.js"
+import { PlayerEvent } from "./PlayerEvent.js"
+import { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import { DistributiveOmit } from "./types.js"
 
 export interface LoopSetting {
   begin: number
@@ -38,7 +38,7 @@ export class Player {
 
   constructor(
     private readonly output: SynthOutput,
-    private readonly eventSource: IEventSource
+    private readonly eventSource: IEventSource,
   ) {
     makeObservable<Player, "_currentTick" | "_isPlaying">(this, {
       _currentTick: observable,
@@ -59,7 +59,7 @@ export class Player {
       () => this.allNotesOffEvents(),
       this._currentTick,
       this.eventSource.timebase,
-      TIMER_INTERVAL + LOOK_AHEAD_TIME
+      TIMER_INTERVAL + LOOK_AHEAD_TIME,
     )
     this._isPlaying = true
     this.output.activate()
@@ -101,7 +101,7 @@ export class Player {
 
   allSoundsOffChannel = (ch: number) => {
     this.sendEvent(
-      controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0)
+      controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
     )
   }
 
@@ -129,7 +129,7 @@ export class Player {
   private resetControllers() {
     for (const ch of range(0, this.numberOfChannels)) {
       this.sendEvent(
-        controllerMidiEvent(0, ch, MIDIControlEvents.RESET_CONTROLLERS, 0x7f)
+        controllerMidiEvent(0, ch, MIDIControlEvents.RESET_CONTROLLERS, 0x7f),
       )
     }
   }
@@ -176,7 +176,7 @@ export class Player {
     event: SendableEvent,
     delayTime: number = 0,
     timestampNow: number = performance.now(),
-    trackId?: number
+    trackId?: number,
   ) => {
     this.output.sendEvent(event, delayTime, timestampNow, trackId)
   }
@@ -188,7 +188,7 @@ export class Player {
   }, 50)
 
   private applyPlayerEvent(
-    e: DistributiveOmit<AnyEvent, "deltaTime" | "channel">
+    e: DistributiveOmit<AnyEvent, "deltaTime" | "channel">,
   ) {
     if (e.type !== "channel" && "subtype" in e) {
       switch (e.subtype) {
@@ -208,7 +208,8 @@ export class Player {
 
     const timestamp = performance.now()
 
-    this.scheduler.loop = this.loop?.enabled ? this.loop : null
+    this.scheduler.loop =
+      this.loop !== null && this.loop.enabled ? this.loop : null
     const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
 
     events.forEach(({ event: e, timestamp: time }) => {

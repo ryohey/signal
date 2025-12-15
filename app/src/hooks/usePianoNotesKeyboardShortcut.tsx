@@ -104,7 +104,7 @@ export const usePianoNotesKeyboardShortcut = () => {
       copySelection,
       pasteSelection,
       cutSelection,
-    ]
+    ],
   )
 
   return useKeyboardShortcut({

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import React, { type FC } from "react"
+import React, { FC } from "react"
 
 const Parent = styled.div`
   text-align: right;
@@ -58,5 +58,5 @@ export const GraphAxis: FC<GraphAxisProps> = React.memo(
         </Values>
       </Parent>
     )
-  }
+  },
 )

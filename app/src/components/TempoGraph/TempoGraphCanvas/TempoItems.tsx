@@ -1,6 +1,6 @@
 import { HitArea } from "@ryohey/webgl-react"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "@signal-app/core"
-import { type FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { useChangeTempo } from "../../../actions"
 import { Rect } from "../../../entities/geometry/Rect"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
@@ -8,7 +8,7 @@ import { useTempoItems } from "../../../hooks/useTempoItems"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { LineGraphItems } from "../../ControlPane/LineGraph/LineGraphItems"
 import { useDragSelectionGesture } from "../MouseHandler/useDragSelectionGesture"
-import type { TempoGraphItem } from "../TempoGraphItem"
+import { TempoGraphItem } from "../TempoGraphItem"
 
 const CIRCLE_RADIUS = 4
 
@@ -32,7 +32,7 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
         id: p.id,
         original: p,
       })),
-    [items]
+    [items],
   )
 
   const handleMouseDownItem = useCallback(
@@ -43,7 +43,7 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
       e.stopPropagation()
       dragSelectionGesture.onMouseDown(e, itemId)
     },
-    [mouseMode, dragSelectionGesture]
+    [mouseMode, dragSelectionGesture],
   )
 
   const handleWheelItem = useCallback(
@@ -53,7 +53,7 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
       const bpm = uSecPerBeatToBPM(event.microsecondsPerBeat)
       changeTempo(event.id, Math.floor(bpmToUSecPerBeat(bpm + movement)))
     },
-    [items, changeTempo]
+    [items, changeTempo],
   )
 
   return (
@@ -92,7 +92,7 @@ const TempoItemWheelArea: FC<{
     (e: WheelEvent) => {
       onWheel(e, item)
     },
-    [onWheel, item]
+    [onWheel, item],
   )
   const hitBounds = useMemo(
     () => ({
@@ -101,7 +101,7 @@ const TempoItemWheelArea: FC<{
       width: bounds.width,
       height: Number.MAX_SAFE_INTEGER, // full height
     }),
-    [bounds.x, bounds.width]
+    [bounds.x, bounds.width],
   )
   return <HitArea bounds={hitBounds} zIndex={zIndex} onWheel={handleWheel} />
 }

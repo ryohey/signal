@@ -1,5 +1,5 @@
 import { useProgress } from "dialog-hooks"
-import { type FC, useCallback, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { useSetSong } from "../../actions"
 import { useLoadSongFromExternalMidiFile } from "../../actions/cloudSong"
 import { songFromArrayBuffer } from "../../actions/file"
@@ -22,8 +22,8 @@ export const OnInit: FC = () => {
   const localized = useLocalization()
   const { shouldShowAutoSaveDialog } = useAutoSave()
 
-  const init = useCallback(async () => {
-    const closeProgress = showProgress(localized.initializing)
+  const init = async () => {
+    const closeProgress = showProgress(localized["initializing"])
     try {
       await rootStore.init()
     } catch (e) {
@@ -32,9 +32,9 @@ export const OnInit: FC = () => {
     } finally {
       closeProgress()
     }
-  }, [localized, rootStore, showProgress])
+  }
 
-  const loadExternalMidiIfNeeded = useCallback(async () => {
+  const loadExternalMidiIfNeeded = async () => {
     const params = new URLSearchParams(window.location.search)
     const openParam = params.get("open")
 
@@ -50,9 +50,9 @@ export const OnInit: FC = () => {
         closeProgress()
       }
     }
-  }, [loadSongFromExternalMidiFile, localized, setSong, showProgress])
+  }
 
-  const loadArgumentFileIfNeeded = useCallback(async () => {
+  const loadArgumentFileIfNeeded = async () => {
     if (!isRunningInElectron()) {
       return
     }
@@ -70,9 +70,9 @@ export const OnInit: FC = () => {
     } finally {
       closeProgress()
     }
-  }, [localized, setSong, showProgress])
+  }
 
-  const checkAutoSave = useCallback(async () => {
+  const checkAutoSave = async () => {
     // Skip auto save restore if external file loading is present
     const params = new URLSearchParams(window.location.search)
     const openParam = params.get("open")
@@ -96,9 +96,8 @@ export const OnInit: FC = () => {
     if (shouldShowAutoSaveDialog()) {
       setIsAutoSaveDialogOpen(true)
     }
-  }, [shouldShowAutoSaveDialog])
+  }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: just run once on mount
   useEffect(() => {
     ;(async () => {
       await init()
@@ -106,6 +105,7 @@ export const OnInit: FC = () => {
       await loadArgumentFileIfNeeded()
       await checkAutoSave()
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
