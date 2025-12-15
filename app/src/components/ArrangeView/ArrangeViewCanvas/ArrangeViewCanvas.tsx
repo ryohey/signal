@@ -69,6 +69,7 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
     <GLCanvas
       width={width}
       height={height}
+      cursor="pointer"
       onMouseDown={onMouseDown}
       onContextMenu={useCallback((e: any) => e.preventDefault(), [])}
       style={{ backgroundColor: theme.editorBackgroundColor }}

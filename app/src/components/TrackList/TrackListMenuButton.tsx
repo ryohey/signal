@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import ArrowLeft from "mdi-react/MenuLeftIcon"
 import { FC, useCallback, useRef } from "react"
 import { useTrackList } from "../../hooks/useTrackList"
+import { Tooltip } from "../ui/Tooltip"
 
 const NavBackButton = styled.button`
   -webkit-appearance: none;
@@ -37,7 +38,7 @@ export const TrackListMenuButton: FC = () => {
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
-    <>
+    <Tooltip title={isOpen ? "Hide track list" : "Show track list"}>
       <NavBackButton
         ref={ref}
         tabIndex={-1}
@@ -48,6 +49,6 @@ export const TrackListMenuButton: FC = () => {
       >
         <ArrowIcon isOpen={isOpen} />
       </NavBackButton>
-    </>
+    </Tooltip>
   )
 }

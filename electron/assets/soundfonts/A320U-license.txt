@@ -1,2 +1,0 @@
-Copyright 2005 by Milton Paredes
-Released under GNU GPL v2, see /usr/share/soundfonts/COPYING

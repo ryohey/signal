@@ -118,25 +118,37 @@ export const TransportPanel: FC = () => {
       </Tooltip>
 
       {isLoopEnabled && (
+        <Tooltip title="Toggle loop playback" side="top">
         <LoopButton onMouseDown={toggleEnableLoop} data-active={isLoopActive}>
           <Loop />
         </LoopButton>
+        </Tooltip>
       )}
 
       <ToolbarSeparator />
 
+      <Tooltip title="Toggle click track" side="top">
       <MetronomeButton
         onMouseDown={toggleMetronome}
         data-active={isMetronomeEnabled}
       >
         <MetronomeIcon />
       </MetronomeButton>
+      </Tooltip>
 
+      <Tooltip title="Beats per minute" side="top">
+        <div>
       <TempoForm />
+        </div>
+      </Tooltip>
 
       <ToolbarSeparator />
 
+      <Tooltip title="Current position (bar:beat:tick)" side="top">
+        <div>
       <Timestamp />
+        </div>
+      </Tooltip>
 
       {isSynthLoading && (
         <Right>

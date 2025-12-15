@@ -64,6 +64,7 @@ const TrackHeader = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   background: var(--color-background);
+  cursor: pointer;
 
   &[data-selected="true"] {
     background-color: var(--color-background-secondary);

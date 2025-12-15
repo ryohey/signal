@@ -17,6 +17,7 @@ import { useRouter } from "../../hooks/useRouter"
 import { useTrack } from "../../hooks/useTrack"
 import { useTrackMute } from "../../hooks/useTrackMute"
 import { categoryEmojis, getCategoryIndex } from "../../midi/GM"
+import { Tooltip } from "../ui/Tooltip"
 import { InstrumentName } from "./InstrumentName"
 import { TrackDialog } from "./TrackDialog"
 import { TrackListContextMenu } from "./TrackListContextMenu"
@@ -28,46 +29,51 @@ export type TrackListItemProps = {
 
 const Container = styled.div`
   background-color: transparent;
-  border: 1px solid;
-  border-color: transparent;
+  border: 1px solid transparent;
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.5rem;
-  border-radius: 0.5rem;
-  margin: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  margin: 0.375rem 0.5rem;
   outline: none;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: var(--color-highlight);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(2px);
   }
 
   &[data-selected="true"] {
-    background-color: var(--color-highlight);
-    border-color: var(--color-divider);
+    background: rgba(0, 212, 170, 0.08);
+    border-color: rgba(0, 212, 170, 0.2);
   }
 `
 
 const Label = styled.div`
   display: flex;
-  padding-bottom: 0.3em;
+  padding-bottom: 0.25em;
   align-items: baseline;
+  gap: 0.5rem;
 `
 
 const Instrument = styled.div`
-  color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  font-size: 0.6875rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-weight: 400;
 `
 
 const Name = styled.div`
   font-weight: 600;
   color: var(--color-text-secondary);
-  padding-right: 0.5em;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: color 150ms;
 
   &[data-selected="true"] {
     color: var(--color-text);
@@ -77,22 +83,28 @@ const Name = styled.div`
 const Controls = styled.div`
   display: flex;
   align-items: center;
+  gap: 0.125rem;
 `
 
 const ChannelName = styled.div`
   flex-shrink: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
   font-size: 0.625rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   border: 1px solid var(--color-divider);
-  padding: 0 0.25rem;
+  padding: 0 0.375rem;
   cursor: pointer;
-  height: 1.25rem;
+  height: 1.375rem;
   margin-left: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 150ms;
 
   &:hover {
-    background: var(--color-highlight);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--color-text-secondary);
   }
 `
 
@@ -100,23 +112,30 @@ const Icon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 1.3rem;
-  margin-right: 0.5rem;
+  font-size: 1.125rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+  margin-right: 0.625rem;
   flex-shrink: 0;
-  background: var(--color-background-secondary);
+  background: rgba(255, 255, 255, 0.04);
   border: 2px solid;
   box-sizing: border-box;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: scale(1.05);
+  }
 
   &[data-selected="true"] {
-    background: var(--color-background);
+    background: rgba(255, 255, 255, 0.08);
   }
 `
 
 const IconInner = styled.div`
-  opacity: 0.5;
+  opacity: 0.6;
+  transition: opacity 150ms;
 
   &[data-selected="true"] {
     opacity: 1;
@@ -124,28 +143,34 @@ const IconInner = styled.div`
 `
 
 const ControlButton = styled.div`
-  width: 1.9rem;
-  height: 1.9rem;
-  margin-right: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  color: var(--color-text-secondary);
+  border-radius: 0.375rem;
+  color: var(--color-text-tertiary);
   cursor: pointer;
   outline: none;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: var(--color-highlight);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text-secondary);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   svg {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1rem;
+    height: 1rem;
   }
 
   &[data-active="true"] {
-    color: var(--color-text);
+    color: var(--color-theme);
   }
 `
 
@@ -236,6 +261,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
         onContextMenu={onContextMenu}
         tabIndex={-1}
       >
+        <Tooltip title="Double-click to change instrument">
         <Icon
           data-selected={selected}
           style={{
@@ -245,6 +271,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
         >
           <IconInner data-selected={selected}>{emoji}</IconInner>
         </Icon>
+        </Tooltip>
         <div>
           <Label>
             <Name data-selected={selected}>
@@ -258,6 +285,7 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
             </Instrument>
           </Label>
           <Controls>
+            <Tooltip title={isSolo ? "Disable solo" : "Solo this track"}>
             <ControlButton
               data-active={isSolo}
               onMouseDown={onClickSolo}
@@ -265,6 +293,8 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
             >
               <Headset />
             </ControlButton>
+            </Tooltip>
+            <Tooltip title={isMuted ? "Unmute track" : "Mute track"}>
             <ControlButton
               data-active={isMuted}
               onMouseDown={onClickMute}
@@ -272,6 +302,8 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
             >
               {isMuted ? <VolumeOff /> : <VolumeUp />}
             </ControlButton>
+            </Tooltip>
+            <Tooltip title="Show notes from other tracks">
             <ControlButton
               data-active={ghostTrack}
               onMouseDown={onClickGhostTrack}
@@ -279,10 +311,13 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
             >
               <Layers />
             </ControlButton>
+            </Tooltip>
             {channel !== undefined && (
+              <Tooltip title="Change MIDI channel">
               <ChannelName onClick={onClickChannel}>
                 CH {channel + 1}
               </ChannelName>
+              </Tooltip>
             )}
           </Controls>
         </div>

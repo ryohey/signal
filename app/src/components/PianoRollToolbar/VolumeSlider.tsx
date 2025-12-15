@@ -3,6 +3,7 @@ import VolumeUp from "mdi-react/VolumeHighIcon"
 import { FC } from "react"
 import { useVolumeSlider } from "../../hooks/useVolumeSlider"
 import { Slider } from "../ui/Slider"
+import { Tooltip } from "../ui/Tooltip"
 
 const Container = styled.div`
   display: flex;
@@ -25,6 +26,7 @@ export const VolumeSlider: FC = () => {
   const { value, setValue, onPointerDown, onPointerUp } = useVolumeSlider()
 
   return (
+    <Tooltip title="Track volume">
     <Container>
       <VolumeIcon />
       <Slider
@@ -36,5 +38,6 @@ export const VolumeSlider: FC = () => {
         minStepsBetweenThumbs={1}
       />
     </Container>
+    </Tooltip>
   )
 }

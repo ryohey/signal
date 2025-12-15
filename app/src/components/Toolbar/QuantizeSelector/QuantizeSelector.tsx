@@ -87,7 +87,7 @@ const QuantizeSelectorContent = React.memo(
 
     return (
       <Container>
-        <Tooltip title={<Localized name="snap-to-grid" />}>
+        <Tooltip title="Snap notes to grid">
           <Switch selected={enabled} onMouseDown={onClickSwitch}>
             <Note />
           </Switch>

@@ -1,5 +1,0 @@
-{
-  "watch": ["dist"],
-  "exec": "electron .",
-  "ext": "js,json,html,css"
-}
