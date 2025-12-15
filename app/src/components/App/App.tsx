@@ -12,6 +12,7 @@ import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { StoreContext } from "../../hooks/useStores"
 import { TempoEditorProvider } from "../../hooks/useTempoEditor"
+import { AudioImportProvider } from "../../providers/AudioImportProvider"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
 import { ProgressDialog } from "../Dialog/ProgressDialog"
@@ -35,17 +36,19 @@ export function App() {
                 <DialogProvider component={ActionDialog}>
                   <ProgressProvider component={ProgressDialog}>
                     <LocalizationProvider>
-                      <PianoRollProvider>
-                        <ArrangeViewProvider>
-                          <TempoEditorProvider>
-                            <GlobalCSS />
-                            {isRunningInElectron() && (
-                              <ElectronCallbackHandler />
-                            )}
-                            <RootView />
-                          </TempoEditorProvider>
-                        </ArrangeViewProvider>
-                      </PianoRollProvider>
+                      <AudioImportProvider>
+                        <PianoRollProvider>
+                          <ArrangeViewProvider>
+                            <TempoEditorProvider>
+                              <GlobalCSS />
+                              {isRunningInElectron() && (
+                                <ElectronCallbackHandler />
+                              )}
+                              <RootView />
+                            </TempoEditorProvider>
+                          </ArrangeViewProvider>
+                        </PianoRollProvider>
+                      </AudioImportProvider>
                     </LocalizationProvider>
                   </ProgressProvider>
                 </DialogProvider>
