@@ -34,18 +34,42 @@ const defaultSoundFonts: (SoundFontItem & Metadata & { id: number })[] =
   isRunningInElectron()
     ? [
         {
-          id: -999, // Use negative number to avoid conflict with user saved soundfonts
+          id: -999,
           type: "file",
           path: "./assets/soundfonts/A320U.sf2",
-          name: "A320U.sf2 (Signal Factory Sound)",
+          name: "A320U.sf2",
+        },
+        {
+          id: -998,
+          type: "file",
+          path: "./assets/soundfonts/FluidR3_GM.sf2",
+          name: "FluidR3_GM.sf2",
+        },
+        {
+          id: -997,
+          type: "file",
+          path: "./assets/soundfonts/Live HQ Natural SoundFont GM.sf2",
+          name: "Live HQ Natural SoundFont GM.sf2",
         },
       ]
     : [
         {
-          id: -999, // Use negative number to avoid conflict with user saved soundfonts
+          id: -999,
           type: "remote",
-          name: "A320U.sf2 (Signal Factory Sound)",
-          url: "https://cdn.jsdelivr.net/gh/ryohey/signal@4569a31/public/A320U.sf2",
+          name: "A320U.sf2",
+          url: `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/soundfonts/A320U.sf2`,
+        },
+        {
+          id: -998,
+          type: "remote",
+          name: "FluidR3_GM.sf2",
+          url: `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/soundfonts/FluidR3_GM.sf2`,
+        },
+        {
+          id: -997,
+          type: "remote",
+          name: "Live HQ Natural SoundFont GM.sf2",
+          url: `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/soundfonts/Live HQ Natural SoundFont GM.sf2`,
         },
       ]
 

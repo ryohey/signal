@@ -1,9 +1,11 @@
 import logging
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
-from app.routers import generate
+from app.routers import generate, render
 
 # Configure logging
 logging.basicConfig(
@@ -36,6 +38,12 @@ app.add_middleware(
 )
 
 app.include_router(generate.router, prefix="/api", tags=["generation"])
+app.include_router(render.router, prefix="/api", tags=["render"])
+
+# Serve soundfonts statically so frontend can load them
+soundfonts_dir = Path(__file__).parent.parent / "soundfonts"
+if soundfonts_dir.exists():
+    app.mount("/soundfonts", StaticFiles(directory=str(soundfonts_dir)), name="soundfonts")
 
 
 @app.exception_handler(Exception)

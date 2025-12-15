@@ -1,18 +1,21 @@
 import styled from "@emotion/styled"
 import CodeTags from "mdi-react/CodeTagsIcon"
 import Help from "mdi-react/HelpCircleIcon"
+import Headphones from "mdi-react/HeadphonesIcon"
 import Robot from "mdi-react/RobotIcon"
 import Settings from "mdi-react/SettingsIcon"
 import { CSSProperties, FC, MouseEvent, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useAIChat } from "../../hooks/useAIChat"
 import { useEditorMode } from "../../hooks/useEditorMode"
+import { useHQRender } from "../../hooks/useHQRender"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
 import ArrangeIcon from "../../images/icons/arrange.svg"
 import PianoIcon from "../../images/icons/piano.svg"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
+import { CircularProgress } from "../ui/CircularProgress"
 import { Tooltip } from "../ui/Tooltip"
 import { EditMenuButton } from "./EditMenuButton"
 import { FileMenuButton } from "./FileMenuButton"
@@ -158,6 +161,7 @@ export const Navigation: FC = () => {
   const { path, setPath } = useRouter()
   const { isOpen: isAIChatOpen, toggle: toggleAIChat } = useAIChat()
   const { toggle: toggleEditorMode, isAdvanced } = useEditorMode()
+  const { render: renderHQ, isLoading: isRenderLoading } = useHQRender()
 
   const onClickPianoRollTab = useCallback(
     (e: MouseEvent) => {
@@ -197,6 +201,16 @@ export const Navigation: FC = () => {
       toggleAIChat()
     },
     [toggleAIChat],
+  )
+
+  const onClickRenderHQ = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault()
+      if (!isRenderLoading) {
+        renderHQ()
+      }
+    },
+    [renderHQ, isRenderLoading],
   )
 
   return (
@@ -258,6 +272,17 @@ export const Navigation: FC = () => {
         <Tab isActive={isAIChatOpen} onClick={onClickAI}>
           <Robot style={IconStyle} />
           <TabTitle>AI</TabTitle>
+        </Tab>
+      </Tooltip>
+
+      <Tooltip title="Render high-quality audio with FluidSynth" delayDuration={500}>
+        <Tab onClick={onClickRenderHQ} style={{ opacity: isRenderLoading ? 0.7 : 1 }}>
+          {isRenderLoading ? (
+            <CircularProgress size="1.3rem" />
+          ) : (
+            <Headphones style={IconStyle} />
+          )}
+          <TabTitle>Render</TabTitle>
         </Tab>
       </Tooltip>
 
