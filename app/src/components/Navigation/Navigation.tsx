@@ -236,20 +236,20 @@ export const Navigation: FC = () => {
 
       <FlexibleSpacer />
 
-      <Tooltip title="Toggle between basic and advanced editing modes" delayDuration={500}>
+      <Tooltip title="Toggle between simple and advanced editing modes" delayDuration={500}>
         <ModeToggleContainer>
           <ModeToggleOption
             isActive={!isAdvanced}
             onClick={() => isAdvanced && toggleEditorMode()}
           >
-            Basic
+            Simple
           </ModeToggleOption>
           <ModeToggleOption
             isActive={isAdvanced}
             onClick={() => !isAdvanced && toggleEditorMode()}
           >
             <CodeTags />
-            Pro
+            Advanced
           </ModeToggleOption>
         </ModeToggleContainer>
       </Tooltip>

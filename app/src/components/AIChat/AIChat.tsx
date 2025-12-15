@@ -151,7 +151,7 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
       ? theme.themeColor
       : role === "error"
         ? "rgba(255, 69, 58, 0.15)"
-        : "rgba(255, 255, 255, 0.04)"};
+        : theme.secondaryBackgroundColor};
   color: ${({ role, theme }) =>
     role === "user"
       ? theme.onSurfaceColor
@@ -171,12 +171,12 @@ const Message = styled.div<{ role: "user" | "assistant" | "error" }>`
   word-break: break-word;
   cursor: text;
   box-sizing: border-box;
-  border: 1px solid ${({ role }) =>
+  border: 1px solid ${({ role, theme }) =>
     role === "user"
       ? "transparent"
       : role === "error"
         ? "rgba(255, 69, 58, 0.3)"
-        : "rgba(255, 255, 255, 0.06)"};
+        : theme.dividerColor};
   animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
   
   @keyframes slideUp {
