@@ -29,4 +29,3 @@ export const InitialView: FC = () => {
     </Container>
   )
 }
-
