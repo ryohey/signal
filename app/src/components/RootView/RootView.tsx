@@ -14,6 +14,7 @@ import { ControlSettingDialog } from "../ControlSettingDialog/ControlSettingDial
 import { ExportProgressDialog } from "../ExportDialog/ExportProgressDialog"
 import { Head } from "../Head/Head"
 import { HelpDialog } from "../Help/HelpDialog"
+import { HQAudioPlayer } from "../HQAudioPlayer/HQAudioPlayer"
 import { InitialView } from "../InitialView/InitialView"
 import { Navigation } from "../Navigation/Navigation"
 import { OnBeforeUnload } from "../OnBeforeUnload/OnBeforeUnload"
@@ -202,6 +203,7 @@ export const RootView: FC = () => {
       <Head />
       <SettingDialog />
       <ControlSettingDialog />
+      <HQAudioPlayer />
       <OnInit />
       <OnBeforeUnload />
     </>

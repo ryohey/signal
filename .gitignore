@@ -62,3 +62,6 @@ ENV/
 .env.venv
 
 package-lock.json
+
+
+backend/soundfonts/*.sf2
