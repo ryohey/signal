@@ -2,8 +2,13 @@ import { WorkletSynthesizer } from "spessasynth_lib"
 import { SoundFont } from "./SoundFont.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
+// Default send levels when effects are enabled (0-127)
+const DEFAULT_REVERB_LEVEL = 40
+const DEFAULT_CHORUS_LEVEL = 30
+
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null
+  private _effectsEnabled: boolean = false
 
   private _loadedSoundFont: SoundFont | null = null
   get loadedSoundFont(): SoundFont | null {
@@ -23,6 +28,11 @@ export class SoundFontSynth implements SynthOutput {
     )
   }
 
+  /** Whether reverb/chorus effects are enabled */
+  get effectsEnabled(): boolean {
+    return this._effectsEnabled
+  }
+
   constructor(private readonly context: AudioContext) {}
 
   async setup() {
@@ -35,11 +45,10 @@ export class SoundFontSynth implements SynthOutput {
       this.synth.destroy()
     }
 
-    // Create new WorkletSynthesizer with reverb/chorus disabled for cleaner sound
-    // These can be re-enabled later if needed by changing the config
+    // Create new WorkletSynthesizer with reverb/chorus enabled
     this.synth = new WorkletSynthesizer(this.context, {
-      initializeReverbProcessor: false,
-      initializeChorusProcessor: false,
+      initializeReverbProcessor: true,
+      initializeChorusProcessor: true,
     })
 
     // Connect to destination
@@ -49,6 +58,14 @@ export class SoundFontSynth implements SynthOutput {
 
     // Load the soundfont data
     await this.synth.soundBankManager.addSoundBank(soundFont.data, "main")
+
+    // Set default reverb/chorus send levels to 0 for clean sound
+    // Songs can override via CC91 (reverb) and CC93 (chorus)
+    for (let ch = 0; ch < 16; ch++) {
+      this.synth.controllerChange(ch, 91 as any, 0) // CC91 = Reverb send
+      this.synth.controllerChange(ch, 93 as any, 0) // CC93 = Chorus send
+    }
+    this._effectsEnabled = false
   }
 
   sendEvent(event: SendableEvent, delayTime: number = 0) {
@@ -80,10 +97,10 @@ export class SoundFontSynth implements SynthOutput {
         this.synth.noteOff(channel, event.noteNumber)
         break
       case "programChange":
-        this.synth.programChange(channel, event.programNumber)
+        this.synth.programChange(channel, event.value)
         break
       case "controller":
-        this.synth.controllerChange(channel, event.controllerType, event.value)
+        this.synth.controllerChange(channel, event.controllerType as any, event.value)
         break
       case "pitchBend":
         this.synth.pitchWheel(channel, event.value)
@@ -104,5 +121,27 @@ export class SoundFontSynth implements SynthOutput {
 
   activate() {
     this.context.resume()
+  }
+
+  /** Enable or disable reverb/chorus effects */
+  setEffectsEnabled(enabled: boolean) {
+    if (this.synth === null) {
+      console.warn("SoundFontSynth: Cannot set effects - synth not initialized")
+      return
+    }
+
+    this._effectsEnabled = enabled
+    const reverbLevel = enabled ? DEFAULT_REVERB_LEVEL : 0
+    const chorusLevel = enabled ? DEFAULT_CHORUS_LEVEL : 0
+
+    for (let ch = 0; ch < 16; ch++) {
+      this.synth.controllerChange(ch, 91 as any, reverbLevel) // CC91 = Reverb send
+      this.synth.controllerChange(ch, 93 as any, chorusLevel) // CC93 = Chorus send
+    }
+  }
+
+  /** Toggle reverb/chorus effects on/off */
+  toggleEffects() {
+    this.setEffectsEnabled(!this._effectsEnabled)
   }
 }

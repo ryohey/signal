@@ -25,20 +25,6 @@ import { LocalizationProvider } from "./LocalizationProvider"
 
 const rootStore = new RootStore()
 
-// Expose reverb controls for testing (type in browser console)
-// Usage: window.setReverb(0.3) for 30% wet, window.setReverb(0) for dry
-declare global {
-  interface Window {
-    setReverb: (mix: number) => void
-    getReverb: () => number
-  }
-}
-window.setReverb = (mix: number) => {
-  rootStore.synth.setReverbMix(mix)
-  console.log(`Reverb set to ${Math.round(mix * 100)}% wet`)
-}
-window.getReverb = () => rootStore.synth.reverbMix
-
 export function App() {
   return (
     <React.StrictMode>

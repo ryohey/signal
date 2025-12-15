@@ -1,12 +1,14 @@
 import styled from "@emotion/styled"
+import BlurIcon from "mdi-react/BlurIcon"
 import FastForward from "mdi-react/FastForwardIcon"
 import FastRewind from "mdi-react/FastRewindIcon"
 import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import Loop from "mdi-react/LoopIcon"
 import MetronomeIcon from "mdi-react/MetronomeIcon"
 import Stop from "mdi-react/StopIcon"
-import { FC } from "react"
+import { FC, useState } from "react"
 import { useSoundFont } from "../../hooks/useSoundFont"
+import { useStores } from "../../hooks/useStores"
 import { useTransportPanel } from "../../hooks/useTransportPanel"
 import { Localized } from "../../localize/useLocalization"
 import { CircularProgress } from "../ui/CircularProgress"
@@ -39,6 +41,14 @@ const LoopButton = styled(CircleButton)`
 `
 
 const MetronomeButton = styled(CircleButton)`
+  color: var(--color-text-secondary);
+
+  &[data-active="true"] {
+    color: var(--color-theme);
+  }
+`
+
+const EffectsButton = styled(CircleButton)`
   color: var(--color-text-secondary);
 
   &[data-active="true"] {
@@ -86,6 +96,13 @@ export const TransportPanel: FC = () => {
     canRecording,
   } = useTransportPanel()
   const { isLoading: isSynthLoading } = useSoundFont()
+  const { synth } = useStores()
+  const [effectsEnabled, setEffectsEnabled] = useState(false)
+
+  const toggleEffects = () => {
+    synth.toggleEffects()
+    setEffectsEnabled(synth.effectsEnabled)
+  }
 
   return (
     <Toolbar>
@@ -131,6 +148,12 @@ export const TransportPanel: FC = () => {
       >
         <MetronomeIcon />
       </MetronomeButton>
+
+      <Tooltip title="Reverb/Chorus Effects" side="top">
+        <EffectsButton onMouseDown={toggleEffects} data-active={effectsEnabled}>
+          <BlurIcon />
+        </EffectsButton>
+      </Tooltip>
 
       <TempoForm />
 
