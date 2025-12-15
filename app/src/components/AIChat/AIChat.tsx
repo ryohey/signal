@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
+import CloseIcon from "mdi-react/CloseIcon"
 import { useLoadAISong } from "../../actions/aiGeneration"
 import { useAIChat } from "../../hooks/useAIChat"
 import { useRouter } from "../../hooks/useRouter"
@@ -123,6 +124,43 @@ const StatusDot = styled.span<{
       : status === "disconnected"
         ? "#ff453a"
         : "#ffd60a"};
+`
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`
+
+const CloseButton = styled.button`
+  padding: 0.375rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: ${({ theme }) => theme.secondaryTextColor};
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: ${({ theme }) => theme.textColor};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `
 
 const MessageList = styled.div`
@@ -1096,17 +1134,26 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
           </NewChatButton>
           </Tooltip>
         )}
-        <Tooltip
-          title={
-            backendStatus === "connected"
-              ? "Backend connected"
-              : backendStatus === "disconnected"
-                ? "Backend not available"
-                : "Checking connection..."
-          }
-        >
-          <StatusDot status={backendStatus} />
-        </Tooltip>
+        <HeaderRight>
+          <Tooltip
+            title={
+              backendStatus === "connected"
+                ? "Backend connected"
+                : backendStatus === "disconnected"
+                  ? "Backend not available"
+                  : "Checking connection..."
+            }
+          >
+            <StatusDot status={backendStatus} />
+          </Tooltip>
+          {!standalone && (
+            <Tooltip title="Collapse chat">
+              <CloseButton onClick={() => setAIChatOpen(false)} disabled={isLoading}>
+                <CloseIcon size={16} />
+              </CloseButton>
+            </Tooltip>
+          )}
+        </HeaderRight>
       </Header>
       {backendStatus === "disconnected" && (
         <WarningBanner>
