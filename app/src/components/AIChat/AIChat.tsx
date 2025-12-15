@@ -1,3 +1,4 @@
+import { keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { useLoadAISong } from "../../actions/aiGeneration"
@@ -464,6 +465,113 @@ const NotesDisplay: FC<{ notes: DetectedNote[] }> = ({ notes }) => {
         </div>
       </div>
     </NotesContainer>
+  )
+}
+
+// Music-themed loading indicator
+const MUSIC_LOADING_WORDS = [
+  "Harmonizing",
+  "Composing",
+  "Orchestrating",
+  "Arranging",
+  "Improvising",
+  "Transposing",
+  "Syncopating",
+  "Modulating",
+  "Arpeggiating",
+  "Crescendoing",
+  "Cadencing",
+  "Voicing",
+  "Layering",
+  "Grooving",
+  "Jamming",
+  "Riffing",
+  "Mixing",
+  "Sequencing",
+  "Quantizing",
+  "Looping",
+]
+
+const pulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+`
+
+const noteFloat = keyframes`
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(5deg);
+  }
+`
+
+const MusicLoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.secondaryBackgroundColor} 0%,
+    rgba(0, 212, 170, 0.08) 100%
+  );
+  border-radius: 0.75rem;
+  max-width: 85%;
+  border: 1px solid rgba(0, 212, 170, 0.2);
+  animation: ${pulse} 2s ease-in-out infinite;
+`
+
+const MusicIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, ${({ theme }) => theme.themeColor} 0%, #00a878 100%);
+  box-shadow: 0 0 12px rgba(0, 212, 170, 0.4);
+  animation: ${noteFloat} 1.5s ease-in-out infinite;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: white;
+  }
+`
+
+const LoadingText = styled.span`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.textColor};
+  letter-spacing: -0.01em;
+`
+
+const MusicLoadingIndicator: FC = () => {
+  const [wordIndex, setWordIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % MUSIC_LOADING_WORDS.length)
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <MusicLoadingContainer>
+      <MusicIcon>
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        </svg>
+      </MusicIcon>
+      <LoadingText>{MUSIC_LOADING_WORDS[wordIndex]}...</LoadingText>
+    </MusicLoadingContainer>
   )
 }
 
@@ -1121,14 +1229,22 @@ export const AIChat: FC<AIChatProps> = ({ standalone = false }) => {
             BPM&quot;
           </Message>
         )}
-        {messages.map((msg, i) => (
-          <Message key={i} role={msg.role}>
-            {msg.content}
-            {msg.notes && msg.notes.length > 0 && (
-              <NotesDisplay notes={msg.notes} />
-            )}
-          </Message>
-        ))}
+        {messages.map((msg, i) => {
+          // Skip rendering empty assistant messages (placeholder while loading)
+          if (msg.role === "assistant" && !msg.content && !msg.notes?.length) {
+            return null
+          }
+          return (
+            <Message key={i} role={msg.role}>
+              {msg.content}
+              {msg.notes && msg.notes.length > 0 && (
+                <NotesDisplay notes={msg.notes} />
+              )}
+            </Message>
+          )
+        })}
+        {/* Show music loading indicator for hybrid agent mode */}
+        {isLoading && agentType === "hybrid" && <MusicLoadingIndicator />}
         {/* Show progress UI only for composition_agent mode */}
         {isLoading && agentType === "composition_agent" && generationStage && (
           <ProgressContainer>
