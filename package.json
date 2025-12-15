@@ -49,6 +49,7 @@
     "@testing-library/dom": "^10.4.1",
     "firebase": "12.6.0",
     "optics-ts": "^2.4.1",
+    "spessasynth_lib": "^4.0.19",
     "vite": "7.2.7"
   }
 }
