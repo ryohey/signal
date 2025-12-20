@@ -113,5 +113,9 @@
     "vite-plugin-svgr": "^4.5.0",
     "vitest": "^3.0.1",
     "workbox-build": "^7.4.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.53.5",
+    "@esbuild/linux-x64": "0.24.0"
   }
 }
