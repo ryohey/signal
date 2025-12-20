@@ -49,6 +49,8 @@ export default defineConfig(({ mode }) => {
           community: path.resolve(__dirname, "community.html"),
         },
       },
+      minify: false,
+      sourcemap: true,
     },
     publicDir: "public",
     server: {
@@ -63,6 +65,9 @@ export default defineConfig(({ mode }) => {
     envDir: "..",
     define: {
       "process.env": env,
+    },
+    optimizeDeps: {
+      include: ["firebase/app", "firebase/firestore"],
     },
   }
 })
