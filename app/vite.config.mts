@@ -49,6 +49,8 @@ export default defineConfig(({ mode }) => {
           community: path.resolve(__dirname, "community.html"),
         },
       },
+      minify: false,
+      sourcemap: true,
     },
     publicDir: "public",
     server: {
