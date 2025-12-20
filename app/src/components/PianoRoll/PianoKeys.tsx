@@ -10,6 +10,7 @@ import { observeDrag2 } from "../../helpers/observeDrag"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoKeys } from "../../hooks/usePianoKeys"
+import { useSettings } from "../../hooks/useSettings"
 import { Theme } from "../../theme/Theme"
 import DrawCanvas from "../DrawCanvas"
 import { PianoKeysContextMenu } from "./PianoKeysContextMenu"
@@ -101,13 +102,17 @@ function drawLabel(
   label: string,
   font: string,
   color: string,
+  vertical: boolean,
 ) {
-  const x = width - 5
+  const [x,y] = (vertical) ? [height / 2 - 3, width - 8] : [width - 5, height / 2];
+  if (vertical) {
+    ctx.rotate(-Math.PI/2);
+  }
   ctx.textAlign = "right"
   ctx.textBaseline = "middle"
   ctx.font = `12px ${font}`
   ctx.fillStyle = color
-  ctx.fillText(label, x, height / 2)
+  ctx.fillText(label, x, y)
 }
 
 function drawKeys(
@@ -119,9 +124,15 @@ function drawKeys(
   theme: Theme,
   selectedKeys: Set<number>,
   scale: number[],
+  vertical: boolean,
 ) {
   ctx.save()
   ctx.translate(0, 0.5)
+
+  if (vertical) {
+    ctx.rotate(Math.PI/2);
+    ctx.translate(-0.5, -keyHeight * numberOfKeys);
+  }
 
   ctx.fillStyle = theme.pianoKeyWhite
   ctx.fillRect(0, 0, width, keyHeight * numberOfKeys)
@@ -200,6 +211,7 @@ function drawKeys(
       label,
       theme.canvasFont,
       theme.secondaryTextColor,
+      vertical
     )
     ctx.restore()
   }
@@ -261,8 +273,9 @@ const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
   width,
   keyNames,
 }) => {
+  const { verticalPiano } = useSettings()
   const drumKeyNames = Array.from(keyNames.entries())
-  const style = useMemo(() => ({ width: width - 1 }), [width])
+  const style = useMemo(() => (verticalPiano ? { height: width - 1 } : { width: width - 1 }), [width, verticalPiano])
 
   return (
     <DrumKeysContainer style={style}>
@@ -274,6 +287,7 @@ const DrumKeys: FC<{ width: number; keyNames: Map<number, string> }> = ({
 }
 
 const PianoKeysCanvas: FC<{ style: React.CSSProperties }> = ({ style }) => {
+  const { verticalPiano } = useSettings();
   const theme = useTheme()
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const { keySignature, keyHeight, numberOfKeys, selectedKeys } = usePianoKeys()
@@ -291,16 +305,20 @@ const PianoKeysCanvas: FC<{ style: React.CSSProperties }> = ({ style }) => {
         theme,
         selectedKeys,
         scale,
+        verticalPiano,
       )
     },
-    [numberOfKeys, theme, selectedKeys, keySignature, keyHeight, blackKeyWidth],
+    [numberOfKeys, theme, selectedKeys, keySignature, keyHeight, blackKeyWidth, verticalPiano],
   )
+
+  const width = useMemo(() => (verticalPiano ? keyHeight * numberOfKeys : Layout.keyWidth), [verticalPiano, keyHeight, numberOfKeys]);
+  const height = useMemo(() => (verticalPiano ? Layout.keyWidth : keyHeight * numberOfKeys), [verticalPiano, keyHeight, numberOfKeys]);
 
   return (
     <DrawCanvas
       draw={draw}
-      width={Layout.keyWidth}
-      height={keyHeight * numberOfKeys}
+      width={width}
+      height={height}
       style={style}
     />
   )
@@ -311,6 +329,7 @@ export interface PianoKeysProps {
 }
 
 export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
+  const { verticalPiano } = useSettings();
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const { onContextMenu, menuProps } = useContextMenu()
   const {
@@ -332,7 +351,8 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
         ? Layout.drumKeysWidth + blackKeyWidth
         : blackKeyWidth
 
-      function posToNoteNumber(x: number, y: number): number {
+      function posToNoteNumber(xx: number, yy: number): number {
+        const [x,y] = verticalPiano ? [yy,numberOfKeys*keyHeight - xx] : [xx,yy];
         const noteNumberFloat = numberOfKeys - y / keyHeight
         const noteNumber = Math.floor(noteNumberFloat)
         const isBlack = Colors[noteNumber % Colors.length] !== 0
@@ -377,12 +397,16 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
       onMouseMoveKey,
       onMouseUpKey,
       keyNames,
+      verticalPiano
     ],
   )
 
   const style: React.CSSProperties = useMemo(
-    () => ({ width, height: keyHeight * numberOfKeys }),
-    [width, keyHeight, numberOfKeys],
+    () => {
+      const height = keyHeight * numberOfKeys;
+      return { width: (verticalPiano) ? height : width, height: (verticalPiano) ? width : height }
+    },
+    [width, keyHeight, numberOfKeys, verticalPiano],
   )
 
   const canvasStyle: React.CSSProperties = useMemo(
