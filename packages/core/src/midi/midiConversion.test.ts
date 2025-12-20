@@ -55,9 +55,8 @@ describe("SongFile", () => {
     const openFile = (fileName: string): AnyEvent[][] => {
       const song = songFromMidi(
         new DataView(
-          fs.readFileSync(
-            path.join(__dirname, "../../testdata/", fileName),
-          ).buffer,
+          fs.readFileSync(path.join(__dirname, "../../testdata/", fileName))
+            .buffer,
         ),
       )
       return songToMidiEvents(song)

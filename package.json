@@ -10,6 +10,7 @@
     "test": "turbo test",
     "lint": "biome lint .",
     "format": "biome format . --write",
+    "format:check": "biome format .",
     "check": "biome check .",
     "firebase": "npm --prefix functions run build && firebase emulators:start",
     "firebase:deploy": "firebase deploy",

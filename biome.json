@@ -70,7 +70,7 @@
       "semicolons": "asNeeded",
       "quoteStyle": "double",
       "jsxQuoteStyle": "double",
-      "trailingCommas": "es5"
+      "trailingCommas": "all"
     }
   },
   "json": {
