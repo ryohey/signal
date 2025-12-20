@@ -66,5 +66,8 @@ export default defineConfig(({ mode }) => {
     define: {
       "process.env": env,
     },
+    optimizeDeps: {
+      include: ["firebase/app", "firebase/firestore"],
+    },
   }
 })
