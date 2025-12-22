@@ -12,11 +12,15 @@ export function useSettings() {
     get showNoteLabels() {
       return useAtomValue(showNoteLabelsAtom)
     },
+    get verticalPiano() {
+      return useAtomValue(verticalPianoAtom)
+    },
     get themeType() {
       return useAtomValue(themeTypeAtom)
     },
     setLanguage: useSetAtom(languageAtom),
     setShowNoteLabels: useSetAtom(showNoteLabelsAtom),
+    setVerticalPiano: useSetAtom(verticalPianoAtom),
     setThemeType: useSetAtom(themeTypeAtom),
   }
 }
@@ -25,9 +29,11 @@ export function useSettings() {
 const settingStorageAtom = atomWithStorage<{
   language: Language | null
   showNoteLabels: boolean
+  verticalPiano: boolean
 }>("SettingStore", {
   language: null,
   showNoteLabels: true,
+  verticalPiano: true, // TODO(sagudev): change this to false
 })
 const themeStorageAtom = atomWithStorage<{
   themeType: ThemeType
@@ -41,6 +47,9 @@ const languageAtom = focusAtom(settingStorageAtom, (optic) =>
 )
 const showNoteLabelsAtom = focusAtom(settingStorageAtom, (optic) =>
   optic.prop("showNoteLabels"),
+)
+const verticalPianoAtom = focusAtom(settingStorageAtom, (optic) =>
+  optic.prop("verticalPiano"),
 )
 const themeTypeAtom = focusAtom(themeStorageAtom, (optic) =>
   optic.prop("themeType"),

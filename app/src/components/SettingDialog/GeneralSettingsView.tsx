@@ -85,6 +85,24 @@ const ShowNoteLabelCheckbox: FC = () => {
   )
 }
 
+const VerticalPianoCheckbox: FC = () => {
+  const { verticalPiano, setVerticalPiano } = useSettings()
+  const onCheckedChange = useCallback(
+    (checked: boolean) => {
+      setVerticalPiano(checked)
+    },
+    [setVerticalPiano],
+  )
+
+  return (
+    <Checkbox
+      checked={verticalPiano}
+      onCheckedChange={onCheckedChange}
+      label={<Localized name="vertical-piano" />}
+    />
+  )
+}
+
 const Column = styled.div`
   display: flex;
   flex-direction: column;
@@ -116,6 +134,7 @@ export const GeneralSettingsView: FC = () => {
               <Localized name="appearance" />
             </SectionTitle>
             <ShowNoteLabelCheckbox />
+            <VerticalPianoCheckbox />
           </SectionContent>
         </Column>
       </DialogContent>
