@@ -10,9 +10,8 @@ import { emptySong } from "./SongFactory"
 describe("Song", () => {
   const song = songFromMidi(
     new DataView(
-      fs.readFileSync(
-        path.join(__dirname, "../../../testdata/tracks.mid"),
-      ).buffer,
+      fs.readFileSync(path.join(__dirname, "../../../testdata/tracks.mid"))
+        .buffer,
     ),
   )
 

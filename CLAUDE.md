@@ -9,14 +9,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm start` - Start development server (runs turbo dev in parallel for app and static)
 - `npm run build` - Build the entire project (app and static site)
 - `npm test` - Run tests across all packages using turbo
-- `npm run lint` - Run linting across all packages
-- `npm run format` - Format code across all packages
+- `npm run lint` - Run linting with Biome across all packages
+- `npm run format` - Format code with Biome across all packages
+- `npm run check` - Run linting and formatting check with Biome
 
 ### App-specific Commands
 
 - `npm run dev -w app` - Start dev server for the main app
 - `npm run build -w app` - Build the main React application
 - `npm run test -w app` - Run tests for the app
+- `npm run lint -w app` - Run Biome linting for the app
+- `npm run format -w app` - Format app code with Biome
+- `npm run check -w app` - Run Biome checks for the app
 
 ### Electron Commands
 

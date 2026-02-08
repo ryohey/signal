@@ -36,6 +36,7 @@ export const toSynthEvents = (
           midi: e,
           delayTime,
         })
+        break
       case "meta":
         switch (e.subtype) {
           case "setTempo":

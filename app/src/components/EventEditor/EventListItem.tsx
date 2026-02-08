@@ -10,7 +10,7 @@ import { EventListInput } from "./EventListInput"
 interface EventListItemProps {
   item: TrackEvent
   style?: React.CSSProperties
-  onClick: (e: React.MouseEvent, ev: TrackEvent) => void
+  onClick?: (e: React.MouseEvent, ev: TrackEvent) => void
 }
 
 const equalEventListItemProps = (
@@ -37,8 +37,8 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
 
     const onChangeTick = useCallback(
       (input: string) => {
-        const value = parseInt(input)
-        if (!isNaN(value)) {
+        const value = parseInt(input, 10)
+        if (!Number.isNaN(value)) {
           updateEvent(item.id, { tick: Math.max(0, value) })
         }
       },
@@ -75,7 +75,7 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
       <Row
         style={style}
         onClick={useCallback(
-          (e: React.MouseEvent) => onClick(e, item),
+          (e: React.MouseEvent) => onClick?.(e, item),
           [item, onClick],
         )}
         onKeyDown={useCallback(

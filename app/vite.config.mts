@@ -49,6 +49,8 @@ export default defineConfig(({ mode }) => {
           community: path.resolve(__dirname, "community.html"),
         },
       },
+      minify: false,
+      sourcemap: true,
     },
     publicDir: "public",
     server: {
@@ -59,10 +61,22 @@ export default defineConfig(({ mode }) => {
       alias: {
         react: path.resolve("../node_modules/react"),
       },
+      dedupe: [
+        "react",
+        "react-dom",
+        "firebase",
+        "firebase/app",
+        "firebase/auth",
+        "firebase/firestore",
+        "firebase/functions",
+      ],
     },
     envDir: "..",
     define: {
       "process.env": env,
+    },
+    optimizeDeps: {
+      include: ["firebase/app", "firebase/firestore"],
     },
   }
 })

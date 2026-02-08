@@ -56,7 +56,7 @@ const Content = styled.div`
   align-items: center;
 
   animation: ${({ show }: { show: boolean }) =>
-      show ? contentShow : contentHide}
+    show ? contentShow : contentHide}
     500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 `
 

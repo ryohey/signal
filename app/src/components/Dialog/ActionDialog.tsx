@@ -3,10 +3,10 @@ import { useContext } from "react"
 import { Button } from "../ui/Button"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "./Dialog"
 
-export const ActionDialog = (props: DialogProps<any>) => {
+export const ActionDialog = <T extends KeyType>(props: DialogProps<T>) => {
   const { setDialog } = useContext(DialogContext)
 
-  const close = (key: any) => {
+  const close = (key: T | null) => {
     props.callback(key)
     setDialog(null)
   }

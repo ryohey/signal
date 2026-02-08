@@ -2,12 +2,14 @@
   "name": "@signal-app/firebaseui-web-react",
   "private": true,
   "version": "0.0.1",
-  "main": "dist/index.js",
   "type": "module",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "default": "./src/index.tsx",
+      "types": "./src/index.tsx"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
     "lint": "prettier --check src",
     "format": "prettier --write src"
   },
@@ -16,12 +18,10 @@
   "peerDependencies": {
     "firebase": "^10.0.0",
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react-dom": ">=16.8.0",
+    "firebaseui": "^6.1.0"
   },
   "devDependencies": {
     "typescript": "^5.6.3"
-  },
-  "dependencies": {
-    "firebaseui": "^6.1.0"
   }
 }

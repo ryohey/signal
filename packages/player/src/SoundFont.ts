@@ -36,15 +36,16 @@ export class SoundFont {
           continue // Skip non-drum kit presets
         }
 
+        let preset = drumKitPresets.get(programNumber)
+
         // Create preset if it doesn't exist
-        if (!drumKitPresets.has(programNumber)) {
-          drumKitPresets.set(programNumber, {
+        if (!preset) {
+          preset = {
             name: `Drum Kit ${programNumber}`,
             samples: new Map(),
-          })
+          }
+          drumKitPresets.set(programNumber, preset)
         }
-
-        const preset = drumKitPresets.get(programNumber)!
 
         // Add sample metadata for each key in the range
         for (let key = keyStart; key <= keyEnd; key++) {
@@ -56,7 +57,7 @@ export class SoundFont {
             name: parameter.name,
           }
 
-          preset.samples.get(key)!.push(sampleMeta)
+          preset.samples.get(key)?.push(sampleMeta)
         }
       }
     }
@@ -66,7 +67,7 @@ export class SoundFont {
   static async loadFromURL(url: string) {
     const response = await fetch(url)
     const data = await response.arrayBuffer()
-    return await this.load(data)
+    return await SoundFont.load(data)
   }
 
   static async load(data: ArrayBuffer) {

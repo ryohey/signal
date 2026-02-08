@@ -32,7 +32,7 @@ export class SoundFontSynth implements SynthOutput {
     this.synth = new AudioWorkletNode(this.context, "synth-processor", {
       numberOfInputs: 0,
       outputChannelCount: [2],
-    } as any)
+    })
     this.synth.connect(this.context.destination)
     this.sequenceNumber = 0
 

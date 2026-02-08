@@ -1,28 +1,30 @@
 import { TrackId } from "@signal-app/core"
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
-import { atomEffect } from "jotai-effect"
 import { useAtomCallback } from "jotai/utils"
-import { useCallback, useMemo } from "react"
+import { atomEffect } from "jotai-effect"
+import { useCallback, useEffect } from "react"
+import { GroupOutput } from "../services/GroupOutput"
 import { TrackMute } from "../trackMute/TrackMute"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
-export function useTrackMute() {
+export function TrackMuteProvider({ children }: { children: React.ReactNode }) {
   const { synthGroup } = useStores()
-  const { getTrack } = useSong()
-  const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
+  const setSynthGroup = useSetAtom(synthGroupAtom)
 
-  // sync with synth group
-  const syncToSynthEffectAtom = useMemo(
-    () =>
-      atomEffect((get) => {
-        synthGroup.trackMute = get(trackMuteAtom)
-      }),
-    [synthGroup],
-  )
+  useEffect(() => {
+    setSynthGroup(synthGroup)
+  }, [setSynthGroup, synthGroup])
 
   useAtom(syncToSynthEffectAtom)
+
+  return <>{children}</>
+}
+
+export function useTrackMute() {
+  const { getTrack } = useSong()
+  const { allSoundsOffChannel, allSoundsOffExclude } = usePlayer()
 
   return {
     get trackMute() {
@@ -90,3 +92,15 @@ const unsoloAtom = atom(null, (_get, set, trackId: TrackId) =>
   set(trackMuteAtom, TrackMute.unsolo(trackId)),
 )
 const resetAtom = atom(null, (_get, set) => set(trackMuteAtom, TrackMute.empty))
+
+// internal atoms
+const synthGroupAtom = atom<GroupOutput | null>(null)
+
+// effects
+const syncToSynthEffectAtom = atomEffect((get) => {
+  const synthGroup = get(synthGroupAtom)
+  const trackMute = get(trackMuteAtom)
+  if (synthGroup !== null) {
+    synthGroup.trackMute = trackMute
+  }
+})
