@@ -37,8 +37,8 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
 
     const onChangeTick = useCallback(
       (input: string) => {
-        const value = parseInt(input)
-        if (!isNaN(value)) {
+        const value = parseInt(input, 10)
+        if (!Number.isNaN(value)) {
           updateEvent(item.id, { tick: Math.max(0, value) })
         }
       },
