@@ -96,7 +96,7 @@
     "concurrently": "^9.1.2",
     "dotenv": "^17.2.3",
     "globals": "^16.0.0",
-    "jsdom": "^26.0.0",
+    "jsdom": "^28.0.0",
     "react-refresh": "0.17.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
