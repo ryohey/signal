@@ -59,7 +59,7 @@
     "jotai-effect": "^2.2.3",
     "jotai-optics": "^0.4.0",
     "jotai-scope": "^0.9.7",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mdi-react": "^9.4.0",
     "midifile-ts": "1.5.1",
     "mobx": "^6.13.7",
