@@ -29,7 +29,7 @@
     "@signal-app/firebaseui-web-react": "*",
     "@signal-app/player": "*",
     "color": ">=4.2.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mdi-react": ">=9.4.0",
     "mobx": ">=6.12.3",
     "mobx-react-lite": ">=4.0.7",
