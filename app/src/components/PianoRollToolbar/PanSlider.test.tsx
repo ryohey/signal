@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react"
+import { render } from "@testing-library/react"
+import { screen } from "@testing-library/dom"
 import userEvent from "@testing-library/user-event"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 import { LocalizationContext } from "../../localize/useLocalization"

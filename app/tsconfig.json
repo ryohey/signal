@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "types": [
+      "react",
+      "react-dom",
       "node",
       "webmidi",
       "wicg-file-system-access",
@@ -22,6 +24,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "paths": {
       // Avoid referencing the node_modules of the library when developing a local library.
       "@types/react": ["../node_modules/@types/react"]
