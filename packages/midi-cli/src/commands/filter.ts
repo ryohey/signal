@@ -17,18 +17,19 @@ export async function filterCommand(options: FilterOptions): Promise<void> {
 
   const predicates: ((n: SerializedNote) => boolean)[] = []
 
+  let fromTick: number | undefined
+  let toTick: number | undefined
+
   if (options.from) {
-    const fromTick = parsePosition(
-      options.from,
-      context.timebase,
-      context.measures,
-    )
-    predicates.push((n) => n.tick >= fromTick)
+    fromTick = parsePosition(options.from, context.timebase, context.measures)
+    const ft = fromTick
+    predicates.push((n) => n.tick >= ft)
   }
 
   if (options.to) {
-    const toTick = parsePosition(options.to, context.timebase, context.measures)
-    predicates.push((n) => n.tick < toTick)
+    toTick = parsePosition(options.to, context.timebase, context.measures)
+    const tt = toTick
+    predicates.push((n) => n.tick < tt)
   }
 
   if (options.pitch) {
@@ -47,5 +48,14 @@ export async function filterCommand(options: FilterOptions): Promise<void> {
     ? stream.notes.filter((n) => !match(n))
     : stream.notes.filter(match)
 
-  writeNoteStream({ context, notes })
+  // Propagate selection range so downstream set-notes knows which region to replace
+  const selection =
+    fromTick !== undefined || toTick !== undefined
+      ? {
+          fromTick: fromTick ?? 0,
+          toTick: toTick ?? Number.POSITIVE_INFINITY,
+        }
+      : context.selection
+
+  writeNoteStream({ context: { ...context, selection }, notes })
 }

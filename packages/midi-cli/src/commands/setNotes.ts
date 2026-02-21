@@ -34,8 +34,12 @@ export async function setNotesCommand(
 
   if (!options.merge) {
     // Replace mode: remove existing notes in the range
-    let fromTick = 0
-    let toTick = Number.POSITIVE_INFINITY
+    // Use explicit --from/--to options first, then fall back to selection
+    // metadata from upstream commands (e.g., get-notes), then full range
+    const selection = stream.context.selection
+
+    let fromTick = selection?.fromTick ?? 0
+    let toTick = selection?.toTick ?? Number.POSITIVE_INFINITY
 
     if (options.from) {
       fromTick = parsePosition(options.from, context.timebase, context.measures)

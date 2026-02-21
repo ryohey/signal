@@ -17,6 +17,10 @@ export interface SerializedMeasure {
 export interface NoteStreamContext {
   timebase: number // ticks per quarter note (e.g. 480)
   measures: SerializedMeasure[]
+  selection?: {
+    fromTick: number
+    toTick: number
+  }
 }
 
 export interface NoteStream {
