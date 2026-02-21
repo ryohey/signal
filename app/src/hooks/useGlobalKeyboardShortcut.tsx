@@ -17,7 +17,7 @@ import { useSong } from "./useSong"
 import { useSongFile } from "./useSongFile"
 
 export const useGlobalKeyboardShortcut = () => {
-  const { setOpenHelpDialog } = useRootView()
+  const { setOpenHelpDialog, setOpenMidiCliDialog } = useRootView()
   const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
   const { isSaved } = useSong()
@@ -137,6 +137,11 @@ export const useGlobalKeyboardShortcut = () => {
         altKey: true,
         run: createNewSong,
       },
+      // Open MIDI CLI (~)
+      {
+        code: "Backquote",
+        run: () => setOpenMidiCliDialog(true),
+      },
     ],
     [
       playOrPause,
@@ -144,6 +149,7 @@ export const useGlobalKeyboardShortcut = () => {
       redo,
       saveAsSong,
       setOpenHelpDialog,
+      setOpenMidiCliDialog,
       stop,
       rewindOneBar,
       fastForwardOneBar,
