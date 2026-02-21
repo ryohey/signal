@@ -38,14 +38,14 @@ export function usePreviewNote() {
   }, [channel, stopNote, removePreviewingNoteNumbers])
 
   const previewNoteOn = useCallback(
-    (noteNumber: number = 64, duration?: number) => {
+    (noteNumber: number = 64, duration?: number, velocity: number = 100) => {
       if (channel === undefined) return
 
       // stop current note immediately if playing
       previewNoteOff()
 
       // start the new note
-      startNote({ noteNumber, velocity: 100, channel })
+      startNote({ noteNumber, velocity, channel })
       addPreviewingNoteNumbers(noteNumber)
 
       // schedule stop if duration is specified

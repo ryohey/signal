@@ -6,7 +6,7 @@ import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
 import { useTrack } from "../../../../hooks/useTrack"
-import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
+import { useCreateNoteDragGesture } from "./useCreateNoteDragGesture"
 
 export const useCreateNoteGesture = (): MouseGesture => {
   const {
@@ -20,7 +20,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
   const { channel, isRhythmTrack, addEvent } = useTrack(selectedTrackId)
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
-  const dragNoteCenterAction = useDragNoteCenterGesture()
+  const createNoteDragAction = useCreateNoteDragGesture()
 
   return {
     onMouseDown: useCallback(
@@ -59,7 +59,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
           return
         }
 
-        dragNoteCenterAction.onMouseDown(e, note.id)
+        createNoteDragAction.onMouseDown(e, note.id)
       },
       [
         transform,
@@ -74,7 +74,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
         lastNoteDuration,
         addEvent,
         pushHistory,
-        dragNoteCenterAction,
+        createNoteDragAction,
       ],
     ),
   }
