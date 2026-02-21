@@ -1,0 +1,27 @@
+{
+  "name": "@signal-app/midi-cli",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "signal-midi": "dist/bin/signal-midi.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "vitest run",
+    "lint": "biome lint src",
+    "format": "biome format src --write"
+  },
+  "dependencies": {
+    "@signal-app/core": "*",
+    "commander": "^13.1.0",
+    "midifile-ts": "^1.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^4.0.18"
+  }
+}

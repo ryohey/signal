@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": true,
+    "target": "esnext",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "lib": ["es2019", "ESNext.Collection"],
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "useDefineForClassFields": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "bin/**/*"]
+}
