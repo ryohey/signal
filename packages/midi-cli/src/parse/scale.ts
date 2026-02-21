@@ -43,7 +43,7 @@ const SCALE_ALIASES: Record<string, Scale> = {
   majorblues: "majorBlues",
   minorblues: "minorBlues",
   halfwholediminished: "halfWholeDiminished",
-  wholehalddiminished: "wholeHalfDiminished",
+  wholehalfdiminished: "wholeHalfDiminished",
   wholetone: "wholeTone",
 }
 

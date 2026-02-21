@@ -61,4 +61,29 @@ describe("parseScale", () => {
   it("throws on invalid scale", () => {
     expect(() => parseScale("c-invalid")).toThrow("Invalid scale type")
   })
+
+  it("parses hyphenated scale names via alias", () => {
+    // "c-whole-half-diminished" → key "c", scaleStr "whole-half-diminished"
+    // resolveScale strips hyphens → "wholehalfdiminished" → alias lookup
+    const result = parseScale("c-whole-half-diminished")
+    expect(result.scale).toBe("wholeHalfDiminished")
+    expect(result.key).toBe(0)
+  })
+
+  it("parses compound scale names like harmonicMinor", () => {
+    const result = parseScale("c-harmonicMinor")
+    expect(result.scale).toBe("harmonicMinor")
+    expect(result.intervals).toEqual([0, 2, 3, 5, 7, 8, 11])
+  })
+
+  it("parses compound scale names via alias with hyphens", () => {
+    const result = parseScale("c-harmonic-minor")
+    expect(result.scale).toBe("harmonicMinor")
+  })
+
+  it("parses pentatonic scales", () => {
+    const result = parseScale("c-majorPentatonic")
+    expect(result.scale).toBe("majorPentatonic")
+    expect(result.intervals).toHaveLength(5)
+  })
 })
