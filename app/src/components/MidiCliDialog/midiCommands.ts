@@ -35,6 +35,7 @@ export function buildNoteStream(
   track: Track,
   conductorTrack: Track | undefined,
   timebase: number,
+  noteIds?: number[],
 ): NoteStream {
   const timeSignatureEvents = conductorTrack
     ? conductorTrack.events.filter(isTimeSignatureEvent)
@@ -59,16 +60,21 @@ export function buildNoteStream(
     })),
   }
 
-  const notes: SerializedNote[] = track.events
-    .filter(isNoteEvent)
-    .map((e: NoteEvent) => ({
-      tick: e.tick,
-      duration: e.duration,
-      noteNumber: e.noteNumber,
-      velocity: e.velocity,
-      channel: track.channel,
-      id: e.id,
-    }))
+  const noteIdSet = noteIds !== undefined ? new Set(noteIds) : undefined
+  const noteEvents = track.events.filter(isNoteEvent)
+  const filteredEvents =
+    noteIdSet !== undefined
+      ? noteEvents.filter((e: NoteEvent) => noteIdSet.has(e.id))
+      : noteEvents
+
+  const notes: SerializedNote[] = filteredEvents.map((e: NoteEvent) => ({
+    tick: e.tick,
+    duration: e.duration,
+    noteNumber: e.noteNumber,
+    velocity: e.velocity,
+    channel: track.channel,
+    id: e.id,
+  }))
 
   return { context, notes }
 }

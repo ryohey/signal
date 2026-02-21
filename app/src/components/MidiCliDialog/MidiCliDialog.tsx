@@ -104,7 +104,7 @@ const Input = styled.input`
 
 export const MidiCliDialog: FC = () => {
   const { openMidiCliDialog, setOpenMidiCliDialog } = useRootView()
-  const { selectedTrack } = usePianoRoll()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
   const { songStore } = useStores()
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
@@ -155,10 +155,12 @@ export const MidiCliDialog: FC = () => {
 
     try {
       const song = songStore.song
+      const hasSelection = selectedNoteIds.length > 0
       const trackStream = buildNoteStream(
         selectedTrack,
         song.conductorTrack,
         timebase,
+        hasSelection ? selectedNoteIds : undefined,
       )
       const result = executeCommand(cmd, trackStream)
 
@@ -172,14 +174,14 @@ export const MidiCliDialog: FC = () => {
       // Apply the changes back to the track
       pushHistory()
 
-      const existingNoteIds = selectedTrack.events
-        .filter(isNoteEvent)
-        .map((e: NoteEvent) => e.id)
+      // Only remove the notes that were part of the input set
+      const inputNoteIds = hasSelection
+        ? selectedNoteIds
+        : selectedTrack.events.filter(isNoteEvent).map((e: NoteEvent) => e.id)
 
-      // Remove old notes
-      selectedTrack.removeEvents(existingNoteIds)
+      selectedTrack.removeEvents(inputNoteIds)
 
-      // Add new notes
+      // Add the transformed notes back
       const newNotes = result.stream.notes.map((note) => ({
         type: "channel" as const,
         subtype: "note" as const,
@@ -190,11 +192,12 @@ export const MidiCliDialog: FC = () => {
       }))
       selectedTrack.addEvents(newNotes as unknown as Omit<TrackEvent, "id">[])
 
+      const scope = hasSelection ? " (selection)" : ""
       setHistory((h) => [
         ...h,
         entry(
           "output",
-          `Applied to track: ${result.stream.notes.length} notes`,
+          `Applied to track${scope}: ${result.stream.notes.length} notes`,
         ),
       ])
     } catch (err) {
@@ -207,6 +210,7 @@ export const MidiCliDialog: FC = () => {
   }, [
     inputValue,
     selectedTrack,
+    selectedNoteIds,
     songStore,
     timebase,
     pushHistory,
@@ -261,7 +265,11 @@ export const MidiCliDialog: FC = () => {
       style={{ maxWidth: "40rem", padding: 0 }}
     >
       <TerminalContainer onClick={() => inputRef.current?.focus()}>
-        <TerminalHeader>signal-midi — {trackName}</TerminalHeader>
+        <TerminalHeader>
+          signal-midi — {trackName}
+          {selectedNoteIds.length > 0 &&
+            ` (${selectedNoteIds.length} selected)`}
+        </TerminalHeader>
         <TerminalOutput ref={outputRef}>
           {history.map((e) => (
             <OutputLine key={e.id} lineType={e.type}>
