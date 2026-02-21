@@ -174,10 +174,27 @@ export const MidiCliDialog: FC = () => {
       // Apply the changes back to the track
       pushHistory()
 
-      // Only remove the notes that were part of the input set
-      const inputNoteIds = hasSelection
-        ? selectedNoteIds
-        : selectedTrack.events.filter(isNoteEvent).map((e: NoteEvent) => e.id)
+      // Determine which notes to remove:
+      // 1. If piano roll has a selection, remove only those notes
+      // 2. If the pipeline narrowed via get-notes/filter, only remove notes in that range
+      // 3. Otherwise, remove all notes on the track
+      const selection = result.stream.context.selection
+      let inputNoteIds: number[]
+      if (hasSelection) {
+        inputNoteIds = selectedNoteIds
+      } else if (selection) {
+        inputNoteIds = selectedTrack.events
+          .filter(isNoteEvent)
+          .filter(
+            (e: NoteEvent) =>
+              e.tick >= selection.fromTick && e.tick < selection.toTick,
+          )
+          .map((e: NoteEvent) => e.id)
+      } else {
+        inputNoteIds = selectedTrack.events
+          .filter(isNoteEvent)
+          .map((e: NoteEvent) => e.id)
+      }
 
       selectedTrack.removeEvents(inputNoteIds)
 

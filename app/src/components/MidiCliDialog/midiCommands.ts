@@ -22,6 +22,10 @@ interface SerializedMeasure {
 interface NoteStreamContext {
   timebase: number
   measures: SerializedMeasure[]
+  selection?: {
+    fromTick: number
+    toTick: number
+  }
 }
 
 interface NoteStream {
@@ -688,21 +692,25 @@ function executeOneCommand(
 
     case "filter": {
       const predicates: ((n: SerializedNote) => boolean)[] = []
+      let filterFromTick: number | undefined
+      let filterToTick: number | undefined
       if (cmd.options.from) {
-        const fromTick = parsePosition(
+        filterFromTick = parsePosition(
           cmd.options.from as string,
           context.timebase,
           context.measures,
         )
-        predicates.push((n) => n.tick >= fromTick)
+        const ft = filterFromTick
+        predicates.push((n) => n.tick >= ft)
       }
       if (cmd.options.to) {
-        const toTick = parsePosition(
+        filterToTick = parsePosition(
           cmd.options.to as string,
           context.timebase,
           context.measures,
         )
-        predicates.push((n) => n.tick < toTick)
+        const tt = filterToTick
+        predicates.push((n) => n.tick < tt)
       }
       if (cmd.options.pitch) {
         const { min, max } = parseNoteRange(cmd.options.pitch as string)
@@ -714,29 +722,40 @@ function executeOneCommand(
       }
       const invert = cmd.options.invert === true
       notes = filterNotes(notes, predicates, invert)
+      const filterSelection =
+        filterFromTick !== undefined || filterToTick !== undefined
+          ? {
+              fromTick: filterFromTick ?? 0,
+              toTick: filterToTick ?? Number.POSITIVE_INFINITY,
+            }
+          : context.selection
       return {
-        stream: { context, notes },
+        stream: { context: { ...context, selection: filterSelection }, notes },
         message: `Filtered to ${notes.length} notes`,
       }
     }
 
     case "get-notes": {
       const predicates: ((n: SerializedNote) => boolean)[] = []
+      let getFromTick: number | undefined
+      let getToTick: number | undefined
       if (cmd.options.from) {
-        const fromTick = parsePosition(
+        getFromTick = parsePosition(
           cmd.options.from as string,
           context.timebase,
           context.measures,
         )
-        predicates.push((n) => n.tick >= fromTick)
+        const ft = getFromTick
+        predicates.push((n) => n.tick >= ft)
       }
       if (cmd.options.to) {
-        const toTick = parsePosition(
+        getToTick = parsePosition(
           cmd.options.to as string,
           context.timebase,
           context.measures,
         )
-        predicates.push((n) => n.tick < toTick)
+        const tt = getToTick
+        predicates.push((n) => n.tick < tt)
       }
       if (cmd.options.pitch) {
         const { min, max } = parseNoteRange(cmd.options.pitch as string)
@@ -747,8 +766,15 @@ function executeOneCommand(
         predicates.push((n) => n.velocity >= min && n.velocity <= max)
       }
       notes = filterNotes(notes, predicates, false)
+      const getSelection =
+        getFromTick !== undefined || getToTick !== undefined
+          ? {
+              fromTick: getFromTick ?? 0,
+              toTick: getToTick ?? Number.POSITIVE_INFINITY,
+            }
+          : context.selection
       return {
-        stream: { context, notes },
+        stream: { context: { ...context, selection: getSelection }, notes },
         message: `Selected ${notes.length} notes`,
       }
     }
