@@ -12,6 +12,7 @@ import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
 import { ControlName } from "./ControlName"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
+import { PencilModeSelector } from "./PencilModeSelector"
 import PianoVelocityControl from "./VelocityControl/VelocityControl"
 
 interface TabBarProps {
@@ -38,7 +39,7 @@ const TabButtonBase = styled.div`
 `
 
 const TabButton = styled(TabButtonBase)`
-  width: 7rem;
+  min-width: 4rem;
   overflow: hidden;
   border-bottom: 1px solid;
   border-color: transparent;
@@ -97,7 +98,7 @@ const Parent = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--color-background-dark);
+  background: var(--color-background);
   outline: none;
 `
 
@@ -115,9 +116,16 @@ const Content = styled.div`
 
 const TabBarWrapper = styled.div`
   position: relative;
+  display: flex;
+  align-items: stretch;
 `
 
-const TAB_HEIGHT = 30
+const TabBarScrollArea = styled.div`
+  flex: 1;
+  overflow: hidden;
+`
+
+const TAB_HEIGHT = 32
 const BORDER_WIDTH = 1
 
 export interface ControlPaneProps {
@@ -127,7 +135,7 @@ export interface ControlPaneProps {
 const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
   const ref = useRef(null)
   const containerSize = useComponentSize(ref)
-  const { setActivePane } = usePianoRoll()
+  const { setActivePane, mouseMode } = usePianoRoll()
   const { controlMode: mode, setControlMode } = useControlPane()
   const keyboardShortcutProps = useControlPaneKeyboardShortcut()
 
@@ -149,6 +157,9 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
     }
   })()
 
+  const showPencilModeSelector =
+    mouseMode === "pencil" && mode.type !== "velocity"
+
   return (
     <Parent
       ref={ref}
@@ -158,7 +169,10 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
       onBlur={onBlur}
     >
       <TabBarWrapper style={{ paddingLeft: axisWidth }}>
-        <TabBar onSelect={setControlMode} selectedMode={mode} />
+        <TabBarScrollArea>
+          <TabBar onSelect={setControlMode} selectedMode={mode} />
+        </TabBarScrollArea>
+        {showPencilModeSelector && <PencilModeSelector />}
       </TabBarWrapper>
       <Content>{control}</Content>
     </Parent>

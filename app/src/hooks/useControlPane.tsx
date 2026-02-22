@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from "jotai"
-import { focusAtom } from "jotai-optics"
 import { atomWithStorage } from "jotai/utils"
+import { focusAtom } from "jotai-optics"
 import { cloneDeep } from "lodash"
 import {
   ControlMode,
@@ -22,11 +22,15 @@ export function useControlPane() {
     get selectedEventIds() {
       return useAtomValue(selectedEventIdsAtom)
     },
+    get controlPencilMode() {
+      return useAtomValue(controlPencilModeAtom)
+    },
     resetSelection: useSetAtom(resetSelectionAtom),
     setControlMode: useSetAtom(controlModeAtom),
     setControlModes: useSetAtom(controlModesAtom),
     setSelection: useSetAtom(selectionAtom),
     setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
+    setControlPencilMode: useSetAtom(controlPencilModeAtom),
     serializeState: useSetAtom(serializeAtom),
     restoreState: useSetAtom(restoreAtom),
   }
@@ -34,6 +38,7 @@ export function useControlPane() {
 
 // atoms
 const controlModeAtom = atom<ControlMode>({ type: "velocity" })
+const controlPencilModeAtom = atom<"pencil" | "single" | "line">("pencil")
 const selectionAtom = atom<ControlSelection | null>(null)
 const selectedEventIdsAtom = atom<number[]>([])
 const storageAtom = atomWithStorage<{ controlModes: ControlMode[] }>(
