@@ -6,6 +6,7 @@ import {
 } from "@signal-app/core"
 import { isEqual } from "lodash"
 import { useCallback, useMemo } from "react"
+import { DEFAULT_TEMPO } from "../Constants"
 import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
@@ -34,7 +35,7 @@ export function useConductorTrack() {
     get currentTempo() {
       const { position } = usePlayer()
       return useMobxSelector(
-        () => conductorTrack?.getTempo(position) ?? 0,
+        () => conductorTrack?.getTempo(position) ?? DEFAULT_TEMPO,
         [conductorTrack, position],
       )
     },
