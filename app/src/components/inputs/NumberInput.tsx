@@ -43,6 +43,10 @@ export const NumberInput: FC<NumberInputProps> = ({
         if (e.key === "Enter") {
           onEnter?.()
         }
+        if (e.key === "Escape") {
+          // blur on escape to trigger onBlur validation
+          ;(e.target as HTMLElement).blur()
+        }
       }}
       min={min}
       max={max}
