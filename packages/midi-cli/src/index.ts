@@ -17,6 +17,8 @@ export {
 } from "./parse/noteRange.js"
 export { parsePosition } from "./parse/position.js"
 export { parseScale } from "./parse/scale.js"
+export type { CommandExecutor } from "./scripting/evaluator.js"
+export { evaluateScript, parseScript } from "./scripting/evaluator.js"
 export type { ChordType } from "./theory/Chord.js"
 export { Chord } from "./theory/Chord.js"
 export {

@@ -20,6 +20,7 @@ import { quantizeTimeCommand } from "../src/commands/quantizeTime.js"
 import { removeCommand } from "../src/commands/remove.js"
 import { repeatCommand } from "../src/commands/repeat.js"
 import { retrogradeCommand } from "../src/commands/retrograde.js"
+import { runCommand } from "../src/commands/run.js"
 import { saveCommand } from "../src/commands/save.js"
 import { setNotesCommand } from "../src/commands/setNotes.js"
 import { shiftCommand } from "../src/commands/shift.js"
@@ -28,6 +29,7 @@ import { spreadCommand } from "../src/commands/spread.js"
 import { thinCommand } from "../src/commands/thin.js"
 import { transposeCommand } from "../src/commands/transpose.js"
 import { velocityCommand } from "../src/commands/velocity.js"
+import { voiceLeadCommand } from "../src/commands/voiceLead.js"
 
 const program = new Command()
 
@@ -60,6 +62,9 @@ program
   .option("--end <position>", "Alias for --to")
   .option("--pitch <range>", "Pitch range (e.g., 60-72, C4-C5)")
   .option("--velocity <range>", "Velocity range (e.g., 0-64)")
+  .option("--nth <n>", "Select every Nth note")
+  .option("--random <percent>", "Randomly select N% of notes")
+  .option("--channel <n>", "Filter by MIDI channel")
   .action(async (options) => {
     await getNotesCommand({
       ...options,
@@ -182,6 +187,9 @@ program
   .option("--to <position>", "End position")
   .option("--end <position>", "Alias for --to")
   .option("--invert", "Keep notes that do NOT match the criteria")
+  .option("--nth <n>", "Select every Nth matching note")
+  .option("--random <percent>", "Randomly select N% of matching notes")
+  .option("--channel <n>", "Filter by MIDI channel")
   .action(async (options) => {
     await filterCommand({
       ...options,
@@ -335,6 +343,14 @@ program
     await analyzeCommand(options)
   })
 
+program
+  .command("voice-lead")
+  .description("Smooth out chord voicings for minimal voice movement")
+  .requiredOption("--key <key-scale>", "Key (e.g., c-major, d-minor)")
+  .action(async (options) => {
+    await voiceLeadCommand(options)
+  })
+
 // ─── Scripting Commands ───
 
 program
@@ -346,6 +362,22 @@ program
   )
   .action(async (assignments) => {
     await letCommand(assignments)
+  })
+
+program
+  .command("run")
+  .description("Execute a script with for/if/while constructs")
+  .argument("<script>", "Script to execute (use quotes)")
+  .action(async (script) => {
+    await runCommand(script, (command, _stream) => {
+      // For the CLI, we don't have a full in-process executor
+      // since each command is its own process in shell pipelines.
+      // The run command is primarily for the web app's inline engine.
+      throw new Error(
+        `The "run" command is designed for the web app inline engine. ` +
+          `For CLI usage, use shell piping instead: ${command}`,
+      )
+    })
   })
 
 // ─── Sink Commands ───

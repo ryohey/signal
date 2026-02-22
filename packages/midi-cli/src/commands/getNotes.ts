@@ -7,6 +7,9 @@ export interface GetNotesOptions {
   to?: string
   pitch?: string
   velocity?: string
+  nth?: string
+  random?: string
+  channel?: string
 }
 
 export async function getNotesCommand(options: GetNotesOptions): Promise<void> {
@@ -37,6 +40,21 @@ export async function getNotesCommand(options: GetNotesOptions): Promise<void> {
   if (options.velocity) {
     const { min, max } = parseVelocityRange(options.velocity)
     notes = notes.filter((n) => n.velocity >= min && n.velocity <= max)
+  }
+
+  if (options.channel) {
+    const ch = parseInt(options.channel, 10)
+    notes = notes.filter((n) => n.channel === ch)
+  }
+
+  if (options.nth) {
+    const nth = parseInt(options.nth, 10)
+    notes = notes.filter((_, i) => (i + 1) % nth === 0)
+  }
+
+  if (options.random) {
+    const pct = parseFloat(options.random)
+    notes = notes.filter(() => Math.random() * 100 < pct)
   }
 
   // Propagate selection range so downstream set-notes knows which region to replace

@@ -1037,8 +1037,36 @@ function executeOneCommand(
         const { min, max } = parseVelocityRange(cmd.options.velocity as string)
         predicates.push((n) => n.velocity >= min && n.velocity <= max)
       }
+      if (cmd.options.channel) {
+        const ch = parseInt(cmd.options.channel as string, 10)
+        predicates.push((n) => n.channel === ch)
+      }
       const invert = cmd.options.invert === true
-      notes = filterNotes(notes, predicates, invert)
+      const matchFilter = (n: SerializedNote) => predicates.every((p) => p(n))
+      let filteredNotes: SerializedNote[]
+      if (cmd.options.nth) {
+        const nth = parseInt(cmd.options.nth as string, 10)
+        let count = 0
+        filteredNotes = notes.filter((n) => {
+          if (matchFilter(n)) {
+            count++
+            return invert ? count % nth !== 0 : count % nth === 0
+          }
+          return !!invert
+        })
+      } else if (cmd.options.random) {
+        const pct = parseFloat(cmd.options.random as string)
+        filteredNotes = notes.filter((n) => {
+          if (matchFilter(n)) {
+            const keep = Math.random() * 100 < pct
+            return invert ? !keep : keep
+          }
+          return !!invert
+        })
+      } else {
+        filteredNotes = filterNotes(notes, predicates, invert)
+      }
+      notes = filteredNotes
       const filterSelection =
         filterFromTick !== undefined || filterToTick !== undefined
           ? {
@@ -1085,7 +1113,19 @@ function executeOneCommand(
         const { min, max } = parseVelocityRange(cmd.options.velocity as string)
         predicates.push((n) => n.velocity >= min && n.velocity <= max)
       }
+      if (cmd.options.channel) {
+        const ch = parseInt(cmd.options.channel as string, 10)
+        predicates.push((n) => n.channel === ch)
+      }
       notes = filterNotes(notes, predicates, false)
+      if (cmd.options.nth) {
+        const nth = parseInt(cmd.options.nth as string, 10)
+        notes = notes.filter((_, i) => (i + 1) % nth === 0)
+      }
+      if (cmd.options.random) {
+        const pct = parseFloat(cmd.options.random as string)
+        notes = notes.filter(() => Math.random() * 100 < pct)
+      }
       const getSelection =
         getFromTick !== undefined || getToTick !== undefined
           ? {
@@ -1678,6 +1718,73 @@ function executeOneCommand(
       }
     }
 
+    case "voice-lead": {
+      const vlKeyStr = cmd.options.key as string
+      if (!vlKeyStr) throw new Error("voice-lead requires --key")
+
+      // Group notes by tick
+      const vlGroups = new Map<number, SerializedNote[]>()
+      for (const note of notes) {
+        const existing = vlGroups.get(note.tick)
+        if (existing) existing.push(note)
+        else vlGroups.set(note.tick, [note])
+      }
+
+      const vlSortedTicks = [...vlGroups.keys()].sort((a, b) => a - b)
+      if (vlSortedTicks.length <= 1) {
+        return {
+          stream: { context, notes },
+          message: "Not enough chords to voice-lead",
+        }
+      }
+
+      const vlResult: SerializedNote[] = []
+      const firstGroup = vlGroups.get(vlSortedTicks[0])
+      if (!firstGroup) {
+        return { stream: { context, notes }, message: "No notes to voice-lead" }
+      }
+      let prevPitches = firstGroup
+        .map((n) => n.noteNumber)
+        .sort((a, b) => a - b)
+      vlResult.push(...firstGroup)
+
+      for (let g = 1; g < vlSortedTicks.length; g++) {
+        const tick = vlSortedTicks[g]
+        const group = vlGroups.get(tick)
+        if (!group) continue
+        group.sort((a, b) => a.noteNumber - b.noteNumber)
+
+        const revoiced: SerializedNote[] = []
+        for (const note of group) {
+          const pc = note.noteNumber % 12
+          const prevAvg =
+            prevPitches.length > 0
+              ? prevPitches.reduce((s, p) => s + p, 0) / prevPitches.length
+              : note.noteNumber
+          let bestPitch = note.noteNumber
+          let bestDist = Math.abs(note.noteNumber - prevAvg)
+          for (let oct = 1; oct <= 9; oct++) {
+            const candidate = oct * 12 + pc
+            if (candidate < 0 || candidate > 127) continue
+            const dist = Math.abs(candidate - prevAvg)
+            if (dist < bestDist) {
+              bestDist = dist
+              bestPitch = candidate
+            }
+          }
+          revoiced.push({ ...note, noteNumber: bestPitch })
+        }
+        prevPitches = revoiced.map((n) => n.noteNumber).sort((a, b) => a - b)
+        vlResult.push(...revoiced)
+      }
+
+      vlResult.sort((a, b) => a.tick - b.tick || a.noteNumber - b.noteNumber)
+      return {
+        stream: { context, notes: vlResult },
+        message: `Voice-led ${vlResult.length} notes across ${vlSortedTicks.length} chords`,
+      }
+    }
+
     case "let": {
       const vars: Record<string, string> = { ...context.vars }
       for (const assignment of cmd.args) {
@@ -1694,13 +1801,23 @@ function executeOneCommand(
       }
     }
 
+    case "run": {
+      const script = cmd.args[0]
+      if (!script) throw new Error("run requires a script argument")
+      const runResult = evaluateRunScript(script, stream)
+      return {
+        stream: runResult,
+        message: `Executed script`,
+      }
+    }
+
     case "help": {
       const helpText = [
         "Available commands:",
         "",
         "── Selection ──",
-        "  get-notes [--from/--start pos] [--to/--end pos]  Select notes",
-        "  filter [--from pos] [--to pos] [--pitch range] [--invert]  Filter notes",
+        "  get-notes [--from pos] [--to pos] [--pitch r] [--nth n] [--channel n]",
+        "  filter [--from pos] [--to pos] [--pitch r] [--invert] [--nth n] [--random pct]",
         "",
         "── Note Generation ──",
         "  add-notes <notes/chords...> [--at pos] [--duration 1/4] [--each 1/1]",
@@ -1720,6 +1837,7 @@ function executeOneCommand(
         "  invert [--axis n]              Mirror pitches",
         "  retrograde                      Reverse order",
         "  harmonize --interval 3rd --key c-major  Add harmony",
+        "  voice-lead --key c-major        Smooth chord voicings",
         "",
         "── Section Operations ──",
         "  remove [--from pos] [--to pos] [--pitch range] [--nth n]",
@@ -1734,8 +1852,10 @@ function executeOneCommand(
         "── Analysis ──",
         "  analyze [--key c-major]         Identify chords",
         "",
-        "── Variables ──",
+        "── Scripting ──",
         "  let key=c-major tempo=120       Set variables",
+        "  run 'for i in 1..4 { add-notes C4 --at m$i-1 }'",
+        "  run 'if $count > 4 { transpose 2 } else { transpose -2 }'",
         "",
         "Positions: m1-1 (measure 1 beat 1), t480 (tick 480)",
         "Pipe commands: transpose 2 | velocity scale 0.8",
@@ -1764,6 +1884,330 @@ function substituteVars(
   if (!vars) return segment
   return segment.replace(/\$([a-zA-Z_]\w*)/g, (match, name) => {
     return vars[name] ?? match
+  })
+}
+
+// ─── Inline Scripting Evaluator (for/if/while) ───
+
+interface ScriptToken {
+  type: "word" | "pipe" | "lbrace" | "rbrace" | "string"
+  value: string
+}
+
+interface ScriptCondition {
+  left: string
+  op: string
+  right: string
+}
+
+type ScriptNode =
+  | { type: "command"; raw: string }
+  | { type: "pipeline"; commands: ScriptNode[] }
+  | {
+      type: "for"
+      variable: string
+      start: number
+      end: number
+      body: ScriptNode
+    }
+  | {
+      type: "if"
+      condition: ScriptCondition
+      thenBranch: ScriptNode
+      elseBranch?: ScriptNode
+    }
+  | {
+      type: "while"
+      condition: ScriptCondition
+      body: ScriptNode
+      maxIterations: number
+    }
+
+function tokenizeScript(input: string): ScriptToken[] {
+  const tokens: ScriptToken[] = []
+  let i = 0
+  while (i < input.length) {
+    const ch = input[i]
+    if (ch === " " || ch === "\t" || ch === "\n" || ch === "\r") {
+      i++
+      continue
+    }
+    if (ch === "{") {
+      tokens.push({ type: "lbrace", value: "{" })
+      i++
+      continue
+    }
+    if (ch === "}") {
+      tokens.push({ type: "rbrace", value: "}" })
+      i++
+      continue
+    }
+    if (ch === "|") {
+      tokens.push({ type: "pipe", value: "|" })
+      i++
+      continue
+    }
+    if (ch === '"' || ch === "'") {
+      const quote = ch
+      let str = ""
+      i++
+      while (i < input.length && input[i] !== quote) {
+        if (input[i] === "\\" && i + 1 < input.length) {
+          i++
+          str += input[i]
+        } else {
+          str += input[i]
+        }
+        i++
+      }
+      if (i < input.length) i++
+      tokens.push({ type: "string", value: str })
+      continue
+    }
+    let word = ""
+    while (i < input.length && !" \t\n\r{}|\"'".includes(input[i])) {
+      word += input[i]
+      i++
+    }
+    if (word) tokens.push({ type: "word", value: word })
+  }
+  return tokens
+}
+
+class ScriptParser {
+  private tokens: ScriptToken[]
+  private pos: number
+  constructor(tokens: ScriptToken[]) {
+    this.tokens = tokens
+    this.pos = 0
+  }
+  peek(): ScriptToken | undefined {
+    return this.tokens[this.pos]
+  }
+  advance(): ScriptToken {
+    const t = this.tokens[this.pos]
+    if (!t) throw new Error("Unexpected end of script")
+    this.pos++
+    return t
+  }
+  expect(type: ScriptToken["type"], value?: string): ScriptToken {
+    const t = this.advance()
+    if (t.type !== type || (value !== undefined && t.value !== value))
+      throw new Error(
+        `Expected ${type}${value ? ` "${value}"` : ""}, got ${t.type} "${t.value}"`,
+      )
+    return t
+  }
+  isAtEnd(): boolean {
+    return this.pos >= this.tokens.length
+  }
+
+  parse(): ScriptNode {
+    return this.parsePipeline()
+  }
+
+  private parsePipeline(): ScriptNode {
+    const first = this.parseStatement()
+    const commands: ScriptNode[] = [first]
+    while (!this.isAtEnd() && this.peek()?.type === "pipe") {
+      this.advance()
+      commands.push(this.parseStatement())
+    }
+    return commands.length === 1 ? commands[0] : { type: "pipeline", commands }
+  }
+
+  private parseStatement(): ScriptNode {
+    const t = this.peek()
+    if (t?.type === "word") {
+      if (t.value === "for") return this.parseFor()
+      if (t.value === "if") return this.parseIf()
+      if (t.value === "while") return this.parseWhile()
+    }
+    return this.parseCommand()
+  }
+
+  private parseCommand(): ScriptNode {
+    const parts: string[] = []
+    while (!this.isAtEnd()) {
+      const t = this.peek()
+      if (!t || t.type === "pipe" || t.type === "rbrace" || t.type === "lbrace")
+        break
+      if (
+        t.type === "word" &&
+        ["for", "if", "while", "else"].includes(t.value) &&
+        parts.length === 0
+      )
+        break
+      const token = this.advance()
+      parts.push(token.type === "string" ? `"${token.value}"` : token.value)
+    }
+    if (parts.length === 0) throw new Error("Expected a command")
+    return { type: "command", raw: parts.join(" ") }
+  }
+
+  private parseFor(): ScriptNode {
+    this.expect("word", "for")
+    const varName = this.advance().value
+    this.expect("word", "in")
+    const rangeStr = this.advance().value
+    const match = rangeStr.match(/^(\d+)\.\.(\d+)$/)
+    if (!match)
+      throw new Error(`Invalid range: "${rangeStr}". Expected: start..end`)
+    this.expect("lbrace")
+    const body = this.parsePipeline()
+    this.expect("rbrace")
+    return {
+      type: "for",
+      variable: varName,
+      start: parseInt(match[1], 10),
+      end: parseInt(match[2], 10),
+      body,
+    }
+  }
+
+  private parseIf(): ScriptNode {
+    this.expect("word", "if")
+    const condition = this.parseCondition()
+    this.expect("lbrace")
+    const thenBody = this.parsePipeline()
+    this.expect("rbrace")
+    let elseBody: ScriptNode | undefined
+    if (!this.isAtEnd() && this.peek()?.value === "else") {
+      this.advance()
+      this.expect("lbrace")
+      elseBody = this.parsePipeline()
+      this.expect("rbrace")
+    }
+    return { type: "if", condition, thenBranch: thenBody, elseBranch: elseBody }
+  }
+
+  private parseWhile(): ScriptNode {
+    this.expect("word", "while")
+    const condition = this.parseCondition()
+    this.expect("lbrace")
+    const body = this.parsePipeline()
+    this.expect("rbrace")
+    return { type: "while", condition, body, maxIterations: 1000 }
+  }
+
+  private parseCondition(): ScriptCondition {
+    const left = this.advance().value
+    const op = this.advance().value
+    const right = this.advance().value
+    if (![">", "<", ">=", "<=", "==", "!="].includes(op))
+      throw new Error(`Invalid operator: "${op}"`)
+    return { left, op, right }
+  }
+}
+
+function resolveScriptValue(
+  value: string,
+  vars: Record<string, string>,
+): string {
+  return value.replace(
+    /\$([a-zA-Z_]\w*)/g,
+    (match, name) => vars[name] ?? match,
+  )
+}
+
+function evalScriptCondition(
+  condition: ScriptCondition,
+  vars: Record<string, string>,
+): boolean {
+  const left = resolveScriptValue(condition.left, vars)
+  const right = resolveScriptValue(condition.right, vars)
+  const leftNum = Number(left)
+  const rightNum = Number(right)
+  if (!Number.isNaN(leftNum) && !Number.isNaN(rightNum)) {
+    switch (condition.op) {
+      case ">":
+        return leftNum > rightNum
+      case "<":
+        return leftNum < rightNum
+      case ">=":
+        return leftNum >= rightNum
+      case "<=":
+        return leftNum <= rightNum
+      case "==":
+        return leftNum === rightNum
+      case "!=":
+        return leftNum !== rightNum
+    }
+  }
+  switch (condition.op) {
+    case "==":
+      return left === right
+    case "!=":
+      return left !== right
+    default:
+      return false
+  }
+}
+
+function evalScriptNode(
+  node: ScriptNode,
+  stream: NoteStream,
+  executor: (command: string, stream: NoteStream) => NoteStream,
+): NoteStream {
+  switch (node.type) {
+    case "command": {
+      const vars = stream.context.vars ?? {}
+      const resolved = resolveScriptValue(node.raw, vars)
+      return executor(resolved, stream)
+    }
+    case "pipeline": {
+      let current = stream
+      for (const cmd of node.commands) {
+        current = evalScriptNode(cmd, current, executor)
+      }
+      return current
+    }
+    case "for": {
+      let current = stream
+      for (let i = node.start; i <= node.end; i++) {
+        const vars = {
+          ...(current.context.vars ?? {}),
+          [node.variable]: String(i),
+        }
+        current = { ...current, context: { ...current.context, vars } }
+        current = evalScriptNode(node.body, current, executor)
+      }
+      return current
+    }
+    case "if": {
+      const vars = stream.context.vars ?? {}
+      if (evalScriptCondition(node.condition, vars)) {
+        return evalScriptNode(node.thenBranch, stream, executor)
+      }
+      if (node.elseBranch) {
+        return evalScriptNode(node.elseBranch, stream, executor)
+      }
+      return stream
+    }
+    case "while": {
+      let current = stream
+      let iterations = 0
+      while (iterations < node.maxIterations) {
+        const vars = current.context.vars ?? {}
+        if (!evalScriptCondition(node.condition, vars)) break
+        current = evalScriptNode(node.body, current, executor)
+        iterations++
+      }
+      return current
+    }
+  }
+}
+
+function evaluateRunScript(script: string, stream: NoteStream): NoteStream {
+  const tokens = tokenizeScript(script)
+  if (tokens.length === 0) return stream
+  const parser = new ScriptParser(tokens)
+  const ast = parser.parse()
+  return evalScriptNode(ast, stream, (command, s) => {
+    const cmd = parseCommandString(command)
+    if (!cmd.name) return s
+    const result = executeOneCommand(cmd, s)
+    return result.stream
   })
 }
 

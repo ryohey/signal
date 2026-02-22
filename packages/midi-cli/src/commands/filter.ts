@@ -9,6 +9,9 @@ export interface FilterOptions {
   from?: string
   to?: string
   invert?: boolean
+  nth?: string
+  random?: string
+  channel?: string
 }
 
 export async function filterCommand(options: FilterOptions): Promise<void> {
@@ -42,11 +45,39 @@ export async function filterCommand(options: FilterOptions): Promise<void> {
     predicates.push((n) => n.velocity >= min && n.velocity <= max)
   }
 
+  if (options.channel) {
+    const ch = parseInt(options.channel, 10)
+    predicates.push((n) => n.channel === ch)
+  }
+
   const match = (n: SerializedNote) => predicates.every((p) => p(n))
 
-  const notes = options.invert
-    ? stream.notes.filter((n) => !match(n))
-    : stream.notes.filter(match)
+  let notes: SerializedNote[]
+
+  if (options.nth) {
+    const nth = parseInt(options.nth, 10)
+    let count = 0
+    notes = stream.notes.filter((n) => {
+      if (match(n)) {
+        count++
+        return options.invert ? count % nth !== 0 : count % nth === 0
+      }
+      return !!options.invert
+    })
+  } else if (options.random) {
+    const pct = parseFloat(options.random)
+    notes = stream.notes.filter((n) => {
+      if (match(n)) {
+        const keep = Math.random() * 100 < pct
+        return options.invert ? !keep : keep
+      }
+      return !!options.invert
+    })
+  } else {
+    notes = options.invert
+      ? stream.notes.filter((n) => !match(n))
+      : stream.notes.filter(match)
+  }
 
   // Propagate selection range so downstream set-notes knows which region to replace
   const selection =

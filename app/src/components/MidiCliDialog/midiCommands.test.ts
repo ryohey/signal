@@ -535,6 +535,176 @@ describe("executeCommand integration", () => {
     })
   })
 
+  describe("voice-lead command", () => {
+    it("revoices chords for minimal voice movement", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+        },
+        notes: [
+          // C major chord in low octave
+          { tick: 0, duration: 480, noteNumber: 48, velocity: 100, id: 1 }, // C3
+          { tick: 0, duration: 480, noteNumber: 52, velocity: 100, id: 2 }, // E3
+          { tick: 0, duration: 480, noteNumber: 55, velocity: 100, id: 3 }, // G3
+          // G major chord in high octave - should be brought closer
+          { tick: 480, duration: 480, noteNumber: 79, velocity: 100, id: 4 }, // G5
+          { tick: 480, duration: 480, noteNumber: 83, velocity: 100, id: 5 }, // B5
+          { tick: 480, duration: 480, noteNumber: 86, velocity: 100, id: 6 }, // D6
+        ],
+      }
+      const result = executeCommand("voice-lead --key c-major", stream)
+      // The second chord should be revoiced closer to the first
+      const secondChordNotes = result.stream.notes.filter((n) => n.tick === 480)
+      const firstChordAvg = (48 + 52 + 55) / 3
+      for (const note of secondChordNotes) {
+        // Each note should be closer to the first chord's average than original
+        expect(Math.abs(note.noteNumber - firstChordAvg)).toBeLessThan(
+          Math.abs(79 - firstChordAvg),
+        )
+      }
+    })
+  })
+
+  describe("run command (scripting)", () => {
+    it("for loop adds notes iteratively", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+        },
+        notes: [],
+      }
+      const result = executeCommand(
+        "run 'for i in 1..3 { add-notes C4 --duration 1/4 }'",
+        stream,
+      )
+      // Each iteration adds a note; 3 iterations = 3 notes
+      expect(result.stream.notes.length).toBe(3)
+    })
+
+    it("if statement executes correct branch", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+          vars: { mode: "5" },
+        },
+        notes: [
+          { tick: 0, duration: 480, noteNumber: 60, velocity: 100, id: 1 },
+        ],
+      }
+      const result = executeCommand(
+        "run 'if $mode > 3 { transpose 12 } else { transpose -12 }'",
+        stream,
+      )
+      expect(result.stream.notes[0].noteNumber).toBe(72)
+    })
+
+    it("if/else executes else branch", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+          vars: { mode: "1" },
+        },
+        notes: [
+          { tick: 0, duration: 480, noteNumber: 60, velocity: 100, id: 1 },
+        ],
+      }
+      const result = executeCommand(
+        "run 'if $mode > 3 { transpose 12 } else { transpose -12 }'",
+        stream,
+      )
+      expect(result.stream.notes[0].noteNumber).toBe(48)
+    })
+  })
+
+  describe("filter with extended options", () => {
+    it("filter --channel selects notes by channel", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+        },
+        notes: [
+          {
+            tick: 0,
+            duration: 480,
+            noteNumber: 60,
+            velocity: 100,
+            channel: 0,
+            id: 1,
+          },
+          {
+            tick: 480,
+            duration: 480,
+            noteNumber: 64,
+            velocity: 100,
+            channel: 1,
+            id: 2,
+          },
+          {
+            tick: 960,
+            duration: 480,
+            noteNumber: 67,
+            velocity: 100,
+            channel: 0,
+            id: 3,
+          },
+        ],
+      }
+      const result = executeCommand("filter --channel 0", stream)
+      expect(result.stream.notes).toHaveLength(2)
+      expect(result.stream.notes.every((n) => n.channel === 0)).toBe(true)
+    })
+
+    it("filter --nth selects every Nth matching note", () => {
+      const stream = makeStream()
+      const result = executeCommand("filter --nth 2", stream)
+      // Every 2nd note: notes at index 1, 3, 5, 7, 9 (0-indexed)
+      expect(result.stream.notes).toHaveLength(5)
+    })
+
+    it("get-notes --channel filters by channel", () => {
+      const stream = {
+        context: {
+          timebase: 480,
+          measures: [{ tick: 0, measure: 0, numerator: 4, denominator: 4 }],
+        },
+        notes: [
+          {
+            tick: 0,
+            duration: 480,
+            noteNumber: 60,
+            velocity: 100,
+            channel: 0,
+            id: 1,
+          },
+          {
+            tick: 480,
+            duration: 480,
+            noteNumber: 64,
+            velocity: 100,
+            channel: 1,
+            id: 2,
+          },
+          {
+            tick: 960,
+            duration: 480,
+            noteNumber: 67,
+            velocity: 100,
+            channel: 0,
+            id: 3,
+          },
+        ],
+      }
+      const result = executeCommand("get-notes --channel 1", stream)
+      expect(result.stream.notes).toHaveLength(1)
+      expect(result.stream.notes[0].noteNumber).toBe(64)
+    })
+  })
+
   describe("help command", () => {
     it("returns comprehensive help text", () => {
       const stream = makeStream()
@@ -549,6 +719,8 @@ describe("executeCommand integration", () => {
       expect(result.message).toContain("thin")
       expect(result.message).toContain("compress")
       expect(result.message).toContain("let")
+      expect(result.message).toContain("voice-lead")
+      expect(result.message).toContain("run")
     })
   })
 })
