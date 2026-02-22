@@ -126,6 +126,36 @@ export const useUpdateValueEvents = (type: ValueEventType) => {
   )
 }
 
+export const useUpdateValueEventsWithCurve = (type: ValueEventType) => {
+  const { selectedTrackId } = usePianoRoll()
+  const { quantizeFloor, quantizeUnit } = useQuantizer()
+  const commands = useCommands()
+
+  return useCallback(
+    (
+      startValue: number,
+      endValue: number,
+      startTick: number,
+      endTick: number,
+      easing: (t: number) => number,
+    ) => {
+      commands.track.updateEventsInRangeWithEasing(
+        selectedTrackId,
+        ValueEventType.getEventPredicate(type),
+        ValueEventType.getEventFactory(type),
+        quantizeFloor,
+        quantizeUnit,
+        startValue,
+        endValue,
+        startTick,
+        endTick,
+        easing,
+      )
+    },
+    [commands, selectedTrackId, type, quantizeFloor, quantizeUnit],
+  )
+}
+
 /* note */
 
 export const useMuteNote = () => {

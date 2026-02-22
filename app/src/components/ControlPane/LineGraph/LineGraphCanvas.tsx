@@ -16,10 +16,13 @@ import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
 import { useCreateSelectionGesture } from "../Graph/MouseHandler/useCreateSelectionGesture"
-import { useLineGesture } from "../Graph/MouseHandler/useLineGesture"
+import {
+  curveEasings,
+  useCurveGesture,
+} from "../Graph/MouseHandler/useCurveGesture"
 import { usePencilGesture } from "../Graph/MouseHandler/usePencilGesture"
-import { useSingleGesture } from "../Graph/MouseHandler/useSingleGesture"
 import { ControlLineGraphItems } from "./ControlLineGraphItems"
+import { DragPreview } from "./DragPreview"
 import { LineGraphSelection } from "./LineGraphSelection"
 
 export interface LineGraphCanvasProps<
@@ -44,19 +47,24 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   circleRadius = 4,
 }: LineGraphCanvasProps<T>) => {
   const { mouseMode } = usePianoRoll()
-  const { controlPencilMode } = useControlPane()
+  const { controlPencilMode, controlCurveType } = useControlPane()
   const beats = useBeats()
   const theme = useTheme()
   const { cursorX, transform: tickTransform, scrollLeft } = useTickScroll()
+  const effectiveCurveType =
+    controlPencilMode === "line" ? "linear" : controlCurveType
   const handlePencilMouseDown = usePencilGesture(eventType)
-  const handleSingleMouseDown = useSingleGesture(eventType)
-  const { gesture: lineGesture, lineDragState } = useLineGesture(eventType)
+  const { gesture: curveGesture, curveDragState } = useCurveGesture(
+    eventType,
+    effectiveCurveType,
+  )
   const createSelectionGesture = useCreateSelectionGesture()
   const { onContextMenu, menuProps } = useContextMenu()
 
   const cursor = useMemo(() => {
     if (mouseMode !== "pencil") return "auto"
-    if (controlPencilMode === "line") return "crosshair"
+    if (controlPencilMode === "line" || controlPencilMode === "curve")
+      return "crosshair"
     return `url("./cursor-pencil.svg") 0 20, pointer`
   }, [mouseMode, controlPencilMode])
 
@@ -91,20 +99,12 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
     [controlTransform, handlePencilMouseDown, getLocal],
   )
 
-  const singleMouseDown: MouseEventHandler = useCallback(
+  const curveMouseDown: MouseEventHandler = useCallback(
     (ev) => {
       const local = getLocal(ev.nativeEvent)
-      handleSingleMouseDown.onMouseDown(ev.nativeEvent, local, controlTransform)
+      curveGesture.onMouseDown(ev.nativeEvent, local, controlTransform)
     },
-    [controlTransform, handleSingleMouseDown, getLocal],
-  )
-
-  const lineMouseDown: MouseEventHandler = useCallback(
-    (ev) => {
-      const local = getLocal(ev.nativeEvent)
-      lineGesture.onMouseDown(ev.nativeEvent, local, controlTransform)
-    },
-    [controlTransform, lineGesture, getLocal],
+    [controlTransform, curveGesture, getLocal],
   )
 
   const selectionMouseDown: MouseEventHandler = useCallback(
@@ -127,10 +127,9 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   const onMouseDown = useMemo(() => {
     if (mouseMode !== "pencil") return selectionMouseDown
     switch (controlPencilMode) {
-      case "single":
-        return singleMouseDown
       case "line":
-        return lineMouseDown
+      case "curve":
+        return curveMouseDown
       default:
         return pencilMouseDown
     }
@@ -138,8 +137,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
     mouseMode,
     controlPencilMode,
     selectionMouseDown,
-    singleMouseDown,
-    lineMouseDown,
+    curveMouseDown,
     pencilMouseDown,
   ])
 
@@ -173,41 +171,18 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
             <Cursor x={cursorX} height={height} zIndex={3} />
           </Transform>
         </GLCanvas>
-        {lineDragState !== null && controlPencilMode === "line" && (
-          <svg
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              pointerEvents: "none",
-            }}
-            width={width}
-            height={height}
-            aria-hidden="true"
-          >
-            <line
-              x1={lineDragState.start.x - scrollLeft}
-              y1={lineDragState.start.y}
-              x2={lineDragState.end.x - scrollLeft}
-              y2={lineDragState.end.y}
-              stroke={theme.themeColor}
-              strokeWidth={2}
-              strokeDasharray="6 3"
+        {curveDragState !== null &&
+          (controlPencilMode === "line" || controlPencilMode === "curve") && (
+            <DragPreview
+              start={curveDragState.start}
+              end={curveDragState.end}
+              scrollLeft={scrollLeft}
+              width={width}
+              height={height}
+              color={theme.themeColor}
+              easing={curveEasings[effectiveCurveType]}
             />
-            <circle
-              cx={lineDragState.start.x - scrollLeft}
-              cy={lineDragState.start.y}
-              r={4}
-              fill={theme.themeColor}
-            />
-            <circle
-              cx={lineDragState.end.x - scrollLeft}
-              cy={lineDragState.end.y}
-              r={4}
-              fill={theme.themeColor}
-            />
-          </svg>
-        )}
+          )}
       </div>
       <ControlSelectionContextMenu {...menuProps} />
     </>

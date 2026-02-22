@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useUpdateValueEvents } from "../../../../actions"
+import { useUpdateValueEventsWithCurve } from "../../../../actions"
 import { ValueEventType } from "../../../../entities/event/ValueEventType"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
@@ -10,18 +10,26 @@ import { useControlPane } from "../../../../hooks/useControlPane"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
-export type LineDragState = {
-  start: Point
-  end: Point
+export type CurveDragState = { start: Point; end: Point }
+
+export type CurveType = "linear" | "easeIn" | "easeOut"
+export const curveTypes = ["easeIn", "easeOut"] as CurveType[]
+
+export const curveEasings: Record<CurveType, (t: number) => number> = {
+  linear: (t) => t,
+  easeIn: (t) => (t * t + 1 - Math.cos((t * Math.PI) / 2)) / 2,
+  easeOut: (t) => (Math.sin((t * Math.PI) / 2) + t * (2 - t)) / 2,
 }
 
-export const useLineGesture = (type: ValueEventType) => {
+export const useCurveGesture = (type: ValueEventType, curveType: CurveType) => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { setSelectedEventIds, setSelection } = useControlPane()
   const { pushHistory } = useHistory()
-  const updateValueEvents = useUpdateValueEvents(type)
-  const [lineDragState, setLineDragState] = useState<LineDragState | null>(null)
+  const updateValueEvents = useUpdateValueEventsWithCurve(type)
+  const [curveDragState, setCurveDragState] = useState<CurveDragState | null>(
+    null,
+  )
 
   const gesture: MouseGesture<[Point, ControlCoordTransform]> = {
     onMouseDown(e, startPoint, transform) {
@@ -33,14 +41,14 @@ export const useLineGesture = (type: ValueEventType) => {
       setSelectedNoteIds([])
 
       const startClientPos = getClientPos(e)
-      setLineDragState({ start: startPoint, end: startPoint })
+      setCurveDragState({ start: startPoint, end: startPoint })
 
       observeDrag({
         onMouseMove(e) {
           const posPx = getClientPos(e)
           const deltaPx = Point.sub(posPx, startClientPos)
           const endPoint = Point.add(startPoint, deltaPx)
-          setLineDragState({ start: startPoint, end: endPoint })
+          setCurveDragState({ start: startPoint, end: endPoint })
         },
         onMouseUp(e) {
           const posPx = getClientPos(e)
@@ -57,12 +65,18 @@ export const useLineGesture = (type: ValueEventType) => {
           )
           const endTick = transform.getTick(endPoint.x)
 
-          updateValueEvents(startPos.value, endValue, startPos.tick, endTick)
-          setLineDragState(null)
+          updateValueEvents(
+            startPos.value,
+            endValue,
+            startPos.tick,
+            endTick,
+            curveEasings[curveType],
+          )
+          setCurveDragState(null)
         },
       })
     },
   }
 
-  return { gesture, lineDragState }
+  return { gesture, curveDragState }
 }
