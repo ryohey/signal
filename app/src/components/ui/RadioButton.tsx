@@ -23,7 +23,7 @@ const RowWrapper = styled.div`
   padding: 0.5rem 0;
   align-items: center;
 
-  &:hover ${Button} {
+  &:hover [data-radio-button] {
     border-color: var(--color-text-secondary);
   }
 `
@@ -47,7 +47,7 @@ export const RadioButton: FC<RadioButtonProps> = ({
 }) => {
   return (
     <RowWrapper onClick={onClick}>
-      <Button>{isSelected && <CheckIcon />}</Button>
+      <Button data-radio-button>{isSelected && <CheckIcon />}</Button>
       <RowLabel>{label}</RowLabel>
     </RowWrapper>
   )
