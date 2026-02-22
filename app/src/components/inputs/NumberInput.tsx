@@ -28,6 +28,7 @@ export const NumberInput: FC<NumberInputProps> = ({
 }) => {
   return (
     <NumericFormat
+      // @ts-expect-error - React 19 type compatibility issue with react-number-format
       value={value}
       onValueChange={({ floatValue }) => {
         if (floatValue !== undefined) {
