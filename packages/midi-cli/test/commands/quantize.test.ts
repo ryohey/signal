@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { NoteStream, SerializedNote } from "../../src/types.js"
 
 // Helper to create a test NoteStream

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { parsePosition } from "../../src/parse/position.js"
 import type { SerializedMeasure } from "../../src/types.js"
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
 describe("filter logic", () => {
@@ -24,14 +24,13 @@ describe("filter logic", () => {
   })
 
   it("filters by velocity range", () => {
-    const filtered = notes.filter(
-      (n) => n.velocity >= 80 && n.velocity <= 120,
-    )
+    const filtered = notes.filter((n) => n.velocity >= 80 && n.velocity <= 120)
     expect(filtered).toHaveLength(3)
   })
 
   it("invert: keeps notes that don't match", () => {
-    const match = (n: SerializedNote) => n.noteNumber >= 60 && n.noteNumber <= 72
+    const match = (n: SerializedNote) =>
+      n.noteNumber >= 60 && n.noteNumber <= 72
     const filtered = notes.filter((n) => !match(n))
     expect(filtered).toHaveLength(1)
     expect(filtered[0].noteNumber).toBe(48)

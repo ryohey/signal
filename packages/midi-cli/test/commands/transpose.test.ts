@@ -1,7 +1,10 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
-function transposeNote(note: SerializedNote, semitones: number): SerializedNote {
+function transposeNote(
+  note: SerializedNote,
+  semitones: number,
+): SerializedNote {
   return {
     ...note,
     noteNumber: Math.max(0, Math.min(127, note.noteNumber + semitones)),

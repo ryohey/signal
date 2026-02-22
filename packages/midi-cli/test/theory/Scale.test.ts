@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { Scale } from "../../src/theory/Scale.js"
 
 describe("Scale", () => {
@@ -62,9 +62,7 @@ describe("Scale", () => {
     })
 
     it("returns correct intervals for dorian", () => {
-      expect(Scale.getIntegerNotation("dorian")).toEqual([
-        0, 2, 3, 5, 7, 9, 10,
-      ])
+      expect(Scale.getIntegerNotation("dorian")).toEqual([0, 2, 3, 5, 7, 9, 10])
     })
 
     it("returns correct intervals for pentatonic scales", () => {
@@ -77,18 +75,14 @@ describe("Scale", () => {
     })
 
     it("returns correct intervals for blues scales", () => {
-      expect(Scale.getIntegerNotation("majorBlues")).toEqual([
-        0, 2, 3, 4, 7, 9,
-      ])
+      expect(Scale.getIntegerNotation("majorBlues")).toEqual([0, 2, 3, 4, 7, 9])
       expect(Scale.getIntegerNotation("minorBlues")).toEqual([
         0, 3, 5, 6, 7, 10,
       ])
     })
 
     it("returns correct intervals for whole tone scale", () => {
-      expect(Scale.getIntegerNotation("wholeTone")).toEqual([
-        0, 2, 4, 6, 8, 10,
-      ])
+      expect(Scale.getIntegerNotation("wholeTone")).toEqual([0, 2, 4, 6, 8, 10])
     })
 
     it("returns correct intervals for diminished scales", () => {

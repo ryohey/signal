@@ -1,12 +1,9 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
 // Re-implement duration logic for isolated testing (matching src/commands/duration.ts)
 
-function setDuration(
-  notes: SerializedNote[],
-  ticks: number,
-): SerializedNote[] {
+function setDuration(notes: SerializedNote[], ticks: number): SerializedNote[] {
   return notes.map((n) => ({ ...n, duration: ticks }))
 }
 

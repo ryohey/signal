@@ -1,12 +1,9 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
 // Re-implement invert logic for isolated testing (matching src/commands/invert.ts)
 
-function invertNotes(
-  notes: SerializedNote[],
-  axis?: number,
-): SerializedNote[] {
+function invertNotes(notes: SerializedNote[], axis?: number): SerializedNote[] {
   if (notes.length === 0) return notes
 
   let effectiveAxis: number

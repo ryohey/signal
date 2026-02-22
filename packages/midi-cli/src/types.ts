@@ -21,6 +21,7 @@ export interface NoteStreamContext {
     fromTick: number
     toTick: number
   }
+  vars?: Record<string, string>
 }
 
 export interface NoteStream {

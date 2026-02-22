@@ -67,7 +67,7 @@ const NOTE_NAMES: Record<string, number> = {
 /**
  * Parse a single note spec: "C4", "C#3", "60", "Eb5"
  */
-function parseNoteSpec(s: string): number {
+export function parseNoteSpec(s: string): number {
   const trimmed = s.trim()
 
   // Pure number

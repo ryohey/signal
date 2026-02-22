@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
 // Re-implement humanize logic for isolated testing (matching src/commands/humanize.ts)

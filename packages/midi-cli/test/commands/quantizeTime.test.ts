@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import type { SerializedNote } from "../../src/types.js"
 
 // Re-implement quantize-time logic for isolated testing (matching src/commands/quantizeTime.ts)

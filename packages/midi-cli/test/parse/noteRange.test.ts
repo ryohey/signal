@@ -1,5 +1,8 @@
-import { describe, it, expect } from "vitest"
-import { parseNoteRange, parseVelocityRange } from "../../src/parse/noteRange.js"
+import { describe, expect, it } from "vitest"
+import {
+  parseNoteRange,
+  parseVelocityRange,
+} from "../../src/parse/noteRange.js"
 
 describe("parseNoteRange", () => {
   it("parses numeric range '60-72'", () => {

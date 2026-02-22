@@ -295,4 +295,260 @@ describe("executeCommand integration", () => {
       expect(keptNotes).toHaveLength(8)
     })
   })
+
+  describe("add-notes command", () => {
+    it("adds individual notes", () => {
+      const stream = makeStream()
+      const result = executeCommand(
+        "add-notes C4 E4 G4 --at m1-1 --duration 1/4",
+        stream,
+      )
+      // 10 original + 3 new = 13
+      expect(result.stream.notes.length).toBe(13)
+      const newNotes = result.stream.notes.filter(
+        (n) =>
+          n.noteNumber === 60 || n.noteNumber === 64 || n.noteNumber === 67,
+      )
+      expect(newNotes.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it("adds chord symbols", () => {
+      const stream = makeStream()
+      const result = executeCommand(
+        "add-notes Cmaj7 --at m1-1 --duration 1/2",
+        stream,
+      )
+      // Cmaj7 has 4 notes: C E G B
+      const newNotes = result.stream.notes.filter(
+        (n) => n.tick === 0 && n.duration === 960,
+      )
+      expect(newNotes.length).toBe(4)
+    })
+
+    it("adds notes with --each for sequential placement", () => {
+      const stream = makeStream()
+      const result = executeCommand(
+        "add-notes C4 E4 G4 --at m1-1 --each 1/4 --duration 1/4",
+        stream,
+      )
+      const addedNotes = result.stream.notes.filter(
+        (n) =>
+          n.duration === 480 &&
+          n.velocity === 100 &&
+          !stream.notes.some((sn) => sn.id === n.id),
+      )
+      expect(addedNotes.length).toBe(3)
+      // Each at different ticks
+      const ticks = addedNotes.map((n) => n.tick)
+      expect(ticks[0]).toBe(0)
+      expect(ticks[1]).toBe(480)
+      expect(ticks[2]).toBe(960)
+    })
+
+    it("adds from scale", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [] as ReturnType<typeof makeStream>["notes"],
+      }
+      const result = executeCommand(
+        "add-notes --scale c-major --octave 4 --each 1/8",
+        stream,
+      )
+      // C major has 7 notes
+      expect(result.stream.notes.length).toBe(7)
+    })
+
+    it("adds from degree progression", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [] as ReturnType<typeof makeStream>["notes"],
+      }
+      const result = executeCommand(
+        "add-notes --degree I,IV,V --key c-major --each 1/1 --octave 4",
+        stream,
+      )
+      // 3 chords × 3 notes each = 9
+      expect(result.stream.notes.length).toBe(9)
+    })
+  })
+
+  describe("gen-pattern command", () => {
+    it("generates ascending arpeggio", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [] as ReturnType<typeof makeStream>["notes"],
+      }
+      const result = executeCommand(
+        "gen-pattern --arpeggio Cmaj7 --pattern up --duration 1/16 --at m1-1",
+        stream,
+      )
+      // Cmaj7 has 4 notes
+      expect(result.stream.notes.length).toBe(4)
+      // Notes should be in ascending order
+      for (let i = 1; i < result.stream.notes.length; i++) {
+        expect(result.stream.notes[i].noteNumber).toBeGreaterThanOrEqual(
+          result.stream.notes[i - 1].noteNumber,
+        )
+      }
+    })
+
+    it("generates with repeat", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [] as ReturnType<typeof makeStream>["notes"],
+      }
+      const result = executeCommand(
+        "gen-pattern --arpeggio Cm --pattern up --duration 1/8 --repeat 2",
+        stream,
+      )
+      // Cm has 3 notes × 2 repeats = 6
+      expect(result.stream.notes.length).toBe(6)
+    })
+  })
+
+  describe("remove command", () => {
+    it("removes notes in a time range", () => {
+      const stream = makeStream()
+      const result = executeCommand("remove --from m2-1 --to m3-1", stream)
+      // Should remove 4 notes in measure 2
+      expect(result.stream.notes.length).toBe(6)
+    })
+
+    it("removes by pitch range", () => {
+      const stream = makeStream()
+      const result = executeCommand("remove --pitch 60-65", stream)
+      const remaining = result.stream.notes.every(
+        (n) => n.noteNumber > 65 || n.noteNumber < 60,
+      )
+      expect(remaining).toBe(true)
+    })
+  })
+
+  describe("slice command", () => {
+    it("extracts a section", () => {
+      const stream = makeStream()
+      const result = executeCommand("slice --from m1-1 --to m2-1", stream)
+      expect(result.stream.notes.length).toBe(4)
+    })
+
+    it("rebases to zero with --zero", () => {
+      const stream = makeStream()
+      const result = executeCommand(
+        "slice --from m2-1 --to m3-1 --zero",
+        stream,
+      )
+      expect(result.stream.notes.length).toBe(4)
+      expect(result.stream.notes[0].tick).toBe(0)
+    })
+  })
+
+  describe("repeat command", () => {
+    it("repeats notes", () => {
+      const stream = makeStream()
+      const sliced = executeCommand("slice --from m1-1 --to m2-1", stream)
+      const result = executeCommand("repeat 3", sliced.stream)
+      // 4 notes × 3 = 12
+      expect(result.stream.notes.length).toBe(12)
+    })
+  })
+
+  describe("harmonize command", () => {
+    it("adds diatonic thirds", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [
+          { tick: 0, duration: 480, noteNumber: 60, velocity: 100 },
+          { tick: 480, duration: 480, noteNumber: 62, velocity: 100 },
+        ],
+      }
+      const result = executeCommand(
+        "harmonize --interval 3rd --key c-major",
+        stream,
+      )
+      // 2 original + 2 harmony = 4
+      expect(result.stream.notes.length).toBe(4)
+    })
+  })
+
+  describe("analyze command", () => {
+    it("identifies chords from clusters", () => {
+      const stream = {
+        context: makeStream().context,
+        notes: [
+          { tick: 0, duration: 480, noteNumber: 60, velocity: 100 },
+          { tick: 0, duration: 480, noteNumber: 64, velocity: 100 },
+          { tick: 0, duration: 480, noteNumber: 67, velocity: 100 },
+        ],
+      }
+      const result = executeCommand("analyze", stream)
+      expect(result.message).toContain("C")
+    })
+  })
+
+  describe("thin command", () => {
+    it("density-based thinning", () => {
+      const stream = makeStream()
+      const result = executeCommand("thin --max-density 1 --per 1/1", stream)
+      // Should keep at most 1 note per measure
+      expect(result.stream.notes.length).toBeLessThanOrEqual(3)
+    })
+  })
+
+  describe("compress command", () => {
+    it("compresses velocity range", () => {
+      const stream = makeStream()
+      const result = executeCommand("compress --range 60-100", stream)
+      for (const note of result.stream.notes) {
+        expect(note.velocity).toBeGreaterThanOrEqual(60)
+        expect(note.velocity).toBeLessThanOrEqual(100)
+      }
+    })
+
+    it("compresses by ratio", () => {
+      const stream = makeStream()
+      const result = executeCommand("compress --ratio 2", stream)
+      // Velocities should be closer to mean
+      const mean =
+        stream.notes.reduce((s, n) => s + n.velocity, 0) / stream.notes.length
+      for (const note of result.stream.notes) {
+        const origNote = stream.notes.find((n) => n.id === note.id)
+        if (!origNote) continue
+        const origDiff = Math.abs(origNote.velocity - mean)
+        const newDiff = Math.abs(note.velocity - mean)
+        expect(newDiff).toBeLessThanOrEqual(origDiff + 1) // +1 for rounding
+      }
+    })
+  })
+
+  describe("let command and variable substitution", () => {
+    it("sets variables on context", () => {
+      const stream = makeStream()
+      const result = executeCommand("let key=c-major", stream)
+      expect(result.stream.context.vars?.key).toBe("c-major")
+    })
+
+    it("variables are substituted in subsequent commands", () => {
+      const stream = makeStream()
+      const result = executeCommand("let amount=5 | transpose $amount", stream)
+      // Should have transposed by 5
+      expect(result.stream.notes[0].noteNumber).toBe(65)
+    })
+  })
+
+  describe("help command", () => {
+    it("returns comprehensive help text", () => {
+      const stream = makeStream()
+      const result = executeCommand("help", stream)
+      expect(result.message).toContain("add-notes")
+      expect(result.message).toContain("gen-pattern")
+      expect(result.message).toContain("remove")
+      expect(result.message).toContain("slice")
+      expect(result.message).toContain("repeat")
+      expect(result.message).toContain("harmonize")
+      expect(result.message).toContain("analyze")
+      expect(result.message).toContain("thin")
+      expect(result.message).toContain("compress")
+      expect(result.message).toContain("let")
+    })
+  })
 })

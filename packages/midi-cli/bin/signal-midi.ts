@@ -1,19 +1,31 @@
 #!/usr/bin/env node
 
 import { Command } from "commander"
+import { addNotesCommand } from "../src/commands/addNotes.js"
+import { analyzeCommand } from "../src/commands/analyze.js"
+import { compressCommand } from "../src/commands/compress.js"
+import { copyCommand, cutCommand, pasteCommand } from "../src/commands/copy.js"
 import { durationCommand } from "../src/commands/duration.js"
 import { filterCommand } from "../src/commands/filter.js"
+import { genPatternCommand } from "../src/commands/genPattern.js"
 import { getNotesCommand } from "../src/commands/getNotes.js"
+import { harmonizeCommand } from "../src/commands/harmonize.js"
 import { humanizeCommand } from "../src/commands/humanize.js"
 import { infoCommand } from "../src/commands/info.js"
 import { invertCommand } from "../src/commands/invert.js"
+import { letCommand } from "../src/commands/let.js"
 import { loadCommand } from "../src/commands/load.js"
 import { quantizeCommand } from "../src/commands/quantize.js"
 import { quantizeTimeCommand } from "../src/commands/quantizeTime.js"
+import { removeCommand } from "../src/commands/remove.js"
+import { repeatCommand } from "../src/commands/repeat.js"
 import { retrogradeCommand } from "../src/commands/retrograde.js"
 import { saveCommand } from "../src/commands/save.js"
 import { setNotesCommand } from "../src/commands/setNotes.js"
 import { shiftCommand } from "../src/commands/shift.js"
+import { sliceCommand } from "../src/commands/slice.js"
+import { spreadCommand } from "../src/commands/spread.js"
+import { thinCommand } from "../src/commands/thin.js"
 import { transposeCommand } from "../src/commands/transpose.js"
 import { velocityCommand } from "../src/commands/velocity.js"
 
@@ -54,6 +66,53 @@ program
       from: options.from ?? options.start,
       to: options.to ?? options.end,
     })
+  })
+
+// ─── Note Generation Commands ───
+
+program
+  .command("add-notes")
+  .description(
+    "Add notes or chords to the stream (e.g., add-notes C4 E4 G4, add-notes Cmaj7)",
+  )
+  .argument("[notes...]", "Note names (C4, Eb5) or chord symbols (Cmaj7, Dm)")
+  .option("--at <position>", "Position to insert at (e.g., m1-1, t0)")
+  .option("--duration <value>", "Note duration (e.g., 1/4, 1/8)", "1/4")
+  .option("--each <value>", "Time between successive groups (e.g., 1/1)")
+  .option("--velocity <n>", "Velocity (0-127)", "100")
+  .option("--octave <n>", "Default octave for chord symbols", "4")
+  .option("--strum <ticks>", "Strum offset between chord notes in ticks", "0")
+  .option("--scale <key-scale>", "Generate scale notes (e.g., c-major)")
+  .option("--degree <degrees...>", "Roman numeral degrees (e.g., I IV V I)")
+  .option("--key <key-scale>", "Key for degree resolution (e.g., c-major)")
+  .option("--rest", "Insert a rest (silence)")
+  .option("--channel <n>", "MIDI channel")
+  .action(async (notes, options) => {
+    await addNotesCommand(notes, options)
+  })
+
+program
+  .command("gen-pattern")
+  .description("Generate repeating melodic/rhythmic patterns")
+  .option("--arpeggio <chord>", "Chord to arpeggiate (e.g., Cmaj7)")
+  .option("--notes <notes...>", "Note names to pattern (e.g., C4 E4 G4)")
+  .option(
+    "--pattern <dir>",
+    "Pattern direction: up, down, updown, downup, random",
+    "up",
+  )
+  .option("--duration <value>", "Note duration (e.g., 1/16)", "1/8")
+  .option("--octaves <n>", "Number of octaves to span", "1")
+  .option("--at <position>", "Start position")
+  .option("--repeat <n>", "Number of repetitions", "1")
+  .option("--velocity <n>", "Velocity (0-127)", "100")
+  .option(
+    "--rhythm <durations>",
+    "Space-separated rhythm (e.g., '1/8 1/8 1/4')",
+  )
+  .option("--channel <n>", "MIDI channel")
+  .action(async (options) => {
+    await genPatternCommand(options)
   })
 
 // ─── Transform Commands ───
@@ -165,6 +224,128 @@ program
   .description("Reverse the order/timing of notes")
   .action(async () => {
     await retrogradeCommand()
+  })
+
+program
+  .command("harmonize")
+  .description("Add diatonic harmony notes")
+  .requiredOption(
+    "--interval <interval>",
+    "Interval: 2nd, 3rd, 4th, 5th, 6th, 7th, octave",
+  )
+  .requiredOption("--key <key-scale>", "Key (e.g., c-major, d-minor)")
+  .option("--chord", "Add full diatonic triad instead of single interval")
+  .action(async (options) => {
+    await harmonizeCommand(options)
+  })
+
+// ─── Section Operations ───
+
+program
+  .command("remove")
+  .description("Remove matching notes from the stream")
+  .option("--from <position>", "Start position")
+  .option("--to <position>", "End position")
+  .option("--pitch <range>", "Pitch range")
+  .option("--velocity <range>", "Velocity range")
+  .option("--nth <n>", "Remove every Nth matching note")
+  .action(async (options) => {
+    await removeCommand(options)
+  })
+
+program
+  .command("slice")
+  .description("Extract a section of notes")
+  .option("--from <position>", "Start position")
+  .option("--to <position>", "End position")
+  .option("--zero", "Rebase extracted notes to tick 0")
+  .action(async (options) => {
+    await sliceCommand(options)
+  })
+
+program
+  .command("repeat")
+  .description("Repeat notes N times end-to-end")
+  .argument("<count>", "Number of repetitions")
+  .option("--gap <value>", "Gap between repetitions (e.g., 1/4)")
+  .action(async (count, options) => {
+    await repeatCommand(count, options)
+  })
+
+program
+  .command("copy")
+  .description("Copy current notes to clipboard")
+  .action(async () => {
+    await copyCommand()
+  })
+
+program
+  .command("cut")
+  .description("Cut current notes to clipboard (removes from stream)")
+  .action(async () => {
+    await cutCommand()
+  })
+
+program
+  .command("paste")
+  .description("Paste notes from clipboard")
+  .option("--at <position>", "Position to paste at")
+  .option("--merge", "Merge with existing notes")
+  .action(async (options) => {
+    await pasteCommand(options)
+  })
+
+// ─── Density & Voice Commands ───
+
+program
+  .command("thin")
+  .description("Thin out notes by percentage or density")
+  .argument("[percent]", "Keep N% of notes randomly")
+  .option("--max-density <n>", "Maximum notes per grid unit")
+  .option("--per <value>", "Grid unit for density (e.g., 1/4)")
+  .action(async (percent, options) => {
+    await thinCommand(percent, options)
+  })
+
+program
+  .command("spread")
+  .description("Split notes into voices by pitch")
+  .option("--voices <n>", "Number of voices", "2")
+  .option("--channel <channels>", "Comma-separated channel assignments")
+  .action(async (options) => {
+    await spreadCommand(options)
+  })
+
+program
+  .command("compress")
+  .description("Compress velocity dynamics")
+  .option("--range <min-max>", "Target velocity range (e.g., 40-100)")
+  .option("--ratio <n>", "Compression ratio toward mean (e.g., 2)")
+  .action(async (options) => {
+    await compressCommand(options)
+  })
+
+// ─── Analysis Commands ───
+
+program
+  .command("analyze")
+  .description("Identify chords from note clusters")
+  .option("--key <key-scale>", "Key for Roman numeral analysis")
+  .action(async (options) => {
+    await analyzeCommand(options)
+  })
+
+// ─── Scripting Commands ───
+
+program
+  .command("let")
+  .description("Set variables on the stream context")
+  .argument(
+    "<assignments...>",
+    "Variable assignments (e.g., key=c-major tempo=120)",
+  )
+  .action(async (assignments) => {
+    await letCommand(assignments)
   })
 
 // ─── Sink Commands ───
