@@ -77,6 +77,59 @@ describe("executeCommand integration", () => {
     })
   })
 
+  describe("--start/--end aliases", () => {
+    it("get-notes --start m1-1 --end m2-1 works like --from/--to", () => {
+      const stream = makeStream()
+      const result = executeCommand("get-notes --start m1-1 --end m2-1", stream)
+      expect(result.stream.notes).toHaveLength(4)
+      expect(result.stream.notes.map((n) => n.noteNumber)).toEqual([
+        60, 64, 67, 72,
+      ])
+      expect(result.stream.context.selection).toEqual({
+        fromTick: 0,
+        toTick: 1920,
+      })
+    })
+
+    it("filter --start m2-1 --end m3-1 works like --from/--to", () => {
+      const stream = makeStream()
+      const result = executeCommand("filter --start m2-1 --end m3-1", stream)
+      expect(result.stream.notes).toHaveLength(4)
+      expect(result.stream.notes.map((n) => n.noteNumber)).toEqual([
+        62, 65, 69, 74,
+      ])
+    })
+
+    it("get-notes --start m1-1 --end m2-1 | retrograde", () => {
+      const stream = makeStream()
+      const result = executeCommand(
+        "get-notes --start m1-1 --end m2-1 | retrograde",
+        stream,
+      )
+      expect(result.stream.notes).toHaveLength(4)
+      expect(result.stream.notes.map((n) => n.noteNumber)).toEqual([
+        72, 67, 64, 60,
+      ])
+    })
+  })
+
+  describe("m0 edge case (clamp to tick 0)", () => {
+    it("m0-0 clamps to tick 0 instead of going negative", () => {
+      const stream = makeStream()
+      const result = executeCommand("get-notes --from m0-0 --to m2-1", stream)
+      // m0-0 clamps to 0, m2-1 = 1920 → selects measures 1
+      expect(result.stream.notes).toHaveLength(4)
+      expect(result.stream.context.selection?.fromTick).toBe(0)
+    })
+
+    it("m0 clamps to tick 0", () => {
+      const stream = makeStream()
+      const result = executeCommand("get-notes --from m0 --to m1-1", stream)
+      // m0 clamps to 0, m1-1 = 0 → empty range [0, 0)
+      expect(result.stream.notes).toHaveLength(0)
+    })
+  })
+
   describe("piped commands", () => {
     it("get-notes --from m1-1 --to m2-1 | retrograde", () => {
       const stream = makeStream()

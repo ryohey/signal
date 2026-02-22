@@ -72,7 +72,7 @@ function mbtToTick(
   const deltaMeasures = targetMeasure - measureDef.measure
   const baseTick = measureDef.tick + deltaMeasures * ticksPerMeasure
 
-  return baseTick + targetBeat * ticksPerBeat + subTick
+  return Math.max(0, baseTick + targetBeat * ticksPerBeat + subTick)
 }
 
 /**

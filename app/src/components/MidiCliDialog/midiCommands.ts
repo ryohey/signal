@@ -332,11 +332,12 @@ function parsePosition(
     const ticksPerBeat = (timebase * 4) / measureDef.denominator
     const ticksPerMeasure = ticksPerBeat * measureDef.numerator
     const deltaMeasures = targetMeasure - measureDef.measure
-    return (
+    return Math.max(
+      0,
       measureDef.tick +
-      deltaMeasures * ticksPerMeasure +
-      targetBeat * ticksPerBeat +
-      subTick
+        deltaMeasures * ticksPerMeasure +
+        targetBeat * ticksPerBeat +
+        subTick,
     )
   }
 
@@ -694,18 +695,20 @@ function executeOneCommand(
       const predicates: ((n: SerializedNote) => boolean)[] = []
       let filterFromTick: number | undefined
       let filterToTick: number | undefined
-      if (cmd.options.from) {
+      const filterFromOpt = cmd.options.from ?? cmd.options.start
+      const filterToOpt = cmd.options.to ?? cmd.options.end
+      if (filterFromOpt) {
         filterFromTick = parsePosition(
-          cmd.options.from as string,
+          filterFromOpt as string,
           context.timebase,
           context.measures,
         )
         const ft = filterFromTick
         predicates.push((n) => n.tick >= ft)
       }
-      if (cmd.options.to) {
+      if (filterToOpt) {
         filterToTick = parsePosition(
-          cmd.options.to as string,
+          filterToOpt as string,
           context.timebase,
           context.measures,
         )
@@ -740,18 +743,20 @@ function executeOneCommand(
       let getFromTick: number | undefined
       let getToTick: number | undefined
       const totalBefore = notes.length
-      if (cmd.options.from) {
+      const fromOpt = cmd.options.from ?? cmd.options.start
+      const toOpt = cmd.options.to ?? cmd.options.end
+      if (fromOpt) {
         getFromTick = parsePosition(
-          cmd.options.from as string,
+          fromOpt as string,
           context.timebase,
           context.measures,
         )
         const ft = getFromTick
         predicates.push((n) => n.tick >= ft)
       }
-      if (cmd.options.to) {
+      if (toOpt) {
         getToTick = parsePosition(
-          cmd.options.to as string,
+          toOpt as string,
           context.timebase,
           context.measures,
         )
@@ -843,8 +848,10 @@ function executeOneCommand(
         "  quantize-time -g <grid>         Quantize timing (e.g., 1/8, 1/16)",
         "  velocity <op> [values]          Adjust velocity (set/add/scale/ramp/random)",
         "  shift <amount>                  Move in time (+120t, -1b, +2m)",
-        "  filter [--pitch] [--velocity]   Filter notes by criteria",
-        "  get-notes [--from] [--to]       Select notes by position/pitch",
+        "  filter [--from/--start] [--to/--end]  Filter notes by criteria",
+        "  get-notes [--from/--start] [--to/--end]  Select notes by position/pitch",
+        "",
+        "Positions: m1-1 (measure 1 beat 1), m2-3 (measure 2 beat 3), t480 (tick 480)",
         "  duration <op> [value]           Adjust durations (set/scale/legato/staccato)",
         "  humanize [--time] [--velocity]  Add random variation",
         "  invert [--axis <note>]          Mirror pitches",

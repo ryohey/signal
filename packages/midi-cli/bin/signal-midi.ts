@@ -43,11 +43,17 @@ program
     "Filter notes from a piped NoteStream by position, pitch, or velocity",
   )
   .option("--from <position>", "Start position (e.g., m1-2, t480)")
+  .option("--start <position>", "Alias for --from")
   .option("--to <position>", "End position (e.g., m3-1, t1920)")
+  .option("--end <position>", "Alias for --to")
   .option("--pitch <range>", "Pitch range (e.g., 60-72, C4-C5)")
   .option("--velocity <range>", "Velocity range (e.g., 0-64)")
   .action(async (options) => {
-    await getNotesCommand(options)
+    await getNotesCommand({
+      ...options,
+      from: options.from ?? options.start,
+      to: options.to ?? options.end,
+    })
   })
 
 // ─── Transform Commands ───
@@ -113,10 +119,16 @@ program
   .option("--pitch <range>", "Pitch range (e.g., 60-72, C4-C5)")
   .option("--velocity <range>", "Velocity range (e.g., 0-64)")
   .option("--from <position>", "Start position")
+  .option("--start <position>", "Alias for --from")
   .option("--to <position>", "End position")
+  .option("--end <position>", "Alias for --to")
   .option("--invert", "Keep notes that do NOT match the criteria")
   .action(async (options) => {
-    await filterCommand(options)
+    await filterCommand({
+      ...options,
+      from: options.from ?? options.start,
+      to: options.to ?? options.end,
+    })
   })
 
 program
@@ -163,10 +175,16 @@ program
   .argument("<file>", "Path to MIDI file to modify")
   .option("-t, --track <number>", "Track number (1-indexed)", "1")
   .option("--from <position>", "Replace notes starting from this position")
+  .option("--start <position>", "Alias for --from")
   .option("--to <position>", "Replace notes up to this position")
+  .option("--end <position>", "Alias for --to")
   .option("--merge", "Merge with existing notes instead of replacing")
   .action(async (file, options) => {
-    await setNotesCommand(file, options)
+    await setNotesCommand(file, {
+      ...options,
+      from: options.from ?? options.start,
+      to: options.to ?? options.end,
+    })
   })
 
 program
