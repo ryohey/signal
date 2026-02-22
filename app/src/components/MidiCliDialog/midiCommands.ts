@@ -739,6 +739,7 @@ function executeOneCommand(
       const predicates: ((n: SerializedNote) => boolean)[] = []
       let getFromTick: number | undefined
       let getToTick: number | undefined
+      const totalBefore = notes.length
       if (cmd.options.from) {
         getFromTick = parsePosition(
           cmd.options.from as string,
@@ -773,9 +774,16 @@ function executeOneCommand(
               toTick: getToTick ?? Number.POSITIVE_INFINITY,
             }
           : context.selection
+      const rangeParts: string[] = []
+      if (getFromTick !== undefined) rangeParts.push(`from=t${getFromTick}`)
+      if (getToTick !== undefined) rangeParts.push(`to=t${getToTick}`)
+      const rangeInfo =
+        rangeParts.length > 0
+          ? ` (${rangeParts.join(" ")} | timebase=${context.timebase} measures=${context.measures.length})`
+          : ""
       return {
         stream: { context: { ...context, selection: getSelection }, notes },
-        message: `Selected ${notes.length} notes`,
+        message: `Selected ${notes.length}/${totalBefore} notes${rangeInfo}`,
       }
     }
 
