@@ -237,6 +237,61 @@ export class TrackCommandService {
     track.updateEvents(notes)
   }
 
+  // Update events in the range with easing interpolation values
+  updateEventsInRangeWithEasing = (
+    trackId: TrackId,
+    filterEvent: (e: TrackEvent) => boolean,
+    createEvent: (value: number) => AnyEvent,
+    quantizeFloor: (tick: number) => number,
+    quantizeUnit: number,
+    startValue: number,
+    endValue: number,
+    startTick: number,
+    endTick: number,
+    easing: (t: number) => number,
+  ) => {
+    const track = this.songStore.song.getTrack(trackId)
+    if (!track) return
+
+    const minTick = Math.min(startTick, endTick)
+    const maxTick = Math.max(startTick, endTick)
+    const _startTick = quantizeFloor(Math.max(0, minTick))
+    const _endTick = quantizeFloor(Math.max(0, maxTick))
+
+    const getValue =
+      endTick === startTick
+        ? () => endValue
+        : (tick: number) => {
+            const t = (tick - startTick) / (endTick - startTick)
+            const easedT = easing(t)
+            const value = startValue + easedT * (endValue - startValue)
+            return Math.floor(
+              Math.min(
+                Math.max(startValue, endValue),
+                Math.max(Math.min(startValue, endValue), value),
+              ),
+            )
+          }
+
+    const events = track.events.filter(filterEvent).filter(
+      (e) =>
+        e.tick !== startTick &&
+        e.tick >= Math.min(minTick, _startTick) &&
+        e.tick <= Math.max(maxTick, _endTick),
+    )
+
+    transaction(() => {
+      track.removeEvents(events.map((e) => e.id))
+      const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(
+        (tick) => ({
+          ...createEvent(getValue(tick)),
+          tick,
+        }),
+      )
+      track.addEvents(newEvents)
+    })
+  }
+
   // Update  events in the range with linear interpolation values
   updateEventsInRange = (
     trackId: TrackId,
