@@ -8,6 +8,7 @@ import {
   useDuplicateSelection,
   useExpandSelection,
   useGoToBeginning,
+  useGoToEnd,
   useInputNoteByKey,
   useMoveCursor,
   useMoveSelectedNotes,
@@ -42,6 +43,7 @@ export const usePianoNotesKeyboardShortcut = () => {
   const deleteAndSelectPrevious = useDeleteAndSelectPrevious()
   const moveCursor = useMoveCursor()
   const goToBeginning = useGoToBeginning()
+  const goToEnd = useGoToEnd()
   const moveSelectedNotes = useMoveSelectedNotes()
 
   const handleShiftRight = useCallback(() => {
@@ -74,6 +76,7 @@ export const usePianoNotesKeyboardShortcut = () => {
   const actions = useMemo(
     () => [
       // ─── Note Input (letter keys) ───
+      // Bare letter = place note and advance cursor
       { code: "KeyC", run: () => inputNoteByKey("C") },
       { code: "KeyD", run: () => inputNoteByKey("D") },
       { code: "KeyE", run: () => inputNoteByKey("E") },
@@ -82,15 +85,57 @@ export const usePianoNotesKeyboardShortcut = () => {
       { code: "KeyA", run: () => inputNoteByKey("A") },
       { code: "KeyB", run: () => inputNoteByKey("B") },
 
+      // Shift+letter = place note at same position (no advance)
+      {
+        code: "KeyC",
+        shiftKey: true,
+        run: () => inputNoteByKey("C", false),
+      },
+      {
+        code: "KeyD",
+        shiftKey: true,
+        run: () => inputNoteByKey("D", false),
+      },
+      {
+        code: "KeyE",
+        shiftKey: true,
+        run: () => inputNoteByKey("E", false),
+      },
+      {
+        code: "KeyF",
+        shiftKey: true,
+        run: () => inputNoteByKey("F", false),
+      },
+      {
+        code: "KeyG",
+        shiftKey: true,
+        run: () => inputNoteByKey("G", false),
+      },
+      {
+        code: "KeyA",
+        shiftKey: true,
+        run: () => inputNoteByKey("A", false),
+      },
+      {
+        code: "KeyB",
+        shiftKey: true,
+        run: () => inputNoteByKey("B", false),
+      },
+
       // ─── Navigation (always active, pitch-proximity based) ───
       { code: "ArrowRight", run: () => selectNoteByProximity(1) },
       { code: "ArrowLeft", run: () => selectNoteByProximity(-1) },
 
-      // ─── Ctrl+Left to go to beginning (when nothing selected) ───
+      // ─── Ctrl+Left to go to beginning, Ctrl+Right to go to last note ───
       {
         code: "ArrowLeft",
         metaKey: true,
         run: handleCtrlLeft,
+      },
+      {
+        code: "ArrowRight",
+        metaKey: true,
+        run: goToEnd,
       },
 
       // ─── Same-tick cycling (Ctrl/Cmd+Up/Down) ───
@@ -170,6 +215,7 @@ export const usePianoNotesKeyboardShortcut = () => {
       inputNoteByKey,
       selectNoteByProximity,
       handleCtrlLeft,
+      goToEnd,
       cycleSameTickNote,
       transposeSelection,
       handleShiftRight,

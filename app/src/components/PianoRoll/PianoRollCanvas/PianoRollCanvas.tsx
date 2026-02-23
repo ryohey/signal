@@ -9,7 +9,6 @@ import { usePianoRoll } from "../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { EditCursor } from "../../GLNodes/EditCursor"
 import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
@@ -26,9 +25,9 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
   width,
   height,
 }) => {
-  const { ghostTrackIds, mouseMode, cursorTick } = usePianoRoll()
+  const { ghostTrackIds, mouseMode } = usePianoRoll()
   const beats = useBeats()
-  const { cursorX, setCanvasWidth, scrollLeft, transform } = useTickScroll()
+  const { cursorX, setCanvasWidth, scrollLeft } = useTickScroll()
   const { scrollTop, setCanvasHeight } = useKeyScroll()
 
   const mouseHandler = useNoteMouseGesture()
@@ -76,11 +75,6 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
     [scrollLeft, scrollTop],
   )
 
-  const editCursorX = useMemo(
-    () => transform.getX(cursorTick),
-    [transform, cursorTick],
-  )
-
   const style = useMemo(
     () => ({
       backgroundColor: theme.editorBackgroundColor,
@@ -106,7 +100,6 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
         <Transform matrix={scrollXMatrix}>
           <Beats height={height} beats={beats} zIndex={1} />
           <Cursor x={cursorX} height={height} zIndex={5} />
-          <EditCursor x={editCursorX} height={height} zIndex={4.5} />
         </Transform>
         <Transform matrix={scrollXYMatrix}>
           {ghostTrackIds.map((trackId) => (

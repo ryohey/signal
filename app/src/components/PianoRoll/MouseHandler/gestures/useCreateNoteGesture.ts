@@ -4,6 +4,7 @@ import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { usePlayer } from "../../../../hooks/usePlayer"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
@@ -23,6 +24,10 @@ export const useCreateNoteGesture = (): MouseGesture => {
     getLocal,
     setNewNoteVelocity,
     setLastNoteDuration,
+    setSelectedNoteIds,
+    setCursorTick,
+    setCursorNoteNumber,
+    setLastNavigatedNoteNumber,
   } = usePianoRoll()
   const { quantizeRound, quantizeFloor, quantizeUnit, isQuantizeEnabled } =
     useQuantizer()
@@ -31,6 +36,7 @@ export const useCreateNoteGesture = (): MouseGesture => {
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const { previewNoteOn, previewNoteOff } = usePreviewNote()
+  const { setPosition } = usePlayer()
 
   return {
     onMouseDown: useCallback(
@@ -68,6 +74,13 @@ export const useCreateNoteGesture = (): MouseGesture => {
         if (note === undefined) {
           return
         }
+
+        // Select the newly created note and sync cursor
+        setSelectedNoteIds([note.id])
+        setCursorTick(quantizedTick)
+        setCursorNoteNumber(noteNumber)
+        setLastNavigatedNoteNumber(noteNumber)
+        setPosition(quantizedTick)
 
         // Preview the note at current velocity
         previewNoteOn(noteNumber, undefined, newNoteVelocity)
@@ -144,6 +157,11 @@ export const useCreateNoteGesture = (): MouseGesture => {
         previewNoteOff,
         setNewNoteVelocity,
         setLastNoteDuration,
+        setSelectedNoteIds,
+        setCursorTick,
+        setCursorNoteNumber,
+        setLastNavigatedNoteNumber,
+        setPosition,
       ],
     ),
   }

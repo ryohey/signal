@@ -2,6 +2,7 @@ import { isNoteEvent } from "@signal-app/core"
 import { useSelectNote } from "../../../../actions"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { usePlayer } from "../../../../hooks/usePlayer"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
@@ -17,6 +18,7 @@ const useDragNoteEdgeGesture =
       setLastNavigatedNoteNumber,
     } = usePianoRoll()
     const { channel, getEventById } = useTrack(selectedTrackId)
+    const { setPosition } = usePlayer()
     const selectNote = useSelectNote()
     const moveDraggableAction = useMoveDraggableGesture()
     const { previewNoteOn, previewNoteOff } = usePreviewNote()
@@ -38,10 +40,11 @@ const useDragNoteEdgeGesture =
           selectNote(noteId)
         }
 
-        // Sync keyboard cursor to clicked note
+        // Sync cursor to clicked note
         setCursorTick(note.tick)
         setCursorNoteNumber(note.noteNumber)
         setLastNavigatedNoteNumber(note.noteNumber)
+        setPosition(note.tick)
 
         const newSelectedNoteIds = isSelected ? selectedNoteIds : [noteId]
 
