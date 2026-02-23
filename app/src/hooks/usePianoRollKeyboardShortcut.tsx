@@ -26,11 +26,13 @@ export const usePianoRollKeyboardShortcut = () => {
       {
         code: "ArrowUp",
         metaKey: true,
+        shiftKey: true,
         run: () => scrollBy(0, SCROLL_DELTA),
       },
       {
         code: "ArrowDown",
         metaKey: true,
+        shiftKey: true,
         run: () => scrollBy(0, -SCROLL_DELTA),
       },
       {

@@ -276,6 +276,24 @@ export function usePianoRoll() {
     toggleTool: useSetAtom(toggleToolAtom, { store }),
     setNewNoteVelocity: useSetAtom(newNoteVelocityAtom, { store }),
     setActivePane: useSetAtom(activePaneAtom, { store }),
+    get cursorTick() {
+      return useAtomValue(cursorTickAtom, { store })
+    },
+    setCursorTick: useSetAtom(cursorTickAtom, { store }),
+    get cursorNoteNumber() {
+      return useAtomValue(cursorNoteNumberAtom, { store })
+    },
+    setCursorNoteNumber: useSetAtom(cursorNoteNumberAtom, { store }),
+    get lastNavigatedNoteNumber() {
+      return useAtomValue(lastNavigatedNoteNumberAtom, { store })
+    },
+    setLastNavigatedNoteNumber: useSetAtom(lastNavigatedNoteNumberAtom, {
+      store,
+    }),
+    get selectionAnchorTick() {
+      return useAtomValue(selectionAnchorTickAtom, { store })
+    },
+    setSelectionAnchorTick: useSetAtom(selectionAnchorTickAtom, { store }),
     serializeState: useSetAtom(serializeAtom, { store }),
     restoreState: useSetAtom(restoreAtom, { store }),
   }
@@ -304,6 +322,12 @@ const openTransposeDialogAtom = atom<boolean>(false)
 const openVelocityDialogAtom = atom<boolean>(false)
 const previewingNoteNumbersAtom = atom<ReadonlySet<number>>(new Set<number>())
 const activePaneAtom = atom<"notes" | "control" | null>(null)
+
+// cursor state for vim-style keyboard navigation
+export const cursorTickAtom = atom<number>(0)
+export const cursorNoteNumberAtom = atom<number>(60)
+export const lastNavigatedNoteNumberAtom = atom<number>(60)
+export const selectionAnchorTickAtom = atom<number | null>(null)
 
 // actions
 const resetSelectionAtom = atom(null, (_get, set) => {
