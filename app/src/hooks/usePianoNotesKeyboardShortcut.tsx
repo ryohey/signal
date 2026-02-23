@@ -1,3 +1,4 @@
+import { useStore } from "jotai"
 import { useCallback, useMemo } from "react"
 import {
   useChangeDuration,
@@ -18,7 +19,11 @@ import {
   useTransposeSelection,
 } from "../actions"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
-import { usePianoRoll } from "./usePianoRoll"
+import {
+  selectedNoteIdsAtom,
+  selectionAnchorTickAtom,
+  usePianoRoll,
+} from "./usePianoRoll"
 
 export const usePianoNotesKeyboardShortcut = () => {
   const copySelection = useCopySelection()
@@ -30,11 +35,10 @@ export const usePianoNotesKeyboardShortcut = () => {
   const {
     resetSelection,
     setOpenTransposeDialog,
-    selectedNoteIds,
-    selectionAnchorTick,
     setSelectionAnchorTick,
     setMouseMode,
   } = usePianoRoll()
+  const store = useStore()
 
   // Vim-style actions
   const selectNoteByProximity = useSelectNoteByProximity()
@@ -49,9 +53,8 @@ export const usePianoNotesKeyboardShortcut = () => {
   const moveSelectedNotes = useMoveSelectedNotes()
 
   const handleShiftRight = useCallback(() => {
-    // If we're in selection-expansion mode (anchor is set), keep expanding
-    // Otherwise, if notes are selected, change their duration
-    // Otherwise, start a new selection expansion
+    const selectionAnchorTick = store.get(selectionAnchorTickAtom)
+    const selectedNoteIds = store.get(selectedNoteIdsAtom)
     if (selectionAnchorTick !== null) {
       expandSelection(1)
     } else if (selectedNoteIds.length > 0) {
@@ -59,9 +62,11 @@ export const usePianoNotesKeyboardShortcut = () => {
     } else {
       expandSelection(1)
     }
-  }, [selectionAnchorTick, selectedNoteIds, changeDuration, expandSelection])
+  }, [store, changeDuration, expandSelection])
 
   const handleShiftLeft = useCallback(() => {
+    const selectionAnchorTick = store.get(selectionAnchorTickAtom)
+    const selectedNoteIds = store.get(selectedNoteIdsAtom)
     if (selectionAnchorTick !== null) {
       expandSelection(-1)
     } else if (selectedNoteIds.length > 0) {
@@ -69,7 +74,7 @@ export const usePianoNotesKeyboardShortcut = () => {
     } else {
       expandSelection(-1)
     }
-  }, [selectionAnchorTick, selectedNoteIds, changeDuration, expandSelection])
+  }, [store, changeDuration, expandSelection])
 
   const handleEscape = useCallback(() => {
     resetSelection()
@@ -78,10 +83,30 @@ export const usePianoNotesKeyboardShortcut = () => {
   }, [resetSelection, setSelectionAnchorTick, setMouseMode])
 
   const handleCtrlLeft = useCallback(() => {
+    const selectedNoteIds = store.get(selectedNoteIdsAtom)
     if (selectedNoteIds.length === 0) {
       goToBeginning()
     }
-  }, [selectedNoteIds, goToBeginning])
+  }, [store, goToBeginning])
+
+  // Alt+Left/Right: move notes if selected, move cursor if not
+  const handleAltRight = useCallback(() => {
+    const selectedNoteIds = store.get(selectedNoteIdsAtom)
+    if (selectedNoteIds.length > 0) {
+      moveSelectedNotes(1)
+    } else {
+      moveCursor(1)
+    }
+  }, [store, moveSelectedNotes, moveCursor])
+
+  const handleAltLeft = useCallback(() => {
+    const selectedNoteIds = store.get(selectedNoteIdsAtom)
+    if (selectedNoteIds.length > 0) {
+      moveSelectedNotes(-1)
+    } else {
+      moveCursor(-1)
+    }
+  }, [store, moveSelectedNotes, moveCursor])
 
   const actions = useMemo(
     () => [
@@ -192,16 +217,16 @@ export const usePianoNotesKeyboardShortcut = () => {
         run: handleShiftLeft,
       },
 
-      // ─── Move selected notes (Alt+Left/Right) ───
+      // ─── Move selected notes / cursor (Alt+Left/Right) ───
       {
         code: "ArrowRight",
         altKey: true,
-        run: () => moveSelectedNotes(1),
+        run: handleAltRight,
       },
       {
         code: "ArrowLeft",
         altKey: true,
-        run: () => moveSelectedNotes(-1),
+        run: handleAltLeft,
       },
 
       // ─── Cursor movement (A/D override global rewind/forward) ───
@@ -230,7 +255,8 @@ export const usePianoNotesKeyboardShortcut = () => {
       transposeSelection,
       handleShiftRight,
       handleShiftLeft,
-      moveSelectedNotes,
+      handleAltRight,
+      handleAltLeft,
       moveCursor,
       deleteAndSelectPrevious,
       copySelection,
