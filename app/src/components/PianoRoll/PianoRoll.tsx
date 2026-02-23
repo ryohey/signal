@@ -2,11 +2,13 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
 import { FC, useCallback, useEffect, useRef } from "react"
+import { useSnapCursorToQuantize } from "../../actions"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
 import { usePianoNotesKeyboardShortcut } from "../../hooks/usePianoNotesKeyboardShortcut"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePlayer } from "../../hooks/usePlayer"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { useTrack } from "../../hooks/useTrack"
 import ControlPane from "../ControlPane/ControlPane"
@@ -53,6 +55,17 @@ const PianoRollWrapper: FC = () => {
     setScaleX,
   } = useTickScroll()
   const keyboardShortcutProps = usePianoNotesKeyboardShortcut()
+
+  // Snap cursor to quantized floor when playback stops
+  const { isPlaying } = usePlayer()
+  const snapCursorToQuantize = useSnapCursorToQuantize()
+  const wasPlayingRef = useRef(false)
+  useEffect(() => {
+    if (wasPlayingRef.current && !isPlaying) {
+      snapCursorToQuantize()
+    }
+    wasPlayingRef.current = isPlaying
+  }, [isPlaying, snapCursorToQuantize])
 
   const ref = useRef(null)
   const size = useComponentSize(ref)

@@ -7,8 +7,10 @@ import {
   useDeleteAndSelectPrevious,
   useDuplicateSelection,
   useExpandSelection,
+  useGoToBeginning,
   useInputNoteByKey,
   useMoveCursor,
+  useMoveSelectedNotes,
   usePasteSelection,
   useQuantizeSelectedNotes,
   useSelectNoteByProximity,
@@ -31,7 +33,7 @@ export const usePianoNotesKeyboardShortcut = () => {
     setSelectionAnchorTick,
   } = usePianoRoll()
 
-  // New vim-style actions
+  // Vim-style actions
   const selectNoteByProximity = useSelectNoteByProximity()
   const cycleSameTickNote = useCycleSameTickNote()
   const inputNoteByKey = useInputNoteByKey()
@@ -39,6 +41,8 @@ export const usePianoNotesKeyboardShortcut = () => {
   const expandSelection = useExpandSelection()
   const deleteAndSelectPrevious = useDeleteAndSelectPrevious()
   const moveCursor = useMoveCursor()
+  const goToBeginning = useGoToBeginning()
+  const moveSelectedNotes = useMoveSelectedNotes()
 
   const handleShiftRight = useCallback(() => {
     if (selectedNoteIds.length > 0) {
@@ -61,6 +65,12 @@ export const usePianoNotesKeyboardShortcut = () => {
     setSelectionAnchorTick(null)
   }, [resetSelection, setSelectionAnchorTick])
 
+  const handleCtrlLeft = useCallback(() => {
+    if (selectedNoteIds.length === 0) {
+      goToBeginning()
+    }
+  }, [selectedNoteIds, goToBeginning])
+
   const actions = useMemo(
     () => [
       // ─── Note Input (letter keys) ───
@@ -75,6 +85,13 @@ export const usePianoNotesKeyboardShortcut = () => {
       // ─── Navigation (always active, pitch-proximity based) ───
       { code: "ArrowRight", run: () => selectNoteByProximity(1) },
       { code: "ArrowLeft", run: () => selectNoteByProximity(-1) },
+
+      // ─── Ctrl+Left to go to beginning (when nothing selected) ───
+      {
+        code: "ArrowLeft",
+        metaKey: true,
+        run: handleCtrlLeft,
+      },
 
       // ─── Same-tick cycling (Ctrl/Cmd+Up/Down) ───
       {
@@ -120,6 +137,18 @@ export const usePianoNotesKeyboardShortcut = () => {
         run: handleShiftLeft,
       },
 
+      // ─── Move selected notes (Alt+Left/Right) ───
+      {
+        code: "ArrowRight",
+        altKey: true,
+        run: () => moveSelectedNotes(1),
+      },
+      {
+        code: "ArrowLeft",
+        altKey: true,
+        run: () => moveSelectedNotes(-1),
+      },
+
       // ─── Cursor movement (A/D override global rewind/forward) ───
       { code: "KeyA", run: () => moveCursor(-1) },
       { code: "KeyD", run: () => moveCursor(1) },
@@ -140,10 +169,12 @@ export const usePianoNotesKeyboardShortcut = () => {
     [
       inputNoteByKey,
       selectNoteByProximity,
+      handleCtrlLeft,
       cycleSameTickNote,
       transposeSelection,
       handleShiftRight,
       handleShiftLeft,
+      moveSelectedNotes,
       moveCursor,
       deleteAndSelectPrevious,
       copySelection,

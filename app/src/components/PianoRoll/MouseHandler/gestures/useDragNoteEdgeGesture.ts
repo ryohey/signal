@@ -8,8 +8,14 @@ import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 const useDragNoteEdgeGesture =
   (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
-    const { selectedTrackId, selectedNoteIds, setLastNoteDuration } =
-      usePianoRoll()
+    const {
+      selectedTrackId,
+      selectedNoteIds,
+      setLastNoteDuration,
+      setCursorTick,
+      setCursorNoteNumber,
+      setLastNavigatedNoteNumber,
+    } = usePianoRoll()
     const { channel, getEventById } = useTrack(selectedTrackId)
     const selectNote = useSelectNote()
     const moveDraggableAction = useMoveDraggableGesture()
@@ -31,6 +37,11 @@ const useDragNoteEdgeGesture =
         if (!isSelected) {
           selectNote(noteId)
         }
+
+        // Sync keyboard cursor to clicked note
+        setCursorTick(note.tick)
+        setCursorNoteNumber(note.noteNumber)
+        setLastNavigatedNoteNumber(note.noteNumber)
 
         const newSelectedNoteIds = isSelected ? selectedNoteIds : [noteId]
 

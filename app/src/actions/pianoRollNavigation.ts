@@ -410,3 +410,62 @@ export const useDeleteAndSelectPrevious = () => {
     lastNavigatedNoteNumber,
   ])
 }
+
+// Go to the beginning of the piece (Ctrl+Left when nothing selected)
+export const useGoToBeginning = () => {
+  const { setCursorTick, setSelectionAnchorTick } = usePianoRoll()
+  const { setPosition } = usePlayer()
+
+  return useCallback(() => {
+    setCursorTick(0)
+    setPosition(0)
+    setSelectionAnchorTick(null)
+  }, [setCursorTick, setPosition, setSelectionAnchorTick])
+}
+
+// Move selected notes by ±1 quantize step (Alt+Left/Right)
+export const useMoveSelectedNotes = () => {
+  const { selectedTrackId, selectedNoteIds, setCursorTick } = usePianoRoll()
+  const { getEventById, updateEvent } = useTrack(selectedTrackId)
+  const { pushHistory } = useHistory()
+  const { quantizeUnit } = usePianoRollQuantizer()
+
+  return useCallback(
+    (direction: 1 | -1) => {
+      if (selectedNoteIds.length === 0) return
+
+      pushHistory()
+
+      const delta = direction * quantizeUnit
+
+      for (const id of selectedNoteIds) {
+        const event = getEventById(id)
+        if (event && isNoteEvent(event)) {
+          const newTick = Math.max(0, event.tick + delta)
+          updateEvent(id, { tick: newTick })
+        }
+      }
+
+      // Also move cursor to follow the notes
+      setCursorTick((prev: number) => Math.max(0, prev + delta))
+    },
+    [
+      selectedNoteIds,
+      getEventById,
+      updateEvent,
+      pushHistory,
+      quantizeUnit,
+      setCursorTick,
+    ],
+  )
+}
+
+// Snap cursor to quantized floor (called on playback stop)
+export const useSnapCursorToQuantize = () => {
+  const { setCursorTick } = usePianoRoll()
+  const { quantizeFloor } = usePianoRollQuantizer()
+
+  return useCallback(() => {
+    setCursorTick((prev: number) => quantizeFloor(prev))
+  }, [setCursorTick, quantizeFloor])
+}
