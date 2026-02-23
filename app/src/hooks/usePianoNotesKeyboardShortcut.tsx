@@ -31,7 +31,9 @@ export const usePianoNotesKeyboardShortcut = () => {
     resetSelection,
     setOpenTransposeDialog,
     selectedNoteIds,
+    selectionAnchorTick,
     setSelectionAnchorTick,
+    setMouseMode,
   } = usePianoRoll()
 
   // Vim-style actions
@@ -47,25 +49,33 @@ export const usePianoNotesKeyboardShortcut = () => {
   const moveSelectedNotes = useMoveSelectedNotes()
 
   const handleShiftRight = useCallback(() => {
-    if (selectedNoteIds.length > 0) {
+    // If we're in selection-expansion mode (anchor is set), keep expanding
+    // Otherwise, if notes are selected, change their duration
+    // Otherwise, start a new selection expansion
+    if (selectionAnchorTick !== null) {
+      expandSelection(1)
+    } else if (selectedNoteIds.length > 0) {
       changeDuration(1)
     } else {
       expandSelection(1)
     }
-  }, [selectedNoteIds, changeDuration, expandSelection])
+  }, [selectionAnchorTick, selectedNoteIds, changeDuration, expandSelection])
 
   const handleShiftLeft = useCallback(() => {
-    if (selectedNoteIds.length > 0) {
+    if (selectionAnchorTick !== null) {
+      expandSelection(-1)
+    } else if (selectedNoteIds.length > 0) {
       changeDuration(-1)
     } else {
       expandSelection(-1)
     }
-  }, [selectedNoteIds, changeDuration, expandSelection])
+  }, [selectionAnchorTick, selectedNoteIds, changeDuration, expandSelection])
 
   const handleEscape = useCallback(() => {
     resetSelection()
     setSelectionAnchorTick(null)
-  }, [resetSelection, setSelectionAnchorTick])
+    setMouseMode("pencil")
+  }, [resetSelection, setSelectionAnchorTick, setMouseMode])
 
   const handleCtrlLeft = useCallback(() => {
     if (selectedNoteIds.length === 0) {

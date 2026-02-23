@@ -1,12 +1,13 @@
 import { isNoteEvent, NoteEvent } from "@signal-app/core"
 import { useCallback } from "react"
+import { MaxNoteNumber } from "../Constants"
 import { Selection } from "../entities/selection/Selection"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll, usePianoRollQuantizer } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { usePreviewNote } from "../hooks/usePreviewNote"
 import { useTrack } from "../hooks/useTrack"
-import { useSelectNote } from "./selection"
+import { eventsInSelection, useSelectNote } from "./selection"
 
 // Move keyboard cursor by ±1 quantize step (A/D keys)
 export const useMoveCursor = () => {
@@ -283,19 +284,27 @@ export const useChangeDuration = () => {
 }
 
 // Expand time selection when nothing is selected (Shift+Left/Right)
+// Switches to the built-in selection tool and creates/grows a selection
 export const useExpandSelection = () => {
   const {
+    selectedTrackId,
     setCursorTick,
     cursorTick,
     setSelection,
+    setSelectedNoteIds,
+    setMouseMode,
     selectionAnchorTick,
     setSelectionAnchorTick,
   } = usePianoRoll()
+  const { getEvents } = useTrack(selectedTrackId)
   const { quantizeUnit } = usePianoRollQuantizer()
   const { setPosition } = usePlayer()
 
   return useCallback(
     (direction: 1 | -1) => {
+      // Switch to the selection tool so the selection rect renders
+      setMouseMode("selection")
+
       let anchor = selectionAnchorTick
       if (anchor === null) {
         anchor = cursorTick
@@ -306,22 +315,27 @@ export const useExpandSelection = () => {
       setCursorTick(newCursorTick)
       setPosition(newCursorTick)
 
-      const fromTick = Math.min(anchor, newCursorTick)
-      const toTick = Math.max(anchor, newCursorTick)
+      // Build selection using Selection.fromPoints (full pitch range)
+      const selection = Selection.fromPoints(
+        { tick: anchor, noteNumber: MaxNoteNumber },
+        { tick: newCursorTick, noteNumber: 0 },
+      )
+      setSelection(selection)
 
-      setSelection({
-        fromTick,
-        toTick,
-        fromNoteNumber: 128,
-        toNoteNumber: 0,
-      } as Selection)
+      // Select notes within the selection range
+      setSelectedNoteIds(
+        eventsInSelection(getEvents(), selection).map((e) => e.id),
+      )
     },
     [
       cursorTick,
       selectionAnchorTick,
       setCursorTick,
       setSelection,
+      setSelectedNoteIds,
+      setMouseMode,
       setSelectionAnchorTick,
+      getEvents,
       quantizeUnit,
       setPosition,
     ],
