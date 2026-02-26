@@ -23,6 +23,40 @@ import {
   writeClipboardData,
 } from "../services/Clipboard"
 
+/**
+ * Select all notes within a pitch range
+ * @param events - All track events
+ * @param fromNoteNumber - Start note number (inclusive)
+ * @param toNoteNumber - End note number (inclusive)
+ * @returns Array of NoteEvent IDs that fall within the pitch range
+ */
+export function selectNotesByPitchRange(
+  events: readonly TrackEvent[],
+  fromNoteNumber: number,
+  toNoteNumber: number,
+): number[] {
+  const minNote = Math.min(fromNoteNumber, toNoteNumber)
+  const maxNote = Math.max(fromNoteNumber, toNoteNumber)
+
+  return events
+    .filter(isNoteEvent)
+    .filter((note) => note.noteNumber >= minNote && note.noteNumber <= maxNote)
+    .map((note) => note.id)
+}
+
+/**
+ * Select all notes with a specific pitch
+ * @param events - All track events
+ * @param noteNumber - The note number (pitch) to filter by
+ * @returns Array of NoteEvent IDs with that pitch
+ */
+export function selectNotesByPitch(
+  events: readonly TrackEvent[],
+  noteNumber: number,
+): number[] {
+  return selectNotesByPitchRange(events, noteNumber, noteNumber)
+}
+
 export function eventsInSelection(
   events: readonly TrackEvent[],
   selection: Selection,
