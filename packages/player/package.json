@@ -24,6 +24,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@ryohey/wavelet": "^0.7.6"
+    "spessasynth_core": "latest",
+    "spessasynth_lib": "latest"
   }
 }

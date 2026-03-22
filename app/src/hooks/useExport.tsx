@@ -77,7 +77,6 @@ const useExportSong = () => {
         timebase,
         sampleRate,
         {
-          bufferSize: 128,
           cancel: () => store.get(isCanceledAtom),
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>

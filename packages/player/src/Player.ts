@@ -14,7 +14,7 @@ export interface LoopSetting {
   enabled: boolean
 }
 
-const TIMER_INTERVAL = 50
+const TIMER_INTERVAL = 100
 const LOOK_AHEAD_TIME = 50
 export const DEFAULT_TEMPO = 120
 
@@ -212,7 +212,7 @@ export class Player {
     const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
 
     events.forEach(({ event: e, timestamp: time }) => {
-      if (e.type === "channel") {
+      if (e.type === "channel" || e.type === "sysEx" || e.type === "dividedSysEx") {
         const delayTime = (time - timestamp) / 1000
         this.sendEvent(e, delayTime, timestamp, e.trackId)
       } else {

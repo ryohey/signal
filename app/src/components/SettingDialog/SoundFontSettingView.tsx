@@ -42,7 +42,7 @@ export const SoundFontSettingsView: FC = () => {
         <SoundFontList />
         {!isRunningInElectron() && (
           <>
-            <FileInput onChange={onOpenSoundFont} accept=".sf2">
+            <FileInput onChange={onOpenSoundFont} accept=".sf2,.sf3,.dls,.sfogg">
               <OpenFileButton as="div">
                 <Localized name="add" />
               </OpenFileButton>
