@@ -14,7 +14,7 @@ export interface LoopSetting {
   enabled: boolean
 }
 
-const TIMER_INTERVAL = 100
+const TIMER_INTERVAL = 50
 const LOOK_AHEAD_TIME = 50
 export const DEFAULT_TEMPO = 120
 
