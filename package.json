@@ -43,6 +43,7 @@
   },
   "workspaces": [
     "app",
+    "electron",
     "packages/*"
   ],
   "packageManager": "npm@11.10.1",
