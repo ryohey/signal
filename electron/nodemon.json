@@ -1,5 +1,6 @@
 {
   "watch": ["dist"],
   "exec": "electron .",
-  "ext": "js,json,html,css"
+  "ext": "js,json,html,css",
+  "legacyWatch": true
 }
