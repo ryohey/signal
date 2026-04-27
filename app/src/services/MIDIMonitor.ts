@@ -15,11 +15,12 @@ export class MIDIMonitor {
     const stream = new Stream(e.data)
     const event = deserializeSingleEvent(stream)
 
-    if (event.type !== "channel") {
+    // Only allow channel and SysEx events
+    if (event.type !== "channel" && event.type !== "sysEx" && event.type !== "dividedSysEx") {
       return
     }
 
-    if (this.midiDeviceStore.midiInputRouting === "selectedTrack") {
+    if (this.midiDeviceStore.midiInputRouting === "selectedTrack" && event.type === "channel") {
       // modify channel to the selected track channel
       event.channel = this.channel
     }

@@ -1,4 +1,8 @@
-import { getSampleEventsFromSoundFont } from "@ryohey/wavelet"
+import {
+  BasicSoundBank,
+  BasicZone,
+  SoundBankLoader,
+} from "spessasynth_core"
 
 interface PresetMeta {
   name: string
@@ -9,55 +13,60 @@ interface SampleMeta {
   name: string
 }
 
+
+function getKeyRange(
+  zone: BasicZone,
+  fallbackMin: number,
+  fallbackMax: number,
+) {
+  if (zone.hasKeyRange)
+    return {
+      min: zone.keyRange.min,
+      max: zone.keyRange.max,
+    }
+  return { min: fallbackMin, max: fallbackMax }
+}
+
 export class SoundFont {
   constructor(
     readonly data: ArrayBuffer,
-    readonly sampleEvents: Awaited<
-      ReturnType<typeof getSampleEventsFromSoundFont>
-    >,
+    readonly parsed: BasicSoundBank,
   ) {}
 
   getDrumKitPresets() {
     const drumKitPresets: Map<number, PresetMeta> = new Map() // programNumber -> PresetMeta
-
-    for (const eventWrapper of this.sampleEvents) {
-      const event = eventWrapper.event
-
-      if (event.type === "sampleParameter") {
-        const { parameter, range } = event
-        const programNumber = range.instrument // GM patch number
-        const keyStart = range.keyRange[0]
-        const keyEnd = range.keyRange[1]
-
-        // Check if this is a drum kit
-        const isDrumKit = range.bank === 128
-
-        if (!isDrumKit) {
-          continue // Skip non-drum kit presets
+    
+    for (const preset of this.parsed.presets) {
+      // Only drums
+      if (!preset.isAnyDrums) {
+        continue
+      }
+      const programNumber = preset.program
+      let presetMeta = drumKitPresets.get(programNumber)
+      if (!presetMeta) {
+        presetMeta = {
+          name: preset.name,
+          samples: new Map(),
         }
+        drumKitPresets.set(programNumber, presetMeta)
+      }
 
-        let preset = drumKitPresets.get(programNumber)
-
-        // Create preset if it doesn't exist
-        if (!preset) {
-          preset = {
-            name: `Drum Kit ${programNumber}`,
-            samples: new Map(),
+      for (const presetZone of preset.zones) {
+        const presetRange = getKeyRange(presetZone, 0, 127)
+        const instrument = presetZone.instrument
+        for (const instrumentZone of instrument.zones) {
+          const instRange = getKeyRange(instrumentZone, presetRange.min, presetRange.max)
+          const min = Math.max(presetRange.min, instRange.min)
+          const max = Math.min(presetRange.max, instRange.max)
+          // Sanity check
+          if (min > max) continue
+          
+          const sampleName = instrumentZone.sample.name
+          for (let key = min; key <= max; key++) {
+            if (!presetMeta.samples.has(key))
+              presetMeta.samples.set(key, [])
+            presetMeta.samples.get(key)!.push({ name: sampleName })
           }
-          drumKitPresets.set(programNumber, preset)
-        }
-
-        // Add sample metadata for each key in the range
-        for (let key = keyStart; key <= keyEnd; key++) {
-          if (!preset.samples.has(key)) {
-            preset.samples.set(key, [])
-          }
-
-          const sampleMeta: SampleMeta = {
-            name: parameter.name,
-          }
-
-          preset.samples.get(key)?.push(sampleMeta)
         }
       }
     }
@@ -71,8 +80,8 @@ export class SoundFont {
   }
 
   static async load(data: ArrayBuffer) {
-    const sampleEvents = getSampleEventsFromSoundFont(new Uint8Array(data))
-
-    return new SoundFont(data, sampleEvents)
+    await BasicSoundBank.isSF3DecoderReady
+    const parsed = SoundBankLoader.fromArrayBuffer(data)
+    return new SoundFont(data, parsed)
   }
 }

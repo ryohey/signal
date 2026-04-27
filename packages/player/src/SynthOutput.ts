@@ -1,7 +1,7 @@
-import { AnyChannelEvent } from "midifile-ts"
+import { AnyChannelEvent, AnySysExEvent } from "midifile-ts"
 import { DistributiveOmit } from "./types.js"
 
-export type SendableEvent = DistributiveOmit<AnyChannelEvent, "deltaTime">
+export type SendableEvent = DistributiveOmit<AnySysExEvent|AnyChannelEvent, "deltaTime">
 
 export interface SynthOutput {
   activate(): void

@@ -1,13 +1,14 @@
 # @signal-app/player
 
-The `@signal-app/player` package provides comprehensive control over the playback and stopping of MIDI events, with sound output functionality powered by [wavelet](https://github.com/ryohey/wavelet). This package is designed to handle precise scheduling and playback of MIDI events, making it ideal for applications that require accurate timing and sound synthesis.
+The `@signal-app/player` package provides comprehensive control over the playback and stopping of MIDI events, with sound output powered by [SpessaSynth](https://github.com/spessasus/spessasynth_core) ( `spessasynth_core` and `spessasynth_lib`). 
+These packages are designed to handle precise scheduling and playback of MIDI events, making it ideal for applications that require accurate timing and sound synthesis.
 
 ## Introduction
 
-The `@signal-app/player` package is designed to manage MIDI event playback and control sound output using the `wavelet` synthesizer. It includes two main classes:
+The `@signal-app/player` package is designed to manage MIDI event playback and control sound output using the SpessaSynth's `WorkletSynthesizer`. It includes two main classes:
 
 - **EventScheduler**: Handles the scheduling of MIDI events with lookahead functionality to ensure accurate timing.
-- **Player**: Manages playback state, controls MIDI events, and outputs sound through the `wavelet` synthesizer.
+- **Player**: Manages playback state, controls MIDI events, and outputs sound through the SpessaSynth synthesizer.
 
 ## Overview
 
@@ -23,7 +24,7 @@ The `EventScheduler` class is responsible for reading and scheduling chronologic
 
 ### Player
 
-The `Player` class is responsible for controlling the playback and stopping of MIDI events. It outputs sound using the `wavelet` synthesizer and manages various playback states.
+The `Player` class is responsible for controlling the playback and stopping of MIDI events. It outputs sound using the SpessaSynth synthesizer and manages various playback states.
 
 #### Key Responsibilities
 
@@ -36,7 +37,7 @@ The `Player` class is responsible for controlling the playback and stopping of M
 
 - **Accurate Scheduling**: Ensures precise timing of MIDI events using the `EventScheduler`.
 - **Comprehensive Playback Control**: Start, stop, and manage playback with the `Player` class.
-- **Sound Output**: Utilizes the `wavelet` synthesizer for high-quality sound output.
+- **Sound Output**: Utilizes SpessaSynth for high-quality SoundFont/DLS-based output.
 - **Loop Support**: Supports looping sections of MIDI events.
 - **Track Muting**: Allows for individual track muting to control playback of specific MIDI tracks.
 
