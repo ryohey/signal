@@ -3,7 +3,7 @@ import throttle from "lodash/throttle.js"
 import { AnyEvent, MIDIControlEvents } from "midifile-ts"
 import { computed, makeObservable, observable } from "mobx"
 import { EventScheduler } from "./EventScheduler.js"
-import { controllerMidiEvent } from "./MidiEventFactory.js"
+import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js";
 import { PlayerEvent } from "./PlayerEvent.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
 import { DistributiveOmit } from "./types.js"
@@ -127,11 +127,28 @@ export class Player {
   }
 
   private resetControllers() {
+    // RP-15 controller reset (it does not do a full reset)
     for (const ch of range(0, this.numberOfChannels)) {
       this.sendEvent(
         controllerMidiEvent(0, ch, MIDIControlEvents.RESET_CONTROLLERS, 0x7f),
       )
     }
+    // Full GS reset
+    this.sendEvent(gsResetMidiEvent(
+        0,
+        [
+          0x41, // Roland
+          0x10, // Device ID (defaults to 16 on Roland)
+          0x42, // GS
+          0x12, // Command ID (DT1)
+          0x40, // System parameter - Address
+          0x00, // Global parameter -  Address
+          0x7f, // GS Change - Address
+          0x00, // Turn on - Data
+          0x41, // Checksum
+          0xf7  // End of exclusive
+        ]
+    ))
   }
 
   stop = () => {
