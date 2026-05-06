@@ -62,8 +62,6 @@
     "lodash": "^4.17.23",
     "mdi-react": "^9.4.0",
     "midifile-ts": "1.5.2",
-    "mobx": "^6.15.0",
-    "mobx-persist-store": "^1.1.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-helmet-async": "^2.0.5",

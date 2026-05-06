@@ -1,6 +1,5 @@
 import { TrackId } from "@signal-app/core"
 import { SendableEvent, SynthOutput } from "@signal-app/player"
-import { makeObservable, observable } from "mobx"
 import { METRONOME_TRACK_ID } from "../player/EventSource"
 import { TrackMute } from "../trackMute/TrackMute"
 
@@ -12,13 +11,30 @@ export interface SynthEntry {
 // Routing of MIDI events to multiple SynthOutputs and muting of tracks
 export class GroupOutput implements SynthOutput {
   outputs: SynthEntry[] = []
-  isMetronomeEnabled: boolean = false
   trackMute = TrackMute.empty
 
-  constructor(private readonly metronomeOutput: SynthOutput) {
-    makeObservable(this, {
-      isMetronomeEnabled: observable,
-    })
+  private _isMetronomeEnabled = false
+  private isMetronomeEnabledListeners = new Set<() => void>()
+  readonly onIsMetronomeEnabledChanged = {
+    subscribe: (callback: () => void) => {
+      this.isMetronomeEnabledListeners.add(callback)
+      return () => {
+        this.isMetronomeEnabledListeners.delete(callback)
+      }
+    },
+  }
+
+  constructor(private readonly metronomeOutput: SynthOutput) {}
+
+  get isMetronomeEnabled() {
+    return this._isMetronomeEnabled
+  }
+
+  setIsMetronomeEnabled(enabled: boolean) {
+    if (this._isMetronomeEnabled !== enabled) {
+      this._isMetronomeEnabled = enabled
+      this.emitIsMetronomeEnabledChanged()
+    }
   }
 
   activate() {
@@ -47,5 +63,9 @@ export class GroupOutput implements SynthOutput {
     this.getOutputs(trackId).forEach((synth) =>
       synth.sendEvent(event, delayTime, timestampNow, trackId),
     )
+  }
+
+  private emitIsMetronomeEnabledChanged() {
+    this.isMetronomeEnabledListeners.forEach((callback) => callback())
   }
 }

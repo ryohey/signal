@@ -1,53 +1,39 @@
-import {
-  isSetTempoEvent,
-  isTimeSignatureEvent,
-  Measure,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
-import { isEqual } from "lodash"
-import { useCallback, useMemo } from "react"
+import { getTempo, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { DEFAULT_TEMPO } from "../Constants"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useTrackEvents } from "./useTrack"
 
+const noop = () => () => {}
+
 export function useConductorTrack() {
-  const { tracks, timebase } = useSong()
-  const conductorTrack = useMobxSelector(
-    () => tracks.find((t) => t.isConductorTrack),
-    [tracks],
-  )
-  const timeSignatures = useMobxSelector(
-    () => (conductorTrack?.events ?? []).filter(isTimeSignatureEvent),
-    [conductorTrack],
-    isEqual,
-  )
-  const measures = useMemo(
-    () => Measure.fromTimeSignatures(timeSignatures, timebase),
-    [timeSignatures, timebase],
+  const { conductorTrack } = useSong()
+  const events = useSyncExternalStore(
+    conductorTrack?.onEventsChanged.subscribe ?? noop,
+    useCallback(
+      () => conductorTrack?.getEventsSnapshot() ?? [],
+      [conductorTrack],
+    ),
   )
 
   return {
     get id() {
-      return useMobxGetter(conductorTrack, "id") ?? UNASSIGNED_TRACK_ID
+      return useSyncExternalStore(
+        conductorTrack?.onIdChanged.subscribe ?? noop,
+        useCallback(
+          () => conductorTrack?.id ?? UNASSIGNED_TRACK_ID,
+          [conductorTrack],
+        ),
+      )
     },
     get currentTempo() {
       const { position } = usePlayer()
-      return useMobxSelector(
-        () => conductorTrack?.getTempo(position) ?? DEFAULT_TEMPO,
-        [conductorTrack, position],
+      return useMemo(
+        () => getTempo(events, position) ?? DEFAULT_TEMPO,
+        [events, position],
       )
     },
-    get tempoEvents() {
-      return useMobxSelector(
-        () => (conductorTrack?.events ?? []).filter(isSetTempoEvent),
-        [conductorTrack],
-        isEqual,
-      )
-    },
-    timeSignatures,
-    measures,
     getEvents: useCallback(
       () => conductorTrack?.events ?? [],
       [conductorTrack],

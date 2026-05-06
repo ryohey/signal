@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useCallback } from "react"
 import {
   useCopySelection,
   useDeleteSelection,
@@ -31,56 +31,56 @@ export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
     const quantizeSelectedNotes = useQuantizeSelectedNotes()
     const transposeSelection = useTransposeSelection()
 
-    const onClickCut = () => {
+    const onClickCut = useCallback(() => {
       copySelection()
       deleteSelection()
       handleClose()
-    }
+    }, [copySelection, deleteSelection, handleClose])
 
-    const onClickCopy = () => {
+    const onClickCopy = useCallback(() => {
       copySelection()
       handleClose()
-    }
+    }, [copySelection, handleClose])
 
-    const onClickPaste = () => {
+    const onClickPaste = useCallback(() => {
       pasteSelection()
       handleClose()
-    }
+    }, [pasteSelection, handleClose])
 
-    const onClickDuplicate = () => {
+    const onClickDuplicate = useCallback(() => {
       duplicateSelection()
       handleClose()
-    }
+    }, [duplicateSelection, handleClose])
 
-    const onClickDelete = () => {
+    const onClickDelete = useCallback(() => {
       deleteSelection()
       handleClose()
-    }
+    }, [deleteSelection, handleClose])
 
-    const onClickOctaveUp = () => {
+    const onClickOctaveUp = useCallback(() => {
       transposeSelection(12)
       handleClose()
-    }
+    }, [transposeSelection, handleClose])
 
-    const onClickOctaveDown = () => {
+    const onClickOctaveDown = useCallback(() => {
       transposeSelection(-12)
       handleClose()
-    }
+    }, [transposeSelection, handleClose])
 
-    const onClickQuantize = () => {
+    const onClickQuantize = useCallback(() => {
       quantizeSelectedNotes()
       handleClose()
-    }
+    }, [quantizeSelectedNotes, handleClose])
 
-    const onClickTranspose = () => {
+    const onClickTranspose = useCallback(() => {
       setOpenTransposeDialog(true)
       handleClose()
-    }
+    }, [setOpenTransposeDialog, handleClose])
 
-    const onClickVelocity = () => {
+    const onClickVelocity = useCallback(() => {
       setOpenVelocityDialog(true)
       handleClose()
-    }
+    }, [setOpenVelocityDialog, handleClose])
 
     return (
       <ContextMenu {...props}>

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import BluetoothIcon from "mdi-react/BluetoothIcon"
-import { FC } from "react"
+import { FC, useCallback, useMemo } from "react"
+import { useBLEMIDIDevice } from "../../../hooks/useBLEMIDIDevice"
 import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
 import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
@@ -85,17 +86,43 @@ const Divider = styled.div`
 
 export const MIDIDeviceView: FC = () => {
   const {
-    inputDevices,
+    inputDevices: midiInputDevices,
     outputDevices,
-    isLoading,
-    requestError,
+    isLoading: midiIsLoading,
+    requestError: midiRequestError,
     midiInputRouting,
-    isBluetoothSupported,
-    setInputEnable,
+    setInputEnable: setMidiInputEnable,
     setOutputEnable,
-    requestBluetoothMIDIDevice,
     setMidiInputRouting,
   } = useMIDIDevice()
+
+  const {
+    inputDevices: btInputDevices,
+    isBluetoothSupported,
+    isLoading: btIsLoading,
+    requestError: btRequestError,
+    requestBluetoothMIDIDevice,
+    setInputEnable: setBTInputEnable,
+  } = useBLEMIDIDevice()
+
+  const isLoading = midiIsLoading || btIsLoading
+  const requestError = midiRequestError || btRequestError
+
+  const inputDevices: Device[] = useMemo(
+    () => [...midiInputDevices, ...btInputDevices],
+    [midiInputDevices, btInputDevices],
+  )
+
+  const setInputEnable = useCallback(
+    (deviceId: string, isEnabled: boolean) => {
+      if (btInputDevices.some((d) => d.id === deviceId)) {
+        setBTInputEnable(deviceId, isEnabled)
+      } else {
+        setMidiInputEnable(deviceId, isEnabled)
+      }
+    },
+    [setBTInputEnable, setMidiInputEnable, btInputDevices],
+  )
 
   return (
     <>

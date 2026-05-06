@@ -1,5 +1,5 @@
 import { Measure } from "@signal-app/core"
-import { useCallback } from "react"
+import { useCallback, useMemo, useSyncExternalStore } from "react"
 import {
   useFastForwardOneBar,
   useRewindOneBar,
@@ -7,12 +7,12 @@ import {
   useToggleRecording,
 } from "../actions"
 import { useCanRecord } from "./useMIDIDevice"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
+import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 export function useTransportPanel() {
-  const { songStore, player, synthGroup, midiRecorder } = useStores()
+  const { synthGroup, midiRecorder } = useStores()
   const canRecording = useCanRecord()
   const { isPlaying, loop, playOrPause, toggleEnableLoop } = usePlayer()
 
@@ -24,27 +24,31 @@ export function useTransportPanel() {
     toggleRecording: useToggleRecording(),
     toggleEnableLoop,
     toggleMetronome: useCallback(() => {
-      synthGroup.isMetronomeEnabled = !synthGroup.isMetronomeEnabled
+      synthGroup.setIsMetronomeEnabled(!synthGroup.isMetronomeEnabled)
     }, [synthGroup]),
     isPlaying,
     isLoopEnabled: loop !== null,
     isLoopActive: loop?.enabled ?? false,
     canRecording,
     get isRecording() {
-      return useMobxGetter(midiRecorder, "isRecording")
+      return useSyncExternalStore(
+        midiRecorder.onIsRecordingChanged.subscribe,
+        useCallback(() => midiRecorder.isRecording, [midiRecorder]),
+      )
     },
     get isMetronomeEnabled() {
-      return useMobxGetter(synthGroup, "isMetronomeEnabled")
+      return useSyncExternalStore(
+        synthGroup.onIsMetronomeEnabledChanged.subscribe,
+        useCallback(() => synthGroup.isMetronomeEnabled, [synthGroup]),
+      )
     },
     get currentMBTTime() {
-      return useMobxSelector(
-        () =>
-          Measure.getMBTString(
-            songStore.song.measures,
-            player.position,
-            songStore.song.timebase,
-          ),
-        [songStore, player],
+      const { measures, timebase } = useSong()
+      const { position } = usePlayer()
+
+      return useMemo(
+        () => Measure.getMBTString(measures, position, timebase),
+        [measures, timebase, position],
       )
     },
   }

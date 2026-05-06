@@ -1,8 +1,8 @@
+import { SongStore } from "@signal-app/core"
 import { act, renderHook } from "@testing-library/react"
 import { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import RootStore from "../stores/RootStore"
-import { SongStore } from "../stores/SongStore"
 import { usePanSlider } from "./usePanSlider"
 import { StoreContext } from "./useStores"
 

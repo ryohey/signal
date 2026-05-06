@@ -1,12 +1,12 @@
-import { volumeMidiEvent } from "@signal-app/core"
-import { useCallback, useState } from "react"
+import { getVolume, volumeMidiEvent } from "@signal-app/core"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import { useHistory } from "./useHistory"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { useTrack } from "./useTrack"
 
 const DEFAULT_VOLUME = 100
+const noop = () => () => {}
 
 export function useVolumeSlider() {
   const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
@@ -15,9 +15,12 @@ export function useVolumeSlider() {
   const { setVolume, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
 
-  const currentVolume = useMobxSelector(
-    () => selectedTrack?.getVolume(position),
-    [selectedTrack, position],
+  const currentVolume = useSyncExternalStore(
+    selectedTrack?.onEventsChanged.subscribe ?? noop,
+    useCallback(
+      () => getVolume(selectedTrack?.events ?? [], position) ?? DEFAULT_VOLUME,
+      [selectedTrack, position],
+    ),
   )
 
   const setTrackVolume = useCallback(

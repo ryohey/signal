@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "outDir": "./dist",
+    "types": ["webmidi"],
     "sourceMap": true,
     "declaration": true,
     "target": "esnext",

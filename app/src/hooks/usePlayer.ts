@@ -1,4 +1,4 @@
-import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
+import { useCallback, useSyncExternalStore } from "react"
 import { useStores } from "./useStores"
 
 export function usePlayer() {
@@ -6,15 +6,29 @@ export function usePlayer() {
 
   return {
     get position() {
-      return useMobxGetter(player, "position")
+      return useSyncExternalStore(
+        player.onPositionChanged.subscribe,
+        useCallback(() => player.position, [player]),
+      )
     },
     get isPlaying() {
-      return useMobxGetter(player, "isPlaying")
+      return useSyncExternalStore(
+        player.onIsPlayingChanged.subscribe,
+        useCallback(() => player.isPlaying, [player]),
+      )
     },
     get loop() {
-      return useMobxGetter(player, "loop")
+      return useSyncExternalStore(
+        player.onLoopChanged.subscribe,
+        useCallback(() => player.loop, [player]),
+      )
     },
-    setPosition: useMobxSetter(player, "position"),
+    setPosition: useCallback(
+      (tick: number) => {
+        player.position = tick
+      },
+      [player],
+    ),
     playOrPause: player.playOrPause,
     play: player.play,
     stop: player.stop,
@@ -23,7 +37,13 @@ export function usePlayer() {
     toggleEnableLoop: player.toggleEnableLoop,
     setLoopBegin: player.setLoopBegin,
     setLoopEnd: player.setLoopEnd,
-    setCurrentTempo: useMobxSetter(player, "currentTempo"),
+    setCurrentTempo: useCallback(
+      (tempo: number) => {
+        player.currentTempo = tempo
+      },
+      [player],
+    ),
+    allSoundsOff: player.allSoundsOff,
     allSoundsOffChannel: player.allSoundsOffChannel,
     allSoundsOffExclude: player.allSoundsOffExclude,
   }

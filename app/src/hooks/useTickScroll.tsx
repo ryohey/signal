@@ -1,14 +1,12 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { createScope, ScopeProvider } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
+import { createScope, ScopeProvider } from "jotai-scope"
 import { clamp } from "lodash"
-import { SetStateAction, useEffect } from "react"
+import { SetStateAction, useEffect, useMemo } from "react"
 import { Layout } from "../Constants"
 import { TickTransform } from "../entities/transform/TickTransform"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
-import { useStores } from "./useStores"
 
 interface TickScrollConfig {
   readonly minScaleX: number
@@ -70,12 +68,9 @@ export function useTickScroll(store = useStore()) {
       return useAtomValue(autoScrollAtom, { store })
     },
     get cursorX() {
-      const { player } = useStores()
+      const { position } = usePlayer()
       const transform = useAtomValue(transformAtom, { store })
-      return useMobxSelector(
-        () => transform.getX(player.position),
-        [transform, player],
-      )
+      return useMemo(() => transform.getX(position), [transform, position])
     },
     get scrollLeft() {
       return useAtomValue(scrollLeftAtom, { store })

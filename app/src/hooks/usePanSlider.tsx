@@ -1,12 +1,12 @@
-import { panMidiEvent } from "@signal-app/core"
-import { useCallback, useState } from "react"
+import { getPan, panMidiEvent } from "@signal-app/core"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import { useHistory } from "./useHistory"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { useTrack } from "./useTrack"
 
 const PAN_CENTER = 64
+const noop = () => () => {}
 
 export function usePanSlider() {
   const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
@@ -15,9 +15,12 @@ export function usePanSlider() {
   const { setPan, channel } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
 
-  const currentPan = useMobxSelector(
-    () => selectedTrack?.getPan(position),
-    [selectedTrack, position],
+  const currentPan = useSyncExternalStore(
+    selectedTrack?.onEventsChanged.subscribe ?? noop,
+    useCallback(
+      () => getPan(selectedTrack?.events ?? [], position) ?? PAN_CENTER,
+      [selectedTrack, position],
+    ),
   )
 
   const setTrackPan = useCallback(

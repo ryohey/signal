@@ -1,89 +1,84 @@
-import { AuthUser, IUserRepository, User } from "@signal-app/api"
-import { makeObservable, observable } from "mobx"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { AuthUser, User } from "@signal-app/api"
+import { atom, useAtom, useAtomValue } from "jotai"
+import { atomEffect } from "jotai-effect"
+import { useCallback, useEffect } from "react"
 import { auth } from "../firebase/firebase"
 import { isRunningInElectron } from "../helpers/platform"
 import { userRepository } from "../services/repositories"
-import { useMobxGetter } from "./useMobxSelector"
 
-class AuthStore {
-  authUser: AuthUser | null = null
-  user: User | null = null
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  useNotifyAuthUserToElectron()
+  useAtom(authEffectAtom)
+  return children
+}
 
-  constructor(private readonly userRepository: IUserRepository) {
-    makeObservable(this, {
-      authUser: observable,
-      user: observable,
-    })
+export function useAuth() {
+  return {
+    get authUser() {
+      return useAtomValue(authUserAtom)
+    },
+    get user() {
+      return useAtomValue(userAtom)
+    },
+    get isLoggedIn() {
+      return useAtomValue(isLoggedInAtom)
+    },
+    signOut: useCallback(async () => {
+      await auth.signOut()
+    }, []),
+  }
+}
 
-    let subscribe: (() => void) | null = null
-
+function useNotifyAuthUserToElectron() {
+  useEffect(() => {
     try {
       userRepository.observeAuthUser(async (user) => {
-        this.authUser = user
-
         if (isRunningInElectron()) {
           window.electronAPI.authStateChanged(user !== null)
-        }
-
-        subscribe?.()
-
-        if (user !== null) {
-          subscribe = userRepository.observeCurrentUser((user) => {
-            this.user = user
-          })
-          await this.createProfileIfNeeded(user)
         }
       })
     } catch (e) {
       console.warn(e)
     }
-  }
+  }, [])
+}
 
-  private async createProfileIfNeeded(authUser: AuthUser) {
-    // Create user profile if not exists
-    const user = await this.userRepository.getCurrentUser()
-    if (user === null) {
-      const newUserData = {
-        name: authUser.displayName ?? "",
-        bio: "",
+// atoms
+
+const authUserAtom = atom<AuthUser | null>(null)
+const userAtom = atom<User | null>(null)
+const isLoggedInAtom = atom((get) => get(authUserAtom) !== null)
+
+// effects
+
+const authEffectAtom = atomEffect((_get, set) => {
+  let unsubscribe: (() => void) | null = null
+
+  try {
+    userRepository.observeAuthUser(async (user) => {
+      set(authUserAtom, user)
+      unsubscribe?.()
+
+      if (user !== null) {
+        unsubscribe = userRepository.observeCurrentUser((user) => {
+          set(userAtom, user)
+        })
+        await createProfileIfNeeded(user)
       }
-      await this.userRepository.create(newUserData)
+    })
+  } catch (e) {
+    console.warn(e)
+  }
+})
+
+// Create user profile if not exists
+async function createProfileIfNeeded(authUser: AuthUser) {
+  const user = await userRepository.getCurrentUser()
+  if (user === null) {
+    const newUserData = {
+      name: authUser.displayName ?? "",
+      bio: "",
     }
-  }
-
-  get isLoggedIn() {
-    return this.authUser !== null
-  }
-}
-
-const AuthStoreContext = createContext<AuthStore>(null!)
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const authStore = useMemo(() => new AuthStore(userRepository), [])
-
-  return (
-    <AuthStoreContext.Provider value={authStore}>
-      {children}
-    </AuthStoreContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const authStore = useContext(AuthStoreContext)
-
-  return {
-    get authUser() {
-      return useMobxGetter(authStore, "authUser")
-    },
-    get user() {
-      return useMobxGetter(authStore, "user")
-    },
-    get isLoggedIn() {
-      return useMobxGetter(authStore, "isLoggedIn")
-    },
-    signOut: useCallback(async () => {
-      await auth.signOut()
-    }, []),
+    await userRepository.create(newUserData)
   }
 }

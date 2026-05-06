@@ -8,6 +8,7 @@ import {
 import { useCallback } from "react"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useAutoSave } from "../hooks/useAutoSave"
+import { useCommands } from "../hooks/useCommands"
 import { useHistory } from "../hooks/useHistory"
 import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
@@ -123,13 +124,13 @@ export const useOpenSong = () => {
 }
 
 export const useAddTrack = () => {
-  const { addTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(() => {
     pushHistory()
-    addTrack(emptyTrack(Math.min(tracks.length - 1, 0xf)))
-  }, [pushHistory, addTrack, tracks])
+    commands.song.addNewTrack()
+  }, [pushHistory, commands])
 }
 
 export const useRemoveTrack = () => {
@@ -182,34 +183,27 @@ export const useSelectTrack = () => {
 }
 
 export const useInsertTrack = () => {
-  const { insertTrack, tracks } = useSong()
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(
     (trackIndex: number) => {
       pushHistory()
-      insertTrack(emptyTrack(tracks.length - 1), trackIndex)
+      commands.song.insertNewTrack(trackIndex)
     },
-    [pushHistory, insertTrack, tracks],
+    [pushHistory, commands],
   )
 }
 
 export const useDuplicateTrack = () => {
-  const { getTrack, tracks, insertTrack } = useSong()
   const { pushHistory } = useHistory()
+  const commands = useCommands()
 
   return useCallback(
     (trackId: TrackId) => {
-      const track = getTrack(trackId)
-      if (track === undefined) {
-        throw new Error("No track found")
-      }
-      const trackIndex = tracks.findIndex((t) => t.id === trackId)
-      const newTrack = track.clone()
-      newTrack.channel = undefined
       pushHistory()
-      insertTrack(newTrack, trackIndex + 1)
+      commands.song.duplicateTrack(trackId)
     },
-    [getTrack, tracks, insertTrack, pushHistory],
+    [commands, pushHistory],
   )
 }

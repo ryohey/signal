@@ -2,12 +2,10 @@ import {
   type BatchUpdateOperation,
   getProgramNumberEvent,
   isProgramChangeEvent,
-  Measure,
   programChangeMidiEvent,
   TrackEvent,
   TrackEventOf,
   TrackId,
-  timeSignatureMidiEvent,
 } from "@signal-app/core"
 import type {
   AnyChannelEvent,
@@ -316,31 +314,27 @@ export const useToggleAllGhostTracks = () => {
 }
 
 export const useAddTimeSignature = () => {
-  const { timebase } = useSong()
   const { pushHistory } = useHistory()
-  const { measures, timeSignatures, addEvent } = useConductorTrack()
+  const commands = useCommands()
 
   return useCallback(
     (tick: number, numerator: number, denominator: number) => {
-      const measureStartTick = Measure.getMeasureStart(
-        measures,
-        tick,
-        timebase,
-      ).tick
+      const measureStartTick = commands.conductorTrack.getMeasureStartTick(tick)
 
       // prevent duplication
-      if (timeSignatures.some((e) => e.tick === measureStartTick)) {
+      if (commands.conductorTrack.hasTimeSignatureAt(measureStartTick)) {
         return
       }
 
       pushHistory()
 
-      addEvent({
-        ...timeSignatureMidiEvent(0, numerator, denominator),
-        tick: measureStartTick,
-      })
+      commands.conductorTrack.addTimeSignature(
+        measureStartTick,
+        numerator,
+        denominator,
+      )
     },
-    [timebase, pushHistory, measures, timeSignatures, addEvent],
+    [pushHistory, commands],
   )
 }
 

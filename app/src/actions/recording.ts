@@ -8,10 +8,10 @@ export const useToggleRecording = () => {
 
   return useCallback(() => {
     if (midiRecorder.isRecording) {
-      midiRecorder.isRecording = false
+      midiRecorder.stop()
       stop()
     } else {
-      midiRecorder.isRecording = true
+      midiRecorder.start()
       play()
     }
   }, [midiRecorder, play, stop])

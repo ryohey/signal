@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePreviewNote } from "./usePreviewNote"
+import { useMidiInputNoteNumbers } from "./usePreviewNoteNumbers"
 import { useStores } from "./useStores"
 import { useTrack } from "./useTrack"
 
@@ -13,11 +14,13 @@ export function usePianoKeys() {
   } = usePianoRoll()
   const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())
   const { previewNoteOn, previewNoteOff } = usePreviewNote()
+  const midiInputKeys = useMidiInputNoteNumbers()
   const { synth } = useStores()
   const { programNumber, isRhythmTrack } = useTrack(selectedTrackId)
   const selectedKeys = useMemo(
-    () => new Set([...touchingKeys, ...previewingNoteNumbers]),
-    [touchingKeys, previewingNoteNumbers],
+    () =>
+      new Set([...touchingKeys, ...previewingNoteNumbers]).union(midiInputKeys),
+    [touchingKeys, previewingNoteNumbers, midiInputKeys],
   )
 
   const onMouseDownKey = useCallback(

@@ -10,6 +10,7 @@ import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { isRunningInElectron } from "../../helpers/platform"
 import { ArrangeViewProvider } from "../../hooks/useArrangeView"
 import { AuthProvider } from "../../hooks/useAuth"
+import { MIDIDeviceProvider } from "../../hooks/useMIDIDevice"
 import { PianoRollProvider } from "../../hooks/usePianoRoll"
 import { StoreContext } from "../../hooks/useStores"
 import { TempoEditorProvider } from "../../hooks/useTempoEditor"
@@ -38,19 +39,21 @@ export function App() {
                   <ProgressProvider component={ProgressDialog}>
                     <LocalizationProvider>
                       <AuthProvider>
-                        <TrackMuteProvider>
-                          <PianoRollProvider>
-                            <ArrangeViewProvider>
-                              <TempoEditorProvider>
-                                <GlobalCSS />
-                                {isRunningInElectron() && (
-                                  <ElectronCallbackHandler />
-                                )}
-                                <RootView />
-                              </TempoEditorProvider>
-                            </ArrangeViewProvider>
-                          </PianoRollProvider>
-                        </TrackMuteProvider>
+                        <MIDIDeviceProvider>
+                          <TrackMuteProvider>
+                            <PianoRollProvider>
+                              <ArrangeViewProvider>
+                                <TempoEditorProvider>
+                                  <GlobalCSS />
+                                  {isRunningInElectron() && (
+                                    <ElectronCallbackHandler />
+                                  )}
+                                  <RootView />
+                                </TempoEditorProvider>
+                              </ArrangeViewProvider>
+                            </PianoRollProvider>
+                          </TrackMuteProvider>
+                        </MIDIDeviceProvider>
                       </AuthProvider>
                     </LocalizationProvider>
                   </ProgressProvider>

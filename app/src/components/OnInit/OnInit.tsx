@@ -5,6 +5,8 @@ import { useLoadSongFromExternalMidiFile } from "../../actions/cloudSong"
 import { songFromArrayBuffer } from "../../actions/file"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useAutoSave } from "../../hooks/useAutoSave"
+import { useMIDIDevice } from "../../hooks/useMIDIDevice"
+import { useSoundFont } from "../../hooks/useSoundFont"
 import { useStores } from "../../hooks/useStores"
 import { useLocalization } from "../../localize/useLocalization"
 import { AutoSaveDialog } from "../AutoSaveDialog/AutoSaveDialog"
@@ -21,11 +23,15 @@ export const OnInit: FC = () => {
   const { show: showProgress } = useProgress()
   const localized = useLocalization()
   const { shouldShowAutoSaveDialog } = useAutoSave()
+  const { initSoundFont } = useSoundFont()
+  const { initMIDIDevice } = useMIDIDevice()
 
   const init = async () => {
     const closeProgress = showProgress(localized["initializing"])
     try {
       await rootStore.init()
+      await initSoundFont()
+      await initMIDIDevice()
     } catch (e) {
       setIsErrorDialogOpen(true)
       setErrorMessage((e as Error).message)

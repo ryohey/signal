@@ -3,11 +3,13 @@ import { SetTempoEvent } from "midifile-ts"
 import { transaction } from "mobx"
 import {
   isSetTempoEvent,
+  Measure,
   TempoEventsClipboardData,
   TrackEventOf,
 } from "../entities"
 import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "../helpers"
 import { isNotUndefined } from "../helpers/array"
+import { timeSignatureMidiEvent } from "../midi"
 import { ISongStore } from "./interfaces"
 import { TrackCommandService } from "./TrackCommandService"
 
@@ -113,6 +115,24 @@ export class ConductorTrackCommandService {
     }))
     transaction(() => {
       events.forEach((e) => conductorTrack.createOrUpdate(e))
+    })
+  }
+
+  getMeasureStartTick = (tick: number) => {
+    const { timebase, measures } = this.songStore.song
+    return Measure.getMeasureStart(measures, tick, timebase).tick
+  }
+
+  hasTimeSignatureAt = (tick: number) => {
+    const { timeSignatures } = this.songStore.song
+    return timeSignatures.some((e) => e.tick === tick)
+  }
+
+  addTimeSignature = (tick: number, numerator: number, denominator: number) => {
+    const conductorTrack = this.songStore.song.conductorTrack
+    return conductorTrack?.addEvent({
+      ...timeSignatureMidiEvent(0, numerator, denominator),
+      tick,
     })
   }
 }

@@ -1,5 +1,4 @@
 import { Range } from "@signal-app/core"
-import { computed, makeObservable, observable, observe } from "mobx"
 import { Unsubscribe } from "../types"
 
 interface TrackEvent {
@@ -10,19 +9,11 @@ export class EventView<T extends TrackEvent> {
   private startTick: number = 0
   private endTick: number = 0
   private listeners: Set<() => void> = new Set()
-  private unregisterReaction: Unsubscribe | null = null
+  private windowedEvents: readonly T[] = []
 
-  constructor(private readonly loadEvents: () => readonly T[]) {
-    makeObservable<EventView<T>, "startTick" | "endTick">(this, {
-      startTick: observable,
-      endTick: observable,
-      windowedEvents: computed({ keepAlive: false }),
-    })
-  }
+  constructor(private readonly loadEvents: () => readonly T[]) {}
 
   dispose() {
-    this.unregisterReaction?.()
-    this.unregisterReaction = null
     this.listeners.clear()
   }
 
@@ -30,19 +21,14 @@ export class EventView<T extends TrackEvent> {
     this.dispose()
   }
 
-  private registerReaction = () => {
-    this.unregisterReaction?.()
-    this.unregisterReaction = observe(
-      this,
-      "windowedEvents",
-      this.notifyListeners,
-    )
+  triggerUpdate() {
+    this.updateWindowedEvents()
   }
 
-  get windowedEvents(): readonly T[] {
+  private updateWindowedEvents() {
     const range = Range.create(this.startTick, this.endTick)
 
-    return this.loadEvents().filter((e) => {
+    this.windowedEvents = this.loadEvents().filter((e) => {
       if ("duration" in e && typeof e.duration === "number") {
         return Range.intersects(
           range,
@@ -51,6 +37,8 @@ export class EventView<T extends TrackEvent> {
       }
       return Range.contains(range, e.tick)
     })
+
+    this.notifyListeners()
   }
 
   setRange = (startTick: number, endTick: number) => {
@@ -59,6 +47,7 @@ export class EventView<T extends TrackEvent> {
     }
     this.startTick = startTick
     this.endTick = endTick
+    this.updateWindowedEvents()
   }
 
   getEvents = (): readonly T[] => {
@@ -68,13 +57,12 @@ export class EventView<T extends TrackEvent> {
   subscribe = (callback: () => void): Unsubscribe => {
     this.listeners.add(callback)
     if (this.listeners.size === 1) {
-      this.registerReaction()
+      this.updateWindowedEvents()
     }
     return () => {
       this.listeners.delete(callback)
       if (this.listeners.size === 0) {
-        this.unregisterReaction?.()
-        this.unregisterReaction = null
+        this.windowedEvents = []
       }
     }
   }

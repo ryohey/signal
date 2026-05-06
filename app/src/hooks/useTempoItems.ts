@@ -1,13 +1,24 @@
-import { useMemo } from "react"
+import { isSetTempoEvent } from "@signal-app/core"
+import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
-import { useConductorTrack } from "./useConductorTrack"
+import { useSong } from "./useSong"
 import { useTempoEditor } from "./useTempoEditor"
 import { useTickScroll } from "./useTickScroll"
 
+const noop = () => () => {}
+
 export function useTempoItems() {
   const { transform } = useTempoEditor()
-  const { tempoEvents } = useConductorTrack()
+  const { conductorTrack } = useSong()
+  const events = useSyncExternalStore(
+    conductorTrack?.onEventsChanged.subscribe ?? noop,
+    useCallback(
+      () => conductorTrack?.getEventsSnapshot() ?? [],
+      [conductorTrack],
+    ),
+  )
   const { canvasWidth, scrollLeft } = useTickScroll()
+  const tempoEvents = useMemo(() => events.filter(isSetTempoEvent), [events])
   const items = useMemo(
     () => transformEvents(tempoEvents, transform, canvasWidth + scrollLeft),
     [tempoEvents, transform, canvasWidth, scrollLeft],

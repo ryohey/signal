@@ -1,5 +1,4 @@
 import { TrackEvent, TrackId } from "@signal-app/core"
-import { toJS } from "mobx"
 import {
   createContext,
   useCallback,
@@ -8,6 +7,7 @@ import {
   useSyncExternalStore,
 } from "react"
 import { EventView } from "../observer/EventView"
+import { Unsubscribe } from "../types"
 import { useDisposable } from "./useDisposable"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
@@ -29,11 +29,34 @@ export function useSyncEventViewWithScroll<T extends { tick: number }>(
 export function useEventViewForTrack(trackId: TrackId) {
   const { songStore } = useStores()
   const createEventView = useCallback(
-    () =>
-      new EventView(() => toJS(songStore.song.getTrack(trackId)?.events) ?? []),
+    () => new EventView(() => songStore.song.getTrack(trackId)?.events ?? []),
     [songStore, trackId],
   )
-  return useDisposable(createEventView)
+  const eventView = useDisposable(createEventView)
+
+  useEffect(() => {
+    let unsubscribeSong: Unsubscribe | null = null
+    let unsubscribeTracks: Unsubscribe | null = null
+    let unsubscribeEvents: Unsubscribe | null = null
+
+    unsubscribeSong = songStore.onSongChanged.subscribe(() => {
+      unsubscribeTracks = songStore.song.onTracksChanged.subscribe(() => {
+        const track = songStore.song.getTrack(trackId)
+        unsubscribeEvents =
+          track?.onEventsChanged.subscribe(() => {
+            eventView.triggerUpdate()
+          }) ?? null
+      })
+    })
+
+    return () => {
+      unsubscribeSong?.()
+      unsubscribeTracks?.()
+      unsubscribeEvents?.()
+    }
+  }, [songStore, trackId, eventView])
+
+  return eventView
 }
 
 export function EventViewProvider({

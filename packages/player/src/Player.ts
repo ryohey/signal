@@ -3,6 +3,8 @@ import throttle from "lodash/throttle.js"
 import { AnyEvent, MIDIControlEvents } from "midifile-ts"
 import { computed, makeObservable, observable } from "mobx"
 import { EventScheduler } from "./EventScheduler.js"
+import { mobxToObservable } from "./helpers/mobxToObservable.js"
+import { Observable } from "./helpers/observable.js"
 import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js";
 import { PlayerEvent } from "./PlayerEvent.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
@@ -36,6 +38,10 @@ export class Player {
   disableSeek: boolean = false
   loop: LoopSetting | null = null
 
+  readonly onPositionChanged: Observable
+  readonly onIsPlayingChanged: Observable
+  readonly onLoopChanged: Observable
+
   constructor(
     private readonly output: SynthOutput,
     private readonly eventSource: IEventSource,
@@ -47,6 +53,10 @@ export class Player {
       position: computed,
       isPlaying: computed,
     })
+
+    this.onPositionChanged = mobxToObservable(this, "position")
+    this.onIsPlayingChanged = mobxToObservable(this, "isPlaying")
+    this.onLoopChanged = mobxToObservable(this, "loop")
   }
 
   play = () => {
@@ -229,7 +239,11 @@ export class Player {
     const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
 
     events.forEach(({ event: e, timestamp: time }) => {
-      if (e.type === "channel" || e.type === "sysEx" || e.type === "dividedSysEx") {
+      if (
+        e.type === "channel" ||
+        e.type === "sysEx" ||
+        e.type === "dividedSysEx"
+      ) {
         const delayTime = (time - timestamp) / 1000
         this.sendEvent(e, delayTime, timestamp, e.trackId)
       } else {

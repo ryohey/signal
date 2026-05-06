@@ -1,13 +1,15 @@
 import { TrackId } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
+import { useCommands } from "./useCommands"
 import { useSong } from "./useSong"
 
 export function useTrackList() {
-  const { tracks, getTrack, moveTrack } = useSong()
+  const { tracks } = useSong()
   const trackIds = tracks
     .filter((track) => !track.isConductorTrack)
     .map((track) => track.id)
+  const commands = useCommands()
 
   return {
     get isOpen() {
@@ -17,16 +19,9 @@ export function useTrackList() {
     trackIds,
     moveTrack: useCallback(
       (id: TrackId, overId: TrackId) => {
-        const track = getTrack(id)
-        const overTrack = getTrack(overId)
-        if (track === undefined || overTrack === undefined) {
-          return
-        }
-        const fromIndex = tracks.indexOf(track)
-        const toIndex = tracks.indexOf(overTrack)
-        moveTrack(fromIndex, toIndex)
+        commands.song.moveTrack(id, overId)
       },
-      [tracks, getTrack, moveTrack],
+      [commands],
     ),
   }
 }

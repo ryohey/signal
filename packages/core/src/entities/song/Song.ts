@@ -14,6 +14,11 @@ import {
   primitive,
   serialize,
 } from "serializr"
+import {
+  mobxToObservable,
+  mobxToObservableDeep,
+} from "../../helpers/mobxToObservable"
+import { Observable } from "../../helpers/observable"
 import { Measure } from "../measure/Measure"
 import { isTimeSignatureEvent, Track, TrackId } from "../track"
 import { collectAllEvents } from "./collectAllEvents"
@@ -23,6 +28,7 @@ const DEFAULT_TIME_BASE = 480
 
 export class Song {
   tracks: readonly Track[] = []
+  private _tracksSnapshot: Track[] = []
   filepath: string = ""
   timebase: number = DEFAULT_TIME_BASE
   name: string = ""
@@ -32,6 +38,17 @@ export class Song {
   isSaved = true
 
   private lastTrackId = 0
+
+  readonly onTracksChanged: Observable
+  readonly onConductorTrackChanged: Observable
+  readonly onNameChanged: Observable
+  readonly onTimebaseChanged: Observable
+  readonly onFilepathChanged: Observable
+  readonly onIsSavedChanged: Observable
+  readonly onMeasuresChanged: Observable
+  readonly onTimeSignaturesChanged: Observable
+  readonly onCloudSongIdChanged: Observable
+  readonly onEndOfSongChanged: Observable
 
   constructor() {
     makeObservable(this, {
@@ -50,6 +67,17 @@ export class Song {
       isSaved: observable,
     })
 
+    this.onTracksChanged = mobxToObservableDeep(this, "tracks")
+    this.onConductorTrackChanged = mobxToObservable(this, "conductorTrack")
+    this.onNameChanged = mobxToObservable(this, "name")
+    this.onTimebaseChanged = mobxToObservable(this, "timebase")
+    this.onFilepathChanged = mobxToObservable(this, "filepath")
+    this.onIsSavedChanged = mobxToObservable(this, "isSaved")
+    this.onMeasuresChanged = mobxToObservable(this, "measures")
+    this.onTimeSignaturesChanged = mobxToObservable(this, "timeSignatures")
+    this.onCloudSongIdChanged = mobxToObservable(this, "cloudSongId")
+    this.onEndOfSongChanged = mobxToObservable(this, "endOfSong")
+
     reaction(
       () => {
         return [
@@ -61,6 +89,13 @@ export class Song {
         ]
       },
       () => (this.isSaved = false),
+    )
+
+    reaction(
+      () => toJS(this.tracks),
+      (tracks) => {
+        this._tracksSnapshot = [...tracks]
+      },
     )
   }
 
@@ -100,6 +135,10 @@ export class Song {
 
   getTrack(id: TrackId): Track | undefined {
     return this.tracks.find((t) => t.id === id)
+  }
+
+  getTracksSnapshot = (): readonly Track[] => {
+    return this._tracksSnapshot
   }
 
   get measures(): Measure[] {

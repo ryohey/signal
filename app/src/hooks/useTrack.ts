@@ -1,43 +1,72 @@
-import { Track, TrackColor, TrackEvent, TrackId } from "@signal-app/core"
-import { useCallback } from "react"
+import {
+  getProgramNumberEvent,
+  Track,
+  TrackColor,
+  TrackEvent,
+  TrackId,
+} from "@signal-app/core"
+import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useTrackMute } from "./useTrackMute"
 
+const noop = () => () => {}
+
 export function useTrack(id: TrackId) {
-  const song = useSong()
-  const track = useMobxSelector(() => song.getTrack(id), [song, id])
+  const { tracks } = useSong()
+  const track = useMemo(() => tracks.find((t) => t.id === id), [tracks, id])
 
   return {
     get isRhythmTrack() {
-      return useMobxGetter(track, "isRhythmTrack") ?? false
+      return useSyncExternalStore(
+        track?.onIsRhythmTrackChanged.subscribe ?? noop,
+        useCallback(() => track?.isRhythmTrack ?? false, [track]),
+      )
     },
     get isConductorTrack() {
-      return useMobxGetter(track, "isConductorTrack") ?? false
+      return useSyncExternalStore(
+        track?.onIsConductorTrackChanged.subscribe ?? noop,
+        useCallback(() => track?.isConductorTrack ?? false, [track]),
+      )
     },
     get programNumber() {
       const { position } = usePlayer()
-      return useMobxSelector(
-        () => track?.getProgramNumber(position) ?? 0,
-        [track, position],
+      return useSyncExternalStore(
+        track?.onEventsChanged.subscribe ?? noop,
+        useCallback(
+          () =>
+            getProgramNumberEvent(track?.events ?? [], position)?.value ?? 0,
+          [track, position],
+        ),
       )
     },
     get name() {
-      return useMobxGetter(track, "name") ?? ""
+      return useSyncExternalStore(
+        track?.onNameChanged.subscribe ?? noop,
+        useCallback(() => track?.name, [track]),
+      )
     },
     get channel() {
-      return useMobxGetter(track, "channel")
+      return useSyncExternalStore(
+        track?.onChannelChanged.subscribe ?? noop,
+        useCallback(() => track?.channel, [track]),
+      )
     },
     get events() {
-      return useMobxGetter(track, "events") ?? []
+      return useSyncExternalStore(
+        track?.onEventsChanged.subscribe ?? noop,
+        useCallback(() => track?.getEventsSnapshot() ?? [], [track]),
+      )
     },
     getEvents() {
       return track?.events ?? []
     },
     get color() {
-      return useMobxGetter(track, "color")
+      return useSyncExternalStore(
+        track?.onColorChanged.subscribe ?? noop,
+        useCallback(() => track?.color, [track]),
+      )
     },
     get isMuted() {
       const { trackMute } = useTrackMute()

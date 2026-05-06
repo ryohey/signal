@@ -1,5 +1,4 @@
 import { Range } from "@signal-app/core"
-import { transaction } from "mobx"
 import { Point } from "../../../../entities/geometry/Point"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
 import { MouseGesture } from "../../../../gesture/MouseGesture"
@@ -49,7 +48,7 @@ export const useMoveDraggableGesture = (): MouseGesture<
     quantize: quantizeUnit,
     quantizeRound,
   } = useQuantizer()
-  const { getDraggablePosition, getDraggableArea, updateDraggable } =
+  const { getDraggablePosition, getDraggableArea, updateDraggables } =
     usePianoRollDraggable()
 
   const { pushHistory } = useHistory()
@@ -134,22 +133,18 @@ export const useMoveDraggableGesture = (): MouseGesture<
             pushHistory()
           }
 
-          transaction(() => {
-            updateDraggable(draggable, newPosition)
-
-            subDraggables.forEach((subDraggable, i) => {
-              const subDraggablePosition = newSubDraggablePositions[i]
-
-              if (
-                subDraggablePosition === null ||
-                subDraggablePosition === null
-              ) {
-                return
+          const updates = [
+            { draggable, position: newPosition },
+            ...subDraggables.flatMap((subDraggable, i) => {
+              const position = newSubDraggablePositions[i]
+              if (position === null) {
+                return []
               }
+              return [{ draggable: subDraggable, position }]
+            }),
+          ]
 
-              updateDraggable(subDraggable, subDraggablePosition)
-            })
-          })
+          updateDraggables(updates)
 
           callback?.onChange?.(e2, {
             oldPosition: currentPosition,

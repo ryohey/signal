@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx"
+import { action, makeObservable, observable } from "mobx"
 import { createModelSchema, list, mapAsArray, primitive } from "serializr"
 import { pojo } from "../pojo"
 
@@ -22,6 +22,9 @@ export class OrderedArray<
 
     makeObservable(this, {
       array: observable.shallow,
+      add: action,
+      remove: action,
+      update: action,
     })
   }
 

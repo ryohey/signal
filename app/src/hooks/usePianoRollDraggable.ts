@@ -27,6 +27,89 @@ export function usePianoRollDraggable() {
   const { getSelection, getSelectedTrack, getSelectedNoteIds, setSelection } =
     usePianoRoll()
 
+  const updateDraggable = useCallback(
+    (draggable: PianoRollDraggable, position: Partial<NotePoint>) => {
+      const selection = getSelection()
+      const selectedTrack = getSelectedTrack()
+
+      switch (draggable.type) {
+        case "note": {
+          if (selectedTrack === undefined) {
+            return
+          }
+          const note = selectedTrack.getEventById(draggable.noteId)
+          if (note === undefined || !isNoteEvent(note)) {
+            return
+          }
+          switch (draggable.position) {
+            case "center": {
+              selectedTrack.updateEvent(note.id, position)
+              break
+            }
+            case "left": {
+              if (position.tick === undefined) {
+                return
+              }
+              selectedTrack.updateEvent(note.id, {
+                tick: position.tick,
+                duration: note.duration + note.tick - position.tick,
+              })
+              break
+            }
+            case "right": {
+              if (position.tick === undefined) {
+                return
+              }
+              selectedTrack.updateEvent(note.id, {
+                duration: position.tick - note.tick,
+              })
+              break
+            }
+          }
+          break
+        }
+        case "selection": {
+          if (selection === null) {
+            return
+          }
+          switch (draggable.position) {
+            case "center": {
+              const from = Selection.getFrom(selection)
+              const defaultedPosition = { ...from, ...position }
+              const delta = NotePoint.sub(defaultedPosition, from)
+              setSelection(
+                Selection.moved(selection, delta.tick, delta.noteNumber),
+              )
+              break
+            }
+            case "left": {
+              if (position.tick === undefined) {
+                return
+              }
+              setSelection({
+                ...selection,
+                fromTick: position.tick,
+              })
+              break
+            }
+            case "right": {
+              if (position.tick === undefined) {
+                return
+              }
+              setSelection({
+                ...selection,
+                toTick: position.tick,
+              })
+              break
+            }
+          }
+          break
+        }
+      }
+    },
+    [getSelection, getSelectedTrack, setSelection],
+  )
+
   return {
     getDraggablePosition: useCallback(
       (draggable: PianoRollDraggable): NotePoint | null => {
@@ -73,87 +156,16 @@ export function usePianoRollDraggable() {
       },
       [getSelectedTrack, getSelection],
     ),
-    updateDraggable: useCallback(
-      (draggable: PianoRollDraggable, position: Partial<NotePoint>) => {
-        const selection = getSelection()
+    updateDraggables: useCallback(
+      (updates: { draggable: PianoRollDraggable; position: NotePoint }[]) => {
         const selectedTrack = getSelectedTrack()
-
-        switch (draggable.type) {
-          case "note": {
-            if (selectedTrack === undefined) {
-              return
-            }
-            const note = selectedTrack.getEventById(draggable.noteId)
-            if (note === undefined || !isNoteEvent(note)) {
-              return
-            }
-            switch (draggable.position) {
-              case "center": {
-                selectedTrack.updateEvent(note.id, position)
-                break
-              }
-              case "left": {
-                if (position.tick === undefined) {
-                  return
-                }
-                selectedTrack.updateEvent(note.id, {
-                  tick: position.tick,
-                  duration: note.duration + note.tick - position.tick,
-                })
-                break
-              }
-              case "right": {
-                if (position.tick === undefined) {
-                  return
-                }
-                selectedTrack.updateEvent(note.id, {
-                  duration: position.tick - note.tick,
-                })
-                break
-              }
-            }
-            break
-          }
-          case "selection": {
-            if (selection === null) {
-              return
-            }
-            switch (draggable.position) {
-              case "center": {
-                const from = Selection.getFrom(selection)
-                const defaultedPosition = { ...from, ...position }
-                const delta = NotePoint.sub(defaultedPosition, from)
-                setSelection(
-                  Selection.moved(selection, delta.tick, delta.noteNumber),
-                )
-                break
-              }
-              case "left": {
-                if (position.tick === undefined) {
-                  return
-                }
-                setSelection({
-                  ...selection,
-                  fromTick: position.tick,
-                })
-                break
-              }
-              case "right": {
-                if (position.tick === undefined) {
-                  return
-                }
-                setSelection({
-                  ...selection,
-                  toTick: position.tick,
-                })
-                break
-              }
-            }
-            break
-          }
-        }
+        selectedTrack?.transaction(() => {
+          updates.forEach(({ draggable, position }) => {
+            updateDraggable(draggable, position)
+          })
+        })
       },
-      [getSelection, getSelectedTrack, setSelection],
+      [updateDraggable, getSelectedTrack],
     ),
     getDraggableArea: useCallback(
       (

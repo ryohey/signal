@@ -5,14 +5,14 @@ import Headset from "mdi-react/HeadphonesIcon"
 import Layers from "mdi-react/LayersIcon"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import VolumeOff from "mdi-react/VolumeOffIcon"
-import { FC, MouseEventHandler, useCallback, useState } from "react"
+import { FC, MouseEventHandler, useCallback, useRef, useState } from "react"
 import {
   useSelectTrack,
   useToggleAllGhostTracks,
   useToggleGhostTrack,
 } from "../../actions"
 import { useContextMenu } from "../../hooks/useContextMenu"
-import { useMIDIActivityIndicator } from "../../hooks/useMIDIActivityIndicator"
+import { useMIDIActivity } from "../../hooks/useMIDIActivity"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRouter } from "../../hooks/useRouter"
 import { useTrack } from "../../hooks/useTrack"
@@ -241,7 +241,19 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
     setDialogOpened(true)
   }, [])
 
-  const midiIndicatorRef = useMIDIActivityIndicator(trackId)
+  const midiIndicatorRef = useRef<HTMLDivElement>(null)
+
+  const onActivity = useCallback(() => {
+    const el = midiIndicatorRef.current
+    if (!el) return
+    // Restart the CSS animation by removing the data-active attribute,
+    // forcing a reflow, then re-adding it.
+    el.removeAttribute("data-active")
+    void el.offsetWidth
+    el.setAttribute("data-active", "true")
+  }, [])
+
+  useMIDIActivity(trackId, onActivity)
 
   const color =
     trackColor !== undefined ? trackColorToCSSColor(trackColor) : "transparent"

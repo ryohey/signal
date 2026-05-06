@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "outDir": "./dist",
     "sourceMap": true,
     "declaration": true,
     "target": "esnext",
@@ -15,7 +13,7 @@
     "alwaysStrict": true,
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": true
   },
   "include": ["src/**/*"]
 }
