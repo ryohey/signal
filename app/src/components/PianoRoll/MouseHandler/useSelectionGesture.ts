@@ -1,20 +1,22 @@
-import { MouseGesture } from "../../../gesture/MouseGesture"
+import { useCallback } from "react"
+import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useCreateSelectionGesture } from "./gestures/useCreateSelectionGesture"
 
-export const useSelectionGesture = (): MouseGesture => {
+export const useSelectionGesture = (): MouseDownHandler => {
   const createSelectionAction = useCreateSelectionGesture()
 
-  return {
-    onMouseDown(e: MouseEvent) {
+  return useCallback(
+    (e) => {
       if (e.relatedTarget) {
         return null
       }
 
       if (e.button === 0) {
-        return createSelectionAction.onMouseDown(e)
+        return createSelectionAction(e)
       }
 
       return null
     },
-  }
+    [createSelectionAction],
+  )
 }

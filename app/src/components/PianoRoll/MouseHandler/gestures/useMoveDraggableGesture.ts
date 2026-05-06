@@ -1,7 +1,8 @@
 import { Range } from "@signal-app/core"
+import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { NotePoint } from "../../../../entities/transform/NotePoint"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
@@ -39,7 +40,7 @@ const constraintToDraggableArea = (
   }
 }
 
-export const useMoveDraggableGesture = (): MouseGesture<
+export const useMoveDraggableGesture = (): MouseDownHandler<
   [PianoRollDraggable, PianoRollDraggable[]?, MoveDraggableCallback?]
 > => {
   const { transform, getLocal } = usePianoRoll()
@@ -53,8 +54,8 @@ export const useMoveDraggableGesture = (): MouseGesture<
 
   const { pushHistory } = useHistory()
 
-  return {
-    onMouseDown(e, draggable, subDraggables = [], callback = {}) {
+  return useCallback(
+    (e, draggable, subDraggables = [], callback = {}) => {
       const draggablePosition = getDraggablePosition(draggable)
 
       if (draggablePosition === null) {
@@ -159,5 +160,16 @@ export const useMoveDraggableGesture = (): MouseGesture<
         },
       })
     },
-  }
+    [
+      getDraggablePosition,
+      getDraggableArea,
+      updateDraggables,
+      transform,
+      getLocal,
+      isQuantizeEnabled,
+      quantizeUnit,
+      quantizeRound,
+      pushHistory,
+    ],
+  )
 }

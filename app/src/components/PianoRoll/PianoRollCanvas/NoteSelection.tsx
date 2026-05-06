@@ -1,5 +1,5 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { Selection as SelectionEntity } from "../../../entities/selection/Selection"
 import { usePianoRoll } from "../../../hooks/usePianoRoll"
@@ -61,18 +61,27 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
     }),
     [rect.x, rect.y, rect.width, rect.height, edgeSize],
   )
-  const onMouseDownLeft = (e: MouseEvent) => {
-    e.stopPropagation()
-    dragSelectionLeftEdgeAction.onMouseDown(e, selectedNoteIds)
-  }
-  const onMouseDownCenter = (e: MouseEvent) => {
-    e.stopPropagation()
-    moveSelectionAction.onMouseDown(e)
-  }
-  const onMouseDownRight = (e: MouseEvent) => {
-    e.stopPropagation()
-    dragSelectionRightEdgeAction.onMouseDown(e, selectedNoteIds)
-  }
+  const onMouseDownLeft = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      dragSelectionLeftEdgeAction(e, selectedNoteIds)
+    },
+    [dragSelectionLeftEdgeAction, selectedNoteIds],
+  )
+  const onMouseDownCenter = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      moveSelectionAction(e)
+    },
+    [moveSelectionAction],
+  )
+  const onMouseDownRight = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      dragSelectionRightEdgeAction(e, selectedNoteIds)
+    },
+    [dragSelectionRightEdgeAction, selectedNoteIds],
+  )
 
   return (
     <>

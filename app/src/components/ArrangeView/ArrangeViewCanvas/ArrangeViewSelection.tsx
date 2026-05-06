@@ -35,7 +35,7 @@ export const ArrangeViewSelection = ({ zIndex }: { zIndex: number }) => {
       }
       e.stopPropagation()
       const startClientPos = getClientPos(e)
-      moveSelectionGesture.onMouseDown(e, startClientPos, selectionRect)
+      moveSelectionGesture(e, startClientPos, selectionRect)
     },
     [moveSelectionGesture, selectionRect],
   )

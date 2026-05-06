@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
@@ -32,10 +32,14 @@ export const ControlLineGraphItems = ({
   const { scrollLeft } = useTickScroll()
   const dragSelectionGesture = useDragSelectionGesture()
 
-  const controlPoints = items.map((p) => ({
-    ...Rect.fromPointWithSize(p, circleRadius * 2),
-    id: p.id,
-  }))
+  const controlPoints = useMemo(
+    () =>
+      items.map((p) => ({
+        ...Rect.fromPointWithSize(p, circleRadius * 2),
+        id: p.id,
+      })),
+    [items, circleRadius],
+  )
 
   const getLocal = useCallback(
     (e: MouseEvent): Point => ({
@@ -52,7 +56,7 @@ export const ControlLineGraphItems = ({
       }
       e.stopPropagation()
       const local = getLocal(e)
-      dragSelectionGesture.onMouseDown(e, hitEventId, local, controlTransform)
+      dragSelectionGesture(e, hitEventId, local, controlTransform)
     },
     [mouseMode, dragSelectionGesture, getLocal, controlTransform],
   )

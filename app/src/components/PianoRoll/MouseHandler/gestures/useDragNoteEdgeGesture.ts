@@ -1,13 +1,14 @@
 import { isNoteEvent } from "@signal-app/core"
+import { useCallback } from "react"
 import { useSelectNote } from "../../../../actions"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePreviewNote } from "../../../../hooks/usePreviewNote"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
-const useDragNoteEdgeGesture =
-  (edge: "left" | "right" | "center") => (): MouseGesture<[number]> => {
+const createUseDragNoteEdgeGesture =
+  (edge: "left" | "right" | "center") => (): MouseDownHandler<[number]> => {
     const { selectedTrackId, selectedNoteIds, setLastNoteDuration } =
       usePianoRoll()
     const { channel, getEventById } = useTrack(selectedTrackId)
@@ -15,14 +16,14 @@ const useDragNoteEdgeGesture =
     const moveDraggableAction = useMoveDraggableGesture()
     const { previewNoteOn, previewNoteOff } = usePreviewNote()
 
-    return {
-      onMouseDown(e, noteId) {
+    return useCallback(
+      (e, noteId) => {
         if (channel === undefined) {
           return
         }
 
         const note = getEventById(noteId)
-        if (note == undefined || !isNoteEvent(note)) {
+        if (note === undefined || !isNoteEvent(note)) {
           return
         }
 
@@ -36,7 +37,7 @@ const useDragNoteEdgeGesture =
 
         previewNoteOn(note.noteNumber)
 
-        moveDraggableAction.onMouseDown(
+        moveDraggableAction(
           e,
           { type: "note", position: edge, noteId },
           newSelectedNoteIds
@@ -49,7 +50,7 @@ const useDragNoteEdgeGesture =
           {
             onChange(_e, { oldPosition, newPosition }) {
               const newNote = getEventById(noteId)
-              if (newNote == undefined || !isNoteEvent(newNote)) {
+              if (newNote === undefined || !isNoteEvent(newNote)) {
                 return
               }
               // save last note duration
@@ -72,9 +73,19 @@ const useDragNoteEdgeGesture =
           },
         )
       },
-    }
+      [
+        channel,
+        getEventById,
+        selectedNoteIds,
+        selectNote,
+        previewNoteOn,
+        previewNoteOff,
+        moveDraggableAction,
+        setLastNoteDuration,
+      ],
+    )
   }
 
-export const useDragNoteLeftGesture = useDragNoteEdgeGesture("left")
-export const useDragNoteRightGesture = useDragNoteEdgeGesture("right")
-export const useDragNoteCenterGesture = useDragNoteEdgeGesture("center")
+export const useDragNoteLeftGesture = createUseDragNoteEdgeGesture("left")
+export const useDragNoteRightGesture = createUseDragNoteEdgeGesture("right")
+export const useDragNoteCenterGesture = createUseDragNoteEdgeGesture("center")

@@ -7,8 +7,8 @@ import { useBeats } from "../../../hooks/useBeats"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
-import { VelocityItems } from "./VelocityItems"
 import { useVelocityPaintGesture } from "./useVelocityPaintGesture"
+import { VelocityItems } from "./VelocityItems"
 
 export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
   width,
@@ -40,7 +40,7 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
       width={width}
       height={height}
       style={style}
-      onMouseDown={velocityPaintGesture.onMouseDown}
+      onMouseDown={velocityPaintGesture}
     >
       <Transform matrix={scrollXMatrix}>
         <VelocityItems velocityTransform={velocityTransform} zIndex={1} />

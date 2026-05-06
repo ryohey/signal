@@ -1,7 +1,8 @@
+import { useCallback } from "react"
 import { eventsInSelection } from "../../../../actions"
 import { Point } from "../../../../entities/geometry/Point"
 import { Selection } from "../../../../entities/selection/Selection"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
@@ -9,7 +10,7 @@ import { usePlayer } from "../../../../hooks/usePlayer"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useTrack } from "../../../../hooks/useTrack"
 
-export const useSelectNoteGesture = (): MouseGesture => {
+export const useSelectNoteGesture = (): MouseDownHandler => {
   const {
     transform,
     getLocal,
@@ -23,8 +24,8 @@ export const useSelectNoteGesture = (): MouseGesture => {
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
-  return {
-    onMouseDown(e) {
+  return useCallback(
+    (e) => {
       const local = getLocal(e)
       const start = transform.getNotePoint(local)
       const startPos = local
@@ -60,5 +61,17 @@ export const useSelectNoteGesture = (): MouseGesture => {
         },
       })
     },
-  }
+    [
+      getEvents,
+      isPlaying,
+      quantizeRound,
+      setPosition,
+      setSelectedEventIds,
+      setSelection,
+      transform,
+      selection,
+      getLocal,
+      setSelectedNoteIds,
+    ],
+  )
 }

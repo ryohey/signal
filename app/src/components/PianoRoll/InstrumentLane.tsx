@@ -11,10 +11,9 @@ export interface InstrumentLaneProps {
 }
 
 const Container = styled.div`
-  height: 24px;
-  width: 100%;
-  padding: 0.25rem 0;
-  position: relative;
+  position: absolute;
+  top: 0.25rem;
+  left: 0;
 `
 
 export const InstrumentLane: FC<InstrumentLaneProps> = ({ width }) => {

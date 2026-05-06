@@ -1,28 +1,27 @@
 import { isEventInRange, isSetTempoEvent, Range } from "@signal-app/core"
+import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
-import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
-import { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
 
-export const useCreateSelectionGesture = (): MouseGesture<
+export const useCreateSelectionGesture = (): MouseDownHandler<
   [Point, TempoCoordTransform]
 > => {
   const { setSelectedEventIds, setSelection } = useTempoEditor()
   const { getEvents } = useConductorTrack()
-  let selection: TempoSelection | null = null
 
-  return {
-    onMouseDown(e, startPoint, transform) {
+  return useCallback(
+    (e, startPoint, transform) => {
       const start = transform.fromPosition(startPoint)
       const startClientPos = getClientPos(e)
 
       setSelectedEventIds([])
 
-      selection = {
+      let selection = {
         fromTick: start.tick,
         toTick: start.tick,
       }
@@ -59,5 +58,6 @@ export const useCreateSelectionGesture = (): MouseGesture<
         },
       })
     },
-  }
+    [getEvents, setSelectedEventIds, setSelection],
+  )
 }

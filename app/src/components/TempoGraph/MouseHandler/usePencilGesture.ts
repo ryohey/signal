@@ -3,17 +3,18 @@ import {
   isSetTempoEvent,
   setTempoMidiEvent,
 } from "@signal-app/core"
+import { useCallback } from "react"
 import { useUpdateEventsInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { TempoCoordTransform } from "../../../entities/transform/TempoCoordTransform"
-import { MouseGesture } from "../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 
-export const usePencilGesture = (): MouseGesture<
+export const usePencilGesture = (): MouseDownHandler<
   [Point, TempoCoordTransform]
 > => {
   const { pushHistory } = useHistory()
@@ -25,8 +26,8 @@ export const usePencilGesture = (): MouseGesture<
     (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v)),
   )
 
-  return {
-    onMouseDown(e, startPoint, transform) {
+  return useCallback(
+    (e, startPoint, transform) => {
       pushHistory()
 
       const startClientPos = getClientPos(e)
@@ -60,5 +61,6 @@ export const usePencilGesture = (): MouseGesture<
         },
       })
     },
-  }
+    [pushHistory, quantizeRound, createOrUpdate, updateEventsInRange],
+  )
 }

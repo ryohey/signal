@@ -1,6 +1,6 @@
 import { NoteEvent, NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
@@ -8,7 +8,7 @@ import { useSong } from "../../../../hooks/useSong"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
-export const useCreateNoteGesture = (): MouseGesture => {
+export const useCreateNoteGesture = (): MouseDownHandler => {
   const {
     transform,
     selectedTrackId,
@@ -22,60 +22,58 @@ export const useCreateNoteGesture = (): MouseGesture => {
   const { pushHistory } = useHistory()
   const dragNoteCenterAction = useDragNoteCenterGesture()
 
-  return {
-    onMouseDown: useCallback(
-      (e) => {
-        if (e.shiftKey) {
-          return
-        }
+  return useCallback(
+    (e) => {
+      if (e.shiftKey) {
+        return
+      }
 
-        const local = getLocal(e)
-        const { tick, noteNumber } = transform.getNotePoint(local)
+      const local = getLocal(e)
+      const { tick, noteNumber } = transform.getNotePoint(local)
 
-        if (channel == undefined || !NoteNumber.isValid(noteNumber)) {
-          return
-        }
+      if (channel == undefined || !NoteNumber.isValid(noteNumber)) {
+        return
+      }
 
-        pushHistory()
+      pushHistory()
 
-        const quantizedTick = isRhythmTrack
-          ? quantizeRound(tick)
-          : quantizeFloor(tick)
+      const quantizedTick = isRhythmTrack
+        ? quantizeRound(tick)
+        : quantizeFloor(tick)
 
-        const duration = isRhythmTrack
-          ? timebase / 8 // 32th note in the rhythm track
-          : (lastNoteDuration ?? quantizeUnit)
+      const duration = isRhythmTrack
+        ? timebase / 8 // 32th note in the rhythm track
+        : (lastNoteDuration ?? quantizeUnit)
 
-        const note = addEvent({
-          type: "channel",
-          subtype: "note",
-          noteNumber: noteNumber,
-          tick: quantizedTick,
-          velocity: newNoteVelocity,
-          duration,
-        } as NoteEvent)
+      const note = addEvent({
+        type: "channel",
+        subtype: "note",
+        noteNumber: noteNumber,
+        tick: quantizedTick,
+        velocity: newNoteVelocity,
+        duration,
+      } as NoteEvent)
 
-        if (note === undefined) {
-          return
-        }
+      if (note === undefined) {
+        return
+      }
 
-        dragNoteCenterAction.onMouseDown(e, note.id)
-      },
-      [
-        transform,
-        getLocal,
-        channel,
-        isRhythmTrack,
-        quantizeRound,
-        quantizeFloor,
-        quantizeUnit,
-        timebase,
-        newNoteVelocity,
-        lastNoteDuration,
-        addEvent,
-        pushHistory,
-        dragNoteCenterAction,
-      ],
-    ),
-  }
+      dragNoteCenterAction(e, note.id)
+    },
+    [
+      transform,
+      getLocal,
+      channel,
+      isRhythmTrack,
+      quantizeRound,
+      quantizeFloor,
+      quantizeUnit,
+      timebase,
+      newNoteVelocity,
+      lastNoteDuration,
+      addEvent,
+      pushHistory,
+      dragNoteCenterAction,
+    ],
+  )
 }

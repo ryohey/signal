@@ -97,18 +97,18 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
         case 0: {
           if (e.shiftKey) {
             if (isSelected) {
-              removeNoteFromSelectionGesture.onMouseDown(e, item.id)
+              removeNoteFromSelectionGesture(e, item.id)
             } else {
-              addNoteToSelectionGesture.onMouseDown(e, item.id)
+              addNoteToSelectionGesture(e, item.id)
             }
           } else {
             switch (position) {
               case "center":
-                return dragNoteCenterGesture.onMouseDown(e, item.id)
+                return dragNoteCenterGesture(e, item.id)
               case "left":
-                return dragNoteLeftGesture.onMouseDown(e, item.id)
+                return dragNoteLeftGesture(e, item.id)
               case "right":
-                return dragNoteRightGesture.onMouseDown(e, item.id)
+                return dragNoteRightGesture(e, item.id)
             }
           }
           break

@@ -51,7 +51,7 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
       }
 
       const local = getLocal(e.nativeEvent)
-      currentGesture.onMouseDown(e.nativeEvent, local, transform)
+      currentGesture(e.nativeEvent, local, transform)
     },
     [currentGesture, transform, getLocal],
   )

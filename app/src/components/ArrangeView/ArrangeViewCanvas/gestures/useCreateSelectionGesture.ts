@@ -1,7 +1,7 @@
 import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
 import { MouseEvent, useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
@@ -9,7 +9,7 @@ import { usePlayer } from "../../../../hooks/usePlayer"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
 
-export const useCreateSelectionGesture = (): MouseGesture<
+export const useCreateSelectionGesture = (): MouseDownHandler<
   [Point, Point],
   MouseEvent
 > => {
@@ -34,40 +34,38 @@ export const useCreateSelectionGesture = (): MouseGesture<
     [quantizeFloor, quantizeCeil, tracks.length],
   )
 
-  return {
-    onMouseDown: useCallback(
-      (_e, startClientPos, startPosPx) => {
-        const startPos = trackTransform.getArrangePoint(startPosPx)
-        resetSelection()
+  return useCallback(
+    (_e, startClientPos, startPosPx) => {
+      const startPos = trackTransform.getArrangePoint(startPosPx)
+      resetSelection()
 
-        if (!isPlaying) {
-          setPosition(quantizeRound(startPos.tick))
-        }
+      if (!isPlaying) {
+        setPosition(quantizeRound(startPos.tick))
+      }
 
-        setSelectedTrackIndex(Math.floor(startPos.trackIndex))
+      setSelectedTrackIndex(Math.floor(startPos.trackIndex))
 
-        let selection: ArrangeSelection | null = null
+      let selection: ArrangeSelection | null = null
 
-        observeDrag({
-          onMouseMove: (e) => {
-            const deltaPx = Point.sub(getClientPos(e), startClientPos)
-            const selectionToPx = Point.add(startPosPx, deltaPx)
-            const endPos = trackTransform.getArrangePoint(selectionToPx)
-            selection = selectionFromPoints(startPos, endPos)
-            setSelection(selection)
-          },
-        })
-      },
-      [
-        isPlaying,
-        setPosition,
-        quantizeRound,
-        trackTransform,
-        resetSelection,
-        setSelectedTrackIndex,
-        selectionFromPoints,
-        setSelection,
-      ],
-    ),
-  }
+      observeDrag({
+        onMouseMove: (e) => {
+          const deltaPx = Point.sub(getClientPos(e), startClientPos)
+          const selectionToPx = Point.add(startPosPx, deltaPx)
+          const endPos = trackTransform.getArrangePoint(selectionToPx)
+          selection = selectionFromPoints(startPos, endPos)
+          setSelection(selection)
+        },
+      })
+    },
+    [
+      isPlaying,
+      setPosition,
+      quantizeRound,
+      trackTransform,
+      resetSelection,
+      setSelectedTrackIndex,
+      selectionFromPoints,
+      setSelection,
+    ],
+  )
 }

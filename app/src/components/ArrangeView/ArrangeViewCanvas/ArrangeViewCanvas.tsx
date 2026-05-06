@@ -9,10 +9,10 @@ import { useTrackScroll } from "../../../hooks/useTrackScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
 import { ArrangeViewSelection } from "./ArrangeViewSelection"
-import { Lines } from "./Lines"
-import { Notes } from "./Notes"
 import { useDragScrollGesture } from "./gestures/useDragScrollGesture"
 import { useSelectionGesture } from "./gestures/useSelectionGesture"
+import { Lines } from "./Lines"
+import { Notes } from "./Notes"
 
 export interface ArrangeViewCanvasProps {
   width: number
@@ -50,10 +50,10 @@ export const ArrangeViewCanvas: FC<ArrangeViewCanvasProps> = ({
     (e: React.MouseEvent) => {
       switch (e.button) {
         case 0:
-          selectionGesture.onMouseDown(e)
+          selectionGesture(e)
           break
         case 1:
-          dragScrollGesture.onMouseDown(e)
+          dragScrollGesture(e)
           break
         case 2:
           onContextMenu(e)

@@ -94,7 +94,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   const pencilMouseDown: MouseEventHandler = useCallback(
     (ev) => {
       const local = getLocal(ev.nativeEvent)
-      handlePencilMouseDown.onMouseDown(ev.nativeEvent, local, controlTransform)
+      handlePencilMouseDown(ev.nativeEvent, local, controlTransform)
     },
     [controlTransform, handlePencilMouseDown, getLocal],
   )
@@ -102,7 +102,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   const curveMouseDown: MouseEventHandler = useCallback(
     (ev) => {
       const local = getLocal(ev.nativeEvent)
-      curveGesture.onMouseDown(ev.nativeEvent, local, controlTransform)
+      curveGesture(ev.nativeEvent, local, controlTransform)
     },
     [controlTransform, curveGesture, getLocal],
   )
@@ -111,14 +111,10 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
     (ev) => {
       const local = getLocal(ev.nativeEvent)
 
-      createSelectionGesture.onMouseDown(
-        ev.nativeEvent,
-        local,
-        controlTransform,
-        (s) =>
-          events
-            .filter(isEventInRange(Range.create(s.fromTick, s.toTick)))
-            .map((e) => e.id),
+      createSelectionGesture(ev.nativeEvent, local, controlTransform, (s) =>
+        events
+          .filter(isEventInRange(Range.create(s.fromTick, s.toTick)))
+          .map((e) => e.id),
       )
     },
     [controlTransform, events, createSelectionGesture, getLocal],

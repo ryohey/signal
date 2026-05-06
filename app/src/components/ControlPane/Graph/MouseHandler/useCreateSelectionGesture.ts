@@ -1,13 +1,17 @@
+import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlSelection } from "../../../../entities/selection/ControlSelection"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 
-export const useCreateSelectionGesture = () => {
+export const useCreateSelectionGesture = (): MouseDownHandler<
+  [Point, ControlCoordTransform, (selection: ControlSelection) => number[]]
+> => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { isPlaying, setPosition } = usePlayer()
@@ -15,15 +19,8 @@ export const useCreateSelectionGesture = () => {
   let { selection } = useControlPane()
   const { quantizeRound } = useQuantizer()
 
-  return {
-    onMouseDown(
-      e: MouseEvent,
-      startPoint: Point,
-      controlTransform: ControlCoordTransform,
-      getControllerEventIdsInSelection: (
-        selection: ControlSelection,
-      ) => number[],
-    ) {
+  return useCallback(
+    (e, startPoint, controlTransform, getControllerEventIdsInSelection) => {
       setSelectedEventIds([])
 
       const startTick = quantizeRound(controlTransform.getTick(startPoint.x))
@@ -59,5 +56,15 @@ export const useCreateSelectionGesture = () => {
         },
       })
     },
-  }
+    [
+      setPianoRollSelection,
+      setSelectedNoteIds,
+      isPlaying,
+      setPosition,
+      setSelectedEventIds,
+      setSelection,
+      selection,
+      quantizeRound,
+    ],
+  )
 }

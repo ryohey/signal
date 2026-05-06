@@ -13,8 +13,8 @@ import { useNoteMouseGesture } from "../MouseHandler/useNoteMouseGesture"
 import { PianoSelectionContextMenu } from "../PianoSelectionContextMenu"
 import { GhostNotes } from "./GhostNotes"
 import { Lines } from "./Lines"
-import { Notes } from "./Notes"
 import { NoteSelection } from "./NoteSelection"
+import { Notes } from "./Notes"
 
 export interface PianoRollCanvasProps {
   width: number
@@ -90,9 +90,7 @@ export const PianoRollCanvas: FC<PianoRollCanvasProps> = ({
         cursor={mouseMode === "pencil" ? "auto" : "crosshair"}
         style={style}
         onContextMenu={handleContextMenu}
-        onMouseDown={mouseHandler.onMouseDown}
-        onMouseMove={mouseHandler.onMouseMove}
-        onMouseUp={mouseHandler.onMouseUp}
+        onMouseDown={mouseHandler}
       >
         <Transform matrix={scrollYMatrix}>
           <Lines zIndex={0} />

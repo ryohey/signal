@@ -1,11 +1,7 @@
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
-export const useChangeToolGesture = (): MouseGesture => {
+export const useChangeToolGesture = (): MouseDownHandler => {
   const { toggleTool } = usePianoRoll()
-  return {
-    onMouseDown() {
-      toggleTool()
-    },
-  }
+  return toggleTool
 }

@@ -1,8 +1,8 @@
+import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
 import { useCallback } from "react"
 import { Point } from "../../../../entities/geometry/Point"
 import { Rect } from "../../../../entities/geometry/Rect"
-import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
@@ -11,7 +11,7 @@ import { useHistory } from "../../../../hooks/useHistory"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
 
-export const useMoveSelectionGesture = (): MouseGesture<
+export const useMoveSelectionGesture = (): MouseDownHandler<
   [Point, Rect],
   MouseEvent
 > => {
@@ -25,75 +25,72 @@ export const useMoveSelectionGesture = (): MouseGesture<
   const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
 
-  return {
-    onMouseDown: useCallback(
-      (_e, startClientPos, selectionRect) => {
-        if (_selection === null) {
-          return
-        }
-        let isMoved = false
-        let selection = _selection
-        let selectedEventIds = commands.arrange.getEventsInSelection(selection)
+  return useCallback(
+    (_e, startClientPos, selectionRect) => {
+      if (_selection === null) {
+        return
+      }
+      let isMoved = false
+      let selection = _selection
+      let selectedEventIds = commands.arrange.getEventsInSelection(selection)
 
-        observeDrag({
-          onMouseMove: (e) => {
-            if (selection === null) {
-              return
-            }
+      observeDrag({
+        onMouseMove: (e) => {
+          if (selection === null) {
+            return
+          }
 
-            const deltaPx = Point.sub(getClientPos(e), startClientPos)
-            const selectionFromPx = Point.add(deltaPx, selectionRect)
+          const deltaPx = Point.sub(getClientPos(e), startClientPos)
+          const selectionFromPx = Point.add(deltaPx, selectionRect)
 
-            if ((deltaPx.x !== 0 || deltaPx.y !== 0) && !isMoved) {
-              isMoved = true
-              pushHistory()
-            }
+          if ((deltaPx.x !== 0 || deltaPx.y !== 0) && !isMoved) {
+            isMoved = true
+            pushHistory()
+          }
 
-            let point = trackTransform.getArrangePoint(selectionFromPx)
+          let point = trackTransform.getArrangePoint(selectionFromPx)
 
-            // quantize
-            point = {
-              tick: quantizeRound(point.tick),
-              trackIndex: Math.round(point.trackIndex),
-            }
+          // quantize
+          point = {
+            tick: quantizeRound(point.tick),
+            trackIndex: Math.round(point.trackIndex),
+          }
 
-            // clamp
-            point = ArrangePoint.clamp(
-              point,
-              tracks.length -
-                (selection.toTrackIndex - selection.fromTrackIndex),
-            )
+          // clamp
+          point = ArrangePoint.clamp(
+            point,
+            tracks.length - (selection.toTrackIndex - selection.fromTrackIndex),
+          )
 
-            const delta = ArrangePoint.sub(
-              point,
-              ArrangeSelection.start(selection),
-            )
+          const delta = ArrangePoint.sub(
+            point,
+            ArrangeSelection.start(selection),
+          )
 
-            if (delta.tick === 0 && delta.trackIndex === 0) {
-              return
-            }
+          if (delta.tick === 0 && delta.trackIndex === 0) {
+            return
+          }
 
-            // Move selection range
-            selection = ArrangeSelection.moved(selection, delta)
+          // Move selection range
+          selection = ArrangeSelection.moved(selection, delta)
 
-            selectedEventIds = commands.arrange.moveEventsBetweenTracks(
-              selectedEventIds,
-              delta,
-            )
+          selectedEventIds = commands.arrange.moveEventsBetweenTracks(
+            selectedEventIds,
+            delta,
+          )
 
-            setSelection(selection)
-          },
-        })
-      },
-      [
-        pushHistory,
-        quantizeRound,
-        trackTransform,
-        tracks,
-        setSelection,
-        _selection,
-        commands,
-      ],
-    ),
-  }
+          setSelection(selection)
+        },
+      })
+    },
+    [
+      pushHistory,
+      quantizeRound,
+      trackTransform,
+      tracks,
+      setSelection,
+      _selection,
+      commands,
+    ],
+  )
 }

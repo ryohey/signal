@@ -1,14 +1,17 @@
 import { ArrangeSelection, Range } from "@signal-app/core"
 import { MouseEvent, useCallback } from "react"
-import { MouseGesture } from "../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../gesture/MouseGesture"
 import { observeDrag } from "../../helpers/observeDrag"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useQuantizer } from "../../hooks/useQuantizer"
 import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 
-export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
-  const { trackTransform, resetSelection, setSelection } = useArrangeView()
+export const useRulerSelectionGesture = (): MouseDownHandler<
+  [],
+  MouseEvent
+> => {
+  const { resetSelection, setSelection } = useArrangeView()
   const { quantizeFloor, quantizeCeil } = useQuantizer()
   const { tracks } = useSong()
   const { transform, scrollLeft } = useTickScroll()
@@ -32,7 +35,7 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
 
   let selection: ArrangeSelection | null = null
 
-  const onMouseDown = useCallback(
+  return useCallback(
     (e: MouseEvent) => {
       if (e.button !== 0 || e.ctrlKey || e.altKey) {
         return
@@ -58,14 +61,10 @@ export const useRulerSelectionGesture = (): MouseGesture<[], MouseEvent> => {
     [
       scrollLeft,
       transform,
-      trackTransform,
+      selection,
+      setSelection,
       selectionFromTickRange,
-      tracks,
       resetSelection,
     ],
   )
-
-  return {
-    onMouseDown,
-  }
 }

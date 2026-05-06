@@ -1,8 +1,9 @@
+import { useCallback } from "react"
 import { useCreateEvent, useUpdateValueEvents } from "../../../../actions"
 import { ValueEventType } from "../../../../entities/event/ValueEventType"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
@@ -11,7 +12,7 @@ import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 
 export const usePencilGesture = (
   type: ValueEventType,
-): MouseGesture<[Point, ControlCoordTransform]> => {
+): MouseDownHandler<[Point, ControlCoordTransform]> => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { setSelectedEventIds, setSelection } = useControlPane()
@@ -20,8 +21,8 @@ export const usePencilGesture = (
   const updateValueEvents = useUpdateValueEvents(type)
   const eventFactory = ValueEventType.getEventFactory(type)
 
-  return {
-    onMouseDown(e, startPoint, transform) {
+  return useCallback(
+    (e, startPoint, transform) => {
       pushHistory()
 
       setSelectedEventIds([])
@@ -56,5 +57,15 @@ export const usePencilGesture = (
         },
       })
     },
-  }
+    [
+      createTrackEvent,
+      eventFactory,
+      pushHistory,
+      setPianoRollSelection,
+      setSelectedEventIds,
+      setSelection,
+      setSelectedNoteIds,
+      updateValueEvents,
+    ],
+  )
 }

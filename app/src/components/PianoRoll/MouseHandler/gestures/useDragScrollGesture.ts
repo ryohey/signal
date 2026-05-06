@@ -1,20 +1,19 @@
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { useCallback } from "react"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 
-export const useDragScrollGesture = (): MouseGesture => {
+export const useDragScrollGesture = (): MouseDownHandler => {
   const { scrollBy } = usePianoRoll()
   const { setAutoScroll } = useTickScroll()
 
-  return {
-    onMouseDown() {
-      observeDrag({
-        onMouseMove: (e: MouseEvent) => {
-          scrollBy(e.movementX, e.movementY)
-          setAutoScroll(false)
-        },
-      })
-    },
-  }
+  return useCallback(() => {
+    observeDrag({
+      onMouseMove: (e: MouseEvent) => {
+        scrollBy(e.movementX, e.movementY)
+        setAutoScroll(false)
+      },
+    })
+  }, [scrollBy, setAutoScroll])
 }

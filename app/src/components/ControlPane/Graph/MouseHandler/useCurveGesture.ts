@@ -1,9 +1,9 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { useUpdateValueEventsWithCurve } from "../../../../actions"
 import { ValueEventType } from "../../../../entities/event/ValueEventType"
 import { Point } from "../../../../entities/geometry/Point"
 import { ControlCoordTransform } from "../../../../entities/transform/ControlCoordTransform"
-import { MouseGesture } from "../../../../gesture/MouseGesture"
+import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
@@ -31,8 +31,8 @@ export const useCurveGesture = (type: ValueEventType, curveType: CurveType) => {
     null,
   )
 
-  const gesture: MouseGesture<[Point, ControlCoordTransform]> = {
-    onMouseDown(e, startPoint, transform) {
+  const gesture: MouseDownHandler<[Point, ControlCoordTransform]> = useCallback(
+    (e, startPoint, transform) => {
       pushHistory()
 
       setSelectedEventIds([])
@@ -76,7 +76,16 @@ export const useCurveGesture = (type: ValueEventType, curveType: CurveType) => {
         },
       })
     },
-  }
+    [
+      pushHistory,
+      setPianoRollSelection,
+      setSelectedEventIds,
+      setSelection,
+      setSelectedNoteIds,
+      updateValueEvents,
+      curveType,
+    ],
+  )
 
   return { gesture, curveDragState }
 }

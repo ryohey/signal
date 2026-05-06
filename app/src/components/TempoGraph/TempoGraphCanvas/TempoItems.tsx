@@ -41,7 +41,7 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
         return
       }
       e.stopPropagation()
-      dragSelectionGesture.onMouseDown(e, itemId)
+      dragSelectionGesture(e, itemId)
     },
     [mouseMode, dragSelectionGesture],
   )
