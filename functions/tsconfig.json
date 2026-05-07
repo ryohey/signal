@@ -5,8 +5,7 @@
     "esModuleInterop": true,
     "strict": true,
     "outDir": "lib",
-    "typeRoots": ["./node_modules/@types"],
-    "baseUrl": "."
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

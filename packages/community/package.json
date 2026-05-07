@@ -18,9 +18,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/lodash": "^4.17.23",
+    "@types/node": "^25.6.0",
     "copyfiles": "^2.4.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "typescript": "6.0.3",
+    "vitest": "4.1.5"
   },
   "dependencies": {
     "@emotion/react": ">=11.14.0",
@@ -32,7 +33,7 @@
     "color": ">=5.0.3",
     "lodash": "^4.17.23",
     "mdi-react": ">=9.4.0",
-    "mobx": ">=6.15.0",
+    "mobx": "6.15.3",
     "mobx-react-lite": ">=4.1.1",
     "react": ">=19.2.4",
     "react-dom": ">=19.2.4",
