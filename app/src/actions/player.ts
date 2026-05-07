@@ -23,17 +23,22 @@ export const useRewindOneBar = () => {
   const { scrollLeftTicks, setScrollLeftInTicks } = usePianoRollTickScroll()
   const { position, setPosition } = usePlayer()
 
+  const getPreviousMeasureTick = useCallback(
+    (position: number) =>
+      Measure.getPreviousMeasureTick(measures, position, timebase),
+    [measures, timebase],
+  )
+
   return useCallback(() => {
-    const tick = Measure.getPreviousMeasureTick(measures, position, timebase)
+    const tick = getPreviousMeasureTick(position)
     setPosition(tick)
 
     // make sure player doesn't move out of sight to the left
-    if (position < scrollLeftTicks) {
-      setScrollLeftInTicks(position)
+    if (tick < scrollLeftTicks) {
+      setScrollLeftInTicks(tick)
     }
   }, [
-    measures,
-    timebase,
+    getPreviousMeasureTick,
     position,
     scrollLeftTicks,
     setPosition,
@@ -47,19 +52,24 @@ export const useFastForwardOneBar = () => {
   const { measures, timebase } = useSong()
   const { position, setPosition } = usePlayer()
 
+  const getNextMeasureTick = useCallback(
+    (position: number) =>
+      Measure.getNextMeasureTick(measures, position, timebase),
+    [measures, timebase],
+  )
+
   return useCallback(() => {
-    const tick = Measure.getNextMeasureTick(measures, position, timebase)
+    const tick = getNextMeasureTick(position)
     setPosition(tick)
 
     // make sure player doesn't move out of sight to the right
-    const x = transform.getX(position)
+    const x = transform.getX(tick)
     const screenX = x - scrollLeft
     if (screenX > canvasWidth * 0.7) {
       setScrollLeftInPixels(x - canvasWidth * 0.7)
     }
   }, [
-    measures,
-    timebase,
+    getNextMeasureTick,
     position,
     transform,
     scrollLeft,
