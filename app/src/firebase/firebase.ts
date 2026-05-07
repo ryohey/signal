@@ -1,13 +1,13 @@
 import { FirebaseApp, initializeApp } from "firebase/app"
 import { Auth, connectAuthEmulator, getAuth } from "firebase/auth"
 import {
-  Firestore,
   connectFirestoreEmulator,
+  Firestore,
   getFirestore,
 } from "firebase/firestore"
 import {
-  Functions,
   connectFunctionsEmulator,
+  Functions,
   getFunctions,
 } from "firebase/functions"
 

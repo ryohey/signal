@@ -4,17 +4,17 @@ import * as path from "path"
 import { describe, expect, it } from "vitest"
 import { emptySong, NoteEvent, Track } from "../entities"
 import {
-  createConductorTrackIfNeeded,
-  songFromMidi,
-  songToMidi,
-  songToMidiEvents,
-} from "./midiConversion"
-import {
   noteOffMidiEvent,
   noteOnMidiEvent,
   setTempoMidiEvent,
   timeSignatureMidiEvent,
 } from "./MidiEvent"
+import {
+  createConductorTrackIfNeeded,
+  songFromMidi,
+  songToMidi,
+  songToMidiEvents,
+} from "./midiConversion"
 
 // id for each event will not be serialized in midi file
 // we change ids sorted by order in events array

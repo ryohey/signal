@@ -28,7 +28,7 @@ export const PageTitle = styled.h1`
   margin-bottom: 2rem;
 `
 
-export interface PageLayoutProps {}
+export type PageLayoutProps = {}
 
 export const PageLayout: FC<PropsWithChildren<PageLayoutProps>> = ({
   children,

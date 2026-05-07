@@ -8,7 +8,6 @@ import maxBy from "lodash/maxBy.js"
 import uniq from "lodash/uniq.js"
 import { AnyChannelEvent } from "midifile-ts"
 import { isNotUndefined } from "../helpers/array.js"
-import { Song, TrackEvent } from "../song/Song.js"
 import {
   isControllerEvent,
   isControllerEventWithType,
@@ -16,6 +15,7 @@ import {
   isProgramChangeEvent,
   isSetTempoEvent,
 } from "../song/identify.js"
+import { Song, TrackEvent } from "../song/Song.js"
 
 export const isEventInRange =
   <T extends { tick: number }>(startTick: number, endTick: number) =>

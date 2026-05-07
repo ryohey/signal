@@ -4,7 +4,6 @@ import { useAtomCallback } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
 import { atomEffect } from "jotai-effect"
 import { cloneDeep } from "lodash"
-import { deserializeSingleEvent, Stream } from "midifile-ts"
 import {
   createContext,
   useCallback,

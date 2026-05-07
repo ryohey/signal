@@ -1,7 +1,6 @@
 import { maxBy } from "lodash"
 import uniq from "lodash/uniq"
 import { isNotUndefined } from "../../helpers/array"
-import { TrackEvent } from "./TrackEvent"
 import {
   isControllerEvent,
   isControllerEventWithType,
@@ -14,6 +13,7 @@ import {
   isTrackNameEvent,
   isVolumeEvent,
 } from "./identify"
+import { TrackEvent } from "./TrackEvent"
 
 export const getLast = <T extends { tick: number }>(
   events: T[],

@@ -1,7 +1,6 @@
+import styled from "@emotion/styled"
 import { FC } from "react"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "../Dialog.js"
-
-import styled from "@emotion/styled"
 import "firebase/auth"
 import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../../firebase/firebase.js"

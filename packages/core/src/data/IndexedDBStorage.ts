@@ -38,7 +38,9 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   private async getCatalog(): Promise<Catalog<Metadata>> {
-    if (!this.db) throw new Error("Database not initialized")
+    if (!this.db) {
+      throw new Error("Database not initialized")
+    }
     const transaction = this.db.transaction(catalogStoreName, "readonly")
     const store = transaction.objectStore(catalogStoreName)
     const request = store.get(catalogKey)
@@ -49,7 +51,9 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   private async setCatalog(catalog: Catalog<Metadata>): Promise<void> {
-    if (!this.db) throw new Error("Database not initialized")
+    if (!this.db) {
+      throw new Error("Database not initialized")
+    }
     const transaction = this.db.transaction(catalogStoreName, "readwrite")
     const store = transaction.objectStore(catalogStoreName)
     const request = store.put(catalog, catalogKey)
@@ -69,7 +73,9 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   async saveMany(items: { data: Data; metadata: Metadata }[]) {
-    if (!this.db) throw new Error("Database not initialized")
+    if (!this.db) {
+      throw new Error("Database not initialized")
+    }
     const transaction = this.db.transaction(filesStoreName, "readwrite")
     const store = transaction.objectStore(filesStoreName)
 
@@ -95,7 +101,9 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   async load(id: number): Promise<Data | null> {
-    if (!this.db) throw new Error("Database not initialized")
+    if (!this.db) {
+      throw new Error("Database not initialized")
+    }
     const transaction = this.db.transaction(filesStoreName, "readonly")
     const store = transaction.objectStore(filesStoreName)
     const request = store.get(id)
@@ -108,7 +116,9 @@ export class IndexedDBStorage<Data, Metadata> {
   }
 
   async deleteMany(ids: number[]): Promise<void> {
-    if (!this.db) throw new Error("Database not initialized")
+    if (!this.db) {
+      throw new Error("Database not initialized")
+    }
     const transaction = this.db.transaction(filesStoreName, "readwrite")
     const store = transaction.objectStore(filesStoreName)
     for (const id of ids) {

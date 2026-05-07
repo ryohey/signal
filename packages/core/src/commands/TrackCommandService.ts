@@ -64,7 +64,7 @@ export class TrackCommandService {
       noteIds
         .map((id) => {
           const n = track.getEventById(id)
-          if (n == undefined || !isNoteEvent(n)) {
+          if (n === undefined || !isNoteEvent(n)) {
             return null
           }
           return {
@@ -251,7 +251,9 @@ export class TrackCommandService {
     easing: (t: number) => number,
   ) => {
     const track = this.songStore.song.getTrack(trackId)
-    if (!track) return
+    if (!track) {
+      return
+    }
 
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)

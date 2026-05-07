@@ -40,7 +40,8 @@
         "useImportType": "off",
         "useNodejsImportProtocol": "off",
         "useTemplate": "off",
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "useBlockStatements": "error"
       },
       "correctness": {
         "useExhaustiveDependencies": "warn",

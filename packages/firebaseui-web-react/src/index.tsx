@@ -52,7 +52,7 @@ export const FirebaseAuthUI = ({
     }
 
     // Render the firebaseUi Widget.
-    // @ts-ignore
+    // @ts-expect-error
     firebaseUiWidget.start(elementRef.current, uiConfig)
 
     return () => {

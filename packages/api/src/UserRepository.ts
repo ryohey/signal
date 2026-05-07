@@ -1,16 +1,16 @@
 import { Auth, deleteUser } from "firebase/auth"
 import {
-  Firestore,
-  FirestoreDataConverter,
-  QueryDocumentSnapshot,
-  Timestamp,
   collection,
   doc,
+  Firestore,
+  FirestoreDataConverter,
   getDoc,
   getDocs,
   onSnapshot,
+  QueryDocumentSnapshot,
   query,
   runTransaction,
+  Timestamp,
   where,
 } from "firebase/firestore"
 import { AuthUser, IUserRepository, User } from "./IUserRepository.js"
