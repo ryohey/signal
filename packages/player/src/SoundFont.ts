@@ -38,7 +38,7 @@ export class SoundFont {
     
     for (const preset of this.parsed.presets) {
       // Only drums
-      if (!preset.isAnyDrums) {
+      if (!preset.isDrum) {
         continue
       }
       const programNumber = preset.program
