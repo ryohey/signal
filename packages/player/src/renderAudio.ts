@@ -32,7 +32,7 @@ export const renderAudio = async (
   await offline.audioWorklet.addModule(url)
 
   const synth = new WorkletSynthesizer(offline, {
-    enableEventSystem: false
+    eventsEnabled: false
   })
   synth.connect(offline.destination)
   await synth.startOfflineRender({
