@@ -5,6 +5,7 @@ import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
 import { useKeyScroll } from "../../hooks/useKeyScroll"
+import { useNoteCoordTransform } from "../../hooks/useNoteCoordTransform"
 import { usePianoNotesKeyboardShortcut } from "../../hooks/usePianoNotesKeyboardShortcut"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useTickScroll } from "../../hooks/useTickScroll"
@@ -35,7 +36,8 @@ const Beta = styled.div`
 `
 
 const PianoRollWrapper: FC = () => {
-  const { transform, scrollBy, selectedTrackId, setActivePane } = usePianoRoll()
+  const { transform, scrollBy } = useNoteCoordTransform()
+  const { selectedTrackId, setActivePane } = usePianoRoll()
   const { isRhythmTrack } = useTrack(selectedTrackId)
   const {
     contentHeight,

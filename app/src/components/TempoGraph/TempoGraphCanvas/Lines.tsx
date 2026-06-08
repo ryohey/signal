@@ -5,13 +5,13 @@ import { range } from "lodash"
 import { FC } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
-import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTempoTransform } from "../../../hooks/useTempoTransform"
 
 export const Lines: FC<{ width: number; zIndex: number }> = ({
   width,
   zIndex,
 }) => {
-  const { transform } = useTempoEditor()
+  const { transform } = useTempoTransform()
   const theme = useTheme()
 
   const hline = (y: number): Rect => ({

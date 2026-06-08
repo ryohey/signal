@@ -1,6 +1,7 @@
 import { FC, useMemo } from "react"
 import { TempoSelection } from "../../../entities/selection/TempoSelection"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTempoTransform } from "../../../hooks/useTempoTransform"
 import { Selection } from "../../GLNodes/Selection"
 
 export interface TempoGraphSelectionProps {
@@ -10,7 +11,8 @@ export interface TempoGraphSelectionProps {
 export const TempoGraphSelection: FC<TempoGraphSelectionProps> = ({
   zIndex,
 }) => {
-  const { transform, selection } = useTempoEditor()
+  const { selection } = useTempoEditor()
+  const { transform } = useTempoTransform()
 
   const selectionRect = useMemo(
     () =>

@@ -2,6 +2,7 @@ import { isNoteEvent, NoteEvent } from "@signal-app/core"
 import { useCallback, useMemo } from "react"
 import { Rect } from "../entities/geometry/Rect"
 import { useEventView } from "./useEventView"
+import { useNoteCoordTransform } from "./useNoteCoordTransform"
 import { usePianoRoll } from "./usePianoRoll"
 
 export type PianoNoteItem = Rect & {
@@ -12,7 +13,8 @@ export type PianoNoteItem = Rect & {
 }
 
 export function useNotes(): PianoNoteItem[] {
-  const { transform, selectedTrack, selectedNoteIds } = usePianoRoll()
+  const { selectedTrack, selectedNoteIds } = usePianoRoll()
+  const { transform } = useNoteCoordTransform()
   const noteEvents = useEventView().filter(isNoteEvent)
 
   const getRect = useCallback(

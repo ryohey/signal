@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
+import { useKeyScroll } from "./useKeyScroll"
 import { usePianoRoll } from "./usePianoRoll"
 import { usePreviewNote } from "./usePreviewNote"
 import { useMidiInputNoteNumbers } from "./usePreviewNoteNumbers"
@@ -6,12 +7,11 @@ import { useStores } from "./useStores"
 import { useTrack } from "./useTrack"
 
 export function usePianoKeys() {
+  const { keySignature, previewingNoteNumbers, selectedTrackId } =
+    usePianoRoll()
   const {
-    keySignature,
     transform: { numberOfKeys, pixelsPerKey: keyHeight },
-    previewingNoteNumbers,
-    selectedTrackId,
-  } = usePianoRoll()
+  } = useKeyScroll()
   const [touchingKeys, setTouchingKeys] = useState<Set<number>>(new Set())
   const { previewNoteOn, previewNoteOff } = usePreviewNote()
   const midiInputKeys = useMidiInputNoteNumbers()

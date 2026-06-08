@@ -6,13 +6,15 @@ import {
   useArrangeDuplicateSelection,
   useArrangePasteSelection,
 } from "../actions"
+import { useArrangeTransform } from "./useArrangeTransform"
 import { useArrangeView } from "./useArrangeView"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 
 const SCROLL_DELTA = 24
 
 export const useArrangeViewKeyboardShortcut = () => {
-  const { resetSelection, scrollBy, setOpenTransposeDialog } = useArrangeView()
+  const { resetSelection, setOpenTransposeDialog } = useArrangeView()
+  const { scrollBy } = useArrangeTransform()
   const arrangeDeleteSelection = useArrangeDeleteSelection()
   const arrangeCopySelection = useArrangeCopySelection()
   const arrangePasteSelection = useArrangePasteSelection()

@@ -1,11 +1,13 @@
 import { useMemo } from "react"
 import { useAllNotesEventView } from "./useAllNotesEventView"
-import { useArrangeView } from "./useArrangeView"
+import { useArrangeNoteTransform } from "./useArrangeNoteTransform"
+import { useArrangeTransform } from "./useArrangeTransform"
 
 const NOTE_RECT_HEIGHT = 1
 
 export function useArrangeNotes() {
-  const { transform, trackTransform } = useArrangeView()
+  const { trackTransform } = useArrangeTransform()
+  const { transform } = useArrangeNoteTransform()
   const events = useAllNotesEventView()
 
   return useMemo(

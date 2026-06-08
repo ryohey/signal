@@ -4,22 +4,23 @@ import useComponentSize from "@rehooks/component-size"
 import { TrackId } from "@signal-app/core"
 import { clamp } from "lodash"
 import { FC, useCallback, useEffect, useRef } from "react"
-import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { useSelectTrack } from "../../actions"
+import { Layout, WHEEL_SCROLL_RATE } from "../../Constants"
 import { isTouchPadEvent } from "../../helpers/touchpad"
+import { useArrangeNoteTransform } from "../../hooks/useArrangeNoteTransform"
 import { useArrangeView } from "../../hooks/useArrangeView"
 import { useContextMenu } from "../../hooks/useContextMenu"
 import { useRouter } from "../../hooks/useRouter"
 import { useSong } from "../../hooks/useSong"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { useTrackScroll } from "../../hooks/useTrackScroll"
-import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
-import { TrackName } from "../TrackList/TrackName"
 import {
   HorizontalScaleScrollBar,
   VerticalScaleScrollBar,
 } from "../inputs/ScaleScrollBar"
 import { BAR_WIDTH } from "../inputs/ScrollBar"
+import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
+import { TrackName } from "../TrackList/TrackName"
 import { ArrangeContextMenu } from "./ArrangeContextMenu"
 import { ArrangeTrackContextMenu } from "./ArrangeTrackContextMenu"
 import { ArrangeViewCanvas } from "./ArrangeViewCanvas/ArrangeViewCanvas"
@@ -76,8 +77,8 @@ const HeaderList = styled.div`
 `
 
 export const ArrangeView: FC = () => {
-  const { transform, scrollBy, selectedTrackIndex, setSelectedTrackIndex } =
-    useArrangeView()
+  const { selectedTrackIndex, setSelectedTrackIndex } = useArrangeView()
+  const { transform } = useArrangeNoteTransform()
   const { tracks } = useSong()
   const {
     trackHeight,

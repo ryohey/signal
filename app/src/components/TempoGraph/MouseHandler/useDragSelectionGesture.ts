@@ -11,16 +11,14 @@ import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTempoTransform } from "../../../hooks/useTempoTransform"
 
 export const useDragSelectionGesture = (): MouseDownHandler<[number]> => {
   const { getEventById } = useConductorTrack()
   const { pushHistory } = useHistory()
-  const {
-    setSelectedEventIds,
-    transform,
-    getLocal,
-    selectedEventIds: _selectedEventIds,
-  } = useTempoEditor()
+  const { setSelectedEventIds, selectedEventIds: _selectedEventIds } =
+    useTempoEditor()
+  const { transform, getLocal } = useTempoTransform()
   const { quantizeRound } = useQuantizer()
   const commands = useCommands()
 

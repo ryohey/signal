@@ -8,12 +8,14 @@ import {
   useToggleSolo,
 } from "../actions"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
+import { useNoteCoordTransform } from "./useNoteCoordTransform"
 import { usePianoRoll } from "./usePianoRoll"
 
 const SCROLL_DELTA = 24
 
 export const usePianoRollKeyboardShortcut = () => {
-  const { setMouseMode, scrollBy } = usePianoRoll()
+  const { setMouseMode } = usePianoRoll()
+  const { scrollBy } = useNoteCoordTransform()
   const selectAllNotes = useSelectAllNotes()
   const nextTrack = useNextTrack()
   const previousTrack = usePreviousTrack()

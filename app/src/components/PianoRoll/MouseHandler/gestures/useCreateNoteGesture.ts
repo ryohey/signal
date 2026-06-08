@@ -2,6 +2,7 @@ import { NoteEvent, NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { useHistory } from "../../../../hooks/useHistory"
+import { useNoteCoordTransform } from "../../../../hooks/useNoteCoordTransform"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useSong } from "../../../../hooks/useSong"
@@ -9,13 +10,8 @@ import { useTrack } from "../../../../hooks/useTrack"
 import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
 export const useCreateNoteGesture = (): MouseDownHandler => {
-  const {
-    transform,
-    selectedTrackId,
-    newNoteVelocity,
-    lastNoteDuration,
-    getLocal,
-  } = usePianoRoll()
+  const { selectedTrackId, newNoteVelocity, lastNoteDuration } = usePianoRoll()
+  const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound, quantizeFloor, quantizeUnit } = useQuantizer()
   const { channel, isRhythmTrack, addEvent } = useTrack(selectedTrackId)
   const { timebase } = useSong()

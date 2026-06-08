@@ -2,14 +2,7 @@ import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
 import { Store } from "jotai/vanilla/store"
 import { createScope } from "jotai-scope"
 import { clamp } from "lodash"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useSyncExternalStore,
-} from "react"
+import { createContext, useContext, useEffect, useMemo } from "react"
 import { Layout } from "../Constants"
 import { BAR_WIDTH } from "../components/inputs/ScrollBar"
 import { TrackTransform } from "../entities/transform/TrackTransform"
@@ -32,6 +25,7 @@ export const createTrackScrollScope = (parentStore: Store) =>
     parentStore,
   })
 
+// biome-ignore lint/style/noNonNullAssertion: we assume the provider is always used
 const TrackScrollContext = createContext<Store>(null!)
 
 export function TrackScrollProvider({

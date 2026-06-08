@@ -3,6 +3,7 @@ import { CSSProperties, FC, useCallback, useMemo } from "react"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
 import { useTempoEditor } from "../../../hooks/useTempoEditor"
+import { useTempoTransform } from "../../../hooks/useTempoTransform"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Beats } from "../../GLNodes/Beats"
 import { Cursor } from "../../GLNodes/Cursor"
@@ -25,7 +26,8 @@ export const TempoGraphCanvas: FC<TempoGraphCanvasProps> = ({
   style,
   className,
 }) => {
-  const { transform, mouseMode } = useTempoEditor()
+  const { mouseMode } = useTempoEditor()
+  const { transform } = useTempoTransform()
   const beats = useBeats()
   const { cursorX, scrollLeft: _scrollLeft } = useTickScroll()
   const pencilGesture = usePencilGesture()

@@ -2,13 +2,13 @@ import { isSetTempoEvent } from "@signal-app/core"
 import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { transformEvents } from "../components/TempoGraph/transformEvents"
 import { useSong } from "./useSong"
-import { useTempoEditor } from "./useTempoEditor"
+import { useTempoTransform } from "./useTempoTransform"
 import { useTickScroll } from "./useTickScroll"
 
 const noop = () => () => {}
 
 export function useTempoItems() {
-  const { transform } = useTempoEditor()
+  const { transform } = useTempoTransform()
   const { conductorTrack } = useSong()
   const events = useSyncExternalStore(
     conductorTrack?.onSetTempoEventsChanged.subscribe ?? noop,

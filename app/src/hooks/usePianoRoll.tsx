@@ -11,14 +11,11 @@ import {
   useEffect,
   useMemo,
 } from "react"
-import { Point } from "../entities/geometry/Point"
 import { KeySignature } from "../entities/scale/KeySignature"
 import { Selection } from "../entities/selection/Selection"
-import { NoteCoordTransform } from "../entities/transform/NoteCoordTransform"
 import { addedSet, deletedSet } from "../helpers/set"
 import { BeatsProvider, createBeatsScope } from "./useBeats"
 import { EventViewProvider } from "./useEventView"
-import { useKeyScroll } from "./useKeyScroll"
 import {
   createQuantizerScope,
   QuantizerProvider,
@@ -110,7 +107,6 @@ export function PianoRollScope({ children }: { children: React.ReactNode }) {
 
 export function usePianoRoll() {
   const { songStore } = useStores()
-  const { tickScrollScope } = useContext(PianoRollStoreContext)
   const store = useStore()
 
   return {
@@ -148,14 +144,6 @@ export function usePianoRoll() {
     get selectedNoteIds() {
       return useAtomValue(selectedNoteIdsAtom, { store })
     },
-    get transform() {
-      const { transform: tickTransform } = useTickScroll(tickScrollScope)
-      const { transform: keyTransform } = useKeyScroll()
-      return useMemo(
-        () => new NoteCoordTransform(tickTransform, keyTransform),
-        [tickTransform, keyTransform],
-      )
-    },
     get ghostTrackIds() {
       const { tracks } = useSong()
       const notGhostTrackIds = useAtomValue(notGhostTrackIdsAtom, { store })
@@ -191,17 +179,6 @@ export function usePianoRoll() {
       return useAtomValue(activePaneAtom, { store })
     },
     resetSelection: useSetAtom(resetSelectionAtom, { store }),
-    get scrollBy() {
-      const { setScrollLeftInPixels } = useTickScroll(tickScrollScope)
-      const { setScrollTopInPixels } = useKeyScroll()
-      return useCallback(
-        (dx: number, dy: number) => {
-          setScrollLeftInPixels((prev) => prev - dx)
-          setScrollTopInPixels((prev) => prev - dy)
-        },
-        [setScrollLeftInPixels, setScrollTopInPixels],
-      )
-    },
     setNotGhostTrackIds: useSetAtom(notGhostTrackIdsAtom, { store }),
     setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom, { store }),
     setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom, { store }),
@@ -224,18 +201,6 @@ export function usePianoRoll() {
       { store },
     ),
     setSelectedNoteIds: useSetAtom(selectedNoteIdsAtom, { store }),
-    // convert mouse position to the local coordinate on the canvas
-    get getLocal() {
-      const { scrollLeft } = useTickScroll()
-      const { scrollTop } = useKeyScroll()
-      return useCallback(
-        (e: { offsetX: number; offsetY: number }): Point => ({
-          x: e.offsetX + scrollLeft,
-          y: e.offsetY + scrollTop,
-        }),
-        [scrollLeft, scrollTop],
-      )
-    },
     getSelection: useSetAtom(getSelectionAtom, { store }),
     getSelectedTrack: useAtomCallback(
       useCallback(

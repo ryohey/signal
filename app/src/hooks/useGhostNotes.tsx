@@ -5,11 +5,11 @@ import {
   useEventViewForTrack,
   useSyncEventViewWithScroll,
 } from "./useEventView"
-import { usePianoRoll } from "./usePianoRoll"
+import { useNoteCoordTransform } from "./useNoteCoordTransform"
 import { useTrack } from "./useTrack"
 
 export function useGhostNotes(trackId: TrackId) {
-  const { transform } = usePianoRoll()
+  const { transform } = useNoteCoordTransform()
   const { isRhythmTrack } = useTrack(trackId)
   const eventView = useEventViewForTrack(trackId)
   const windowedEvents = useEventView(eventView)

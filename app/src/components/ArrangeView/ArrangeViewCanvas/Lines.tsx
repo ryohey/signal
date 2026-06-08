@@ -5,14 +5,14 @@ import { range } from "lodash"
 import { FC, useCallback, useMemo } from "react"
 import { Rect } from "../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../gl/color"
-import { useArrangeView } from "../../../hooks/useArrangeView"
+import { useArrangeTransform } from "../../../hooks/useArrangeTransform"
 import { useSong } from "../../../hooks/useSong"
 
 export const Lines: FC<{ width: number; zIndex: number }> = ({
   width,
   zIndex,
 }) => {
-  const { trackTransform } = useArrangeView()
+  const { trackTransform } = useArrangeTransform()
   const { tracks } = useSong()
   const theme = useTheme()
 

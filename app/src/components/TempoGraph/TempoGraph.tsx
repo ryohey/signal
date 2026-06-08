@@ -2,10 +2,10 @@ import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Layout } from "../../Constants"
-import { useTempoEditor } from "../../hooks/useTempoEditor"
+import { useTempoTransform } from "../../hooks/useTempoTransform"
 import { useTickScroll } from "../../hooks/useTickScroll"
-import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { BAR_WIDTH, HorizontalScrollBar } from "../inputs/ScrollBar"
+import CanvasPianoRuler from "../PianoRoll/CanvasPianoRuler"
 import { TempoGraphAxis } from "./TempoGraphAxis"
 import { TempoGraphCanvas } from "./TempoGraphCanvas/TempoGraphCanvas"
 
@@ -35,7 +35,7 @@ const StyledGraphCanvas = styled(TempoGraphCanvas)`
 `
 
 export const TempoGraph: FC = () => {
-  const { transform, setCanvasHeight } = useTempoEditor()
+  const { transform, setCanvasHeight } = useTempoTransform()
   const {
     contentWidth,
     scrollLeft: _scrollLeft,

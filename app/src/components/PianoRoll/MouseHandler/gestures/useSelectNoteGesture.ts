@@ -5,19 +5,15 @@ import { Selection } from "../../../../entities/selection/Selection"
 import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useControlPane } from "../../../../hooks/useControlPane"
+import { useNoteCoordTransform } from "../../../../hooks/useNoteCoordTransform"
 import { usePianoRoll } from "../../../../hooks/usePianoRoll"
 import { usePlayer } from "../../../../hooks/usePlayer"
 import { useQuantizer } from "../../../../hooks/useQuantizer"
 import { useTrack } from "../../../../hooks/useTrack"
 
 export const useSelectNoteGesture = (): MouseDownHandler => {
-  const {
-    transform,
-    getLocal,
-    setSelection,
-    selectedTrackId,
-    setSelectedNoteIds,
-  } = usePianoRoll()
+  const { setSelection, selectedTrackId, setSelectedNoteIds } = usePianoRoll()
+  const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound } = useQuantizer()
   let { selection } = usePianoRoll()
   const { getEvents } = useTrack(selectedTrackId)

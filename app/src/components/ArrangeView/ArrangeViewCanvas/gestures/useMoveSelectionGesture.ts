@@ -5,6 +5,7 @@ import { Rect } from "../../../../entities/geometry/Rect"
 import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { observeDrag } from "../../../../helpers/observeDrag"
+import { useArrangeTransform } from "../../../../hooks/useArrangeTransform"
 import { useArrangeView } from "../../../../hooks/useArrangeView"
 import { useCommands } from "../../../../hooks/useCommands"
 import { useHistory } from "../../../../hooks/useHistory"
@@ -17,11 +18,8 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
 > => {
   const commands = useCommands()
   const { pushHistory } = useHistory()
-  const {
-    selection: _selection,
-    trackTransform,
-    setSelection,
-  } = useArrangeView()
+  const { selection: _selection, setSelection } = useArrangeView()
+  const { trackTransform } = useArrangeTransform()
   const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
 

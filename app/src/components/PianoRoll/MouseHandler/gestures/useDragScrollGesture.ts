@@ -1,11 +1,11 @@
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag } from "../../../../helpers/observeDrag"
-import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useNoteCoordTransform } from "../../../../hooks/useNoteCoordTransform"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 
 export const useDragScrollGesture = (): MouseDownHandler => {
-  const { scrollBy } = usePianoRoll()
+  const { scrollBy } = useNoteCoordTransform()
   const { setAutoScroll } = useTickScroll()
 
   return useCallback(() => {

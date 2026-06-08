@@ -5,7 +5,7 @@ import { NotePoint } from "../../../../entities/transform/NotePoint"
 import { MouseDownHandler } from "../../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../../helpers/observeDrag"
 import { useHistory } from "../../../../hooks/useHistory"
-import { usePianoRoll } from "../../../../hooks/usePianoRoll"
+import { useNoteCoordTransform } from "../../../../hooks/useNoteCoordTransform"
 import {
   DraggableArea,
   PianoRollDraggable,
@@ -43,7 +43,7 @@ const constraintToDraggableArea = (
 export const useMoveDraggableGesture = (): MouseDownHandler<
   [PianoRollDraggable, PianoRollDraggable[]?, MoveDraggableCallback?]
 > => {
-  const { transform, getLocal } = usePianoRoll()
+  const { transform, getLocal } = useNoteCoordTransform()
   const {
     isQuantizeEnabled,
     quantize: quantizeUnit,
