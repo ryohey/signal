@@ -20,26 +20,3 @@ export function mobxToObservable(mobxObject: object, key: string): Observable {
     },
   }
 }
-
-export function mobxToObservableDeep<Key extends string>(
-  mobxObject: { [K in Key]: unknown },
-  key: Key,
-): Observable
-export function mobxToObservableDeep<
-  MobxObject extends object,
-  Key extends string,
->(mobxObject: MobxObject, key: Key): Observable
-export function mobxToObservableDeep(
-  mobxObject: object,
-  key: string,
-): Observable {
-  return {
-    subscribe: (listener: () => void) => {
-      const disposer = autorun(() => {
-        toJS((mobxObject as Record<string, unknown>)[key])
-        listener()
-      })
-      return disposer
-    },
-  }
-}

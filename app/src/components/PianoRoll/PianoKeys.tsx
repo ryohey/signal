@@ -310,7 +310,7 @@ export interface PianoKeysProps {
   width: number
 }
 
-export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
+const _PianoKeys: FC<PianoKeysProps> = ({ width }) => {
   const blackKeyWidth = Layout.keyWidth * Layout.blackKeyWidthRatio
   const { onContextMenu, menuProps } = useContextMenu()
   const {
@@ -411,3 +411,5 @@ export const PianoKeys: FC<PianoKeysProps> = ({ width }) => {
     </>
   )
 }
+
+export const PianoKeys = React.memo(_PianoKeys)

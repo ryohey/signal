@@ -33,7 +33,7 @@ export function useTrack(id: TrackId) {
     get programNumber() {
       const { position } = usePlayer()
       return useSyncExternalStore(
-        track?.onEventsChanged.subscribe ?? noop,
+        track?.onProgramChangeEventsChanged.subscribe ?? noop,
         useCallback(
           () =>
             getProgramNumberEvent(track?.events ?? [], position)?.value ?? 0,

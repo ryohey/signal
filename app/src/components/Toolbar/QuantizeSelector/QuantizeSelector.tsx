@@ -130,8 +130,8 @@ export const QuantizeSelector: FC = () => {
     useQuantizer()
 
   const onClickQuantizeSwitch = useCallback(() => {
-    setIsQuantizeEnabled(!isQuantizeEnabled)
-  }, [setIsQuantizeEnabled, isQuantizeEnabled])
+    setIsQuantizeEnabled((prev) => !prev)
+  }, [setIsQuantizeEnabled])
 
   return (
     <QuantizeSelectorContent

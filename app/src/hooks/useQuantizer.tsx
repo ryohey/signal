@@ -1,8 +1,9 @@
 import { Measure } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { createScope, ScopeProvider } from "jotai-scope"
+import { useHydrateAtoms } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
-import { useCallback, useEffect, useMemo } from "react"
+import { createScope, ScopeProvider } from "jotai-scope"
+import { useCallback, useMemo } from "react"
 import { useStores } from "./useStores"
 
 export function QuantizerProvider({
@@ -14,11 +15,7 @@ export function QuantizerProvider({
   quantize: number
   children: React.ReactNode
 }) {
-  const setQuantize = useSetAtom(quantizeAtom, { store: scope })
-
-  useEffect(() => {
-    setQuantize(quantize)
-  }, [setQuantize, quantize])
+  useHydrateAtoms([[quantizeAtom, quantize]], { store: scope })
 
   return <ScopeProvider scope={scope}>{children}</ScopeProvider>
 }

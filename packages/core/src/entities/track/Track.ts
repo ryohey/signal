@@ -1,21 +1,22 @@
 import {
   action,
   computed,
+  IObservableArray,
   makeObservable,
   observable,
+  observe,
   reaction,
   toJS,
   transaction,
 } from "mobx"
 import { createModelSchema, object, primitive } from "serializr"
 import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
-import {
-  mobxToObservable,
-  mobxToObservableDeep,
-} from "../../helpers/mobxToObservable"
+import { Emitter } from "../../helpers/emitter"
+import { getChangedItems } from "../../helpers/getChangedItems"
+import { mobxToObservable } from "../../helpers/mobxToObservable"
 import { Observable } from "../../helpers/observable"
 import { Branded } from "../../types"
-import { isNoteEvent } from "./identify"
+import { isNoteEvent, isProgramChangeEvent, isSetTempoEvent } from "./identify"
 import {
   getPan,
   getProgramNumberEvent,
@@ -49,6 +50,11 @@ export class Track {
   readonly onEventsChanged: Observable
   readonly onColorChanged: Observable
 
+  private readonly _onProgramChangeEventsChanged = new Emitter()
+  private readonly _onSetTempoEventsChanged = new Emitter()
+
+  private unsubscribeReactions: (() => void)[] = []
+
   constructor() {
     makeObservable(this, {
       updateEvent: action,
@@ -71,15 +77,49 @@ export class Track {
     this.onIsConductorTrackChanged = mobxToObservable(this, "isConductorTrack")
     this.onChannelChanged = mobxToObservable(this, "channel")
     this.onNameChanged = mobxToObservable(this, "name")
-    this.onEventsChanged = mobxToObservableDeep(this, "events")
+    this.onEventsChanged = mobxToObservable(this, "events")
     this.onColorChanged = mobxToObservable(this, "color")
 
-    reaction(
-      () => toJS(this._events.getArray()),
-      (events) => {
-        this._eventsSnapshot = [...events]
-      },
-    )
+    this.setupReactions()
+  }
+
+  private setupReactions() {
+    this.unsubscribeReactions.forEach((unsubscribe) => unsubscribe())
+    this.unsubscribeReactions = [
+      reaction(
+        () => toJS(this._events.getArray()),
+        (events) => {
+          this._eventsSnapshot = [...events]
+        },
+      ),
+      observe(this.events as IObservableArray<TrackEvent>, (change) => {
+        const changedEvents = getChangedItems(change)
+        if (
+          this._onProgramChangeEventsChanged.listenerCount > 0 &&
+          changedEvents.some(isProgramChangeEvent)
+        ) {
+          this._onProgramChangeEventsChanged.emit()
+        }
+        if (
+          this._onSetTempoEventsChanged.listenerCount > 0 &&
+          changedEvents.some(isSetTempoEvent)
+        ) {
+          this._onSetTempoEventsChanged.emit()
+        }
+      }),
+    ]
+  }
+
+  afterDeserialize() {
+    this._eventsSnapshot = [...this.events]
+    this.setupReactions()
+  }
+
+  get onProgramChangeEventsChanged() {
+    return this._onProgramChangeEventsChanged
+  }
+  get onSetTempoEventsChanged() {
+    return this._onSetTempoEventsChanged
   }
 
   get events(): readonly TrackEvent[] {

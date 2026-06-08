@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { useAddTimeSignature } from "../../actions"
 import { useConductorTrack } from "../../hooks/useConductorTrack"
 import { usePlayer } from "../../hooks/usePlayer"
@@ -17,10 +17,7 @@ export interface RulerContextMenuProps extends ContextMenuProps {
   tick: number
 }
 
-export const RulerContextMenu: FC<RulerContextMenuProps> = ({
-  tick,
-  ...props
-}) => {
+const _RulerContextMenu: FC<RulerContextMenuProps> = ({ tick, ...props }) => {
   const { handleClose } = props
   const { setLoopBegin, setLoopEnd } = usePlayer()
   const { selectedTimeSignatureEventIds } = useRuler()
@@ -97,3 +94,5 @@ export const RulerContextMenu: FC<RulerContextMenuProps> = ({
     </>
   )
 }
+
+export const RulerContextMenu = React.memo(_RulerContextMenu)

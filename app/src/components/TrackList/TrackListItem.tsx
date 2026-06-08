@@ -5,7 +5,13 @@ import Headset from "mdi-react/HeadphonesIcon"
 import Layers from "mdi-react/LayersIcon"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import VolumeOff from "mdi-react/VolumeOffIcon"
-import { FC, MouseEventHandler, useCallback, useRef, useState } from "react"
+import React, {
+  FC,
+  MouseEventHandler,
+  useCallback,
+  useRef,
+  useState,
+} from "react"
 import {
   useSelectTrack,
   useToggleAllGhostTracks,
@@ -173,7 +179,7 @@ const ControlButton = styled.div`
   }
 `
 
-export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
+const _TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
   const { selectedTrackId, notGhostTrackIds } = usePianoRoll()
   const {
     channel,
@@ -245,7 +251,9 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
 
   const onActivity = useCallback(() => {
     const el = midiIndicatorRef.current
-    if (!el) return
+    if (!el) {
+      return
+    }
     // Restart the CSS animation by removing the data-active attribute,
     // forcing a reflow, then re-adding it.
     el.removeAttribute("data-active")
@@ -338,3 +346,5 @@ export const TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
     </>
   )
 }
+
+export const TrackListItem = React.memo(_TrackListItem)

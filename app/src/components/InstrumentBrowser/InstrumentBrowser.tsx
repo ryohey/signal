@@ -2,7 +2,13 @@ import styled from "@emotion/styled"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import type { TrackEventOf, TrackId } from "@signal-app/core"
 import type { ProgramChangeEvent } from "midifile-ts"
-import { type FC, useCallback, useEffect, useMemo, useState } from "react"
+import React, {
+  type FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
@@ -49,7 +55,7 @@ export interface InstrumentBrowserProps {
   showInsertButton?: boolean
 }
 
-export const InstrumentBrowser: FC<InstrumentBrowserProps> = ({
+const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   isOpen,
   onOpenChange,
   trackId,
@@ -215,3 +221,5 @@ export const InstrumentBrowser: FC<InstrumentBrowserProps> = ({
     </Dialog>
   )
 }
+
+export const InstrumentBrowser = React.memo(_InstrumentBrowser)

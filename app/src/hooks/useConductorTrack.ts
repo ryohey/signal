@@ -9,13 +9,6 @@ const noop = () => () => {}
 
 export function useConductorTrack() {
   const { conductorTrack } = useSong()
-  const events = useSyncExternalStore(
-    conductorTrack?.onEventsChanged.subscribe ?? noop,
-    useCallback(
-      () => conductorTrack?.getEventsSnapshot() ?? [],
-      [conductorTrack],
-    ),
-  )
 
   return {
     get id() {
@@ -29,6 +22,13 @@ export function useConductorTrack() {
     },
     get currentTempo() {
       const { position } = usePlayer()
+      const events = useSyncExternalStore(
+        conductorTrack?.onSetTempoEventsChanged.subscribe ?? noop,
+        useCallback(
+          () => conductorTrack?.getEventsSnapshot() ?? [],
+          [conductorTrack],
+        ),
+      )
       return useMemo(
         () => getTempo(events, position) ?? DEFAULT_TEMPO,
         [events, position],

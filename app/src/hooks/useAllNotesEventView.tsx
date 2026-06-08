@@ -30,7 +30,8 @@ export function useEventViewForAllTracks() {
     let unsubscribeTracks: Unsubscribe | null = null
     let unsubscribeEvents: Unsubscribe[] = []
 
-    unsubscribeSong = songStore.onSongChanged.subscribe(() => {
+    const subscribeEvents = () => {
+      unsubscribeEvents.forEach((unsubscribe) => unsubscribe())
       unsubscribeTracks = songStore.song.onTracksChanged.subscribe(() => {
         const tracks = songStore.song.tracks
         unsubscribeEvents = tracks.map((track) =>
@@ -39,7 +40,21 @@ export function useEventViewForAllTracks() {
           }),
         )
       })
+    }
+
+    const subscribeTracks = () => {
+      unsubscribeTracks?.()
+      unsubscribeTracks = songStore.song.onTracksChanged.subscribe(() => {
+        subscribeEvents()
+      })
+      subscribeEvents()
+    }
+
+    unsubscribeSong = songStore.onSongChanged.subscribe(() => {
+      subscribeTracks()
     })
+
+    subscribeTracks()
 
     return () => {
       unsubscribeSong?.()

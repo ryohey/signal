@@ -11,7 +11,7 @@ export function useTempoItems() {
   const { transform } = useTempoEditor()
   const { conductorTrack } = useSong()
   const events = useSyncExternalStore(
-    conductorTrack?.onEventsChanged.subscribe ?? noop,
+    conductorTrack?.onSetTempoEventsChanged.subscribe ?? noop,
     useCallback(
       () => conductorTrack?.getEventsSnapshot() ?? [],
       [conductorTrack],

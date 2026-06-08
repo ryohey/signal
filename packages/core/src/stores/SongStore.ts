@@ -1,19 +1,27 @@
-import { makeObservable, observable } from "mobx"
 import { emptySong } from "../entities"
-import { mobxToObservable } from "../helpers/mobxToObservable"
+import { Emitter } from "../helpers/emitter"
 import { Observable } from "../helpers/observable"
 
 export class SongStore {
-  song = emptySong()
+  _song = emptySong()
 
   readonly onSongChanged: Observable
+  private readonly _onSongChanged = new Emitter()
 
   constructor() {
-    makeObservable(this, {
-      song: observable.ref,
-    })
+    this.onSongChanged = this._onSongChanged
+  }
 
-    this.onSongChanged = mobxToObservable(this, "song")
+  get song() {
+    return this._song
+  }
+
+  set song(song) {
+    if (this._song === song) {
+      return
+    }
+    this._song = song
+    this._onSongChanged.emit()
   }
 
   serialize() {

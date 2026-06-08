@@ -1,4 +1,5 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { useHydrateAtoms } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { clamp } from "lodash"
@@ -42,11 +43,14 @@ export function TickScrollProvider({
   const { isPlaying, position } = usePlayer()
   const triggerAutoScroll = useSetAtom(triggerAutoScrollAtom, { store: scope })
   const setEndTick = useSetAtom(endTickAtom, { store: scope })
-  const setMinScaleX = useSetAtom(minScaleXAtom, { store: scope })
-  const setMaxScaleX = useSetAtom(maxScaleXAtom, { store: scope })
 
-  useEffect(() => setMinScaleX(minScaleX), [setMinScaleX, minScaleX])
-  useEffect(() => setMaxScaleX(maxScaleX), [setMaxScaleX, maxScaleX])
+  useHydrateAtoms(
+    [
+      [minScaleXAtom, minScaleX],
+      [maxScaleXAtom, maxScaleX],
+    ],
+    { store: scope },
+  )
 
   // keep endTick updated
   useEffect(() => {

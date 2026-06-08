@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { range } from "lodash"
-import { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,
@@ -32,7 +32,7 @@ const NumberInput = styled(TextField)`
   }
 `
 
-export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
+const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
   initialNumerator = 4,
   initialDenominator = 4,
   open,
@@ -96,7 +96,7 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
             onChange={(e) => setDenominator(parseInt(e.target.value as string))}
           >
             {range(0, 6)
-              .map((v) => Math.pow(2, v))
+              .map((v) => 2 ** v)
               .map((v) => (
                 <option key={v} value={v.toString()}>
                   {v}
@@ -122,3 +122,5 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
     </Dialog>
   )
 }
+
+export const TimeSignatureDialog = React.memo(_TimeSignatureDialog)

@@ -40,8 +40,8 @@ export const AutoScrollButton: FC = () => {
   const { autoScroll, setAutoScroll } = useTickScroll()
 
   const onClickAutoScroll = useCallback(
-    () => setAutoScroll(!autoScroll),
-    [autoScroll, setAutoScroll],
+    () => setAutoScroll((prev) => !prev),
+    [setAutoScroll],
   )
 
   return (

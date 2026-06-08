@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
-import { CSSProperties, FC, MouseEvent, useCallback } from "react"
+import React, { CSSProperties, FC, MouseEvent, useCallback } from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
@@ -82,7 +82,7 @@ export const IconStyle: CSSProperties = {
   fill: "currentColor",
 }
 
-export const Navigation: FC = () => {
+const _Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
 
@@ -225,3 +225,5 @@ export const Navigation: FC = () => {
     </Container>
   )
 }
+
+export const Navigation = React.memo(_Navigation)

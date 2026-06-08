@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import {
   useCopySelection,
   useDeleteSelection,
@@ -20,7 +20,7 @@ export interface EditMenuProps {
   trigger: React.ReactNode
 }
 
-export const EditMenu: FC<EditMenuProps> = ({ trigger }) => {
+const _EditMenu: FC<EditMenuProps> = ({ trigger }) => {
   const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
     usePianoRoll()
   const { hasUndo, hasRedo, undo, redo } = useHistory()
@@ -208,3 +208,5 @@ export const EditMenu: FC<EditMenuProps> = ({ trigger }) => {
     </Menu>
   )
 }
+
+export const EditMenu = React.memo(_EditMenu)

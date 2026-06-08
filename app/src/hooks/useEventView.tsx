@@ -12,6 +12,7 @@ import { useDisposable } from "./useDisposable"
 import { useStores } from "./useStores"
 import { useTickScroll } from "./useTickScroll"
 
+// biome-ignore lint/style/noNonNullAssertion: We ensure that the context is provided in EventViewProvider
 const EventViewContext = createContext<EventView<TrackEvent>>(null!)
 
 export function useSyncEventViewWithScroll<T extends { tick: number }>(
@@ -35,19 +36,32 @@ export function useEventViewForTrack(trackId: TrackId) {
   const eventView = useDisposable(createEventView)
 
   useEffect(() => {
-    let unsubscribeSong: Unsubscribe | null = null
     let unsubscribeTracks: Unsubscribe | null = null
     let unsubscribeEvents: Unsubscribe | null = null
+    let unsubscribeSong: Unsubscribe | null = null
+
+    const subscribeEvents = () => {
+      unsubscribeEvents?.()
+      const track = songStore.song.getTrack(trackId)
+      unsubscribeEvents =
+        track?.onEventsChanged.subscribe(() => {
+          eventView.triggerUpdate()
+        }) ?? null
+    }
+
+    const subscribeTracks = () => {
+      unsubscribeTracks?.()
+      unsubscribeTracks = songStore.song.onTracksChanged.subscribe(() => {
+        subscribeEvents()
+      })
+      subscribeEvents()
+    }
 
     unsubscribeSong = songStore.onSongChanged.subscribe(() => {
-      unsubscribeTracks = songStore.song.onTracksChanged.subscribe(() => {
-        const track = songStore.song.getTrack(trackId)
-        unsubscribeEvents =
-          track?.onEventsChanged.subscribe(() => {
-            eventView.triggerUpdate()
-          }) ?? null
-      })
+      subscribeTracks()
     })
+
+    subscribeTracks()
 
     return () => {
       unsubscribeSong?.()
