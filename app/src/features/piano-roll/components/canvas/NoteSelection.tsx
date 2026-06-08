@@ -1,0 +1,114 @@
+import { HitArea } from "@ryohey/webgl-react"
+import { FC, useCallback, useMemo } from "react"
+import { Selection } from "../../../../components/GLNodes/Selection"
+import { Rect } from "../../../../entities/geometry/Rect"
+import { Selection as SelectionEntity } from "../../entities/Selection"
+import { useDragSelectionLeftEdgeGesture } from "../../gestures/useDragSelectionLeftEdgeGesture"
+import { useDragSelectionRightEdgeGesture } from "../../gestures/useDragSelectionRightEdgeGesture"
+import { useMoveSelectionGesture } from "../../gestures/useMoveSelectionGesture"
+import { useNoteCoordTransform } from "../../hooks/useNoteCoordTransform"
+import { usePianoRoll } from "../../hooks/usePianoRoll"
+
+export const NoteSelection: FC<{ zIndex: number }> = ({ zIndex }) => {
+  const { transform } = useNoteCoordTransform()
+  const { selection } = usePianoRoll()
+  const selectionBounds = useMemo(() => {
+    if (selection === null) {
+      return null
+    }
+    return SelectionEntity.getBounds(selection, transform)
+  }, [selection, transform])
+
+  if (selectionBounds === null) {
+    return <></>
+  }
+
+  return <NoteSelectionContent rect={selectionBounds} zIndex={zIndex} />
+}
+
+const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
+  rect,
+  zIndex,
+}) => {
+  const { selectedNoteIds } = usePianoRoll()
+  const moveSelectionAction = useMoveSelectionGesture()
+  const dragSelectionLeftEdgeAction = useDragSelectionLeftEdgeGesture()
+  const dragSelectionRightEdgeAction = useDragSelectionRightEdgeGesture()
+
+  const edgeSize = Math.min(rect.width / 3, 8)
+  const leftEdgeBounds: Rect = useMemo(
+    () => ({
+      x: rect.x,
+      y: rect.y,
+      width: edgeSize,
+      height: rect.height,
+    }),
+    [rect.x, rect.y, rect.height, edgeSize],
+  )
+  const centerBounds: Rect = useMemo(
+    () => ({
+      x: rect.x + edgeSize,
+      y: rect.y,
+      width: rect.width - edgeSize * 2,
+      height: rect.height,
+    }),
+    [rect.x, rect.y, rect.width, rect.height, edgeSize],
+  )
+  const rightEdgeBounds: Rect = useMemo(
+    () => ({
+      x: rect.x + rect.width - edgeSize,
+      y: rect.y,
+      width: edgeSize,
+      height: rect.height,
+    }),
+    [rect.x, rect.y, rect.width, rect.height, edgeSize],
+  )
+  const onMouseDownLeft = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      dragSelectionLeftEdgeAction(e, selectedNoteIds)
+    },
+    [dragSelectionLeftEdgeAction, selectedNoteIds],
+  )
+  const onMouseDownCenter = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      moveSelectionAction(e)
+    },
+    [moveSelectionAction],
+  )
+  const onMouseDownRight = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      dragSelectionRightEdgeAction(e, selectedNoteIds)
+    },
+    [dragSelectionRightEdgeAction, selectedNoteIds],
+  )
+
+  return (
+    <>
+      <Selection rect={rect} zIndex={zIndex} />
+      {/* left edge */}
+      <HitArea
+        bounds={leftEdgeBounds}
+        zIndex={zIndex}
+        cursor="w-resize"
+        onMouseDown={onMouseDownLeft}
+      />
+      {/* center */}
+      <HitArea
+        bounds={centerBounds}
+        zIndex={zIndex}
+        cursor="move"
+        onMouseDown={onMouseDownCenter}
+      />
+      {/* right edge */}
+      <HitArea
+        bounds={rightEdgeBounds}
+        zIndex={zIndex}
+        cursor="e-resize"
+        onMouseDown={onMouseDownRight}
+      />
+    </>
+  )
+}

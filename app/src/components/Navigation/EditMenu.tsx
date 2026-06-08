@@ -9,9 +9,9 @@ import {
   useSelectNextNote,
   useSelectPreviousNote,
   useTransposeSelection,
-} from "../../actions"
+} from "../../features/piano-roll/hooks/selection"
+import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
 import { useHistory } from "../../hooks/useHistory"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { MenuHotKey as HotKey, Menu, MenuDivider, MenuItem } from "../ui/Menu"

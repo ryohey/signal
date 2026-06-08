@@ -2,9 +2,9 @@ import { Song } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { useCallback } from "react"
-import { useArrangeView } from "./useArrangeView"
-import { useControlPane } from "./useControlPane"
-import { usePianoRoll } from "./usePianoRoll"
+import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
+import { useControlPane } from "../features/control-pane/hooks/useControlPane"
+import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
@@ -145,7 +145,7 @@ const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   }
   return state
 })
-const clearHistoryAtom = atom(null, (get, set) => {
+const clearHistoryAtom = atom(null, (_get, set) => {
   set(undoHistoryAtom, [])
   set(redoHistoryAtom, [])
 })

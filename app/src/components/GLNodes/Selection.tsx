@@ -3,8 +3,8 @@ import { BorderedRectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { FC, useMemo } from "react"
 import { Rect } from "../../entities/geometry/Rect"
+import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
 import { colorToVec4 } from "../../gl/color"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
 
 export const Selection: FC<{ rect: Rect | null; zIndex: number }> = ({
   rect,

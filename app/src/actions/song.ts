@@ -6,14 +6,17 @@ import {
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
 import { useCallback } from "react"
-import { useArrangeView } from "../hooks/useArrangeView"
+import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
+import {
+  usePianoRoll,
+  usePianoRollTickScroll,
+} from "../features/piano-roll/hooks/usePianoRoll"
+import { useTrackList } from "../features/track-list/hooks/useTrackList"
 import { useAutoSave } from "../hooks/useAutoSave"
 import { useCommands } from "../hooks/useCommands"
 import { useHistory } from "../hooks/useHistory"
-import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useTrackList } from "../hooks/useTrackList"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/downloadSongAsMidi"
 import { songFromFile } from "./file"

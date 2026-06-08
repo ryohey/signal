@@ -1,7 +1,7 @@
 import { MIDIInputEvent, TrackId } from "@signal-app/core"
 import { useEffect } from "react"
+import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
 import { useMIDIDevice } from "./useMIDIDevice"
-import { usePianoRoll } from "./usePianoRoll"
 import { useStores } from "./useStores"
 import { useTrack } from "./useTrack"
 

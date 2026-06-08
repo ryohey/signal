@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { useStartNote, useStopNote } from "../actions"
-import { usePianoRoll } from "./usePianoRoll"
+import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
 import { useTrack } from "./useTrack"
 
 const playingNoteRef = {

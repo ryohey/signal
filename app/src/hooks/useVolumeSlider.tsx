@@ -1,7 +1,7 @@
 import { getVolume, volumeMidiEvent } from "@signal-app/core"
 import { useCallback, useState, useSyncExternalStore } from "react"
+import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
 import { useHistory } from "./useHistory"
-import { usePianoRoll } from "./usePianoRoll"
 import { usePlayer } from "./usePlayer"
 import { useTrack } from "./useTrack"
 

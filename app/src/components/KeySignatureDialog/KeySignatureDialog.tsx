@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import React, { FC } from "react"
 import { Scale } from "../../entities/scale/Scale"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
 import { Localized } from "../../localize/useLocalization"
 import {
   Dialog,

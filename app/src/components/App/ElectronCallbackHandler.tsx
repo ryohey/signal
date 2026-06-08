@@ -8,7 +8,13 @@ import {
 } from "firebase/auth"
 import { FC } from "react"
 import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
-import { auth } from "../.././firebase/firebase"
+import { useSetSong } from "../../actions"
+import { songFromArrayBuffer } from "../../actions/file"
+import {
+  useCopySelectionGlobal,
+  useCutSelectionGlobal,
+  usePasteSelectionGlobal,
+} from "../../actions/hotkey"
 import {
   useDeleteSelection,
   useDuplicateSelection,
@@ -16,20 +22,14 @@ import {
   useSelectAllNotes,
   useSelectNextNote,
   useSelectPreviousNote,
-  useSetSong,
   useTransposeSelection,
-} from "../../actions"
-import { songFromArrayBuffer } from "../../actions/file"
-import {
-  useCopySelectionGlobal,
-  useCutSelectionGlobal,
-  usePasteSelectionGlobal,
-} from "../../actions/hotkey"
+} from "../../features/piano-roll/hooks/selection"
+import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
+import { auth } from "../.././firebase/firebase"
 import { useAuth } from "../../hooks/useAuth"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useExport } from "../../hooks/useExport"
 import { useHistory } from "../../hooks/useHistory"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"

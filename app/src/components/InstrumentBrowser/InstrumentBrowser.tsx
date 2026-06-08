@@ -9,11 +9,11 @@ import React, {
   useMemo,
   useState,
 } from "react"
+import { InstrumentName } from "../../features/track-list/components/InstrumentName"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
 import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { InstrumentName } from "../TrackList/InstrumentName"
 import { Button, PrimaryButton } from "../ui/Button"
 import { Checkbox } from "../ui/Checkbox"
 import { DropdownButton } from "../ui/DropdownButton"

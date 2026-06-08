@@ -1,10 +1,10 @@
 import { TempoEventsClipboardDataSchema } from "@signal-app/core"
 import { useCallback } from "react"
+import { useTempoEditor } from "../features/tempo-editor/hooks/useTempoEditor"
 import { useCommands } from "../hooks/useCommands"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
-import { useTempoEditor } from "../hooks/useTempoEditor"
 import {
   readClipboardData,
   readJSONFromClipboard,
