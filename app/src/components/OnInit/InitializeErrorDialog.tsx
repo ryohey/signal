@@ -1,12 +1,12 @@
-import { FC } from "react"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
+} from "@signal-app/ui"
+import { FC } from "react"
+import { Localized } from "../../localize/useLocalization"
 
 export interface InitializeErrorDialogProps {
   open: boolean

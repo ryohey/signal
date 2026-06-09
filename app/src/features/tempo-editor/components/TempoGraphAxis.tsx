@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { Positioned } from "@signal-app/ui"
 import range from "lodash/range"
 import { FC } from "react"
-import { Positioned } from "../../../components/ui/Positioned"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"
 
 const Container = styled(Positioned)`

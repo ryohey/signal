@@ -1,7 +1,7 @@
+import { MenuDivider, MenuItem } from "@signal-app/ui"
 import { ChangeEvent, FC } from "react"
 import { useSongFile } from "../../hooks/useSongFile"
 import { Localized } from "../../localize/useLocalization"
-import { MenuDivider, MenuItem } from "../ui/Menu"
 
 export const fileInputID = "OpenButtonInputFile"
 

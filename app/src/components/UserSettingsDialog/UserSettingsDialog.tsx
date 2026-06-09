@@ -1,11 +1,10 @@
 import styled from "@emotion/styled"
 import { DialogTitle } from "@radix-ui/react-dialog"
+import { Button, Dialog, DialogActions, DialogContent } from "@signal-app/ui"
 import { FC } from "react"
 import { useAuth } from "../../hooks/useAuth"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
 
 const UserIcon = styled.img`
   width: 3rem;

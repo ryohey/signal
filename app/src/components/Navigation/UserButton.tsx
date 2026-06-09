@@ -1,11 +1,11 @@
 import { useTheme } from "@emotion/react"
+import { Menu, MenuItem } from "@signal-app/ui"
 import AccountCircle from "mdi-react/AccountCircleIcon"
 import { FC, useRef, useState } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useAuth } from "../../hooks/useAuth"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
-import { Menu, MenuItem } from "../ui/Menu"
 import { IconStyle, Tab, TabTitle } from "./Navigation"
 
 export const UserButton: FC = () => {

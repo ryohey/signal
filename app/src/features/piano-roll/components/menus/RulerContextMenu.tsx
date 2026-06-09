@@ -1,11 +1,11 @@
-import React, { FC, useCallback, useState } from "react"
-import { useAddTimeSignature } from "../../../../actions"
 import {
   ContextMenu,
   ContextMenuProps,
   ContextMenuHotKey as HotKey,
-} from "../../../../components/ContextMenu/ContextMenu"
-import { MenuItem } from "../../../../components/ui/Menu"
+  MenuItem,
+} from "@signal-app/ui"
+import React, { FC, useCallback, useState } from "react"
+import { useAddTimeSignature } from "../../../../actions"
 import { useConductorTrack } from "../../../../hooks/useConductorTrack"
 import { usePlayer } from "../../../../hooks/usePlayer"
 import { useRuler } from "../../../../hooks/useRuler"

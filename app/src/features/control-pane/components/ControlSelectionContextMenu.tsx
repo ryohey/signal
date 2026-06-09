@@ -1,10 +1,10 @@
-import { FC, useCallback } from "react"
 import {
   ContextMenu,
   ContextMenuProps,
   ContextMenuHotKey as HotKey,
-} from "../../../components/ContextMenu/ContextMenu"
-import { MenuItem } from "../../../components/ui/Menu"
+  MenuItem,
+} from "@signal-app/ui"
+import { FC, useCallback } from "react"
 import { envString } from "../../../localize/envString"
 import { Localized } from "../../../localize/useLocalization"
 import {

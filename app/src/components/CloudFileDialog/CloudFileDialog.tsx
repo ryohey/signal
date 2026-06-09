@@ -1,13 +1,13 @@
-import { useCallback } from "react"
-import { useRootView } from "../../hooks/useRootView"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
+} from "@signal-app/ui"
+import { useCallback } from "react"
+import { useRootView } from "../../hooks/useRootView"
+import { Localized } from "../../localize/useLocalization"
 import { CloudFileList } from "./CloudFileList"
 
 export const CloudFileDialog = () => {

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { Positioned } from "@signal-app/ui"
 import { FC } from "react"
 import { Layout } from "../../../Constants"
-import { Positioned } from "../../../components/ui/Positioned"
 import { useKeyScroll } from "../hooks/useKeyScroll"
 import CanvasPianoRuler from "./CanvasPianoRuler"
 import { PianoRollCanvas } from "./canvas/PianoRollCanvas"

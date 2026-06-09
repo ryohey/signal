@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
+import { Tooltip } from "@signal-app/ui"
 import Pause from "mdi-react/PauseIcon"
 import PlayArrow from "mdi-react/PlayArrowIcon"
 import { FC } from "react"
-import { Tooltip } from "../../../components/ui/Tooltip"
 import { Localized } from "../../../localize/useLocalization"
 import { CircleButton } from "./CircleButton"
 

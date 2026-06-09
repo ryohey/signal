@@ -1,6 +1,16 @@
 import styled from "@emotion/styled"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import type { TrackEventOf, TrackId } from "@signal-app/core"
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DropdownButton,
+  Label,
+  PrimaryButton,
+} from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
 import React, {
   type FC,
@@ -13,11 +23,6 @@ import { InstrumentName } from "../../features/track-list/components/InstrumentN
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { Button, PrimaryButton } from "../ui/Button"
-import { Checkbox } from "../ui/Checkbox"
-import { DropdownButton } from "../ui/DropdownButton"
-import { Label } from "../ui/Label"
 import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName"
 import { SelectBox } from "./SelectBox"
 

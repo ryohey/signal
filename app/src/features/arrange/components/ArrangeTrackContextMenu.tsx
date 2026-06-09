@@ -1,14 +1,10 @@
+import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import { FC } from "react"
 import {
   useDuplicateTrack,
   useInsertTrack,
   useRemoveTrack,
 } from "../../../actions"
-import {
-  ContextMenu,
-  ContextMenuProps,
-} from "../../../components/ContextMenu/ContextMenu"
-import { MenuItem } from "../../../components/ui/Menu"
 import { useSong } from "../../../hooks/useSong"
 import { Localized } from "../../../localize/useLocalization"
 import { useArrangeView } from "../hooks/useArrangeView"

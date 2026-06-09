@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
+import { ToolbarButton, Tooltip } from "@signal-app/ui"
 import KeyboardTab from "mdi-react/KeyboardTabIcon"
 import { FC, useCallback } from "react"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { Localized } from "../../localize/useLocalization"
-import { Tooltip } from "../ui/Tooltip"
-import { ToolbarButton } from "./ToolbarButton"
 
 const AutoScrollIcon = styled(KeyboardTab)`
   width: 1.2rem;

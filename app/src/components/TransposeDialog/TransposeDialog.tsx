@@ -1,13 +1,14 @@
-import { FC, useEffect, useState } from "react"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button, PrimaryButton } from "../ui/Button"
-import { TextField } from "../ui/TextField"
+  PrimaryButton,
+  TextField,
+} from "@signal-app/ui"
+import { FC, useEffect, useState } from "react"
+import { Localized } from "../../localize/useLocalization"
 
 export interface TransposeDialogProps {
   open: boolean

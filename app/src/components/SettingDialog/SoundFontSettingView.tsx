@@ -1,12 +1,10 @@
 import styled from "@emotion/styled"
+import { Alert, Button, DialogContent, DialogTitle } from "@signal-app/ui"
 import { ChangeEvent, FC } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
-import { DialogContent, DialogTitle } from "../Dialog/Dialog"
 import { FileInput } from "../Navigation/LegacyFileMenu"
-import { Alert } from "../ui/Alert"
-import { Button } from "../ui/Button"
 import { SoundFontList } from "./SoundFontList"
 import { SoundFontScanPathList } from "./SoundFontScanPathList"
 

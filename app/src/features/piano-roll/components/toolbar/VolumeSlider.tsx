@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { Slider } from "@signal-app/ui"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import { FC } from "react"
-import { Slider } from "../../../../components/ui/Slider"
 import { useVolumeSlider } from "../../../../hooks/useVolumeSlider"
 
 const Container = styled.div`

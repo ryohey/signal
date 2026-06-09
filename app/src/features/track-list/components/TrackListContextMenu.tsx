@@ -1,13 +1,9 @@
 import { TrackId } from "@signal-app/core"
+import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import Color from "color"
 import { FC, useCallback, useState } from "react"
 import { useAddTrack, useRemoveTrack } from "../../../actions"
 import { ColorPicker } from "../../../components/ColorPicker/ColorPicker"
-import {
-  ContextMenu,
-  ContextMenuProps,
-} from "../../../components/ContextMenu/ContextMenu"
-import { MenuItem } from "../../../components/ui/Menu"
 import { useTrack } from "../../../hooks/useTrack"
 import { Localized } from "../../../localize/useLocalization"
 import { TrackDialog } from "./TrackDialog"

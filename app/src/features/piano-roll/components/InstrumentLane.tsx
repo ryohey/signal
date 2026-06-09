@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { isProgramChangeEvent } from "@signal-app/core"
+import { Positioned } from "@signal-app/ui"
 import { type FC, useMemo } from "react"
-import { Positioned } from "../../../components/ui/Positioned"
 import { useEventView } from "../../../hooks/useEventView"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { InstrumentMark } from "./InstrumentMark"

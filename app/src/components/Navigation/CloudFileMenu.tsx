@@ -1,9 +1,9 @@
+import { MenuDivider, MenuItem } from "@signal-app/ui"
 import { ChangeEvent, FC } from "react"
 import { hasFSAccess } from "../../actions/file"
 import { useCloudFile } from "../../hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
-import { MenuDivider, MenuItem } from "../ui/Menu"
 import { FileInput } from "./LegacyFileMenu"
 
 export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {

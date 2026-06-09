@@ -1,7 +1,6 @@
+import { ToolbarButton, Tooltip } from "@signal-app/ui"
 import FormatListBulleted from "mdi-react/FormatListBulletedIcon"
 import { FC, MouseEvent, useCallback } from "react"
-import { ToolbarButton } from "../../../../components/Toolbar/ToolbarButton"
-import { Tooltip } from "../../../../components/ui/Tooltip"
 import { Localized } from "../../../../localize/useLocalization"
 import { useEventList } from "../../../event-list/hooks/useEventList"
 

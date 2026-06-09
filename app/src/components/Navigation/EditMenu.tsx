@@ -1,3 +1,9 @@
+import {
+  MenuHotKey as HotKey,
+  Menu,
+  MenuDivider,
+  MenuItem,
+} from "@signal-app/ui"
 import React, { FC, useCallback, useState } from "react"
 import {
   useCopySelection,
@@ -14,7 +20,6 @@ import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
 import { useHistory } from "../../hooks/useHistory"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
-import { MenuHotKey as HotKey, Menu, MenuDivider, MenuItem } from "../ui/Menu"
 
 export interface EditMenuProps {
   trigger: React.ReactNode

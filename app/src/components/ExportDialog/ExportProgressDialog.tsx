@@ -1,14 +1,14 @@
-import { FC, useCallback } from "react"
-import { useExport } from "../../hooks/useExport"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
-import { LinearProgress } from "../ui/LinearProgress"
+  LinearProgress,
+} from "@signal-app/ui"
+import { FC, useCallback } from "react"
+import { useExport } from "../../hooks/useExport"
+import { Localized } from "../../localize/useLocalization"
 
 export const ExportProgressDialog: FC = () => {
   const {

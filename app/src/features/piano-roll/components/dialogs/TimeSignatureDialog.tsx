@@ -1,15 +1,16 @@
 import styled from "@emotion/styled"
-import { range } from "lodash"
-import React, { FC, useEffect, useState } from "react"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../../../../components/Dialog/Dialog"
-import { Button, PrimaryButton } from "../../../../components/ui/Button"
-import { Select } from "../../../../components/ui/Select"
-import { TextField } from "../../../../components/ui/TextField"
+  PrimaryButton,
+  Select,
+  TextField,
+} from "@signal-app/ui"
+import { range } from "lodash"
+import React, { FC, useEffect, useState } from "react"
 import { Localized } from "../../../../localize/useLocalization"
 
 export interface TimeSignatureDialogProps {

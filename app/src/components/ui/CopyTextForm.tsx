@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
+import { PrimaryButton } from "@signal-app/ui"
 import { useToast } from "dialog-hooks"
 import { FC, useCallback } from "react"
 import { Localized, useLocalization } from "../../localize/useLocalization"
-import { PrimaryButton } from "./Button"
 
 const Form = styled.div`
   display: flex;

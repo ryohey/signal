@@ -1,4 +1,11 @@
 import styled from "@emotion/styled"
+import {
+  Checkbox,
+  DialogContent,
+  DialogTitle,
+  Label,
+  Select,
+} from "@signal-app/ui"
 import { FC, useCallback } from "react"
 import { useSettings } from "../../hooks/useSettings"
 import {
@@ -6,12 +13,8 @@ import {
   Localized,
   useCurrentLanguage,
 } from "../../localize/useLocalization"
-import { themes, ThemeType } from "../../theme/Theme"
+import { ThemeType, themes } from "../../theme/Theme"
 import { ThemeName } from "../../theme/ThemeName"
-import { DialogContent, DialogTitle } from "../Dialog/Dialog"
-import { Checkbox } from "../ui/Checkbox"
-import { Label } from "../ui/Label"
-import { Select } from "../ui/Select"
 
 interface LanguageItem {
   label: string

@@ -1,15 +1,18 @@
 import styled from "@emotion/styled"
+import {
+  Alert,
+  Checkbox,
+  CircularProgress,
+  DialogContent,
+  DialogTitle,
+  Label,
+  RadioButton,
+} from "@signal-app/ui"
 import BluetoothIcon from "mdi-react/BluetoothIcon"
 import { FC, useCallback, useMemo } from "react"
 import { useBLEMIDIDevice } from "../../../hooks/useBLEMIDIDevice"
 import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
-import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
-import { Alert } from "../../ui/Alert"
-import { Checkbox } from "../../ui/Checkbox"
-import { CircularProgress } from "../../ui/CircularProgress"
-import { Label } from "../../ui/Label"
-import { RadioButton } from "../../ui/RadioButton"
 
 interface ListItem {
   device: Device

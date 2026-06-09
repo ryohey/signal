@@ -1,17 +1,17 @@
 import { arrayMove } from "@dnd-kit/sortable"
 import styled from "@emotion/styled"
-import { range } from "lodash"
-import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
-import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
-import { useCallback, useState } from "react"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../../../../components/Dialog/Dialog"
+} from "@signal-app/ui"
+import { range } from "lodash"
+import ChevronDoubleLeftIcon from "mdi-react/ChevronDoubleLeftIcon"
+import ChevronDoubleRightIcon from "mdi-react/ChevronDoubleRightIcon"
+import { useCallback, useState } from "react"
 import { DraggableList } from "../../../../components/DraggableList/DraggableList"
-import { Button } from "../../../../components/ui/Button"
 import { useRootView } from "../../../../hooks/useRootView"
 import { Localized } from "../../../../localize/useLocalization"
 import {

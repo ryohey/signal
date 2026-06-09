@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
+import { Toolbar } from "@signal-app/ui"
 import { FC } from "react"
 import { AutoScrollButton } from "../../../../components/Toolbar/AutoScrollButton"
 import { QuantizeSelector } from "../../../../components/Toolbar/QuantizeSelector/QuantizeSelector"
-import { Toolbar } from "../../../../components/Toolbar/Toolbar"
 import { Localized } from "../../../../localize/useLocalization"
 import { TempoGraphToolSelector } from "./TempoGraphToolSelector"
 

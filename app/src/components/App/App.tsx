@@ -1,3 +1,4 @@
+import { ActionDialog, ProgressDialog, PromptDialog } from "@signal-app/ui"
 import {
   DialogProvider,
   ProgressProvider,
@@ -6,7 +7,6 @@ import {
 } from "dialog-hooks"
 import React from "react"
 import { HelmetProvider } from "react-helmet-async"
-import { ActionDialog } from "../../components/Dialog/ActionDialog"
 import { ArrangeViewProvider } from "../../features/arrange/hooks/useArrangeView"
 import { PianoRollProvider } from "../../features/piano-roll/hooks/usePianoRoll"
 import { TempoEditorProvider } from "../../features/tempo-editor/hooks/useTempoEditor"
@@ -17,8 +17,6 @@ import { StoreContext } from "../../hooks/useStores"
 import { TrackMuteProvider } from "../../hooks/useTrackMute"
 import RootStore from "../../stores/RootStore"
 import { ThemeProvider } from "../../theme/ThemeProvider"
-import { ProgressDialog } from "../Dialog/ProgressDialog"
-import { PromptDialog } from "../Dialog/PromptDialog"
 import { RootView } from "../RootView/RootView"
 import { GlobalCSS } from "../Theme/GlobalCSS"
 import { Toast } from "../ui/Toast"

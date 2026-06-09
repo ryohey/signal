@@ -1,5 +1,14 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  PrimaryButton,
+} from "@signal-app/ui"
 import { useToast } from "dialog-hooks"
 import OpenInNewIcon from "mdi-react/OpenInNewIcon"
 import { FC, useCallback, useEffect, useState } from "react"
@@ -8,14 +17,6 @@ import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { Localized, useLocalization } from "../../localize/useLocalization"
 import { cloudSongRepository } from "../../services/repositories"
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "../Dialog/Dialog"
-import { Alert } from "../ui/Alert"
-import { Button, PrimaryButton } from "../ui/Button"
 import { LinkShare } from "../ui/LinkShare"
 
 type PublishState = "publishable" | "published" | "notPublishable"

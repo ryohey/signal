@@ -1,6 +1,6 @@
+import { ToolbarButton } from "@signal-app/ui"
 import { type FC, useState } from "react"
 import { InstrumentBrowser } from "../../../../components/InstrumentBrowser/InstrumentBrowser"
-import { ToolbarButton } from "../../../../components/Toolbar/ToolbarButton"
 import { useTrack } from "../../../../hooks/useTrack"
 import { categoryEmojis, getCategoryIndex } from "../../../../midi/GM"
 import { InstrumentName } from "../../../track-list/components/InstrumentName"

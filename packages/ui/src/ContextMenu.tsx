@@ -2,8 +2,7 @@ import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
 import { FC, ReactNode, useCallback, useEffect } from "react"
-import { Point } from "../../entities/geometry/Point"
-import { Positioned } from "../ui/Positioned"
+import { Positioned } from "./Positioned"
 
 export const ContextMenuHotKey = styled.div`
   font-size: 0.9em;
@@ -37,7 +36,7 @@ const List = styled.ul`
 
 export interface ContextMenuProps {
   isOpen: boolean
-  position: Point
+  position: { x: number; y: number }
   handleClose: () => void
   children?: ReactNode
 }
@@ -68,7 +67,7 @@ export const ContextMenu: FC<ContextMenuProps> = ({
       document.removeEventListener("keydown", onKeyDown)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen])
+  }, [isOpen, handleClose])
 
   if (!isOpen) {
     return <></>

@@ -1,14 +1,14 @@
 import styled from "@emotion/styled"
-import { FC, useCallback, useState } from "react"
-import { useRootView } from "../../hooks/useRootView"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
+} from "@signal-app/ui"
+import { FC, useCallback, useState } from "react"
+import { useRootView } from "../../hooks/useRootView"
+import { Localized } from "../../localize/useLocalization"
 import { GeneralSettingsView } from "./GeneralSettingsView"
 import { MIDIDeviceView } from "./MIDIDeviceView/MIDIDeviceView"
 import { SettingNavigation, SettingRoute } from "./SettingNavigation"

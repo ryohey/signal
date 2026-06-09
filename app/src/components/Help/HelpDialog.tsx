@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
-import { FC, ReactNode } from "react"
-import { useRootView } from "../../hooks/useRootView"
-import { envString } from "../../localize/envString"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
+} from "@signal-app/ui"
+import { FC, ReactNode } from "react"
+import { useRootView } from "../../hooks/useRootView"
+import { envString } from "../../localize/envString"
+import { Localized } from "../../localize/useLocalization"
 
 interface HotKeyProps {
   hotKeys: string[][]

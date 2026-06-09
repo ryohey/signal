@@ -1,17 +1,17 @@
 import styled from "@emotion/styled"
-import React, { FC } from "react"
-import { Scale } from "../../entities/scale/Scale"
-import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
-import { Label } from "../ui/Label"
-import { Select } from "../ui/Select"
+  Label,
+  Select,
+} from "@signal-app/ui"
+import React, { FC } from "react"
+import { Scale } from "../../entities/scale/Scale"
+import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
+import { Localized } from "../../localize/useLocalization"
 import { ScaleName } from "./ScaleName"
 
 export interface KeySignatureDialogProps {

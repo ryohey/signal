@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { Tooltip } from "@signal-app/ui"
 import ArrowDropDownIcon from "mdi-react/ArrowDropDownIcon"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Tooltip } from "../../../components/ui/Tooltip"
 import PencilIcon from "../../../images/icons/pencil.svg"
 import { Localized } from "../../../localize/useLocalization"
 import { type CurveType, curveTypes } from "../gestures/useCurveGesture"

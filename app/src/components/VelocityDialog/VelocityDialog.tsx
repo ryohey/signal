@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
 import { BatchUpdateOperation } from "@signal-app/core"
-import { FC, useCallback, useEffect, useState } from "react"
-import { Localized } from "../../localize/useLocalization"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
-import { RadioButton } from "../ui/RadioButton"
+  RadioButton,
+} from "@signal-app/ui"
+import { FC, useCallback, useEffect, useState } from "react"
+import { Localized } from "../../localize/useLocalization"
 import { StyledNumberInput } from "../ui/StyledNumberInput"
 
 const Column = styled.div`

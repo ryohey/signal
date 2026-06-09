@@ -1,9 +1,9 @@
+import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "@signal-app/ui"
 import { FC } from "react"
 import { useSong } from "../../hooks/useSong"
 import { useSongFile } from "../../hooks/useSongFile"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
-import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "../ui/Menu"
 
 export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
   const { fileHandle } = useSong()

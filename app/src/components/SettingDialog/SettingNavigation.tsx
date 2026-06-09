@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
+import { Button } from "@signal-app/ui"
 import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
-import { Button } from "../ui/Button"
 
 export type SettingRoute = "general" | "midi" | "soundfont"
 const routes: SettingRoute[] = ["general", "midi", "soundfont"]
