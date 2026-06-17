@@ -1,22 +1,14 @@
 import { min } from "lodash"
 import { transaction } from "mobx"
 import { ControlEventsClipboardData } from "../entities/clipboard/clipboardTypes"
-import { TrackId } from "../entities/track/Track"
+import { Track, TrackId } from "../entities/track/Track"
 import { isNotUndefined } from "../helpers"
 import type { ISongStore } from "./interfaces"
+import { createBindTrack } from "./TrackCommandService"
 
-export class ControlCommandService {
-  constructor(private readonly songStore: ISongStore) {}
-
-  getClipboardDataForSelection = (
-    trackId: TrackId,
-    eventIds: number[],
-  ): ControlEventsClipboardData | null => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return null
-    }
-
+const getClipboardDataForSelection =
+  (track: Track) =>
+  (eventIds: number[]): ControlEventsClipboardData | null => {
     // Copy selected events
     const events = eventIds
       .map((id) => track.getEventById(id))
@@ -39,20 +31,24 @@ export class ControlCommandService {
     }
   }
 
-  pasteClipboardDataAtPosition = (
-    trackId: TrackId,
-    data: ControlEventsClipboardData,
-    position: number,
-  ) => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return
-    }
-
+const pasteClipboardDataAtPosition =
+  (track: Track) => (data: ControlEventsClipboardData, position: number) => {
     const events = data.events.map((e) => ({
       ...e,
       tick: e.tick + position,
     }))
     transaction(() => events.forEach((e) => track.createOrUpdate(e)))
   }
+
+export function createControlCommandService(songStore: ISongStore) {
+  const bindTrack = createBindTrack(songStore)
+
+  return {
+    getClipboardDataForSelection: bindTrack(getClipboardDataForSelection),
+    pasteClipboardDataAtPosition: bindTrack(pasteClipboardDataAtPosition),
+  }
 }
+
+export type ControlCommandService = ReturnType<
+  typeof createControlCommandService
+>

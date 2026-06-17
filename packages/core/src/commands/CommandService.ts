@@ -1,9 +1,24 @@
-import { ArrangeCommandService } from "./ArrangeCommandService"
-import { ConductorTrackCommandService } from "./ConductorTrackCommandService"
-import { ControlCommandService } from "./ControlCommandService"
+import {
+  ArrangeCommandService,
+  createArrangeCommandService,
+} from "./ArrangeCommandService"
+import {
+  ConductorTrackCommandService,
+  createConductorTrackCommandService,
+} from "./ConductorTrackCommandService"
+import {
+  ControlCommandService,
+  createControlCommandService,
+} from "./ControlCommandService"
 import { ISongStore } from "./interfaces"
-import { SongCommandService } from "./SongCommandService"
-import { TrackCommandService } from "./TrackCommandService"
+import {
+  createSongCommandService,
+  SongCommandService,
+} from "./SongCommandService"
+import {
+  createTrackCommandService,
+  TrackCommandService,
+} from "./TrackCommandService"
 
 export class CommandService {
   readonly song: SongCommandService
@@ -13,10 +28,10 @@ export class CommandService {
   readonly control: ControlCommandService
 
   constructor(private readonly songStore: ISongStore) {
-    this.song = new SongCommandService(this.songStore)
-    this.arrange = new ArrangeCommandService(this.songStore)
-    this.track = new TrackCommandService(this.songStore)
-    this.conductorTrack = new ConductorTrackCommandService(this.songStore)
-    this.control = new ControlCommandService(this.songStore)
+    this.song = createSongCommandService(this.songStore)
+    this.arrange = createArrangeCommandService(this.songStore)
+    this.track = createTrackCommandService(this.songStore)
+    this.conductorTrack = createConductorTrackCommandService(this.songStore)
+    this.control = createControlCommandService(this.songStore)
   }
 }

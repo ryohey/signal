@@ -1,6 +1,11 @@
 import { mapValues } from "lodash"
 import { transaction } from "mobx"
-import { ArrangeNotesClipboardData, Range, TrackEvent } from "../entities"
+import {
+  ArrangeNotesClipboardData,
+  Range,
+  Track,
+  TrackEvent,
+} from "../entities"
 import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
 import { ArrangePoint } from "../entities/transform/ArrangePoint"
 import { isNotUndefined } from "../helpers/array"
@@ -8,22 +13,17 @@ import { isEventInRange } from "../helpers/filterEvents"
 import { ISongStore } from "./interfaces"
 import {
   BatchUpdateOperation,
-  TrackCommandService,
+  batchUpdateNotesVelocity as batchUpdateNotesVelocityForTrack,
+  transposeNotes,
 } from "./TrackCommandService"
 
-export class ArrangeCommandService {
-  private readonly trackCommands: TrackCommandService
-
-  constructor(private readonly songStore: ISongStore) {
-    this.trackCommands = new TrackCommandService(songStore)
-  }
-
-  // returns moved event ids
-  moveEventsBetweenTracks = (
+// returns moved event ids
+const moveEventsBetweenTracks =
+  (tracks: readonly Track[]) =>
+  (
     eventIdForTrackIndex: { [trackIndex: number]: number[] },
     delta: ArrangePoint,
   ) => {
-    const { tracks } = this.songStore.song
     return transaction(() => {
       const updates = []
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
@@ -67,20 +67,17 @@ export class ArrangeCommandService {
     })
   }
 
-  batchUpdateNotesVelocity = (
-    selection: ArrangeSelection,
-    operation: BatchUpdateOperation,
-  ) => {
-    const { tracks } = this.songStore.song
-    const eventIdForTrackIndex = this.getEventsInSelection(selection)
+const batchUpdateNotesVelocity =
+  (tracks: readonly Track[]) =>
+  (selection: ArrangeSelection, operation: BatchUpdateOperation) => {
+    const eventIdForTrackIndex = getEventsInSelection(tracks)(selection)
     transaction(() => {
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
         eventIdForTrackIndex,
       )) {
         const trackIndex = parseInt(trackIndexStr, 10)
         const track = tracks[trackIndex]
-        this.trackCommands.batchUpdateNotesVelocity(
-          track.id,
+        batchUpdateNotesVelocityForTrack(track)(
           selectedEventIdsValue,
           operation,
         )
@@ -88,11 +85,11 @@ export class ArrangeCommandService {
     })
   }
 
-  duplicateSelection = (selection: ArrangeSelection): ArrangeSelection => {
-    const { tracks } = this.songStore.song
-
+const duplicateSelection =
+  (tracks: readonly Track[]) =>
+  (selection: ArrangeSelection): ArrangeSelection => {
     const deltaTick = selection.toTick - selection.fromTick
-    const selectedEventIds = this.getEventsInSelection(selection)
+    const selectedEventIds = getEventsInSelection(tracks)(selection)
 
     transaction(() => {
       for (const [trackIndexStr, eventIds] of Object.entries(
@@ -121,9 +118,9 @@ export class ArrangeCommandService {
     }
   }
 
-  deleteSelection = (selection: ArrangeSelection) => {
-    const selectedEventIds = this.getEventsInSelection(selection)
-    const { tracks } = this.songStore.song
+const deleteSelection =
+  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
+    const selectedEventIds = getEventsInSelection(tracks)(selection)
     transaction(() => {
       for (const trackIndex in selectedEventIds) {
         tracks[trackIndex].removeEvents(selectedEventIds[trackIndex])
@@ -131,28 +128,28 @@ export class ArrangeCommandService {
     })
   }
 
-  transposeSelection = (selection: ArrangeSelection, deltaPitch: number) => {
-    const selectedEventIds = this.getEventsInSelection(selection)
-    const { tracks } = this.songStore.song
+const transposeSelection =
+  (tracks: readonly Track[]) =>
+  (selection: ArrangeSelection, deltaPitch: number) => {
+    const selectedEventIds = getEventsInSelection(tracks)(selection)
 
     transaction(() => {
       for (const trackIndexStr in selectedEventIds) {
-        const trackIndex = parseInt(trackIndexStr)
+        const trackIndex = parseInt(trackIndexStr, 10)
         const eventIds = selectedEventIds[trackIndex]
         const track = tracks[trackIndex]
         if (track === undefined) {
           continue
         }
-        this.trackCommands.transposeNotes(track.id, eventIds, deltaPitch)
+        transposeNotes(track)(eventIds, deltaPitch)
       }
     })
   }
 
-  getClipboardDataForSelection = (
-    selection: ArrangeSelection,
-  ): ArrangeNotesClipboardData => {
-    const selectedEventIds = this.getEventsInSelection(selection)
-    const { tracks } = this.songStore.song
+const getClipboardDataForSelection =
+  (tracks: readonly Track[]) =>
+  (selection: ArrangeSelection): ArrangeNotesClipboardData => {
+    const selectedEventIds = getEventsInSelection(tracks)(selection)
 
     const notes = mapValues(selectedEventIds, (ids, trackIndex) => {
       const track = tracks[parseInt(trackIndex, 10)]
@@ -171,13 +168,13 @@ export class ArrangeCommandService {
     }
   }
 
-  pasteClipboardDataAt = (
+const pasteClipboardDataAt =
+  (tracks: readonly Track[]) =>
+  (
     data: ArrangeNotesClipboardData,
     position: number,
     selectedTrackIndex: number,
   ) => {
-    const { tracks } = this.songStore.song
-
     transaction(() => {
       for (const trackIndex in data.notes) {
         const notes = data.notes[trackIndex].map((note) => ({
@@ -190,7 +187,7 @@ export class ArrangeCommandService {
           ? 0
           : -data.selectedTrackIndex + selectedTrackIndex
 
-        const destTrackIndex = parseInt(trackIndex) + trackNumberOffset
+        const destTrackIndex = parseInt(trackIndex, 10) + trackNumberOffset
 
         if (destTrackIndex < tracks.length) {
           tracks[destTrackIndex].addEvents(notes)
@@ -199,9 +196,9 @@ export class ArrangeCommandService {
     })
   }
 
-  // returns { trackIndex: [eventId] }
-  getEventsInSelection = (selection: ArrangeSelection) => {
-    const { tracks } = this.songStore.song
+// returns { trackIndex: [eventId] }
+const getEventsInSelection =
+  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
     const ids: { [key: number]: number[] } = {}
     for (
       let trackIndex = selection.fromTrackIndex;
@@ -217,8 +214,33 @@ export class ArrangeCommandService {
     return ids
   }
 
-  hasSelectionNotes = (selection: ArrangeSelection) => {
-    const selectedEventIds = this.getEventsInSelection(selection)
+const hasSelectionNotes =
+  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
+    const selectedEventIds = getEventsInSelection(tracks)(selection)
     return Object.values(selectedEventIds).some((ids) => ids.length > 0)
   }
+
+export function createArrangeCommandService(songStore: ISongStore) {
+  function bindTracks<Args extends unknown[], Result>(
+    command: (tracks: readonly Track[]) => (...args: Args) => Result,
+  ): (...args: Args) => Result {
+    return (...args: Args) => {
+      return command(songStore.song.tracks)(...args)
+    }
+  }
+  return {
+    moveEventsBetweenTracks: bindTracks(moveEventsBetweenTracks),
+    batchUpdateNotesVelocity: bindTracks(batchUpdateNotesVelocity),
+    duplicateSelection: bindTracks(duplicateSelection),
+    deleteSelection: bindTracks(deleteSelection),
+    transposeSelection: bindTracks(transposeSelection),
+    getClipboardDataForSelection: bindTracks(getClipboardDataForSelection),
+    pasteClipboardDataAt: bindTracks(pasteClipboardDataAt),
+    getEventsInSelection: bindTracks(getEventsInSelection),
+    hasSelectionNotes: bindTracks(hasSelectionNotes),
+  }
 }
+
+export type ArrangeCommandService = ReturnType<
+  typeof createArrangeCommandService
+>

@@ -5,6 +5,7 @@ import {
   isNoteEvent,
   NoteEvent,
   Range,
+  Track,
   TrackEvent,
   TrackEvents,
   TrackId,
@@ -19,20 +20,8 @@ export interface BatchUpdateOperation {
   readonly value: number
 }
 
-export class TrackCommandService {
-  constructor(private readonly songStore: ISongStore) {}
-
-  batchUpdateNotesVelocity = (
-    trackId: TrackId,
-    noteIds: number[],
-    operation: BatchUpdateOperation,
-  ) => {
-    const track = this.songStore.song.getTrack(trackId)
-
-    if (!track) {
-      return
-    }
-
+export const batchUpdateNotesVelocity =
+  (track: Track) => (noteIds: number[], operation: BatchUpdateOperation) => {
     const selectedNotes = noteIds
       .map((id) => track.getEventById(id))
       .filter(isNotUndefined)
@@ -49,17 +38,8 @@ export class TrackCommandService {
     )
   }
 
-  transposeNotes = (
-    trackId: TrackId,
-    noteIds: number[],
-    deltaPitch: number,
-  ) => {
-    const track = this.songStore.song.getTrack(trackId)
-
-    if (!track) {
-      return
-    }
-
+export const transposeNotes =
+  (track: Track) => (noteIds: number[], deltaPitch: number) => {
     track.updateEvents(
       noteIds
         .map((id) => {
@@ -76,41 +56,30 @@ export class TrackCommandService {
     )
   }
 
-  duplicateEvents = (trackId: TrackId, eventIds: number[]) => {
-    const track = this.songStore.song.getTrack(trackId)
+export const duplicateEvents = (track: Track) => (eventIds: number[]) => {
+  const selectedEvents = eventIds
+    .map((id) => track.getEventById(id))
+    .filter(isNotUndefined)
 
-    if (!track) {
-      return []
-    }
+  // move to the end of selection
+  const deltaTick =
+    (maxBy(selectedEvents, (e) => e.tick)?.tick ?? 0) -
+    (minBy(selectedEvents, (e) => e.tick)?.tick ?? 0)
 
-    const selectedEvents = eventIds
-      .map((id) => track.getEventById(id))
-      .filter(isNotUndefined)
+  const events = selectedEvents.map((note) => ({
+    ...note,
+    tick: note.tick + deltaTick,
+  }))
 
-    // move to the end of selection
-    const deltaTick =
-      (maxBy(selectedEvents, (e) => e.tick)?.tick ?? 0) -
-      (minBy(selectedEvents, (e) => e.tick)?.tick ?? 0)
+  return transaction(() => events.map((e) => track.createOrUpdate(e)))
+    .filter(isNotUndefined)
+    .map((e) => e.id)
+}
 
-    const events = selectedEvents.map((note) => ({
-      ...note,
-      tick: note.tick + deltaTick,
-    }))
-
-    return transaction(() => events.map((e) => track.createOrUpdate(e)))
-      .filter(isNotUndefined)
-      .map((e) => e.id)
-  }
-
-  // duplicate notes with an optional deltaTick
-  // if deltaTick is 0, duplicate to the right of the selected notes
-  duplicateNotes = (trackId: TrackId, noteIds: number[], deltaTick: number) => {
-    const track = this.songStore.song.getTrack(trackId)
-
-    if (!track) {
-      return { addedNoteIds: [], deltaTick: 0 }
-    }
-
+// duplicate notes with an optional deltaTick
+// if deltaTick is 0, duplicate to the right of the selected notes
+const duplicateNotes =
+  (track: Track) => (noteIds: number[], deltaTick: number) => {
     const selectedNotes = noteIds
       .map((id) => track.getEventById(id))
       .filter(isNotUndefined)
@@ -136,21 +105,16 @@ export class TrackCommandService {
     }
   }
 
-  // update velocities of notes in the specified range using linear interpolation
-  updateVelocitiesInRange = (
-    trackId: TrackId,
+// update velocities of notes in the specified range using linear interpolation
+const updateVelocitiesInRange =
+  (track: Track) =>
+  (
     selectedNoteIds: number[], // if empty, apply to all notes
     startTick: number,
     startValue: number,
     endTick: number,
     endValue: number,
   ) => {
-    const track = this.songStore.song.getTrack(trackId)
-
-    if (!track) {
-      return
-    }
-
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)
     const minValue = Math.min(startValue, endValue)
@@ -185,14 +149,11 @@ export class TrackCommandService {
     })
   }
 
-  removeRedundantEvents = <T extends TrackEvent>(
-    trackId: TrackId,
+export const removeRedundantEvents =
+  (track: Track) =>
+  <T extends TrackEvent>(
     event: T & { subtype?: string; controllerType?: number },
   ) => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return
-    }
     const eventsIdsToRemove = TrackEvents.getRedundantEvents(event)(
       track.events,
     )
@@ -201,30 +162,21 @@ export class TrackCommandService {
     track.removeEvents(eventsIdsToRemove)
   }
 
-  removeRedundantEventsForEventIds = (trackId: TrackId, eventIds: number[]) => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return
-    }
+export const removeRedundantEventsForEventIds =
+  (track: Track) => (eventIds: number[]) => {
     const controllerEvents = track.events.filter((e: TrackEvent) =>
       eventIds.includes(e.id),
     )
     transaction(() =>
       controllerEvents.forEach((e: TrackEvent) =>
-        this.removeRedundantEvents(trackId, e),
+        removeRedundantEvents(track)(e),
       ),
     )
   }
 
-  quantizeNotes = (
-    trackId: TrackId,
-    noteIds: number[],
-    quantizeRound: (tick: number) => number,
-  ) => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return
-    }
+const quantizeNotes =
+  (track: Track) =>
+  (noteIds: number[], quantizeRound: (tick: number) => number) => {
     const notes = noteIds
       .map((id) => track.getEventById(id))
       .filter(isNotUndefined)
@@ -237,9 +189,10 @@ export class TrackCommandService {
     track.updateEvents(notes)
   }
 
-  // Update events in the range with easing interpolation values
-  updateEventsInRangeWithEasing = (
-    trackId: TrackId,
+// Update events in the range with easing interpolation values
+const updateEventsInRangeWithEasing =
+  (track: Track) =>
+  (
     filterEvent: (e: TrackEvent) => boolean,
     createEvent: (value: number) => AnyEvent,
     quantizeFloor: (tick: number) => number,
@@ -250,11 +203,6 @@ export class TrackCommandService {
     endTick: number,
     easing: (t: number) => number,
   ) => {
-    const track = this.songStore.song.getTrack(trackId)
-    if (!track) {
-      return
-    }
-
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)
     const _startTick = quantizeFloor(Math.max(0, minTick))
@@ -296,9 +244,10 @@ export class TrackCommandService {
     })
   }
 
-  // Update  events in the range with linear interpolation values
-  updateEventsInRange = (
-    trackId: TrackId,
+// Update  events in the range with linear interpolation values
+const updateEventsInRange =
+  (track: Track) =>
+  (
     filterEvent: (e: TrackEvent) => boolean,
     createEvent: (value: number) => AnyEvent,
     quantizeFloor: (tick: number) => number,
@@ -308,12 +257,6 @@ export class TrackCommandService {
     startTick: number,
     endTick: number,
   ) => {
-    const track = this.songStore.song.getTrack(trackId)
-
-    if (!track) {
-      return
-    }
-
     const minTick = Math.min(startTick, endTick)
     const maxTick = Math.max(startTick, endTick)
     const _startTick = quantizeFloor(Math.max(0, minTick))
@@ -361,7 +304,54 @@ export class TrackCommandService {
       track.addEvents(newEvents)
     })
   }
+
+export function createBindTrack(songStore: ISongStore) {
+  function bindTrack<Args extends unknown[], Result>(
+    command: (track: Track) => (...args: Args) => Result,
+    // biome-ignore lint/suspicious/noConfusingVoidType: allow void for commands that may not return a value
+  ): (trackId: TrackId, ...args: Args) => Result | void
+  function bindTrack<Args extends unknown[], Result>(
+    command: (track: Track) => (...args: Args) => Result,
+    orFailure: Result,
+  ): (trackId: TrackId, ...args: Args) => Result
+  function bindTrack<Args extends unknown[], Result>(
+    command: (track: Track) => (...args: Args) => Result,
+    orFailure?: Result,
+  ) {
+    return (trackId: TrackId, ...args: Args) => {
+      const track = songStore.song.getTrack(trackId)
+      if (!track) {
+        return orFailure
+      }
+      return command(track)(...args)
+    }
+  }
+  return bindTrack
 }
+
+export const createTrackCommandService = (songStore: ISongStore) => {
+  const bindTrack = createBindTrack(songStore)
+
+  return {
+    batchUpdateNotesVelocity: bindTrack(batchUpdateNotesVelocity),
+    transposeNotes: bindTrack(transposeNotes),
+    duplicateEvents: bindTrack(duplicateEvents, []),
+    duplicateNotes: bindTrack(duplicateNotes, {
+      addedNoteIds: [],
+      deltaTick: 0,
+    }),
+    updateVelocitiesInRange: bindTrack(updateVelocitiesInRange),
+    removeRedundantEvents: bindTrack(removeRedundantEvents),
+    removeRedundantEventsForEventIds: bindTrack(
+      removeRedundantEventsForEventIds,
+    ),
+    quantizeNotes: bindTrack(quantizeNotes),
+    updateEventsInRangeWithEasing: bindTrack(updateEventsInRangeWithEasing),
+    updateEventsInRange: bindTrack(updateEventsInRange),
+  }
+}
+
+export type TrackCommandService = ReturnType<typeof createTrackCommandService>
 
 const applyOperation = (operation: BatchUpdateOperation, value: number) => {
   switch (operation.type) {
