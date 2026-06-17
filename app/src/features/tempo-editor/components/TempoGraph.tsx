@@ -7,7 +7,7 @@ import {
   HorizontalScrollBar,
 } from "../../../components/inputs/ScrollBar"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import CanvasPianoRuler from "../../piano-roll/components/CanvasPianoRuler"
+import CanvasPianoRuler from "../../piano-roll/components/PianoRuler"
 import { useTempoTransform } from "../hooks/useTempoTransform"
 import { TempoGraphCanvas } from "./canvas/TempoGraphCanvas"
 import { TempoGraphAxis } from "./TempoGraphAxis"

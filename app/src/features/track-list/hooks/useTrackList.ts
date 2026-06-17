@@ -2,6 +2,7 @@ import { TrackId } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
 import { useCommands } from "../../../hooks/useCommands"
+import { useHistory } from "../../../hooks/useHistory"
 import { useSong } from "../../../hooks/useSong"
 
 export function useTrackList() {
@@ -10,6 +11,7 @@ export function useTrackList() {
     .filter((track) => !track.isConductorTrack)
     .map((track) => track.id)
   const commands = useCommands()
+  const { pushHistory } = useHistory()
 
   return {
     get isOpen() {
@@ -23,6 +25,10 @@ export function useTrackList() {
       },
       [commands],
     ),
+    addTrack: useCallback(() => {
+      pushHistory()
+      commands.song.addNewTrack()
+    }, [pushHistory, commands]),
   }
 }
 

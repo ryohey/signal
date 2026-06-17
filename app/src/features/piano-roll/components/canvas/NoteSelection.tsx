@@ -30,7 +30,7 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
   rect,
   zIndex,
 }) => {
-  const { selectedNoteIds } = usePianoRoll()
+  const { selectedNoteIds, activePane } = usePianoRoll()
   const moveSelectionAction = useMoveSelectionGesture()
   const dragSelectionLeftEdgeAction = useDragSelectionLeftEdgeGesture()
   const dragSelectionRightEdgeAction = useDragSelectionRightEdgeGesture()
@@ -87,7 +87,11 @@ const NoteSelectionContent: FC<{ rect: Rect; zIndex: number }> = ({
 
   return (
     <>
-      <Selection rect={rect} zIndex={zIndex} />
+      <Selection
+        rect={rect}
+        zIndex={zIndex}
+        isActive={activePane === "notes"}
+      />
       {/* left edge */}
       <HitArea
         bounds={leftEdgeBounds}

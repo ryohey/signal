@@ -1,7 +1,7 @@
 import { MenuDivider, MenuItem } from "@signal-app/ui"
 import { ChangeEvent, FC } from "react"
 import { hasFSAccess } from "../../actions/file"
-import { useCloudFile } from "../../hooks/useCloudFile"
+import { useCloudFile } from "../../features/cloud-file/hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
 import { FileInput } from "./LegacyFileMenu"

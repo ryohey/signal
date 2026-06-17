@@ -1,8 +1,11 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
 import { ArrangeEditor } from "../../features/arrange/components/ArrangeEditor"
+import { CloudFileDialog } from "../../features/cloud-file/components/CloudFileDialog"
 import { ControlSettingDialog } from "../../features/control-pane/components/dialogs/ControlSettingDialog"
+import { ExportProgressDialog } from "../../features/export/components/ExportProgressDialog"
 import { PianoRollEditor } from "../../features/piano-roll/components/PianoRollEditor"
+import { SettingDialog } from "../../features/setting/components/SettingDialog"
 import { TempoEditor } from "../../features/tempo-editor/components/TempoEditor"
 import { TransportPanel } from "../../features/transport-panel/components/TransportPanel"
 import { useDisableBounceScroll } from "../../hooks/useDisableBounceScroll"
@@ -11,15 +14,13 @@ import { useDisableZoom } from "../../hooks/useDisableZoom"
 import { useGlobalKeyboardShortcut } from "../../hooks/useGlobalKeyboardShortcut"
 import { useRouter } from "../../hooks/useRouter"
 import { BuildInfo } from "../BuildInfo"
-import { CloudFileDialog } from "../CloudFileDialog/CloudFileDialog"
-import { ExportProgressDialog } from "../ExportDialog/ExportProgressDialog"
 import { Head } from "../Head/Head"
 import { HelpDialog } from "../Help/HelpDialog"
+import { EditMenuChildrenProvider } from "../Navigation/EditMenuPortal"
 import { Navigation } from "../Navigation/Navigation"
 import { OnBeforeUnload } from "../OnBeforeUnload/OnBeforeUnload"
 import { OnInit } from "../OnInit/OnInit"
 import { PublishDialog } from "../PublishDialog/PublishDialog"
-import { SettingDialog } from "../SettingDialog/SettingDialog"
 import { SignInDialog } from "../SignInDialog/SignInDialog"
 import { DeleteAccountDialog } from "../UserSettingsDialog/DeleteAccountDialog"
 import { UserSettingsDialog } from "../UserSettingsDialog/UserSettingsDialog"
@@ -60,16 +61,18 @@ export const RootView: FC = () => {
 
   return (
     <>
-      <DropZone>
-        <Column {...keyboardShortcutProps} tabIndex={0}>
-          <Navigation />
-          <Container>
-            <Routes />
-            <TransportPanel />
-            <BuildInfo />
-          </Container>
-        </Column>
-      </DropZone>
+      <EditMenuChildrenProvider>
+        <DropZone>
+          <Column {...keyboardShortcutProps} tabIndex={0}>
+            <Navigation />
+            <Container>
+              <Routes />
+              <TransportPanel />
+              <BuildInfo />
+            </Container>
+          </Column>
+        </DropZone>
+      </EditMenuChildrenProvider>
       <HelpDialog />
       <ExportProgressDialog />
       <Head />

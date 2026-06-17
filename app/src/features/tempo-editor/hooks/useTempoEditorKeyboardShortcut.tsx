@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from "react"
+import { useKeyboardShortcut } from "../../../hooks/useKeyboardShortcut"
 import {
   useCopyTempoSelection,
   useCutTempoSelection,
   useDeleteTempoSelection,
   useDuplicateTempoSelection,
   usePasteTempoSelection,
-} from "../../../actions/tempo"
-import { useKeyboardShortcut } from "../../../hooks/useKeyboardShortcut"
+} from "./tempo"
 import { useTempoEditor } from "./useTempoEditor"
 
 export const useTempoEditorKeyboardShortcut = () => {

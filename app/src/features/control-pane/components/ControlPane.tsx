@@ -10,6 +10,7 @@ import {
   isEqualControlMode,
 } from "../entities/ControlMode"
 import { useControlPane } from "../hooks/useControlPane"
+import { useControlPaneGlobalKeyboardShortcut } from "../hooks/useControlPaneGlobalKeyboardShortcut"
 import { useControlPaneKeyboardShortcut } from "../hooks/useControlPaneKeyboardShortcut"
 import { ControlName } from "./ControlName"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
@@ -142,6 +143,8 @@ const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
 
   const onFocus = useCallback(() => setActivePane("control"), [setActivePane])
   const onBlur = useCallback(() => setActivePane(null), [setActivePane])
+
+  useControlPaneGlobalKeyboardShortcut()
 
   const controlSize = {
     width: containerSize.width - axisWidth - BORDER_WIDTH,

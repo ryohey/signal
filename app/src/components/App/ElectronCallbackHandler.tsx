@@ -10,25 +10,10 @@ import { FC } from "react"
 import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 import { useSetSong } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
-import {
-  useCopySelectionGlobal,
-  useCutSelectionGlobal,
-  usePasteSelectionGlobal,
-} from "../../actions/hotkey"
-import {
-  useDeleteSelection,
-  useDuplicateSelection,
-  useQuantizeSelectedNotes,
-  useSelectAllNotes,
-  useSelectNextNote,
-  useSelectPreviousNote,
-  useTransposeSelection,
-} from "../../features/piano-roll/hooks/selection"
-import { usePianoRoll } from "../../features/piano-roll/hooks/usePianoRoll"
+import { useCloudFile } from "../../features/cloud-file/hooks/useCloudFile"
+import { useExport } from "../../features/export/hooks/useExport"
 import { auth } from "../.././firebase/firebase"
 import { useAuth } from "../../hooks/useAuth"
-import { useCloudFile } from "../../hooks/useCloudFile"
-import { useExport } from "../../hooks/useExport"
 import { useHistory } from "../../hooks/useHistory"
 import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
@@ -40,21 +25,10 @@ export const ElectronCallbackHandler: FC = () => {
   const { isSaved, filepath, getSong, setSaved, setFilepath } = useSong()
   const { isLoggedIn } = useAuth()
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
-  const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
   const localized = useLocalization()
   const localSongFile = useSongFile()
   const cloudSongFile = useCloudFile()
   const toast = useToast()
-  const cutSelectionGlobal = useCutSelectionGlobal()
-  const copySelectionGlobal = useCopySelectionGlobal()
-  const pasteSelectionGlobal = usePasteSelectionGlobal()
-  const deleteSelection = useDeleteSelection()
-  const duplicateSelection = useDuplicateSelection()
-  const selectAllNotes = useSelectAllNotes()
-  const selectNextNote = useSelectNextNote()
-  const selectPreviousNote = useSelectPreviousNote()
-  const quantizeSelectedNotes = useQuantizeSelectedNotes()
-  const transposeSelection = useTransposeSelection()
   const { undo, redo } = useHistory()
   const setSong = useSetSong()
   const { exportSong } = useExport()
@@ -155,23 +129,19 @@ export const ElectronCallbackHandler: FC = () => {
       }}
       onUndo={undo}
       onRedo={redo}
-      onCut={cutSelectionGlobal}
-      onCopy={copySelectionGlobal}
-      onPaste={pasteSelectionGlobal}
-      onDuplicate={duplicateSelection}
-      onDelete={deleteSelection}
-      onSelectAll={selectAllNotes}
-      onSelectNextNote={selectNextNote}
-      onSelectPreviousNote={selectPreviousNote}
-      onTransposeUpOctave={() => transposeSelection(12)}
-      onTransposeDownOctave={() => transposeSelection(-12)}
-      onTranspose={() => {
-        setOpenTransposeDialog(true)
-      }}
-      onQuantize={quantizeSelectedNotes}
-      onVelocity={() => {
-        setOpenVelocityDialog(true)
-      }}
+      onCut={() => {}}
+      onCopy={() => {}}
+      onPaste={() => {}}
+      onDuplicate={() => {}}
+      onDelete={() => {}}
+      onSelectAll={() => {}}
+      onSelectNextNote={() => {}}
+      onSelectPreviousNote={() => {}}
+      onTransposeUpOctave={() => {}}
+      onTransposeDownOctave={() => {}}
+      onTranspose={() => {}}
+      onQuantize={() => {}}
+      onVelocity={() => {}}
       onOpenSetting={() => {
         setOpenSettingDialog(true)
       }}

@@ -6,10 +6,10 @@ import {
   useStop,
   useToggleRecording,
 } from "../../../actions"
-import { useCanRecord } from "../../../hooks/useMIDIDevice"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
 import { useStores } from "../../../hooks/useStores"
+import { useCanRecord } from "../../midi-device/hooks/useMIDIDevice"
 
 export function useTransportPanel() {
   const { synthGroup, midiRecorder } = useStores()

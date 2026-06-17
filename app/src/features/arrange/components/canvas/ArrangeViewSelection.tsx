@@ -48,7 +48,7 @@ export const ArrangeViewSelection = ({ zIndex }: { zIndex: number }) => {
 
   return (
     <>
-      <Selection rect={selectionRect} zIndex={zIndex} />
+      <Selection rect={selectionRect} zIndex={zIndex} isActive={true} />
       <HitArea
         bounds={selectionRect}
         zIndex={zIndex}

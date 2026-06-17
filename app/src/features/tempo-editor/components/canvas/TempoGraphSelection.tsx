@@ -20,5 +20,5 @@ export const TempoGraphSelection: FC<TempoGraphSelectionProps> = ({
     [selection, transform],
   )
 
-  return <Selection rect={selectionRect} zIndex={zIndex} />
+  return <Selection rect={selectionRect} zIndex={zIndex} isActive={true} />
 }

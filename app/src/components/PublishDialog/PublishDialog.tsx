@@ -12,7 +12,10 @@ import {
 import { useToast } from "dialog-hooks"
 import OpenInNewIcon from "mdi-react/OpenInNewIcon"
 import { FC, useCallback, useEffect, useState } from "react"
-import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
+import {
+  usePublishSong,
+  useUnpublishSong,
+} from "../../features/cloud-file/hooks/cloudSong"
 import { useRootView } from "../../hooks/useRootView"
 import { useSong } from "../../hooks/useSong"
 import { Localized, useLocalization } from "../../localize/useLocalization"

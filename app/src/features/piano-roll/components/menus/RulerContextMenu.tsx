@@ -8,19 +8,22 @@ import React, { FC, useCallback, useState } from "react"
 import { useAddTimeSignature } from "../../../../actions"
 import { useConductorTrack } from "../../../../hooks/useConductorTrack"
 import { usePlayer } from "../../../../hooks/usePlayer"
-import { useRuler } from "../../../../hooks/useRuler"
 import { envString } from "../../../../localize/envString"
 import { Localized } from "../../../../localize/useLocalization"
 import { TimeSignatureDialog } from "../dialogs/TimeSignatureDialog"
 
 export interface RulerContextMenuProps extends ContextMenuProps {
   tick: number
+  selectedTimeSignatureEventIds: Set<number>
 }
 
-const _RulerContextMenu: FC<RulerContextMenuProps> = ({ tick, ...props }) => {
+const _RulerContextMenu: FC<RulerContextMenuProps> = ({
+  tick,
+  selectedTimeSignatureEventIds,
+  ...props
+}) => {
   const { handleClose } = props
   const { setLoopBegin, setLoopEnd } = usePlayer()
-  const { selectedTimeSignatureEventIds } = useRuler()
   const { removeEvents } = useConductorTrack()
   const addTimeSignature = useAddTimeSignature()
   const [isOpenTimeSignatureDialog, setOpenTimeSignatureDialog] =

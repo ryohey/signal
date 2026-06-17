@@ -3,10 +3,10 @@ import { Positioned } from "@signal-app/ui"
 import { FC } from "react"
 import { Layout } from "../../../Constants"
 import { useKeyScroll } from "../hooks/useKeyScroll"
-import CanvasPianoRuler from "./CanvasPianoRuler"
 import { PianoRollCanvas } from "./canvas/PianoRollCanvas"
 import { InstrumentLane } from "./InstrumentLane"
 import { PianoKeys } from "./PianoKeys"
+import CanvasPianoRuler from "./PianoRuler"
 
 export interface PianoRollStageProps {
   width: number

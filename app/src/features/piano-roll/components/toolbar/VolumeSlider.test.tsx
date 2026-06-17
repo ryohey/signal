@@ -5,7 +5,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 import { VolumeSlider } from "./VolumeSlider"
 
 const setTrackVolumeMock = vi.fn()
-vi.mock("../../../../hooks/useVolumeSlider", () => ({
+vi.mock("../../hooks/useVolumeSlider", () => ({
   useVolumeSlider: vi.fn(() => ({
     value: 42,
     setValue: setTrackVolumeMock,

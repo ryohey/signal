@@ -1,10 +1,14 @@
+import { Beat } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { createScope, ScopeProvider } from "jotai-scope"
 import { Store } from "jotai/vanilla/store"
+import { createScope, ScopeProvider } from "jotai-scope"
 import { useEffect } from "react"
-import { BeatWithX } from "../entities/beat/BeatWithX"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
+
+export type BeatWithX = Beat & {
+  readonly x: number
+}
 
 export const createBeatsScope = (parentStore: Store) =>
   createScope({
@@ -19,22 +23,20 @@ export function BeatsProvider({
   scope: Store
   children: React.ReactNode
 }) {
-  const { scrollLeft, transform, canvasWidth } = useTickScroll()
+  const { transform, tickRange } = useTickScroll()
   const { measures, timebase } = useSong()
-
   const setBeats = useSetAtom(beatsAtom, { store: scope })
 
-  // update beats when scrollLeft, transform, canvasWidth, measures, or timebase changes
+  // update beats when scroll, measures changed
   useEffect(() => {
-    const beats = BeatWithX.createInRange(
-      measures,
-      transform,
-      timebase,
-      scrollLeft,
-      canvasWidth,
+    const beats = Beat.createInRange(measures, timebase, tickRange).map(
+      (b) => ({
+        ...b,
+        x: Math.round(transform.getX(b.tick)),
+      }),
     )
     setBeats(beats)
-  }, [scrollLeft, transform, canvasWidth, measures, timebase, setBeats])
+  }, [transform, tickRange, measures, timebase, setBeats])
 
   return <ScopeProvider scope={scope}>{children}</ScopeProvider>
 }

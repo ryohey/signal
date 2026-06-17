@@ -1,10 +1,4 @@
-import {
-  emptySong,
-  emptyTrack,
-  Song,
-  TrackId,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
+import { emptySong, Song, TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
 import {
@@ -124,16 +118,6 @@ export const useOpenSong = () => {
     },
     [setSong, onUserExplicitAction],
   )
-}
-
-export const useAddTrack = () => {
-  const { pushHistory } = useHistory()
-  const commands = useCommands()
-
-  return useCallback(() => {
-    pushHistory()
-    commands.song.addNewTrack()
-  }, [pushHistory, commands])
 }
 
 export const useRemoveTrack = () => {

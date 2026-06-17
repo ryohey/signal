@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import Add from "mdi-react/AddIcon"
 import { FC } from "react"
-import { useAddTrack } from "../../../actions"
 import { Localized } from "../../../localize/useLocalization"
+import { useTrackList } from "../hooks/useTrackList"
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ const Label = styled.div`
 `
 
 export const AddTrackButton: FC = () => {
-  const addTrack = useAddTrack()
+  const { addTrack } = useTrackList()
 
   return (
     <Wrapper onClick={addTrack}>

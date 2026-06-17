@@ -1,7 +1,7 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
 import React, { FC, useCallback, useMemo } from "react"
-import { useSettings } from "../../../../hooks/useSettings"
 import { useTrack } from "../../../../hooks/useTrack"
+import { useSettings } from "../../../setting/hooks/useSettings"
 import { useAddNoteToSelectionGesture } from "../../gestures/useAddNoteToSelectionGesture"
 import {
   useDragNoteCenterGesture,

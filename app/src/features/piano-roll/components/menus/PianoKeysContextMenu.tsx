@@ -1,8 +1,8 @@
 import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import { FC, useState } from "react"
-import { KeySignatureDialog } from "../../../../components/KeySignatureDialog/KeySignatureDialog"
 import { Localized } from "../../../../localize/useLocalization"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { KeySignatureDialog } from "../dialogs/KeySignatureDialog"
 
 export const PianoKeysContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props

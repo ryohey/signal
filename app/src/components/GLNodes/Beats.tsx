@@ -3,14 +3,13 @@ import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
 import { FC, useMemo } from "react"
-import { BeatWithX } from "../../entities/beat/BeatWithX"
 import { colorToVec4 } from "../../gl/color"
 import { LegacyBeats } from "./legacy/LegacyBeats"
 import { VerticalLines } from "./VerticalLines"
 
 export interface BeatsProps {
   height: number
-  beats: BeatWithX[]
+  beats: { x: number; beat: number }[]
   zIndex: number
 }
 

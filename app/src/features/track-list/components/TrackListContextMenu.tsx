@@ -2,10 +2,11 @@ import { TrackId } from "@signal-app/core"
 import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import Color from "color"
 import { FC, useCallback, useState } from "react"
-import { useAddTrack, useRemoveTrack } from "../../../actions"
+import { useRemoveTrack } from "../../../actions"
 import { ColorPicker } from "../../../components/ColorPicker/ColorPicker"
 import { useTrack } from "../../../hooks/useTrack"
 import { Localized } from "../../../localize/useLocalization"
+import { useTrackList } from "../hooks/useTrackList"
 import { TrackDialog } from "./TrackDialog"
 
 export interface TrackListContextMenuProps extends ContextMenuProps {
@@ -17,7 +18,7 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
   ...props
 }) => {
   const { setColor } = useTrack(trackId)
-  const addTrack = useAddTrack()
+  const { addTrack } = useTrackList()
   const removeTrack = useRemoveTrack()
 
   const { handleClose } = props

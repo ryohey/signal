@@ -1,9 +1,7 @@
 import styled from "@emotion/styled"
-import { DEFAULT_TEMPO } from "@signal-app/player"
 import { FC } from "react"
 import { NumberInput } from "../../../components/inputs/NumberInput"
-import { useConductorTrack } from "../../../hooks/useConductorTrack"
-import { usePlayer } from "../../../hooks/usePlayer"
+import { useTempoForm } from "../hooks/useTempoForm"
 
 const TempoInput = styled(NumberInput)`
   background: transparent;
@@ -44,14 +42,7 @@ const TempoWrapper = styled.div`
 `
 
 export const TempoForm: FC = () => {
-  const { position, setCurrentTempo } = usePlayer()
-  const { currentTempo, setTempo } = useConductorTrack()
-  const tempo = currentTempo ?? DEFAULT_TEMPO
-
-  const changeTempo = (tempo: number) => {
-    setTempo(tempo, position)
-    setCurrentTempo(tempo)
-  }
+  const { tempo, changeTempo } = useTempoForm()
 
   return (
     <TempoWrapper>

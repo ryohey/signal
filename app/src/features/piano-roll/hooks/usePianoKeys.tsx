@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from "react"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
-import { useMidiInputNoteNumbers } from "../../../hooks/usePreviewNoteNumbers"
 import { useStores } from "../../../hooks/useStores"
 import { useTrack } from "../../../hooks/useTrack"
 import { useKeyScroll } from "./useKeyScroll"
 import { usePianoRoll } from "./usePianoRoll"
+import { useMidiInputNoteNumbers } from "./usePreviewNoteNumbers"
 
 export function usePianoKeys() {
   const { keySignature, previewingNoteNumbers, selectedTrackId } =

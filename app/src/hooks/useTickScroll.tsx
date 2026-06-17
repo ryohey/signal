@@ -94,6 +94,9 @@ export function useTickScroll(store = useStore()) {
     get contentWidth() {
       return useAtomValue(contentWidthAtom, { store })
     },
+    get tickRange() {
+      return useAtomValue(tickRangeAtom, { store })
+    },
     getTick: useSetAtom(getTickAtom, { store }),
     setCanvasWidth: useSetAtom(canvasWidthAtom, { store }),
     setScrollLeftInPixels: useSetAtom(setScrollLeftInPixelsAtom, { store }),
@@ -130,6 +133,14 @@ const contentWidthAtom = atom((get) => {
   const widthTick = transform.getTick(canvasWidth)
   const endTick = startTick + widthTick
   return transform.getX(Math.max(trackEndTick, endTick))
+})
+export const tickRangeAtom = atom((get) => {
+  const transform = get(transformAtom)
+  const scrollLeft = get(scrollLeftAtom)
+  const canvasWidth = get(canvasWidthAtom)
+  const startTick = transform.getTick(scrollLeft)
+  const endTick = transform.getTick(scrollLeft + canvasWidth)
+  return [startTick, endTick] as const
 })
 
 // actions
