@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Commands
 
-- `npm start` - Start development server (runs turbo dev in parallel for app and static)
-- `npm run build` - Build the entire project (app and static site)
+- `npm start` - Start development tasks via Turbo (`turbo run dev --parallel`)
+- `npm run build` - Build app artifacts for distribution (`npm run build:app`)
 - `npm test` - Run tests across all packages using turbo
-- `npm run lint` - Run linting with Biome across all packages
-- `npm run format` - Format code with Biome across all packages
-- `npm run check` - Run linting and formatting check with Biome
+- `npm run lint` - Run lint tasks via Turbo
+- `npm run format` - Run format tasks via Turbo
+- `npm run check` - Run check tasks via Turbo
 
 ### App-specific Commands
 
@@ -21,6 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint -w app` - Run Biome linting for the app
 - `npm run format -w app` - Format app code with Biome
 - `npm run check -w app` - Run Biome checks for the app
+- `npm run typecheck -w app` - Run TypeScript type-check for app
 
 ### Electron Commands
 
@@ -42,18 +43,22 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 **Main Application (`/app`)**
 
-- React application using MobX for state management
+- React application using Jotai for app/feature-side state
 - WebGL-based rendering for performance-critical UI components (piano roll, arrange view)
 - Web Audio API integration for MIDI playback and audio synthesis
-- Modular store architecture with reactive patterns
+- Feature-oriented architecture with hooks/scopes and reactive bridges to core
 
-**Core Stores (MobX-based):**
+**Core Domain (`/packages/core`):**
 
-- `RootStore` - Central store managing audio context, synthesizers, and MIDI I/O
-- `SongStore` - Song data and track management
-- `PianoRollStore` - Piano roll editor state
-- `ArrangeViewStore` - Arrange view state and selections
-- `ControlStore` - Control pane for automation data
+- MobX is used internally in core domain models/stores
+- Core does not expose MobX internals directly to app UI
+- App synchronization is done via `useSyncExternalStore`-compatible subscriptions
+
+Representative core modules:
+
+- `SongStore` - Current song lifecycle and change notifications
+- Command services - Song/arrange/control mutation orchestration
+- MIDI/device services and repositories
 
 **Key Views:**
 
@@ -68,7 +73,8 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - `@signal-app/api` - Firebase/Cloud integration for song storage
 - `@signal-app/community` - Community features and song sharing
 - `dialog-hooks` - React hooks for modal dialogs
-- `firebaseui-web-react` - Firebase authentication components
+- `@signal-app/firebaseui-web-react` - Firebase authentication UI wrapper
+- `@signal-app/ui` - Shared design-system-like UI components
 
 **Electron Application (`/electron`)**
 
@@ -76,9 +82,7 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - File system access for local MIDI files
 - Native OS integration (menus, file associations)
 
-**Static Site (`/static`)**
-
-- Marketing/landing page built with Next.js
+Note: The static website project has been moved to a separate repository and is not part of this workspace.
 
 ### Data Architecture
 
@@ -97,10 +101,11 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 ### Technology Stack
 
-- **Frontend:** React 18, TypeScript, MobX, Emotion CSS-in-JS
+- **Frontend:** React 19, TypeScript, Jotai, Emotion CSS-in-JS
+- **Core State Engine:** MobX (internal to `@signal-app/core`)
 - **Audio:** Web Audio API, SoundFont synthesis, WebMIDI API
 - **Graphics:** WebGL for performance-critical rendering
-- **Build:** Vite, Turbo (monorepo), ESLint, Prettier
+- **Build/Quality:** Vite, Turbo (monorepo), Biome
 - **Desktop:** Electron with Forge
 - **Cloud:** Firebase (auth, storage), Vercel (hosting)
 
@@ -111,4 +116,31 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - Domain entities in `/entities` (geometry, beats, selections, transforms)
 - WebGL shaders and rendering code in `/gl` and component-specific shader directories
 
+### Rendering and Performance Policy
+
+This codebase is highly performance-sensitive. Minimize React re-renders and avoid broad prop drilling for high-churn editor data.
+
+Preferred pattern:
+
+- Leaf components fetch required data via focused hooks.
+- Parent components pass only structural/static props when possible.
+- Use memoized derived data and targeted subscriptions.
+
+Example pattern:
+
+- Prefer `<Notes zIndex={2} />` where `Notes` internally uses `useNotes()`
+- Avoid `<Notes notes={...} selectedNoteIds={...} zIndex={2} />` when it causes wider invalidation and render fan-out
+
+Relevant files:
+
+- `app/src/features/piano-roll/components/canvas/Notes.tsx`
+- `app/src/features/piano-roll/hooks/useNotes.tsx`
+
 The application emphasizes real-time performance for audio and UI, using WebGL acceleration for intensive graphics operations and optimized audio scheduling for glitch-free playback.
+
+## Documentation Map
+
+- `ARCHITECTURE.md` - Current architecture overview and global policies
+- `app/README.md` - App workspace structure and state boundary policy
+- `app/src/features/*/README.md` - Feature-level architecture details
+- `packages/*/README.md` - Package-specific design and API notes

@@ -1,50 +1,50 @@
 # @signal-app/player
 
-The `@signal-app/player` package provides comprehensive control over the playback and stopping of MIDI events, with sound output powered by [SpessaSynth](https://github.com/spessasus/spessasynth_core) ( `spessasynth_core` and `spessasynth_lib`). 
-These packages are designed to handle precise scheduling and playback of MIDI events, making it ideal for applications that require accurate timing and sound synthesis.
+## Purpose
 
-## Introduction
+Provides MIDI event scheduling and playback components for Signal.
 
-The `@signal-app/player` package is designed to manage MIDI event playback and control sound output using the SpessaSynth's `WorkletSynthesizer`. It includes two main classes:
+## Responsibilities
 
-- **EventScheduler**: Handles the scheduling of MIDI events with lookahead functionality to ensure accurate timing.
-- **Player**: Manages playback state, controls MIDI events, and outputs sound through the SpessaSynth synthesizer.
+- Schedule MIDI events with stable timing.
+- Manage playback lifecycle and loop behavior.
+- Drive sound output through synthesizer adapters.
 
-## Overview
+## Representative Classes and APIs
 
-### EventScheduler
+- `Player`
+  - Core playback controller with `play`, `stop`, `reset`, `position`, loop controls, and channel-wide panic helpers (`allSoundsOff`).
+  - Emits subscribe-style observables (`onPositionChanged`, `onIsPlayingChanged`, `onLoopChanged`) through a MobX adapter.
+- `EventScheduler<E>`
+  - Look-ahead scheduler converting tick windows to timestamped events.
+  - Supports loop boundary stitching and loop-end cleanup event injection.
+- `SoundFontSynth`
+  - `SynthOutput` implementation backed by `WorkletSynthesizer`.
+  - Handles channel events plus SysEx buffering and dispatch.
+- `renderAudio(...)`
+  - Offline rendering pipeline using `OfflineAudioContext` and SpessaSynth worklet.
+  - Reports progress and supports cancellation.
+- `SoundFont`
+  - Loads/parses SF2/SF3 data and exposes drum-kit preset/sample metadata.
 
-The `EventScheduler` class is responsible for reading and scheduling chronological events. It uses a lookahead mechanism to ensure events are scheduled accurately, even during high-load scenarios.
+## Core Concepts
 
-#### Key Responsibilities
+- EventScheduler: Reads and schedules chronological events.
+- Player: Controls playback state and emits events to synth backends.
 
-- Reading events within a specified tick range.
-- Converting time in milliseconds to MIDI ticks based on the tempo.
-- Managing the current scheduling position and seeking to specific ticks.
+## Boundary Rules
 
-### Player
+- Keep transport and playback concerns isolated from app UI.
+- Expose typed APIs suitable for both app and tooling use.
 
-The `Player` class is responsible for controlling the playback and stopping of MIDI events. It outputs sound using the SpessaSynth synthesizer and manages various playback states.
+## Architecture Notes
 
-#### Key Responsibilities
+- Uses event-source abstraction (`IEventSource`) so timeline/event retrieval is provided by consumers.
+- Uses `SynthOutput` abstraction so output backend can vary (realtime synth, offline render target, etc.).
+- Relies on millisecond tick conversion and throttled position sync to balance precision and UI update cost.
 
-- Starting and stopping playback.
-- Managing loop settings.
-- Ensuring precise event scheduling and sound output.
-- Muting and controlling individual tracks.
+## Libraries and External Factors
 
-## Key Features
-
-- **Accurate Scheduling**: Ensures precise timing of MIDI events using the `EventScheduler`.
-- **Comprehensive Playback Control**: Start, stop, and manage playback with the `Player` class.
-- **Sound Output**: Utilizes SpessaSynth for high-quality SoundFont/DLS-based output.
-- **Loop Support**: Supports looping sections of MIDI events.
-- **Track Muting**: Allows for individual track muting to control playback of specific MIDI tracks.
-
-## Getting Started
-
-1. **Setup**: Initialize the `EventScheduler` and `Player` with the necessary configurations and dependencies.
-2. **Playback Control**: Use the `Player` class to manage playback, including starting, stopping, and seeking within MIDI events.
-3. **Event Handling**: Implement custom logic for handling MIDI events as needed for your application.
-
-For detailed examples and API documentation, refer to the source code and inline comments within the package.
+- Dependencies: `spessasynth_core`, `spessasynth_lib`.
+- Peer dependencies: `midifile-ts`, `mobx`, `lodash`.
+- Requires Web Audio APIs (AudioContext/OfflineAudioContext + AudioWorklet); autoplay policies and browser support can affect startup timing.

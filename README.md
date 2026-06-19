@@ -7,6 +7,10 @@
 
 <img width="1024" alt="image" src="https://github.com/user-attachments/assets/0c64ff3d-b095-4359-ab77-9355e04a8bee" />
 
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for repository architecture and design policies.
+
 ## Launch
 
 https://signalmidi.app/edit
@@ -60,13 +64,14 @@ By setting these constraints, signal aims to offer a streamlined and distraction
 2. The application should now be running on [http://localhost:3000](http://localhost:3000).
 
 ### Running via Docker
-> [!NOTE] 
+
+> [!NOTE]
 > with docker, `npm install` and `npm run build` will not be necessary, and you will only need to install **docker**, then **clone the repository**, then run the command specified below.
 
 1. to run via docker, run:
    ```sh
    docker compose up
-   # or 
+   # or
    docker compose up -d
    ```
 2. The application should now be accessible on [http://localhost:3000](http://localhost:3000).
@@ -90,4 +95,5 @@ As the creator of signal, I, [@ryohey](https://github.com/ryohey), welcome any f
 Your engagement, big or small, contributes greatly to the development of signal. Thank you for being a part of this journey, and I'm eager to see the impact of your contributions on this application.
 
 ## License
+
 MIT. See [LICENSE](/LICENSE)
