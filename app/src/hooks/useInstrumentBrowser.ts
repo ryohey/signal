@@ -75,7 +75,6 @@ export function useInstrumentBrowser(
           return [0]
         }
         return range(0, 127, 8)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [setting.isRhythmTrack])
     },
     get categoryInstruments() {
@@ -85,7 +84,6 @@ export function useInstrumentBrowser(
         }
         const offset = selectedCategoryIndex * 8
         return range(offset, offset + 8)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [selectedCategoryIndex, setting.isRhythmTrack])
     },
     changeInstrument: useCallback(

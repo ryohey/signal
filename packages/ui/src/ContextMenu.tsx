@@ -66,7 +66,6 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     return () => {
       document.removeEventListener("keydown", onKeyDown)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, handleClose])
 
   if (!isOpen) {

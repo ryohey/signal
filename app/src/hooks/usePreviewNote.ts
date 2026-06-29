@@ -39,7 +39,9 @@ export function usePreviewNote() {
 
   const previewNoteOn = useCallback(
     (noteNumber: number = 64, duration?: number) => {
-      if (channel === undefined) return
+      if (channel === undefined) {
+        return
+      }
 
       // stop current note immediately if playing
       previewNoteOff()

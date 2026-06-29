@@ -19,6 +19,7 @@ export function addDeltaTime<T extends TickProvider>(
         ...e,
         deltaTime: Math.round(e.tick) - Math.round(prevTick),
       }
+      // biome-ignore lint/suspicious/noExplicitAny: ignore
       delete (newEvent as any).tick
       prevTick = e.tick
       return newEvent

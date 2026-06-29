@@ -91,9 +91,9 @@ export const CloudFileList = () => {
   const theme = useTheme()
   const localized = useLocalization()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     loadFiles()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onClickSong = async (song: CloudSong) => {

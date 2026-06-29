@@ -75,9 +75,9 @@ export const SelectBox = <T,>({
 
   return (
     <Select onKeyDown={onKeyDown} tabIndex={0}>
-      {items.map((item, i) => (
+      {items.map((item) => (
         <Option
-          key={i}
+          key={String(item.value)}
           checked={item.value === selectedValue}
           onClick={() => onChange(item.value)}
         >

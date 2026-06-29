@@ -116,6 +116,7 @@ export const useCopySelection = () => {
       .filter(isNoteEvent)
 
     const startTick =
+      // biome-ignore lint/style/noNonNullAssertion: selectedNotes is not empty
       selection?.fromTick ?? min(selectedNotes.map((note) => note.tick))!
 
     // 選択されたノートをコピー

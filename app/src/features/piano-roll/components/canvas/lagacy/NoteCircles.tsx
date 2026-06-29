@@ -20,6 +20,7 @@ export const NoteCircles: FC<NoteCirclesProps> = ({
 
   return (
     <GLNode
+      // biome-ignore lint/suspicious/noExplicitAny: not used in WebGL2 disabled environment
       shader={null as any}
       shaderFallback={DrumNoteShader}
       uniforms={{ projectionMatrix, strokeColor }}

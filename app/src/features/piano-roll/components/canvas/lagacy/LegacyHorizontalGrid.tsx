@@ -25,6 +25,7 @@ export const LegacyHorizontalGrid: FC<LegacyHorizontalGridProps> = ({
 
   return (
     <GLNode
+      // biome-ignore lint/suspicious/noExplicitAny: not used in WebGL2 disabled environment
       shader={null as any}
       shaderFallback={HorizontalGridShader}
       uniforms={{

@@ -1,4 +1,4 @@
-import { autorun, toJS } from "mobx"
+import { autorun } from "mobx"
 import { Observable } from "./observable"
 
 export function mobxToObservable<Key extends string>(

@@ -29,7 +29,7 @@ const ChannelSelect: FC<{
   return (
     <Select
       value={channel}
-      onChange={(e) => onChange(parseInt(e.target.value as string))}
+      onChange={(e) => onChange(parseInt(e.target.value as string, 10))}
     >
       {range(0, 16).map((v) => (
         <option key={v} value={v.toString()}>
@@ -57,13 +57,13 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   const [_name, _setName] = useState(name)
   const [_channel, _setChannel] = useState(channel)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     if (!open) {
       return
     }
     _setName(name)
     _setChannel(channel)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackId, open])
 
   return (

@@ -1,7 +1,7 @@
 import { min } from "lodash"
 import { transaction } from "mobx"
 import { ControlEventsClipboardData } from "../entities/clipboard/clipboardTypes"
-import { Track, TrackId } from "../entities/track/Track"
+import { Track } from "../entities/track/Track"
 import { isNotUndefined } from "../helpers"
 import type { ISongStore } from "./interfaces"
 import { createBindTrack } from "./TrackCommandService"

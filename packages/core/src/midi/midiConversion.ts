@@ -40,7 +40,7 @@ const tracksFromFormat0Events = (events: AnyEvent[]): Track[] => {
   const tracks: Track[] = []
   for (const channel of Object.keys(eventsPerChannel)) {
     const events = eventsPerChannel[channel]
-    const ch = parseInt(channel)
+    const ch = parseInt(channel, 10)
     while (tracks.length <= ch) {
       const track = new Track()
       track.channel = ch > 0 ? ch - 1 : undefined

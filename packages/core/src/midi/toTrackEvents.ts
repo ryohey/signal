@@ -24,7 +24,8 @@ export function addTick<T extends DeltaTimeProvider>(
   })
 }
 
-export const removeUnnecessaryProps = <T>(e: T): T => {
+const removeUnnecessaryProps = <T>(e: T): T => {
+  // biome-ignore lint/suspicious/noExplicitAny: we should correctly type this function in the future
   const { channel, ...ev } = e as any
   return ev
 }

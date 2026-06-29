@@ -9,21 +9,18 @@ import {
 import { Rect } from "../../../../../entities/geometry/Rect"
 
 class HorizontalGridBuffer {
-  private gl: WebGLRenderingContext
-
   readonly buffers: {
     position: WebGLBuffer
   }
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl
+  constructor(private readonly gl: WebGLRenderingContext) {
     this.buffers = {
-      position: gl.createBuffer()!,
+      position: gl.createBuffer(),
     }
   }
 
   update(rect: Rect) {
-    const { gl } = this
+    const gl = this.gl
     const positions = rectToTriangles(rect)
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.DYNAMIC_DRAW)

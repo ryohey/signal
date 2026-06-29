@@ -49,8 +49,7 @@ const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
       setNumerator(initialNumerator)
       setDenominator(initialDenominator)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }, [open, initialDenominator, initialNumerator])
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -70,7 +69,7 @@ const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
             type="number"
             min={1}
             max={32}
-            onChange={(e) => setNumerator(parseInt(e.target.value))}
+            onChange={(e) => setNumerator(parseInt(e.target.value, 10))}
             onBlur={() => setNumerator(Math.max(1, Math.min(32, numerator)))}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
@@ -94,7 +93,9 @@ const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
               minWidth: "5em",
             }}
             value={denominator.toString()}
-            onChange={(e) => setDenominator(parseInt(e.target.value as string))}
+            onChange={(e) =>
+              setDenominator(parseInt(e.target.value as string, 10))
+            }
           >
             {range(0, 6)
               .map((v) => 2 ** v)
@@ -115,7 +116,7 @@ const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
             onClickOK({ numerator, denominator })
             onClose()
           }}
-          disabled={isNaN(numerator) && numerator <= 32 && numerator > 0}
+          disabled={Number.isNaN(numerator) && numerator <= 32 && numerator > 0}
         >
           <Localized name="ok" />
         </PrimaryButton>

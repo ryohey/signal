@@ -1,11 +1,11 @@
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
-import { VelocityTransform } from "../../../entities/transform/VelocityTransform"
 import { usePianoRoll } from "../../../features/piano-roll/hooks/usePianoRoll"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useCommands } from "../../../hooks/useCommands"
 import { useTickScroll } from "../../../hooks/useTickScroll"
+import { VelocityTransform } from "../entities/VelocityTransform"
 
 export const useVelocityPaintGesture = ({
   velocityTransform,

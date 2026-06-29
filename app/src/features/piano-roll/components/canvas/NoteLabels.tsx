@@ -17,6 +17,7 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
   const [texture, setTexture] = useState<WebGLTexture | null>(null)
   const projectionMatrix = useTransform()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     const gl = renderer.gl
 
@@ -34,7 +35,6 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
         gl.deleteTexture(texture)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [renderer.gl])
 
   const theme = useTheme()

@@ -92,7 +92,7 @@ export const saveFile = async (song: Song) => {
 }
 
 export const saveFileAs = async (song: Song) => {
-  let fileHandle
+  let fileHandle: FileSystemFileHandle | null = null
   try {
     fileHandle = await window.showSaveFilePicker({
       types: [
@@ -112,6 +112,9 @@ export const saveFileAs = async (song: Song) => {
     return
   }
   try {
+    if (fileHandle === null) {
+      return
+    }
     const data = songToMidi(song).buffer as ArrayBuffer
     await writeFile(fileHandle, data)
     song.fileHandle = fileHandle

@@ -1,5 +1,5 @@
-import { Point } from "../geometry/Point"
-import { TickTransform } from "./TickTransform"
+import { Point } from "../../../entities/geometry/Point"
+import { TickTransform } from "../../../entities/transform/TickTransform"
 import { TrackTransform } from "./TrackTransform"
 
 export class ArrangeCoordTransform {

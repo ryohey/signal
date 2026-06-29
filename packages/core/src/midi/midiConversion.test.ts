@@ -19,7 +19,7 @@ import {
 // id for each event will not be serialized in midi file
 // we change ids sorted by order in events array
 const reassignIDs = (track: Track) => {
-  track.events.forEach((e, i) => {
+  track.events.forEach((_e, i) => {
     track.events[i].id = i
   })
 }

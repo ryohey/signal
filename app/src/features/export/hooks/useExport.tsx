@@ -73,7 +73,7 @@ const useExportSong = () => {
     try {
       const audioBuffer = await renderAudio(
         soundFontData,
-        getSong().allEvents as any,
+        getSong().allEvents,
         timebase,
         sampleRate,
         {
@@ -89,7 +89,7 @@ const useExportSong = () => {
       const encoder = getEncoder(format)
       const audioData = await encoder.encode(audioBuffer)
 
-      const blob = new Blob([audioData as any], { type: encoder.mimeType })
+      const blob = new Blob([audioData as BlobPart], { type: encoder.mimeType })
       setOpenDialog(false)
       downloadBlob(blob, "song." + encoder.ext)
     } catch (e) {

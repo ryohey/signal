@@ -65,7 +65,9 @@ export const InstrumentMark: FC<{
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (e.button !== 0) return
+      if (e.button !== 0) {
+        return
+      }
       e.stopPropagation()
 
       const startTick = event.tick

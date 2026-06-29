@@ -13,6 +13,7 @@ export interface Props {
   // disableAutoSignIn().
   uiCallback?(ui: firebaseui.auth.AuthUI): void
   // The Firebase App auth instance to use.
+  // biome-ignore lint/suspicious/noExplicitAny: ignore
   firebaseAuth: any // As firebaseui-web
   className?: string
   style?: React.CSSProperties
@@ -28,6 +29,7 @@ export const FirebaseAuthUI = ({
   const [userSignedIn, setUserSignedIn] = useState(false)
   const elementRef = useRef(null)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     // Get or Create a firebaseUI instance.
     const firebaseUiWidget =

@@ -104,6 +104,7 @@ export const OnInit: FC = () => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     ;(async () => {
       await init()
@@ -111,7 +112,6 @@ export const OnInit: FC = () => {
       await loadArgumentFileIfNeeded()
       await checkAutoSave()
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

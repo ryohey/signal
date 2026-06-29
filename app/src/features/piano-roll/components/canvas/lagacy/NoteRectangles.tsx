@@ -19,6 +19,7 @@ export const NoteRectangles: FC<NoteRectanglesProps> = ({
 
   return (
     <GLNode
+      // biome-ignore lint/suspicious/noExplicitAny: not used in WebGL2 disabled environment
       shader={null as any}
       shaderFallback={NoteShader}
       uniforms={{ projectionMatrix, strokeColor }}

@@ -5,8 +5,8 @@ import { clamp } from "lodash"
 import { createContext, useContext, useEffect, useMemo } from "react"
 import { Layout } from "../../../Constants"
 import { BAR_WIDTH } from "../../../components/inputs/ScrollBar"
-import { TrackTransform } from "../../../entities/transform/TrackTransform"
 import { useSong } from "../../../hooks/useSong"
+import { TrackTransform } from "../entities/TrackTransform"
 
 const DEFAULT_TRACK_HEIGHT = 64
 const SCALE_Y_MIN = 0.5

@@ -38,12 +38,15 @@ export class NoteLabelBuffer
   }
 
   update(rects: (Rect & INoteLabelData)[]) {
-    if (this.bounds.length < rects.length * 4)
+    if (this.bounds.length < rects.length * 4) {
       this.bounds = new Float32Array(rects.length * 4)
-    if (this.noteNumbers.length < rects.length)
+    }
+    if (this.noteNumbers.length < rects.length) {
       this.noteNumbers = new Float32Array(rects.length)
-    if (this.state.length < rects.length * 2)
+    }
+    if (this.state.length < rects.length * 2) {
       this.state = new Float32Array(rects.length * 2)
+    }
 
     for (let i = 0; i < rects.length; i++) {
       const r = rects[i]

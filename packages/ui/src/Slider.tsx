@@ -84,6 +84,7 @@ export const Slider: FC<SliderProps> = ({
       <StyledRange />
       {marks?.map((value, index) => (
         <Mark
+          // biome-ignore lint/suspicious/noArrayIndexKey: Using index as key is acceptable here since marks are static and do not change order
           key={index}
           style={{
             left: `${(value / (props.max ?? 100)) * 100}%`,

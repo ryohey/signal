@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["webmidi"],
+    "types": ["webmidi", "node"],
     "sourceMap": true,
     "declaration": true,
     "target": "esnext",

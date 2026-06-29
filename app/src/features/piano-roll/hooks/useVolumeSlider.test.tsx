@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: ignore in test */
 import { SongStore } from "@signal-app/core"
 import { act, renderHook } from "@testing-library/react"
 import { ReactNode } from "react"

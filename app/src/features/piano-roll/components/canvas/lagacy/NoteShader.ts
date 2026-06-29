@@ -13,8 +13,6 @@ export interface IColorData {
 }
 
 export class NoteBuffer {
-  private gl: WebGLRenderingContext
-
   readonly buffers: {
     position: WebGLBuffer
     bounds: WebGLBuffer
@@ -23,17 +21,16 @@ export class NoteBuffer {
 
   private _vertexCount: number = 0
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl
+  constructor(private readonly gl: WebGLRenderingContext) {
     this.buffers = {
-      position: gl.createBuffer()!,
-      bounds: gl.createBuffer()!,
-      color: gl.createBuffer()!,
+      position: gl.createBuffer(),
+      bounds: gl.createBuffer(),
+      color: gl.createBuffer(),
     }
   }
 
   update(rects: (Rect & IColorData)[]) {
-    const { gl } = this
+    const gl = this.gl
     const positions = rects.flatMap(rectToTriangles)
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.DYNAMIC_DRAW)

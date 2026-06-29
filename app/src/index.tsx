@@ -9,7 +9,13 @@ Sentry.init({
   tracesSampleRate: 1.0,
 })
 
-const root = createRoot(document.querySelector("#root")!)
+const rootElement = document.querySelector("#root")
+
+if (rootElement === null) {
+  throw new Error("Root element '#root' was not found")
+}
+
+const root = createRoot(rootElement)
 root.render(<App />)
 
 if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {

@@ -16,11 +16,6 @@ const BetaLabel = styled.span`
   color: var(--color-text-secondary);
 `
 
-const Description = styled.div`
-  margin: 1rem 0 2rem 0;
-  line-height: 1.5;
-`
-
 export interface SignInDialogContentProps {
   open: boolean
   onClose: () => void

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import { ArrangeCoordTransform } from "../../../entities/transform/ArrangeCoordTransform"
+import { ArrangeCoordTransform } from "../entities/ArrangeCoordTransform"
 import { useArrangeTickScroll, useArrangeTrackScroll } from "./useArrangeView"
 
 export function useArrangeTransform() {
