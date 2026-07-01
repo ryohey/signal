@@ -1,10 +1,8 @@
+import { type Observable, ObservableValue } from "@signal-app/observable"
 import range from "lodash/range.js"
 import throttle from "lodash/throttle.js"
 import { AnyEvent, MIDIControlEvents } from "midifile-ts"
-import { computed, makeObservable, observable } from "mobx"
 import { EventScheduler } from "./EventScheduler.js"
-import { mobxToObservable } from "./helpers/mobxToObservable.js"
-import { Observable } from "./helpers/observable.js"
 import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js";
 import { PlayerEvent } from "./PlayerEvent.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
@@ -31,12 +29,12 @@ export class Player {
   private scheduler: EventScheduler<PlayerEvent> | null = null
   private interval: number | null = null
 
-  private _currentTempo = DEFAULT_TEMPO
-  private _currentTick = 0
-  private _isPlaying = false
+  private readonly _currentTempo = new ObservableValue(DEFAULT_TEMPO)
+  private readonly _currentTick = new ObservableValue(0)
+  private readonly _isPlaying = new ObservableValue(false)
+  private readonly _loop = new ObservableValue<LoopSetting | null>(null)
 
   disableSeek: boolean = false
-  loop: LoopSetting | null = null
 
   readonly onPositionChanged: Observable
   readonly onIsPlayingChanged: Observable
@@ -46,17 +44,9 @@ export class Player {
     private readonly output: SynthOutput,
     private readonly eventSource: IEventSource,
   ) {
-    makeObservable<Player, "_currentTick" | "_isPlaying">(this, {
-      _currentTick: observable,
-      _isPlaying: observable,
-      loop: observable,
-      position: computed,
-      isPlaying: computed,
-    })
-
-    this.onPositionChanged = mobxToObservable(this, "position")
-    this.onIsPlayingChanged = mobxToObservable(this, "isPlaying")
-    this.onLoopChanged = mobxToObservable(this, "loop")
+    this.onPositionChanged = this._currentTick.onChanged
+    this.onIsPlayingChanged = this._isPlaying.onChanged
+    this.onLoopChanged = this._loop.onChanged
   }
 
   play = () => {
@@ -67,11 +57,11 @@ export class Player {
     this.scheduler = new EventScheduler<PlayerEvent>(
       (startTick, endTick) => this.eventSource.getEvents(startTick, endTick),
       () => this.allNotesOffEvents(),
-      this._currentTick,
+      this._currentTick.value,
       this.eventSource.timebase,
       TIMER_INTERVAL + LOOK_AHEAD_TIME,
     )
-    this._isPlaying = true
+    this._isPlaying.set(true)
     this.output.activate()
     this.interval = window.setInterval(() => this._onTimer(), TIMER_INTERVAL)
     this.output.activate()
@@ -88,7 +78,7 @@ export class Player {
     if (this.scheduler) {
       this.scheduler.seek(tick)
     }
-    this._currentTick = tick
+    this._currentTick.set(tick)
 
     if (this.isPlaying) {
       this.allSoundsOff()
@@ -98,11 +88,19 @@ export class Player {
   }
 
   get position() {
-    return this._currentTick
+    return this._currentTick.value
   }
 
   get isPlaying() {
-    return this._isPlaying
+    return this._isPlaying.value
+  }
+
+  get loop(): LoopSetting | null {
+    return this._loop.value
+  }
+
+  set loop(value: LoopSetting | null) {
+    this._loop.set(value)
   }
 
   get numberOfChannels() {
@@ -164,7 +162,7 @@ export class Player {
   stop = () => {
     this.scheduler = null
     this.allSoundsOff()
-    this._isPlaying = false
+    this._isPlaying.set(false)
 
     if (this.interval !== null) {
       clearInterval(this.interval)
@@ -175,7 +173,7 @@ export class Player {
   reset = () => {
     this.resetControllers()
     this.stop()
-    this._currentTick = 0
+    this._currentTick.set(0)
   }
 
   /*
@@ -184,18 +182,18 @@ export class Player {
    and send them to the synthesizer
   */
   sendCurrentStateEvents = () => {
-    this.eventSource.getCurrentStateEvents(this._currentTick).forEach((e) => {
+    this.eventSource.getCurrentStateEvents(this._currentTick.value).forEach((e) => {
       this.applyPlayerEvent(e)
       this.sendEvent(e)
     })
   }
 
   get currentTempo() {
-    return this._currentTempo
+    return this._currentTempo.value
   }
 
   set currentTempo(value: number) {
-    this._currentTempo = value
+    this._currentTempo.set(value)
   }
 
   // delayTime: seconds, timestampNow: milliseconds
@@ -210,7 +208,7 @@ export class Player {
 
   private syncPosition = throttle(() => {
     if (this.scheduler !== null) {
-      this._currentTick = this.scheduler.scheduledTick
+      this._currentTick.set(this.scheduler.scheduledTick)
     }
   }, 50)
 
@@ -220,7 +218,7 @@ export class Player {
     if (e.type !== "channel" && "subtype" in e) {
       switch (e.subtype) {
         case "setTempo":
-          this._currentTempo = 60000000 / e.microsecondsPerBeat
+          this._currentTempo.set(60000000 / e.microsecondsPerBeat)
           break
         default:
           break
@@ -236,7 +234,10 @@ export class Player {
     const timestamp = performance.now()
 
     this.scheduler.loop = this.loop?.enabled ? this.loop : null
-    const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
+    const events = this.scheduler.readNextEvents(
+      this._currentTempo.value,
+      timestamp,
+    )
 
     events.forEach(({ event: e, timestamp: time }) => {
       if (

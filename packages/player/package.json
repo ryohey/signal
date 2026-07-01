@@ -17,14 +17,14 @@
   "license": "MIT",
   "peerDependencies": {
     "lodash": "^4.17.21",
-    "midifile-ts": "1.5.2",
-    "mobx": "6.15.3"
+    "midifile-ts": "1.5.2"
   },
   "devDependencies": {
     "typescript": "6.0.3",
     "vitest": "4.1.5"
   },
   "dependencies": {
+    "@signal-app/observable": "*",
     "spessasynth_core": "latest",
     "spessasynth_lib": "latest"
   }
