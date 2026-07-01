@@ -34,6 +34,9 @@
   },
   "homepage": "https://github.com/ryohey/signal/",
   "private": true,
+  "engines": {
+    "node": ">=24 <25"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
     "@testing-library/dom": "^10.4.1",
