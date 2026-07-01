@@ -6,8 +6,10 @@ import {
   Unsubscribe,
 } from "@signal-app/observable"
 import { TimeSignatureEvent } from "midifile-ts"
-import { createModelSchema, object, primitive } from "serializr"
-import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
+import {
+  deserializeTickOrderedArray,
+  TickOrderedArray,
+} from "../../data/OrdererdArray/TickOrderedArray"
 import { Branded } from "../../types"
 import {
   isNoteEvent,
@@ -25,9 +27,16 @@ import { TrackEvents } from "./TrackEvents"
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
 
+type SerializedTrack = {
+  id?: TrackId
+  _events?: unknown
+  channel?: number
+  endOfTrack?: number
+}
+
 export class Track {
   private readonly _id = new ObservableValue<TrackId>(UNASSIGNED_TRACK_ID)
-  private readonly _events = new TickOrderedArray<TrackEvent>()
+  private _events = new TickOrderedArray<TrackEvent>()
   private _eventsSnapshot: TrackEvent[] = []
   private readonly _name = new ObservableValue<string | undefined>(undefined)
   private readonly _color = new ObservableValue<
@@ -311,11 +320,26 @@ export class Track {
     track.addEvents(this.events.map((e) => ({ ...e })))
     return track
   }
-}
 
-createModelSchema(Track, {
-  id: primitive(),
-  _events: object(TickOrderedArray),
-  channel: primitive(),
-  endOfTrack: primitive(),
-})
+  serialize() {
+    return {
+      id: this.id,
+      _events: this._events.serialize(),
+      channel: this.channel,
+      endOfTrack: this.endOfTrack,
+    }
+  }
+
+  static deserialize(json: unknown): Track {
+    const serialized = (json ?? {}) as SerializedTrack
+    const track = new Track()
+    track._events = deserializeTickOrderedArray(
+      serialized._events ?? {},
+    ) as unknown as TickOrderedArray<TrackEvent>
+    track.id = serialized.id ?? UNASSIGNED_TRACK_ID
+    track.channel = serialized.channel
+    track.endOfTrack = serialized.endOfTrack ?? 0
+    track.afterDeserialize()
+    return track
+  }
+}

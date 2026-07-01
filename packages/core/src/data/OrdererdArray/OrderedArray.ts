@@ -1,6 +1,16 @@
 import { Emitter } from "@signal-app/observable"
-import { createModelSchema, list, mapAsArray, primitive } from "serializr"
-import { pojo } from "../pojo"
+
+export type DeserializedOrderedItem = {
+  id: number
+  rowIndex?: number
+  [key: string]: unknown
+}
+
+export type SerializedOrderedArray<T> = {
+  array?: T[]
+  descending?: boolean
+  lookupMap?: T[]
+}
 
 /**
  * A class that efficiently maintains array order using a key extractor
@@ -189,10 +199,24 @@ export class OrderedArray<
       return this.descending ? -comparison : comparison
     })
   }
+
+  serialize(): SerializedOrderedArray<T> {
+    return {
+      array: this.array,
+      descending: this.descending,
+      lookupMap: Array.from(this.lookupMap.values()),
+    }
+  }
 }
 
-createModelSchema(OrderedArray, {
-  array: list(pojo),
-  descending: primitive(),
-  lookupMap: mapAsArray(pojo, "id"),
-})
+export function deserializeOrderedArray(
+  json: unknown,
+): OrderedArray<DeserializedOrderedItem, number> {
+  const serialized = json as SerializedOrderedArray<DeserializedOrderedItem>
+  const source = [...(serialized.lookupMap ?? serialized.array ?? [])]
+  return new OrderedArray<DeserializedOrderedItem, number>(
+    source,
+    (item) => item.rowIndex as number,
+    serialized.descending ?? false,
+  )
+}

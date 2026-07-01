@@ -1,7 +1,6 @@
 import * as fs from "fs"
 import * as path from "path"
-import { deserialize, serialize } from "serializr"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { songFromMidi, songToMidi, timeSignatureMidiEvent } from "../../midi"
 import { toTrackEvents } from "../../midi/toTrackEvents"
 import { emptyTrack } from "../track"
@@ -43,10 +42,46 @@ describe("Song", () => {
   it("should be serializable", () => {
     const song = emptySong()
     song.filepath = "abc"
-    const x = serialize(song)
-    const s = deserialize(Song, x)
+    const x = song.serialize()
+    const s = Song.deserialize(x)
     expect(s.filepath).toBe("abc")
     expect(s.tracks.length).toBe(song.tracks.length)
+  })
+
+  it("should deserialize from its own serialized POJO", () => {
+    const song = emptySong()
+    song.filepath = "abc"
+    song.name = "test"
+
+    const restored = Song.deserialize(song.serialize())
+
+    expect(restored.serialize()).toStrictEqual(song.serialize())
+  })
+
+  it("should serialize to a POJO", () => {
+    const song = emptySong()
+    song.filepath = "abc"
+    song.name = "test"
+
+    const serialized = song.serialize()
+
+    expect(serialized).toMatchObject({
+      tracks: song.tracks.map((track) => track.serialize()),
+      name: "test",
+      filepath: "abc",
+      timebase: song.timebase,
+      isSaved: song.isSaved,
+    })
+    expect(serialized.lastTrackId).toBeGreaterThanOrEqual(song.tracks.length)
+  })
+
+  it("should use Track.serialize when serializing song", () => {
+    const song = emptySong()
+    const spy = vi.spyOn(song.tracks[0], "serialize")
+
+    song.serialize()
+
+    expect(spy).toHaveBeenCalled()
   })
 
   it("should assign id to track", () => {

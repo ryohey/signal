@@ -22,8 +22,7 @@
   },
   "dependencies": {
     "@signal-app/observable": "*",
-    "lodash": "^4.17.23",
-    "serializr": "^3.0.5"
+    "lodash": "^4.17.23"
   },
   "peerDependencies": {
     "midifile-ts": "^1.5.1",
