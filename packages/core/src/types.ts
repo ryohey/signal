@@ -3,5 +3,3 @@ export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
   : never
 
 export type Branded<T, U> = T & { __brand: U }
-
-export type Unsubscribe = () => void

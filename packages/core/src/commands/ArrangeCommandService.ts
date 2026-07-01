@@ -1,5 +1,4 @@
 import { mapValues } from "lodash"
-import { transaction } from "mobx"
 import {
   ArrangeNotesClipboardData,
   Range,
@@ -17,6 +16,17 @@ import {
   transposeNotes,
 } from "./TrackCommandService"
 
+const runTrackTransaction = <T>(tracks: readonly Track[], fn: () => T): T => {
+  const runInAllTracks = (index: number): T => {
+    if (index >= tracks.length) {
+      return fn()
+    }
+    return tracks[index].transaction(() => runInAllTracks(index + 1))
+  }
+
+  return runInAllTracks(0)
+}
+
 // returns moved event ids
 const moveEventsBetweenTracks =
   (tracks: readonly Track[]) =>
@@ -24,7 +34,7 @@ const moveEventsBetweenTracks =
     eventIdForTrackIndex: { [trackIndex: number]: number[] },
     delta: ArrangePoint,
   ) => {
-    return transaction(() => {
+    return runTrackTransaction(tracks, () => {
       const updates = []
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
         eventIdForTrackIndex,
@@ -71,7 +81,7 @@ const batchUpdateNotesVelocity =
   (tracks: readonly Track[]) =>
   (selection: ArrangeSelection, operation: BatchUpdateOperation) => {
     const eventIdForTrackIndex = getEventsInSelection(tracks)(selection)
-    transaction(() => {
+    runTrackTransaction(tracks, () => {
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
         eventIdForTrackIndex,
       )) {
@@ -91,7 +101,7 @@ const duplicateSelection =
     const deltaTick = selection.toTick - selection.fromTick
     const selectedEventIds = getEventsInSelection(tracks)(selection)
 
-    transaction(() => {
+    runTrackTransaction(tracks, () => {
       for (const [trackIndexStr, eventIds] of Object.entries(
         selectedEventIds,
       )) {
@@ -121,7 +131,7 @@ const duplicateSelection =
 const deleteSelection =
   (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
     const selectedEventIds = getEventsInSelection(tracks)(selection)
-    transaction(() => {
+    runTrackTransaction(tracks, () => {
       for (const trackIndex in selectedEventIds) {
         tracks[trackIndex].removeEvents(selectedEventIds[trackIndex])
       }
@@ -133,7 +143,7 @@ const transposeSelection =
   (selection: ArrangeSelection, deltaPitch: number) => {
     const selectedEventIds = getEventsInSelection(tracks)(selection)
 
-    transaction(() => {
+    runTrackTransaction(tracks, () => {
       for (const trackIndexStr in selectedEventIds) {
         const trackIndex = parseInt(trackIndexStr, 10)
         const eventIds = selectedEventIds[trackIndex]
@@ -175,7 +185,7 @@ const pasteClipboardDataAt =
     position: number,
     selectedTrackIndex: number,
   ) => {
-    transaction(() => {
+    runTrackTransaction(tracks, () => {
       for (const trackIndex in data.notes) {
         const notes = data.notes[trackIndex].map((note) => ({
           ...note,

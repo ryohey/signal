@@ -49,6 +49,7 @@
     "@signal-app/community": "*",
     "@signal-app/core": "*",
     "@signal-app/firebaseui-web-react": "*",
+    "@signal-app/observable": "*",
     "@signal-app/player": "*",
     "@signal-app/ui": "*",
     "color": "^5.0.3",

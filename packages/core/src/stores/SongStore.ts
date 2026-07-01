@@ -1,6 +1,5 @@
+import { Emitter, Observable } from "@signal-app/observable"
 import { emptySong } from "../entities"
-import { Emitter } from "../helpers/emitter"
-import { Observable } from "../helpers/observable"
 
 export class SongStore {
   _song = emptySong()

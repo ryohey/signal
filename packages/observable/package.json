@@ -1,7 +1,7 @@
 {
-  "name": "@signal-app/core",
+  "name": "@signal-app/observable",
   "version": "0.1.0",
-  "description": "Signal music domain core entities and logic",
+  "description": "Observable primitives for Signal packages",
   "type": "module",
   "scripts": {
     "test": "vitest run",
@@ -16,17 +16,7 @@
     }
   },
   "devDependencies": {
-    "@types/webmidi": "2.1.0",
     "typescript": "6.0.3",
     "vitest": "4.1.5"
-  },
-  "dependencies": {
-    "@signal-app/observable": "*",
-    "lodash": "^4.17.23",
-    "serializr": "^3.0.5"
-  },
-  "peerDependencies": {
-    "midifile-ts": "^1.5.1",
-    "zod": "^3.24.4"
   }
 }

@@ -1,5 +1,4 @@
 import { min } from "lodash"
-import { transaction } from "mobx"
 import { ControlEventsClipboardData } from "../entities/clipboard/clipboardTypes"
 import { Track } from "../entities/track/Track"
 import { isNotUndefined } from "../helpers"
@@ -37,7 +36,7 @@ const pasteClipboardDataAtPosition =
       ...e,
       tick: e.tick + position,
     }))
-    transaction(() => events.forEach((e) => track.createOrUpdate(e)))
+    track.transaction(() => events.forEach((e) => track.createOrUpdate(e)))
   }
 
 export function createControlCommandService(songStore: ISongStore) {

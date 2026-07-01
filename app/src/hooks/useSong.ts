@@ -28,12 +28,6 @@ export const useSong = () => {
         useCallback(() => song.measures, [song]),
       )
     },
-    get timeSignatures() {
-      return useSyncExternalStore(
-        song.onTimeSignaturesChanged.subscribe,
-        useCallback(() => song.timeSignatures, [song]),
-      )
-    },
     get tracks() {
       return useSyncExternalStore(
         song.onTracksChanged.subscribe,

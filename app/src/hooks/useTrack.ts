@@ -12,6 +12,7 @@ import { useSong } from "./useSong"
 import { useTrackMute } from "./useTrackMute"
 
 const noop = () => () => {}
+const emptyArray: never[] = []
 
 export function useTrack(id: TrackId) {
   const { tracks } = useSong()
@@ -56,11 +57,11 @@ export function useTrack(id: TrackId) {
     get events() {
       return useSyncExternalStore(
         track?.onEventsChanged.subscribe ?? noop,
-        useCallback(() => track?.getEventsSnapshot() ?? [], [track]),
+        useCallback(() => track?.getEventsSnapshot() ?? emptyArray, [track]),
       )
     },
     getEvents() {
-      return track?.events ?? []
+      return track?.events ?? emptyArray
     },
     get color() {
       return useSyncExternalStore(

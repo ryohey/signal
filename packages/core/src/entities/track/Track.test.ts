@@ -1,5 +1,6 @@
 import { deserialize, serialize } from "serializr"
 import { describe, expect, it } from "vitest"
+import { getPan, getVolume } from "./selector"
 import { Track } from "./Track"
 import { NoteEvent } from "./TrackEvent"
 import { emptyTrack } from "./TrackFactory"
@@ -120,15 +121,15 @@ describe("Track", () => {
   })
   it("should update pan after setPan", () => {
     const track = emptyTrack(1)
-    expect(track.getPan(1)).toBe(64)
+    expect(getPan(track.events, 1)).toBe(64)
     track.setPan(100, 1)
-    expect(track.getPan(1)).toBe(100)
+    expect(getPan(track.events, 1)).toBe(100)
   })
   it("should update volume after setVolume", () => {
     const track = emptyTrack(1)
-    expect(track.getVolume(1)).toBe(100)
+    expect(getVolume(track.events, 1)).toBe(100)
     track.setVolume(50, 1)
-    expect(track.getVolume(1)).toBe(50)
+    expect(getVolume(track.events, 1)).toBe(50)
   })
   it("should update color after setColor", () => {
     const track = emptyTrack(1)
@@ -145,5 +146,45 @@ describe("Track", () => {
       blue: 92,
       alpha: 1,
     })
+  })
+
+  it("should notify channel and track type changes", () => {
+    const track = new Track()
+    let channelChanges = 0
+    let conductorChanges = 0
+    let rhythmChanges = 0
+
+    track.onChannelChanged.subscribe(() => channelChanges++)
+    track.onIsConductorTrackChanged.subscribe(() => conductorChanges++)
+    track.onIsRhythmTrackChanged.subscribe(() => rhythmChanges++)
+
+    track.channel = 1
+    track.channel = 9
+    track.channel = 9
+    track.channel = undefined
+
+    expect(channelChanges).toBe(3)
+    expect(conductorChanges).toBe(2)
+    expect(rhythmChanges).toBe(2)
+  })
+
+  it("should notify onChanged for non-derived state changes", () => {
+    const track = new Track()
+    let changes = 0
+
+    track.onChanged.subscribe(() => changes++)
+
+    track.id = 1 as Track["id"]
+    track.channel = 1
+    track.addEvent<NoteEvent>({
+      type: "channel",
+      subtype: "note",
+      duration: 120,
+      tick: 123,
+      velocity: 100,
+      noteNumber: 100,
+    })
+
+    expect(changes).toBe(3)
   })
 })

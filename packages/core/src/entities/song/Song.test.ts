@@ -1,9 +1,16 @@
-import { emptyTrack } from "@signal-app/core"
 import * as fs from "fs"
 import * as path from "path"
 import { deserialize, serialize } from "serializr"
 import { describe, expect, it } from "vitest"
-import { songFromMidi } from "../../midi"
+import { songFromMidi, songToMidi, timeSignatureMidiEvent } from "../../midi"
+import { toTrackEvents } from "../../midi/toTrackEvents"
+import { emptyTrack } from "../track"
+import {
+  getPan,
+  getProgramNumberEvent,
+  getTempo,
+  getVolume,
+} from "../track/selector"
 import { Song } from "./Song"
 import { emptySong } from "./SongFactory"
 
@@ -27,10 +34,10 @@ describe("Song", () => {
     expect(tracks[3].channel).toBe(1)
     expect(tracks[17].channel).toBe(15)
 
-    expect(tracks[0].getTempo(240)).toBe(128)
-    expect(tracks[2].getVolume(193)).toBe(100)
-    expect(tracks[2].getPan(192)).toBe(1)
-    expect(tracks[2].getProgramNumber(189)).toBe(29)
+    expect(getTempo(tracks[0].events, 240)).toBe(128)
+    expect(getVolume(tracks[2].events, 193)).toBe(100)
+    expect(getPan(tracks[2].events, 192)).toBe(1)
+    expect(getProgramNumberEvent(tracks[2].events, 189)?.value).toBe(29)
   })
 
   it("should be serializable", () => {
@@ -53,5 +60,62 @@ describe("Song", () => {
     song.removeTrack(song.tracks[1].id)
     song.addTrack(emptyTrack(8))
     expect(song.tracks[2].id).toBe(3)
+  })
+
+  it("should restore measures when opening midi", () => {
+    const song = emptySong()
+    song.timebase = 960
+    song.conductorTrack?.addEvents(
+      toTrackEvents([timeSignatureMidiEvent(3840, 3, 4)]),
+    )
+
+    const reopenedSong = songFromMidi(songToMidi(song))
+
+    expect(reopenedSong.measures).toStrictEqual([
+      {
+        tick: 0,
+        measure: 0,
+        numerator: 4,
+        denominator: 4,
+      },
+      {
+        tick: 3840,
+        measure: 1,
+        numerator: 3,
+        denominator: 4,
+      },
+    ])
+  })
+
+  it("should notify endOfSong changes when track endOfTrack changes", () => {
+    const song = emptySong()
+    const notifications: number[] = []
+
+    song.onEndOfSongChanged.subscribe(() => {
+      notifications.push(song.endOfSong)
+    })
+
+    song.tracks[1].addEvents(
+      toTrackEvents([
+        {
+          type: "channel",
+          subtype: "noteOn",
+          channel: 0,
+          noteNumber: 60,
+          velocity: 100,
+          deltaTime: 0,
+        },
+        {
+          type: "channel",
+          subtype: "noteOff",
+          channel: 0,
+          noteNumber: 60,
+          velocity: 0,
+          deltaTime: 960,
+        },
+      ]),
+    )
+
+    expect(notifications.length).toBeGreaterThan(0)
   })
 })

@@ -4,7 +4,7 @@ import { useHydrateAtoms } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { useCallback, useMemo } from "react"
-import { useStores } from "./useStores"
+import { useSong } from "./useSong"
 
 export function QuantizerProvider({
   scope,
@@ -27,22 +27,18 @@ export const createQuantizerScope = (parentStore: Store) =>
   })
 
 function useQuantizeCalc(store: Store, fn: (tick: number) => number) {
-  const { songStore } = useStores()
+  const { measures, timebase } = useSong()
   const quantize = useAtomValue(quantizeAtom, { store })
 
   return useCallback(
     (tick: number) => {
-      const measureStart = Measure.getMeasureStart(
-        songStore.song.measures,
-        tick,
-        songStore.song.timebase,
-      )
+      const measureStart = Measure.getMeasureStart(measures, tick, timebase)
       const beats = quantize === 1 ? (measureStart.numerator ?? 4) : 4
-      const u = (songStore.song.timebase * beats) / quantize
+      const u = (timebase * beats) / quantize
       const offset = measureStart?.tick ?? 0
       return fn((tick - offset) / u) * u + offset
     },
-    [songStore, quantize, fn],
+    [timebase, measures, quantize, fn],
   )
 }
 
@@ -52,12 +48,9 @@ export function useQuantizer(store = useStore()) {
       return useAtomValue(quantizeAtom, { store })
     },
     get quantizeUnit() {
-      const { songStore } = useStores()
+      const { timebase } = useSong()
       const quantize = useAtomValue(quantizeAtom, { store })
-      return useMemo(
-        () => (songStore.song.timebase * 4) / quantize,
-        [songStore, quantize],
-      )
+      return useMemo(() => (timebase * 4) / quantize, [timebase, quantize])
     },
     get isQuantizeEnabled() {
       return useAtomValue(isEnabledAtom, { store })

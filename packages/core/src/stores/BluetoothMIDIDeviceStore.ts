@@ -1,33 +1,48 @@
-import { action, makeObservable, observable } from "mobx"
-import { makePersistable } from "mobx-persist-store"
+import { Observable, ObservableValue } from "@signal-app/observable"
 import { BLEMIDIDevice, MIDIMessageEvent } from "web-ble-midi"
-import { mobxToObservable } from "../helpers/mobxToObservable"
-import { Observable } from "../helpers/observable"
 import { MIDIInput } from "../services/MIDIInput"
 
-export class BluetoothMIDIDeviceStore {
-  inputs: BLEMIDIDevice[] = []
-  enabledInputs: { [deviceId: string]: boolean } = {}
+const STORAGE_KEY = "BluetoothMIDIDeviceStore"
 
-  readonly onInputsChanged: Observable
-  readonly onEnabledInputsChanged: Observable
+export class BluetoothMIDIDeviceStore {
+  private readonly _inputs = new ObservableValue<BLEMIDIDevice[]>([])
+  private readonly _enabledInputs = new ObservableValue<
+    Record<string, boolean>
+  >({})
 
   constructor(private readonly midiInput: MIDIInput) {
-    makeObservable(this, {
-      inputs: observable,
-      enabledInputs: observable,
-      setInputEnable: action,
-      registerDevice: action,
+    this._enabledInputs.set(loadEnabledInputs())
+    this._enabledInputs.onChanged.subscribe(() => {
+      this.persistEnabledInputs()
     })
+  }
 
-    makePersistable(this, {
-      name: "BluetoothMIDIDeviceStore",
-      properties: ["enabledInputs"],
-      storage: window.localStorage,
-    })
+  get inputs(): BLEMIDIDevice[] {
+    return this._inputs.value
+  }
 
-    this.onInputsChanged = mobxToObservable(this, "inputs")
-    this.onEnabledInputsChanged = mobxToObservable(this, "enabledInputs")
+  private set inputs(value: BLEMIDIDevice[]) {
+    this._inputs.set(value)
+  }
+
+  get onInputsChanged(): Observable {
+    return this._inputs.onChanged
+  }
+
+  get enabledInputs(): Record<string, boolean> {
+    return this._enabledInputs.value
+  }
+
+  private set enabledInputs(value: Record<string, boolean>) {
+    this._enabledInputs.set(value)
+  }
+
+  get onEnabledInputsChanged(): Observable {
+    return this._enabledInputs.onChanged
+  }
+
+  private persistEnabledInputs() {
+    saveEnabledInputs(this.enabledInputs)
   }
 
   async setInputEnable(deviceId: string, enabled: boolean) {
@@ -93,6 +108,26 @@ export class BluetoothMIDIDeviceStore {
         })
       }
     })
-    this.inputs.push(device)
+    this.inputs = [...this.inputs, device]
   }
+}
+
+function saveEnabledInputs(enabledInputs: Record<string, boolean>) {
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(enabledInputs))
+}
+
+function loadEnabledInputs(): Record<string, boolean> {
+  try {
+    const json = window.localStorage.getItem(STORAGE_KEY)
+    if (json === null) {
+      return {}
+    }
+    const value = JSON.parse(json)
+    if (value !== null && typeof value === "object") {
+      return value as Record<string, boolean>
+    }
+  } catch {
+    // Ignore invalid persisted data and fall back to defaults.
+  }
+  return {}
 }

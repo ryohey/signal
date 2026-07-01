@@ -1,6 +1,5 @@
 import { clamp, max, maxBy, min, minBy } from "lodash"
 import { AnyEvent } from "midifile-ts"
-import { transaction } from "mobx"
 import {
   isNoteEvent,
   NoteEvent,
@@ -71,7 +70,8 @@ export const duplicateEvents = (track: Track) => (eventIds: number[]) => {
     tick: note.tick + deltaTick,
   }))
 
-  return transaction(() => events.map((e) => track.createOrUpdate(e)))
+  return track
+    .transaction(() => events.map((e) => track.createOrUpdate(e)))
     .filter(isNotUndefined)
     .map((e) => e.id)
 }
@@ -139,7 +139,7 @@ const updateVelocitiesInRange =
 
     const events = notes.filter(isEventInRange(Range.create(minTick, maxTick)))
 
-    transaction(() => {
+    track.transaction(() => {
       track.updateEvents(
         events.map((e: TrackEvent) => ({
           id: e.id,
@@ -167,7 +167,7 @@ export const removeRedundantEventsForEventIds =
     const controllerEvents = track.events.filter((e: TrackEvent) =>
       eventIds.includes(e.id),
     )
-    transaction(() =>
+    track.transaction(() =>
       controllerEvents.forEach((e: TrackEvent) =>
         removeRedundantEvents(track)(e),
       ),
@@ -232,7 +232,7 @@ const updateEventsInRangeWithEasing =
           e.tick <= Math.max(maxTick, _endTick),
       )
 
-    transaction(() => {
+    track.transaction(() => {
       track.removeEvents(events.map((e) => e.id))
       const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(
         (tick) => ({
@@ -291,7 +291,7 @@ const updateEventsInRange =
         e.tick <= Math.max(maxTick, _endTick),
     )
 
-    transaction(() => {
+    track.transaction(() => {
       track.removeEvents(events.map((e) => e.id))
 
       const newEvents = closedRange(_startTick, _endTick, quantizeUnit).map(

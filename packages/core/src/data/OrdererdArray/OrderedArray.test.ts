@@ -299,4 +299,77 @@ describe("OrderedArray", () => {
     // Lookup should work
     expect(orderedArray.get(2)?.name).toBe("Bobby")
   })
+
+  test("should emit per-operation changes outside transaction", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+    orderedArray.remove(1)
+
+    expect(notifications).toEqual([
+      { added: [{ id: 4, rowIndex: 15, name: "Dave" }] },
+      { removed: [{ id: 1, rowIndex: 10, name: "Alice" }] },
+    ])
+  })
+
+  test("should emit a single aggregated change after transaction", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.transaction(() => {
+      orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+      orderedArray.remove(1)
+      orderedArray.update(2, { rowIndex: 5, name: "Bobby" })
+    })
+
+    expect(notifications.length).toBe(1)
+    expect(notifications[0]).toEqual({
+      removed: [
+        { id: 1, rowIndex: 10, name: "Alice" },
+        { id: 2, rowIndex: 20, name: "Bob" },
+      ],
+      added: [
+        { id: 4, rowIndex: 15, name: "Dave" },
+        { id: 2, rowIndex: 5, name: "Bobby" },
+      ],
+    })
+  })
+
+  test("should emit once after nested transactions", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.transaction(() => {
+      orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+      orderedArray.transaction(() => {
+        orderedArray.remove(3)
+      })
+    })
+
+    expect(notifications).toEqual([
+      {
+        removed: [{ id: 3, rowIndex: 30, name: "Charlie" }],
+        added: [{ id: 4, rowIndex: 15, name: "Dave" }],
+      },
+    ])
+  })
 })

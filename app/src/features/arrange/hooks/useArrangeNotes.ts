@@ -1,5 +1,7 @@
 import { isNoteEvent, NoteEvent, TrackId } from "@signal-app/core"
-import { useEffect, useMemo, useState } from "react"
+import { combineSubscription } from "@signal-app/observable"
+import { useCallback, useMemo } from "react"
+import { useDerivedValue } from "../../../hooks/useDerivedValue"
 import { useSong } from "../../../hooks/useSong"
 import { useArrangeNoteTransform } from "./useArrangeNoteTransform"
 import { useArrangeTransform } from "./useArrangeTransform"
@@ -18,11 +20,16 @@ export function useArrangeNotes() {
   const { trackTransform } = useArrangeTransform()
   const { transform } = useArrangeNoteTransform()
   const { tracks } = useSong()
-  const [events, setEvents] = useState<readonly ArrangeNote[]>([])
-
-  useEffect(() => {
-    const onChange = () => {
-      setEvents(
+  const events: ArrangeNote[] = useDerivedValue(
+    useMemo(
+      () =>
+        combineSubscription(
+          tracks.map((track) => track.onEventsChanged.subscribe),
+        ),
+      [tracks],
+    ),
+    useCallback(
+      () =>
         tracks.flatMap((track, index) =>
           track.events.filter(isNoteEvent).map((event) => ({
             tick: event.tick,
@@ -32,13 +39,9 @@ export function useArrangeNotes() {
             trackIndex: index,
           })),
         ),
-      )
-    }
-    const unsubscribes = tracks.map((track) =>
-      track.onEventsChanged.subscribe(onChange),
-    )
-    return () => unsubscribes.forEach((unsubscribe) => unsubscribe())
-  }, [tracks])
+      [tracks],
+    ),
+  )
 
   return useMemo(
     () =>

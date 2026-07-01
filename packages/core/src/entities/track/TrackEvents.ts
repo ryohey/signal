@@ -1,6 +1,5 @@
 import { isEqual, omit } from "lodash"
 import { ControllerEvent, SetTempoEvent, TrackNameEvent } from "midifile-ts"
-import { transaction } from "mobx"
 import { TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray"
 import { bpmToUSecPerBeat } from "../../helpers/bpm"
 import { setTempoMidiEvent, trackNameMidiEvent } from "../../midi/MidiEvent"
@@ -80,7 +79,7 @@ export namespace TrackEvents {
       const events = getRedundantEvents(newEvent)(anEvents.getArray())
 
       if (events.length > 0) {
-        transaction(() => {
+        anEvents.transaction(() => {
           events.forEach((e) => {
             updateEvent(e.id, { ...newEvent, id: e.id } as Partial<T>)(anEvents)
           })
