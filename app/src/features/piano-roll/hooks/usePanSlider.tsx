@@ -1,27 +1,23 @@
-import { getPan, panMidiEvent } from "@signal-app/core"
-import { useCallback, useState, useSyncExternalStore } from "react"
+import { getPan, isPanEvent, panMidiEvent, setPan } from "@signal-app/core"
+import { useCallback, useMemo, useState } from "react"
+import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
+import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
 import { useTrack } from "../../../hooks/useTrack"
 import { usePianoRoll } from "./usePianoRoll"
 
 const PAN_CENTER = 64
-const noop = () => () => {}
 
 export function usePanSlider() {
   const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { setPan, channel } = useTrack(trackId)
+  const { channel } = useTrack(trackId)
+  const mutateTrack = useMutateTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
-
-  const currentPan = useSyncExternalStore(
-    selectedTrack?.onEventsChanged.subscribe ?? noop,
-    useCallback(
-      () => getPan(selectedTrack?.events ?? [], position) ?? PAN_CENTER,
-      [selectedTrack, position],
-    ),
-  )
+  const query = useMemo(() => getPan(position), [position])
+  const currentPanEvent = useSyncTrackQuery(selectedTrack, query, isPanEvent)
 
   const setTrackPan = useCallback(
     (pan: number) => {
@@ -30,17 +26,17 @@ export function usePanSlider() {
         pushHistory()
       }
 
-      setPan(pan, position)
+      mutateTrack(setPan(pan, position))
 
       if (channel !== undefined) {
         sendEvent(panMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, setPan, position, sendEvent, channel, isDragging],
+    [pushHistory, mutateTrack, position, sendEvent, channel, isDragging],
   )
 
   return {
-    value: currentPan ?? PAN_CENTER,
+    value: currentPanEvent?.value ?? PAN_CENTER,
     setValue: setTrackPan,
     defaultValue: PAN_CENTER,
     onPointerDown: useCallback(() => {

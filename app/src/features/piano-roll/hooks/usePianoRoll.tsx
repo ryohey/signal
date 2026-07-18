@@ -236,7 +236,7 @@ export function usePianoRollQuantizer() {
 const mouseModeAtom = atom<"pencil" | "selection">("pencil")
 const selectedTrackIdAtom = atom<TrackId>(UNASSIGNED_TRACK_ID)
 const selectionAtom = atom<Selection | null>(null)
-const selectedNoteIdsAtom = atom<number[]>([])
+const selectedNoteIdsAtom = atom<readonly number[]>([])
 const lastNoteDurationAtom = atom<number | null>(null)
 const notGhostTrackIdsAtom = atom<ReadonlySet<TrackId>>(new Set<TrackId>())
 const newNoteVelocityAtom = atom<number>(100)
@@ -282,7 +282,7 @@ const restoreAtom = atom(
       selectedTrackId,
     }: {
       selection: Selection | null
-      selectedNoteIds: number[]
+      selectedNoteIds: readonly number[]
       selectedTrackId: TrackId
     },
   ) => {

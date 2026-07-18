@@ -1,4 +1,3 @@
-import { isNoteEvent } from "@signal-app/core"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
@@ -8,58 +7,53 @@ import { usePianoRoll } from "../hooks/usePianoRoll"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 const createUseDragNoteEdgeGesture =
-  (edge: "left" | "right" | "center") => (): MouseDownHandler<[number]> => {
+  (edge: "left" | "right" | "center") =>
+  (): MouseDownHandler<[{ id: number; noteNumber: number }]> => {
     const { selectedTrackId, selectedNoteIds, setLastNoteDuration } =
       usePianoRoll()
-    const { channel, getEventById } = useTrack(selectedTrackId)
+    const { channel } = useTrack(selectedTrackId)
     const selectNote = useSelectNote()
     const moveDraggableAction = useMoveDraggableGesture()
     const { previewNoteOn, previewNoteOff } = usePreviewNote()
 
     return useCallback(
-      (e, noteId) => {
+      (e, note) => {
         if (channel === undefined) {
           return
         }
 
-        const note = getEventById(noteId)
-        if (note === undefined || !isNoteEvent(note)) {
-          return
-        }
-
-        const isSelected = selectedNoteIds.includes(noteId)
+        const isSelected = selectedNoteIds.includes(note.id)
 
         if (!isSelected) {
-          selectNote(noteId)
+          selectNote(note.id)
         }
 
-        const newSelectedNoteIds = isSelected ? selectedNoteIds : [noteId]
+        const newSelectedNoteIds = isSelected ? selectedNoteIds : [note.id]
 
         previewNoteOn(note.noteNumber)
 
         moveDraggableAction(
           e,
-          { type: "note", position: edge, noteId },
+          { type: "note", position: edge, noteId: note.id },
           newSelectedNoteIds
-            .filter((id) => id !== noteId)
+            .filter((id) => id !== note.id)
             .map((noteId) => ({
               type: "note",
               position: edge,
               noteId,
             })),
           {
-            onChange(_e, { oldPosition, newPosition }) {
-              const newNote = getEventById(noteId)
-              if (newNote === undefined || !isNoteEvent(newNote)) {
-                return
-              }
+            onChange(_e, { oldPosition, newPosition, updatedNotes }) {
               // save last note duration
               if (oldPosition.tick !== newPosition.tick) {
-                setLastNoteDuration(newNote.duration)
+                const newNote = updatedNotes.find((n) => n.id === note.id)
+                if (newNote) {
+                  setLastNoteDuration(newNote.duration)
+                }
               }
               if (oldPosition.noteNumber !== newPosition.noteNumber) {
                 previewNoteOff()
-                previewNoteOn(newNote.noteNumber)
+                previewNoteOn(newPosition.noteNumber)
               }
             },
             onMouseUp() {
@@ -67,7 +61,7 @@ const createUseDragNoteEdgeGesture =
             },
             onClick(e) {
               if (!e.shiftKey) {
-                selectNote(noteId)
+                selectNote(note.id)
               }
             },
           },
@@ -75,7 +69,6 @@ const createUseDragNoteEdgeGesture =
       },
       [
         channel,
-        getEventById,
         selectedNoteIds,
         selectNote,
         previewNoteOn,

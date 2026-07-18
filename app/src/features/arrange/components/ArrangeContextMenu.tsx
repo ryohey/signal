@@ -1,3 +1,4 @@
+import { hasSelectionNotes as hasSelectionNotesCmd } from "@signal-app/core"
 import {
   ContextMenu,
   ContextMenuProps,
@@ -6,7 +7,7 @@ import {
   MenuItem,
 } from "@signal-app/ui"
 import { FC, useCallback, useMemo } from "react"
-import { useCommands } from "../../../hooks/useCommands"
+import { useTracksCommand } from "../../../hooks/useCommand"
 import { envString } from "../../../localize/envString"
 import { Localized } from "../../../localize/useLocalization"
 import {
@@ -20,9 +21,9 @@ import { useArrangeView } from "../hooks/useArrangeView"
 
 export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props
-  const commands = useCommands()
   const { selection, setOpenVelocityDialog, setOpenTransposeDialog } =
     useArrangeView()
+  const hasSelectionNotes = useTracksCommand(hasSelectionNotesCmd)
 
   const arrangeCopySelection = useArrangeCopySelection()
   const arrangeDeleteSelection = useArrangeDeleteSelection()
@@ -31,8 +32,8 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
   const arrangeTransposeSelection = useArrangeTransposeSelection()
 
   const isNoteSelected = useMemo(
-    () => selection !== null && commands.arrange.hasSelectionNotes(selection),
-    [selection, commands],
+    () => selection !== null && hasSelectionNotes(selection),
+    [selection, hasSelectionNotes],
   )
 
   const onClickVelocity = useCallback(() => {

@@ -9,17 +9,17 @@ export type PianoNotesClipboardData = z.infer<
   typeof PianoNotesClipboardDataSchema
 >
 
-export const ArrangeNotesClipboardDataSchema = z.object({
-  type: z.literal("arrange_notes"),
-  notes: z.record(
+export const ArrangeEventsClipboardDataSchema = z.object({
+  type: z.literal("arrange_events"),
+  events: z.record(
     z.union([z.number(), z.string()]).describe("trackIndex"),
     z.array(z.any().describe("TrackEvent")),
   ),
   selectedTrackIndex: z.number(),
 })
 
-export type ArrangeNotesClipboardData = z.infer<
-  typeof ArrangeNotesClipboardDataSchema
+export type ArrangeEventsClipboardData = z.infer<
+  typeof ArrangeEventsClipboardDataSchema
 >
 
 export const ControlEventsClipboardDataSchema = z.object({

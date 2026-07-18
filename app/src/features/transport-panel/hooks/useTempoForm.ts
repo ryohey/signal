@@ -1,6 +1,7 @@
-import { getTempo } from "@signal-app/core"
+import { getTempo, setTempo } from "@signal-app/core"
 import { DEFAULT_TEMPO } from "@signal-app/player"
 import { useCallback, useMemo, useSyncExternalStore } from "react"
+import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
 
@@ -9,6 +10,7 @@ const noop = () => () => {}
 export function useTempoForm() {
   const { conductorTrack } = useSong()
   const { position, setCurrentTempo } = usePlayer()
+  const mutateConductorTrack = useMutateConductorTrack()
 
   return {
     get tempo() {
@@ -27,10 +29,10 @@ export function useTempoForm() {
     },
     changeTempo: useCallback(
       (bpm: number) => {
-        conductorTrack?.setTempo(bpm, position)
+        mutateConductorTrack(setTempo(bpm, position))
         setCurrentTempo(bpm)
       },
-      [conductorTrack, position, setCurrentTempo],
+      [mutateConductorTrack, position, setCurrentTempo],
     ),
   }
 }

@@ -1,9 +1,15 @@
-import { TempoEventsClipboardDataSchema } from "@signal-app/core"
+import {
+  addClipboardTempoEvents,
+  duplicateEvents,
+  TempoEventsClipboardDataSchema,
+  tempoEventsToClipboardData,
+} from "@signal-app/core"
 import { useCallback } from "react"
-import { useCommands } from "../../../hooks/useCommands"
+import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
+import { useConductorTrackQuery } from "../../../hooks/useTrackQuery"
 import {
   readClipboardData,
   readJSONFromClipboard,
@@ -32,33 +38,36 @@ export const useDeleteTempoSelection = () => {
 
 export const useCopyTempoSelection = () => {
   const { selectedEventIds } = useTempoEditor()
-  const commands = useCommands()
+  const query = useConductorTrackQuery()
 
-  return async () => {
-    const data = commands.conductorTrack.copyTempoEvents(selectedEventIds)
+  return useCallback(async () => {
+    const data = query(tempoEventsToClipboardData(selectedEventIds))
     if (!data) {
       return
     }
     await writeClipboardData(data)
-  }
+  }, [query, selectedEventIds])
 }
 
 export const usePasteTempoSelection = () => {
   const { position } = usePlayer()
-  const commands = useCommands()
   const { pushHistory } = useHistory()
+  const mutate = useMutateConductorTrack()
 
-  return async (e?: ClipboardEvent) => {
-    const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
-    const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
+  return useCallback(
+    async (e?: ClipboardEvent) => {
+      const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
+      const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
 
-    if (!data) {
-      return
-    }
+      if (!data) {
+        return
+      }
 
-    pushHistory()
-    commands.conductorTrack.pasteTempoEventsAt(data, position)
-  }
+      pushHistory()
+      mutate(addClipboardTempoEvents(data, position))
+    },
+    [pushHistory, mutate, position],
+  )
 }
 
 export const useCutTempoSelection = () => {
@@ -74,7 +83,7 @@ export const useCutTempoSelection = () => {
 export const useDuplicateTempoSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
-  const commands = useCommands()
+  const mutateConductorTrack = useMutateConductorTrack()
 
   return () => {
     if (selectedEventIds.length === 0) {
@@ -84,7 +93,7 @@ export const useDuplicateTempoSelection = () => {
     pushHistory()
 
     const addedEventIds =
-      commands.conductorTrack.duplicateEvents(selectedEventIds)
+      mutateConductorTrack(duplicateEvents(selectedEventIds)) ?? []
 
     // select the created events
     setSelectedEventIds(addedEventIds)

@@ -36,7 +36,7 @@ export class EventSource implements IEventSource {
 
   getCurrentStateEvents(tick: number): SendableEvent[] {
     return this.songStore.song.tracks.flatMap((t) => {
-      const statusEvents = getStatusEvents(t.events, tick)
+      const statusEvents = getStatusEvents(tick)(t.events)
       return convertTrackEvents(
         statusEvents,
         t.channel,

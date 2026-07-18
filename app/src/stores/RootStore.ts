@@ -1,6 +1,5 @@
 import {
   BluetoothMIDIDeviceStore,
-  CommandService,
   MIDIDeviceStore,
   MIDIInput,
   SongStore,
@@ -26,7 +25,6 @@ export default class RootStore {
   readonly midiMonitor: MIDIMonitor
   readonly bluetoothMIDIDeviceStore: BluetoothMIDIDeviceStore
   readonly autoSaveService: AutoSaveService
-  readonly commands = new CommandService(this.songStore)
 
   constructor() {
     const context = new (window.AudioContext || window.webkitAudioContext)()

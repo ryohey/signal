@@ -1,13 +1,13 @@
+import { getNoteIdsInSelection } from "@signal-app/core"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useTrack } from "../../../hooks/useTrack"
+import { useTrackQuery } from "../../../hooks/useTrackQuery"
 import { useControlPane } from "../../control-pane/hooks/useControlPane"
 import { Selection } from "../entities/Selection"
-import { eventsInSelection } from "../hooks/selection"
 import { useNoteCoordTransform } from "../hooks/useNoteCoordTransform"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 
@@ -16,7 +16,7 @@ export const useSelectNoteGesture = (): MouseDownHandler => {
   const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound } = useQuantizer()
   let { selection } = usePianoRoll()
-  const { getEvents } = useTrack(selectedTrackId)
+  const query = useTrackQuery(selectedTrackId)
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
@@ -49,16 +49,14 @@ export const useSelectNoteGesture = (): MouseDownHandler => {
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
-          setSelectedNoteIds(
-            eventsInSelection(getEvents(), selection).map((e) => e.id),
-          )
+          setSelectedNoteIds(query(getNoteIdsInSelection(selection)) ?? [])
 
           setSelection(null)
         },
       })
     },
     [
-      getEvents,
+      query,
       isPlaying,
       quantizeRound,
       setPosition,

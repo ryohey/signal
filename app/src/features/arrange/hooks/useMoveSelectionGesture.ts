@@ -1,11 +1,16 @@
-import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
+import {
+  ArrangePoint,
+  ArrangeSelection,
+  getEventsInSelection as getEventsInSelectionCmd,
+  moveEventsBetweenTracks as moveEventsBetweenTracksCmd,
+} from "@signal-app/core"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { Rect } from "../../../entities/geometry/Rect"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useCommands } from "../../../hooks/useCommands"
+import { useTracksCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useSong } from "../../../hooks/useSong"
@@ -16,12 +21,13 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
   [Point, Rect],
   MouseEvent
 > => {
-  const commands = useCommands()
   const { pushHistory } = useHistory()
   const { selection: _selection, setSelection } = useArrangeView()
   const { trackTransform } = useArrangeTransform()
   const { quantizeRound } = useQuantizer()
   const { tracks } = useSong()
+  const getEventsInSelection = useTracksCommand(getEventsInSelectionCmd)
+  const moveEventsBetweenTracks = useTracksCommand(moveEventsBetweenTracksCmd)
 
   return useCallback(
     (_e, startClientPos, selectionRect) => {
@@ -30,7 +36,7 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
       }
       let isMoved = false
       let selection = _selection
-      let selectedEventIds = commands.arrange.getEventsInSelection(selection)
+      let selectedEventIds = getEventsInSelection(selection)
 
       observeDrag({
         onMouseMove: (e) => {
@@ -72,10 +78,7 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
           // Move selection range
           selection = ArrangeSelection.moved(selection, delta)
 
-          selectedEventIds = commands.arrange.moveEventsBetweenTracks(
-            selectedEventIds,
-            delta,
-          )
+          selectedEventIds = moveEventsBetweenTracks(selectedEventIds, delta)
 
           setSelection(selection)
         },
@@ -88,7 +91,8 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
       tracks,
       setSelection,
       _selection,
-      commands,
+      getEventsInSelection,
+      moveEventsBetweenTracks,
     ],
   )
 }

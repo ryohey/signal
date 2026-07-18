@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import { isNotNullOrUndefined, NoteEvent, Range } from "@signal-app/core"
 import { useCallback } from "react"
 import { Point } from "../../../entities/geometry/Point"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -18,7 +18,11 @@ const MIN_LENGTH = 10
 export interface MoveDraggableCallback {
   onChange?: (
     e: MouseEvent,
-    changes: { oldPosition: NotePoint; newPosition: NotePoint },
+    changes: {
+      oldPosition: NotePoint
+      newPosition: NotePoint
+      updatedNotes: NoteEvent[]
+    },
   ) => void
   onMouseUp?: (e: MouseEvent) => void
   onClick?: (e: MouseEvent) => void
@@ -145,11 +149,12 @@ export const useMoveDraggableGesture = (): MouseDownHandler<
             }),
           ]
 
-          updateDraggables(updates)
+          const result = updateDraggables(updates) ?? []
 
           callback?.onChange?.(e2, {
             oldPosition: currentPosition,
             newPosition,
+            updatedNotes: result?.filter(isNotNullOrUndefined) ?? [],
           })
         },
         onMouseUp: (e2) => {

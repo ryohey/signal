@@ -1,5 +1,6 @@
-import { isEventInRange, isEventOverlapRange, Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
+import { Range } from "../entities"
+import { isEventInRange, isEventOverlapRange } from "./filterEvents"
 
 describe("filterEvents", () => {
   const events = [

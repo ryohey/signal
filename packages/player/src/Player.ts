@@ -182,10 +182,12 @@ export class Player {
    and send them to the synthesizer
   */
   sendCurrentStateEvents = () => {
-    this.eventSource.getCurrentStateEvents(this._currentTick.value).forEach((e) => {
-      this.applyPlayerEvent(e)
-      this.sendEvent(e)
-    })
+    this.eventSource
+      .getCurrentStateEvents(this._currentTick.value)
+      .forEach((e) => {
+        this.applyPlayerEvent(e)
+        this.sendEvent(e)
+      })
   }
 
   get currentTempo() {

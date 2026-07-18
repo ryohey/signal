@@ -1,8 +1,13 @@
-import { ControlEventsClipboardDataSchema } from "@signal-app/core"
+import {
+  ControlEventsClipboardDataSchema,
+  createOrUpdateControllerEventsValue,
+  duplicateEvents,
+  getControlClipboardDataForSelection,
+  pasteClipboardDataAtPosition,
+} from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
-import { isNotUndefined } from "../../../helpers/array"
-import { useCommands } from "../../../hooks/useCommands"
+import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useTrack } from "../../../hooks/useTrack"
@@ -16,8 +21,7 @@ import { useControlPane } from "./useControlPane"
 
 export const useCreateOrUpdateControlEventsValue = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { getEventById, updateEvent, createOrUpdate } =
-    useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
@@ -26,29 +30,11 @@ export const useCreateOrUpdateControlEventsValue = () => {
     <T extends ControllerEvent | PitchBendEvent>(event: T) => {
       pushHistory()
 
-      const controllerEvents = selectedEventIds
-        .map((id) => getEventById(id))
-        .filter(isNotUndefined)
-
-      if (controllerEvents.length > 0) {
-        controllerEvents.forEach((e) =>
-          updateEvent(e.id, { value: event.value }),
-        )
-      } else {
-        createOrUpdate({
-          ...event,
-          tick: position,
-        })
-      }
+      mutate(
+        createOrUpdateControllerEventsValue(selectedEventIds, event, position),
+      )
     },
-    [
-      selectedEventIds,
-      getEventById,
-      updateEvent,
-      createOrUpdate,
-      position,
-      pushHistory,
-    ],
+    [selectedEventIds, mutate, position, pushHistory],
   )
 }
 
@@ -74,29 +60,26 @@ export const useDeleteControlSelection = () => {
 export const useCopyControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
   const { selectedEventIds } = useControlPane()
-  const commands = useCommands()
+  const mutate = useMutateTrack(selectedTrackId)
 
   return useCallback(async () => {
     if (selectedEventIds.length === 0) {
       return
     }
-    const data = commands.control.getClipboardDataForSelection(
-      selectedTrackId,
-      selectedEventIds,
-    )
+    const data = mutate(getControlClipboardDataForSelection(selectedEventIds))
     if (!data) {
       return
     }
 
     await writeClipboardData(data)
-  }, [selectedEventIds, commands, selectedTrackId])
+  }, [selectedEventIds, mutate])
 }
 
 export const usePasteControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
-  const commands = useCommands()
+  const mutate = useMutateTrack(selectedTrackId)
 
   return useCallback(
     async (e?: ClipboardEvent) => {
@@ -108,13 +91,9 @@ export const usePasteControlSelection = () => {
       }
 
       pushHistory()
-      commands.control.pasteClipboardDataAtPosition(
-        selectedTrackId,
-        data,
-        position,
-      )
+      mutate(pasteClipboardDataAtPosition(data, position))
     },
-    [commands, position, pushHistory, selectedTrackId],
+    [mutate, position, pushHistory],
   )
 }
 
@@ -132,7 +111,7 @@ export const useDuplicateControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
-  const commands = useCommands()
+  const mutate = useMutateTrack(selectedTrackId)
 
   return useCallback(() => {
     if (selectedEventIds.length === 0) {
@@ -142,16 +121,7 @@ export const useDuplicateControlSelection = () => {
     pushHistory()
 
     // select the created events
-    const addedEventIds = commands.track.duplicateEvents(
-      selectedTrackId,
-      selectedEventIds,
-    )
+    const addedEventIds = mutate(duplicateEvents(selectedEventIds)) ?? []
     setSelectedEventIds(addedEventIds)
-  }, [
-    selectedEventIds,
-    pushHistory,
-    setSelectedEventIds,
-    commands,
-    selectedTrackId,
-  ])
+  }, [selectedEventIds, pushHistory, setSelectedEventIds, mutate])
 }

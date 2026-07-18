@@ -104,11 +104,11 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
           } else {
             switch (position) {
               case "center":
-                return dragNoteCenterGesture(e, item.id)
+                return dragNoteCenterGesture(e, item)
               case "left":
-                return dragNoteLeftGesture(e, item.id)
+                return dragNoteLeftGesture(e, item)
               case "right":
-                return dragNoteRightGesture(e, item.id)
+                return dragNoteRightGesture(e, item)
             }
           }
           break

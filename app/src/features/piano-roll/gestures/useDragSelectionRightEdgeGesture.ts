@@ -3,7 +3,7 @@ import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
 
 export const useDragSelectionRightEdgeGesture = (): MouseDownHandler<
-  [number[]]
+  [readonly number[]]
 > => {
   const moveDraggableAction = useMoveDraggableGesture()
 

@@ -5,8 +5,8 @@ import {
   isSequencerSpecificEvent,
   TickProvider,
   TrackEvent,
-} from "../entities/track"
-import { mapToSignalEvent } from "../entities/track/signalEvents"
+} from "../entities"
+import { mapToSignalEvent } from "../entities/event/signalEvents"
 import { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 

@@ -1,7 +1,11 @@
-import { TrackId } from "@signal-app/core"
+import {
+  addNewTrack as addNewTrackCmd,
+  moveTrack as moveTrackCmd,
+  TrackId,
+} from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
-import { useCommands } from "../../../hooks/useCommands"
+import { useSongCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useSong } from "../../../hooks/useSong"
 
@@ -10,7 +14,8 @@ export function useTrackList() {
   const trackIds = tracks
     .filter((track) => !track.isConductorTrack)
     .map((track) => track.id)
-  const commands = useCommands()
+  const addNewTrack = useSongCommand(addNewTrackCmd)
+  const moveTrack = useSongCommand(moveTrackCmd)
   const { pushHistory } = useHistory()
 
   return {
@@ -21,14 +26,14 @@ export function useTrackList() {
     trackIds,
     moveTrack: useCallback(
       (id: TrackId, overId: TrackId) => {
-        commands.song.moveTrack(id, overId)
+        moveTrack(id, overId)
       },
-      [commands],
+      [moveTrack],
     ),
     addTrack: useCallback(() => {
       pushHistory()
-      commands.song.addNewTrack()
-    }, [pushHistory, commands]),
+      addNewTrack()
+    }, [pushHistory, addNewTrack]),
   }
 }
 

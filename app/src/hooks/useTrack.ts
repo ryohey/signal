@@ -37,7 +37,7 @@ export function useTrack(id: TrackId) {
         track?.onProgramChangeEventsChanged.subscribe ?? noop,
         useCallback(
           () =>
-            getProgramNumberEvent(track?.events ?? [], position)?.value ?? 0,
+            getProgramNumberEvent(position)(track?.events ?? [])?.value ?? 0,
           [track, position],
         ),
       )
@@ -99,43 +99,12 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
-    setPan: useCallback(
-      (pan: number, tick: number) => {
-        track?.setPan(pan, tick)
-      },
-      [track],
-    ),
-    setVolume: useCallback(
-      (volume: number, tick: number) => {
-        track?.setVolume(volume, tick)
-      },
-      [track],
-    ),
     ...useTrackEvents(track),
   }
 }
 
 export function useTrackEvents(track: Track | undefined) {
   return {
-    addEvent: useCallback(
-      <T extends TrackEvent>(
-        event: Omit<T, "id"> & { subtype?: string },
-      ): T | undefined => {
-        if (track) {
-          return track.addEvent(event)
-        }
-        return undefined
-      },
-      [track],
-    ),
-    addEvents: useCallback(
-      <T extends TrackEvent>(events: Omit<T, "id">[]) => {
-        if (track) {
-          return track.addEvents(events)
-        }
-      },
-      [track],
-    ),
     removeEvent: useCallback(
       (eventId: number) => {
         if (track) {
@@ -145,7 +114,7 @@ export function useTrackEvents(track: Track | undefined) {
       [track],
     ),
     removeEvents: useCallback(
-      (eventIds: number[]) => {
+      (eventIds: readonly number[]) => {
         if (track) {
           track.removeEvents(eventIds)
         }
@@ -176,12 +145,6 @@ export function useTrackEvents(track: Track | undefined) {
         if (track) {
           track.updateEvents(events)
         }
-      },
-      [track],
-    ),
-    getEventById: useCallback(
-      (eventId: number) => {
-        return track?.getEventById(eventId)
       },
       [track],
     ),

@@ -1,6 +1,6 @@
 import { isEqual } from "lodash"
 import { SequencerSpecificEvent } from "midifile-ts"
-import { TrackColor } from "./TrackColor"
+import { TrackColor } from "../track/TrackColor"
 import { TrackEvent, TrackEventOf } from "./TrackEvent"
 
 /**

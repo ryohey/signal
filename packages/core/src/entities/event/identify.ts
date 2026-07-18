@@ -62,3 +62,17 @@ export const isSequencerSpecificEvent = (
   e: TrackEvent,
 ): e is TrackEventOf<SequencerSpecificEvent> =>
   "subtype" in e && e.subtype === "sequencerSpecific"
+
+export const isRedundantEvents =
+  <T extends TrackEvent>(
+    event: Omit<T, "id"> & { subtype?: string; controllerType?: number },
+  ) =>
+  (e: TrackEvent) =>
+    e.type === event.type &&
+    e.tick === event.tick &&
+    ("subtype" in e && "subtype" in event
+      ? e.subtype === event.subtype
+      : true) &&
+    ("controllerType" in e && "controllerType" in event
+      ? e.controllerType === event.controllerType
+      : true)

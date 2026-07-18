@@ -103,7 +103,7 @@ export const InstrumentMark: FC<{
         isOpen={isOpenInstrumentBrowser}
         onOpenChange={setIsOpenInstrumentBrowser}
         trackId={selectedTrackId}
-        targetEventId={event.id}
+        targetEvent={event}
       />
     </>
   )

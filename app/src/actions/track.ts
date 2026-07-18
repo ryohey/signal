@@ -1,18 +1,30 @@
 import {
-  type BatchUpdateOperation,
+  addEvent,
+  addTimeSignature,
+  BatchUpdateOperation,
+  batchUpdateNotesVelocity,
+  getMeasureStartTick as getMeasureStartTickCmd,
   getProgramNumberEvent,
+  hasTimeSignatureAt,
   isProgramChangeEvent,
   programChangeMidiEvent,
   TrackEvent,
   TrackEventOf,
   TrackId,
+  updateEvent,
+  updateEventsInRange,
+  updateEventsInRangeWithEasing,
 } from "@signal-app/core"
 import type { AnyChannelEvent, AnyEvent, ProgramChangeEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { ValueEventType } from "../features/control-pane/entities/ValueEventType"
 import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
 import { addedSet, deletedSet } from "../helpers/set"
-import { useCommands } from "../hooks/useCommands"
+import {
+  useMutateConductorTrack,
+  useMutateTrack,
+  useSongCommand,
+} from "../hooks/useCommand"
 import { useConductorTrack } from "../hooks/useConductorTrack"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
@@ -77,7 +89,7 @@ export const useUpdateEventsInRange = (
   createEvent: (value: number) => AnyEvent,
 ) => {
   const { quantizeFloor, quantizeUnit } = useQuantizer()
-  const commands = useCommands()
+  const mutate = useMutateTrack(trackId)
 
   return useCallback(
     (
@@ -86,19 +98,20 @@ export const useUpdateEventsInRange = (
       startTick: number,
       endTick: number,
     ) => {
-      commands.track.updateEventsInRange(
-        trackId,
-        filterEvent,
-        createEvent,
-        quantizeFloor,
-        quantizeUnit,
-        startValue,
-        endValue,
-        startTick,
-        endTick,
+      mutate(
+        updateEventsInRange(
+          filterEvent,
+          createEvent,
+          quantizeFloor,
+          quantizeUnit,
+          startValue,
+          endValue,
+          startTick,
+          endTick,
+        ),
       )
     },
-    [commands, trackId, filterEvent, createEvent, quantizeFloor, quantizeUnit],
+    [mutate, filterEvent, createEvent, quantizeFloor, quantizeUnit],
   )
 }
 
@@ -115,7 +128,7 @@ export const useUpdateValueEvents = (type: ValueEventType) => {
 export const useUpdateValueEventsWithCurve = (type: ValueEventType) => {
   const { selectedTrackId } = usePianoRoll()
   const { quantizeFloor, quantizeUnit } = useQuantizer()
-  const commands = useCommands()
+  const mutate = useMutateTrack(selectedTrackId)
 
   return useCallback(
     (
@@ -125,20 +138,21 @@ export const useUpdateValueEventsWithCurve = (type: ValueEventType) => {
       endTick: number,
       easing: (t: number) => number,
     ) => {
-      commands.track.updateEventsInRangeWithEasing(
-        selectedTrackId,
-        ValueEventType.getEventPredicate(type),
-        ValueEventType.getEventFactory(type),
-        quantizeFloor,
-        quantizeUnit,
-        startValue,
-        endValue,
-        startTick,
-        endTick,
-        easing,
+      mutate(
+        updateEventsInRangeWithEasing(
+          ValueEventType.getEventPredicate(type),
+          ValueEventType.getEventFactory(type),
+          quantizeFloor,
+          quantizeUnit,
+          startValue,
+          endValue,
+          startTick,
+          endTick,
+          easing,
+        ),
       )
     },
-    [commands, selectedTrackId, type, quantizeFloor, quantizeUnit],
+    [mutate, type, quantizeFloor, quantizeUnit],
   )
 }
 
@@ -179,7 +193,8 @@ export const useSetTrackName = () => {
 export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
   const { sendEvent, position } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel, getEvents, updateEvent, addEvent } = useTrack(trackId)
+  const { channel, getEvents } = useTrack(trackId)
+  const mutate = useMutateTrack(trackId)
 
   return useCallback(
     (programNumber: number) => {
@@ -189,12 +204,14 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
 
       if (eventId === undefined) {
         // get last program change event before position
-        const programNumberEvent =
-          getProgramNumberEvent(getEvents(), position) ??
-          addEvent<TrackEventOf<ProgramChangeEvent>>({
-            ...programChangeMidiEvent(0, 0, programNumber),
-            tick: 0,
-          })
+        const programNumberEvent = mutate(
+          (events) =>
+            getProgramNumberEvent(position)(events.getArray()) ??
+            addEvent<TrackEventOf<ProgramChangeEvent>>({
+              ...programChangeMidiEvent(0, 0, programNumber),
+              tick: 0,
+            })(events),
+        )
         targetEventId = programNumberEvent?.id
       }
 
@@ -202,14 +219,13 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
         return
       }
 
-      const targetEvent = updateEvent<TrackEventOf<ProgramChangeEvent>>(
-        targetEventId,
-        {
+      const targetEvent = mutate(
+        updateEvent<TrackEventOf<ProgramChangeEvent>>(targetEventId, {
           value: programNumber,
-        },
+        }),
       )
 
-      if (targetEvent === null) {
+      if (!targetEvent) {
         return
       }
 
@@ -225,23 +241,15 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
         }
       }
     },
-    [
-      pushHistory,
-      channel,
-      sendEvent,
-      position,
-      getEvents,
-      eventId,
-      updateEvent,
-      addEvent,
-    ],
+    [pushHistory, channel, sendEvent, position, getEvents, eventId, mutate],
   )
 }
 
 export const useInsertTrackInstrument = (trackId: TrackId) => {
   const { sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel, addEvent } = useTrack(trackId)
+  const { channel } = useTrack(trackId)
+  const mutate = useMutateTrack(trackId)
 
   return useCallback(
     (programNumber: number, tick: number) => {
@@ -251,14 +259,16 @@ export const useInsertTrackInstrument = (trackId: TrackId) => {
 
       pushHistory()
 
-      addEvent<TrackEventOf<ProgramChangeEvent>>({
-        ...programChangeMidiEvent(0, 0, programNumber),
-        tick,
-      })
+      mutate(
+        addEvent<TrackEventOf<ProgramChangeEvent>>({
+          ...programChangeMidiEvent(0, 0, programNumber),
+          tick,
+        }),
+      )
 
       sendEvent(programChangeMidiEvent(0, channel, programNumber))
     },
-    [pushHistory, channel, sendEvent, addEvent],
+    [pushHistory, channel, sendEvent, mutate],
   )
 }
 
@@ -296,26 +306,29 @@ export const useToggleAllGhostTracks = () => {
 
 export const useAddTimeSignature = () => {
   const { pushHistory } = useHistory()
-  const commands = useCommands()
+  const getMeasureStartTick = useSongCommand(getMeasureStartTickCmd)
+  const mutateConductorTrack = useMutateConductorTrack()
 
   return useCallback(
     (tick: number, numerator: number, denominator: number) => {
-      const measureStartTick = commands.conductorTrack.getMeasureStartTick(tick)
+      const measureStartTick = getMeasureStartTick(tick)
 
       // prevent duplication
-      if (commands.conductorTrack.hasTimeSignatureAt(measureStartTick)) {
+      if (
+        mutateConductorTrack((events) =>
+          hasTimeSignatureAt(measureStartTick)(events.getArray()),
+        )
+      ) {
         return
       }
 
       pushHistory()
 
-      commands.conductorTrack.addTimeSignature(
-        measureStartTick,
-        numerator,
-        denominator,
+      mutateConductorTrack(
+        addTimeSignature(measureStartTick, numerator, denominator),
       )
     },
-    [pushHistory, commands],
+    [pushHistory, getMeasureStartTick, mutateConductorTrack],
   )
 }
 
@@ -338,17 +351,13 @@ export const useUpdateTimeSignature = () => {
 export const useBatchUpdateSelectedNotesVelocity = () => {
   const { selectedTrackId, selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
-  const commands = useCommands()
+  const mutate = useMutateTrack(selectedTrackId)
 
   return useCallback(
     (operation: BatchUpdateOperation) => {
       pushHistory()
-      commands.track.batchUpdateNotesVelocity(
-        selectedTrackId,
-        selectedNoteIds,
-        operation,
-      )
+      mutate(batchUpdateNotesVelocity(selectedNoteIds, operation))
     },
-    [selectedTrackId, selectedNoteIds, pushHistory, commands],
+    [selectedNoteIds, pushHistory, mutate],
   )
 }

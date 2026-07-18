@@ -1,9 +1,15 @@
 import {
-  ArrangeNotesClipboardDataSchema,
+  ArrangeEventsClipboardDataSchema,
   BatchUpdateOperation,
+  batchUpdateArrangeNotesVelocity as batchUpdateArrangeNotesVelocityCmd,
+  deleteSelection as deleteSelectionCmd,
+  duplicateSelection as duplicateSelectionCmd,
+  getArrangeClipboardDataForSelection as getArrangeClipboardDataForSelectionCmd,
+  pasteClipboardDataAt as pasteClipboardDataAtCmd,
+  transposeSelection as transposeSelectionCmd,
 } from "@signal-app/core"
 import { useCallback } from "react"
-import { useCommands } from "../../../hooks/useCommands"
+import { useTracksCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import {
@@ -15,51 +21,53 @@ import { useArrangeView } from "./useArrangeView"
 
 export const useArrangeCopySelection = () => {
   const { selection } = useArrangeView()
-  const commands = useCommands()
+  const getClipboardData = useTracksCommand(
+    getArrangeClipboardDataForSelectionCmd,
+  )
 
   return useCallback(() => {
     if (selection === null) {
       return
     }
-    const data = commands.arrange.getClipboardDataForSelection(selection)
+    const data = getClipboardData(selection)
     writeClipboardData(data)
-  }, [commands, selection])
+  }, [getClipboardData, selection])
 }
 
 export const useArrangePasteSelection = () => {
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedTrackIndex } = useArrangeView()
-  const commands = useCommands()
+  const pasteClipboard = useTracksCommand(pasteClipboardDataAtCmd)
 
   return useCallback(
     async (e?: ClipboardEvent) => {
       const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
-      const { data, error } = ArrangeNotesClipboardDataSchema.safeParse(obj)
+      const { data, error } = ArrangeEventsClipboardDataSchema.safeParse(obj)
       if (!data) {
         console.error("Invalid clipboard data", error)
         return
       }
       pushHistory()
-      commands.arrange.pasteClipboardDataAt(data, position, selectedTrackIndex)
+      pasteClipboard(data, position, selectedTrackIndex)
     },
-    [commands, position, pushHistory, selectedTrackIndex],
+    [pasteClipboard, position, pushHistory, selectedTrackIndex],
   )
 }
 
 export const useArrangeDeleteSelection = () => {
   const { pushHistory } = useHistory()
   const { setSelection, selection } = useArrangeView()
-  const commands = useCommands()
+  const deleteSelection = useTracksCommand(deleteSelectionCmd)
 
   return useCallback(() => {
     if (selection === null) {
       return
     }
     pushHistory()
-    commands.arrange.deleteSelection(selection)
+    deleteSelection(selection)
     setSelection(null)
-  }, [commands, pushHistory, selection, setSelection])
+  }, [deleteSelection, pushHistory, selection, setSelection])
 }
 
 export const useArrangeCutSelection = () => {
@@ -75,7 +83,7 @@ export const useArrangeCutSelection = () => {
 export const useArrangeTransposeSelection = () => {
   const { pushHistory } = useHistory()
   const { selection } = useArrangeView()
-  const commands = useCommands()
+  const transposeSelection = useTracksCommand(transposeSelectionCmd)
 
   return useCallback(
     (deltaPitch: number) => {
@@ -83,31 +91,33 @@ export const useArrangeTransposeSelection = () => {
         return
       }
       pushHistory()
-      commands.arrange.transposeSelection(selection, deltaPitch)
+      transposeSelection(selection, deltaPitch)
     },
-    [commands, pushHistory, selection],
+    [transposeSelection, pushHistory, selection],
   )
 }
 
 export const useArrangeDuplicateSelection = () => {
   const { pushHistory } = useHistory()
   const { selection, setSelection } = useArrangeView()
-  const commands = useCommands()
+  const duplicateSelection = useTracksCommand(duplicateSelectionCmd)
 
   return useCallback(() => {
     if (selection === null) {
       return
     }
     pushHistory()
-    const newSelection = commands.arrange.duplicateSelection(selection)
-    setSelection(newSelection)
-  }, [selection, pushHistory, setSelection, commands])
+    const newSelection = duplicateSelection(selection)
+    setSelection(newSelection ?? null)
+  }, [selection, pushHistory, setSelection, duplicateSelection])
 }
 
 export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
   const { pushHistory } = useHistory()
   const { selection } = useArrangeView()
-  const commands = useCommands()
+  const batchUpdateVelocity = useTracksCommand(
+    batchUpdateArrangeNotesVelocityCmd,
+  )
 
   return useCallback(
     (operation: BatchUpdateOperation) => {
@@ -115,8 +125,8 @@ export const useArrangeBatchUpdateSelectedNotesVelocity = () => {
         return
       }
       pushHistory()
-      commands.arrange.batchUpdateNotesVelocity(selection, operation)
+      batchUpdateVelocity(selection, operation)
     },
-    [commands, pushHistory, selection],
+    [batchUpdateVelocity, pushHistory, selection],
   )
 }

@@ -1,7 +1,7 @@
 import { AnyChannelEvent } from "midifile-ts"
 import { deassemble as deassembleNote } from "../../midi/noteAssembler"
+import { TrackEvent } from "../event/TrackEvent"
 import { Track, TrackId } from "../track/Track"
-import { TrackEvent } from "../track/TrackEvent"
 
 type CollectableEvent = AnyChannelEvent & {
   tick: number

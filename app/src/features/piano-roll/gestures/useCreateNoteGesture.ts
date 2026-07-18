@@ -1,6 +1,7 @@
-import { NoteEvent, NoteNumber } from "@signal-app/core"
+import { addEvent, NoteEvent, NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useSong } from "../../../hooks/useSong"
@@ -13,7 +14,8 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
   const { selectedTrackId, newNoteVelocity, lastNoteDuration } = usePianoRoll()
   const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound, quantizeFloor, quantizeUnit } = useQuantizer()
-  const { channel, isRhythmTrack, addEvent } = useTrack(selectedTrackId)
+  const { channel, isRhythmTrack } = useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const dragNoteCenterAction = useDragNoteCenterGesture()
@@ -41,20 +43,22 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
         ? timebase / 8 // 32th note in the rhythm track
         : (lastNoteDuration ?? quantizeUnit)
 
-      const note = addEvent({
-        type: "channel",
-        subtype: "note",
-        noteNumber: noteNumber,
-        tick: quantizedTick,
-        velocity: newNoteVelocity,
-        duration,
-      } as NoteEvent)
+      const note = mutate(
+        addEvent<NoteEvent>({
+          type: "channel",
+          subtype: "note",
+          noteNumber: noteNumber,
+          tick: quantizedTick,
+          velocity: newNoteVelocity,
+          duration,
+        }),
+      )
 
       if (note === undefined) {
         return
       }
 
-      dragNoteCenterAction(e, note.id)
+      dragNoteCenterAction(e, note)
     },
     [
       transform,
@@ -67,7 +71,7 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
       timebase,
       newNoteVelocity,
       lastNoteDuration,
-      addEvent,
+      mutate,
       pushHistory,
       dragNoteCenterAction,
     ],

@@ -12,13 +12,7 @@ import {
   PrimaryButton,
 } from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
-import React, {
-  type FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import React, { type FC, useCallback, useEffect, useState } from "react"
 import { InstrumentName } from "../../features/track-list/components/InstrumentName"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useTrack } from "../../hooks/useTrack"
@@ -56,7 +50,7 @@ export interface InstrumentBrowserProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   trackId: TrackId
-  targetEventId?: number
+  targetEvent?: TrackEventOf<ProgramChangeEvent>
   showInsertButton?: boolean
 }
 
@@ -64,13 +58,12 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   isOpen,
   onOpenChange,
   trackId,
-  targetEventId,
+  targetEvent,
   showInsertButton = false,
 }) => {
   const {
     programNumber: initialProgramNumber,
     isRhythmTrack: initialIsRhythmTrack,
-    getEventById,
     removeEvent,
   } = useTrack(trackId)
   const [setting, setSetting] = useState({
@@ -86,16 +79,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
     changeInstrument,
     onClickOK,
     changeRhythmTrack,
-  } = useInstrumentBrowser(setting, targetEventId)
-
-  const targetEvent = useMemo(() => {
-    if (targetEventId !== undefined) {
-      return getEventById(targetEventId) as
-        | TrackEventOf<ProgramChangeEvent>
-        | undefined
-    }
-    return undefined
-  }, [targetEventId, getEventById])
+  } = useInstrumentBrowser(setting, targetEvent?.id)
 
   useEffect(() => {
     if (isOpen) {
@@ -156,11 +140,11 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   }, [onOpenChange, insertInstrumentChangeAtCurrentPosition, programNumber])
 
   const handleClickDelete = useCallback(() => {
-    if (targetEventId !== undefined) {
-      removeEvent(targetEventId)
+    if (targetEvent !== undefined) {
+      removeEvent(targetEvent.id)
     }
     onOpenChange(false)
-  }, [targetEventId, removeEvent, onOpenChange])
+  }, [targetEvent, removeEvent, onOpenChange])
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -196,7 +180,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
         </Footer>
       </DialogContent>
       <DialogActions>
-        {targetEventId !== undefined && (
+        {targetEvent && (
           <Button onClick={handleClickDelete} style={{ marginRight: "auto" }}>
             <Localized name="delete" />
           </Button>

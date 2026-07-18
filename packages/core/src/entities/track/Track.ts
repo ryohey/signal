@@ -5,27 +5,42 @@ import {
   ObservableValue,
   Unsubscribe,
 } from "@signal-app/observable"
+import { flow } from "lodash"
 import { TimeSignatureEvent } from "midifile-ts"
 import {
   deserializeTickOrderedArray,
   TickOrderedArray,
 } from "../../data/OrdererdArray/TickOrderedArray"
 import { Branded } from "../../types"
+import { getColorEvent, getMaxTick, getTrackNameEvent } from "../event"
 import {
   isNoteEvent,
   isProgramChangeEvent,
   isSetTempoEvent,
   isTimeSignatureEvent,
   isTrackNameEvent,
-} from "./identify"
-import { getTrackNameEvent } from "./selector"
-import { isSignalTrackColorEvent, SignalTrackColorEvent } from "./signalEvents"
-import { TrackColor } from "./TrackColor"
-import { TrackEvent, TrackEventOf } from "./TrackEvent"
-import { TrackEvents } from "./TrackEvents"
+} from "../event/identify"
+import {
+  isSignalTrackColorEvent,
+  SignalTrackColorEvent,
+} from "../event/signalEvents"
+import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
+import * as TrackEvents from "./mutations"
+import { TrackEventsQuery } from "./queries/basic"
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
+
+export type TrackEventsMutator<R = void> = (
+  events: TickOrderedArray<TrackEvent>,
+) => R
+
+type TrackEventPredicate = (event: TrackEvent) => boolean
+
+type FilteredEventsObserver = {
+  emitter: Emitter
+  observable: Observable
+}
 
 type SerializedTrack = {
   id?: TrackId
@@ -48,14 +63,16 @@ export class Track {
   private readonly _endOfTrack = new ObservableValue<number>(0)
   private readonly _channel = new ObservableValue<number | undefined>(undefined)
 
-  getEventById = (id: number): TrackEvent | undefined => this._events.get(id)
-
   private readonly _onEventsChanged = new Emitter()
   private readonly _onProgramChangeEventsChanged = new Emitter()
   private readonly _onSetTempoEventsChanged = new Emitter()
   private readonly _onIsRhythmTrackChanged = new Emitter()
   private readonly _onIsConductorTrackChanged = new Emitter()
   private readonly _onChanged: Observable
+  private readonly _filteredEventsObservers = new Map<
+    TrackEventPredicate,
+    FilteredEventsObserver
+  >()
 
   private unsubscribeReaction: Unsubscribe | null = null
 
@@ -80,10 +97,19 @@ export class Track {
       )
       this._onEventsChanged.emit()
       this.didEventsChanged(changedEvents)
+
+      // Reactively maintain endOfTrack
+      if ("added" in change) {
+        for (const event of change.added) {
+          this.extendEndOfTrack(event)
+        }
+      }
     })
   }
 
   private didEventsChanged = (changedEvents: readonly TrackEvent[]) => {
+    this.emitFilteredEventsChanged(changedEvents)
+
     if (
       this._onProgramChangeEventsChanged.listenerCount > 0 &&
       changedEvents.some(isProgramChangeEvent)
@@ -101,11 +127,26 @@ export class Track {
       this._name.set(nextName)
     }
     if (changedEvents.some(isSignalTrackColorEvent)) {
-      const nextColor = TrackEvents.getColorEvent(this.events)
+      const nextColor = getColorEvent(this.events)
       this._color.set(nextColor)
     }
     if (changedEvents.some(isTimeSignatureEvent)) {
       this._timeSignatureEvents.set(this.events.filter(isTimeSignatureEvent))
+    }
+  }
+
+  private emitFilteredEventsChanged(changedEvents: readonly TrackEvent[]) {
+    if (changedEvents.length === 0) {
+      return
+    }
+
+    for (const [predicate, observer] of this._filteredEventsObservers) {
+      if (
+        observer.emitter.listenerCount > 0 &&
+        changedEvents.some((event) => predicate(event))
+      ) {
+        observer.emitter.emit()
+      }
     }
   }
 
@@ -163,6 +204,30 @@ export class Track {
     return this._onEventsChanged
   }
 
+  observeEventsChanged(predicate: TrackEventPredicate): Observable {
+    const found = this._filteredEventsObservers.get(predicate)
+    if (found !== undefined) {
+      return found.observable
+    }
+
+    const emitter = new Emitter()
+    const observable: Observable = {
+      subscribe: (listener) => {
+        const unsubscribe = emitter.subscribe(listener)
+        return () => {
+          unsubscribe()
+          if (emitter.listenerCount === 0) {
+            this._filteredEventsObservers.delete(predicate)
+          }
+        }
+      },
+    }
+
+    this._filteredEventsObservers.set(predicate, { emitter, observable })
+
+    return observable
+  }
+
   get timeSignatureEvents() {
     return this._timeSignatureEvents.value
   }
@@ -210,41 +275,6 @@ export class Track {
     return this._eventsSnapshot
   }
 
-  updateEvent<T extends TrackEvent>(id: number, obj: Partial<T>): T | null {
-    const newObj = TrackEvents.updateEvent(id, obj)(this._events)
-    if (newObj !== null) {
-      this.extendEndOfTrack(newObj)
-    }
-    return newObj
-  }
-
-  updateEvents<T extends TrackEvent>(events: Partial<T>[]) {
-    this.transaction(() => {
-      events.forEach((event) => {
-        if (event.id === undefined) {
-          return
-        }
-        this.updateEvent(event.id, event)
-      })
-    })
-  }
-
-  removeEvent(id: number) {
-    this.removeEvents([id])
-  }
-
-  removeEvents(ids: number[]) {
-    ids.forEach((id) => {
-      this._events.remove(id)
-    })
-  }
-
-  addEvent<T extends TrackEvent>(e: Omit<T, "id"> & { subtype?: string }): T {
-    const newEvent = TrackEvents.addEvent(e)(this._events)
-    this.extendEndOfTrack(newEvent)
-    return newEvent
-  }
-
   addEvents<T extends TrackEvent>(events: Omit<T, "id">[]): T[] {
     const result = this.transaction(() => {
       const dontMoveChannelEvent = this.isConductorTrack
@@ -256,20 +286,36 @@ export class Track {
     return result
   }
 
-  transaction<T>(func: (track: Track) => T) {
+  transaction = <T>(func: (track: Track) => T) => {
     return this._events.transaction(() => func(this))
   }
 
-  /* helper */
-
-  createOrUpdate<T extends TrackEvent>(
-    newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
-  ): T {
-    return TrackEvents.createOrUpdate(newEvent)(this._events)
+  mutate = <R = void>(fn: TrackEventsMutator<R>): R => {
+    return this._events.transaction(() => fn(this._events))
   }
 
+  query = <R>(fn: TrackEventsQuery<R>): R => {
+    return fn(this._events)
+  }
+
+  /* mutations */
+
+  addEvent = flow(TrackEvents.addEvent, this.mutate)
+  updateEvent = flow(TrackEvents.updateEvent, this.mutate)
+  updateEvents = flow(TrackEvents.updateEvents, this.mutate)
+  removeEvent = flow(
+    (id: number) => TrackEvents.removeEvents([id]),
+    this.mutate,
+  )
+  removeEvents = flow(TrackEvents.removeEvents, this.mutate)
+  createOrUpdate = flow(TrackEvents.createOrUpdate, this.mutate)
+  setColor = flow(TrackEvents.setColor, this.mutate)
+  setName = flow(TrackEvents.setName, this.mutate)
+
+  /* helper */
+
   updateEndOfTrack() {
-    this.endOfTrack = TrackEvents.getMaxTick(this.events)
+    this.endOfTrack = getMaxTick(this.events)
   }
 
   private extendEndOfTrack(newEvent: TrackEvent) {
@@ -287,23 +333,6 @@ export class Track {
 
   get color(): SignalTrackColorEvent | undefined {
     return this._color.value
-  }
-
-  setColor(color: TrackColor | null) {
-    TrackEvents.setColor(color)(this._events)
-  }
-
-  setVolume(value: number, tick: number) {
-    TrackEvents.setVolume(value, tick)(this._events)
-  }
-  setPan(value: number, tick: number) {
-    TrackEvents.setPan(value, tick)(this._events)
-  }
-  setTempo = (bpm: number, tick: number) => {
-    TrackEvents.setTempo(bpm, tick)(this._events)
-  }
-  setName(text: string) {
-    TrackEvents.setName(text)(this._events)
   }
 
   get isConductorTrack() {
