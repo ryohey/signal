@@ -1,13 +1,11 @@
 import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import { FC } from "react"
-import {
-  useDuplicateTrack,
-  useInsertTrack,
-  useRemoveTrack,
-} from "../../../actions"
+import { useRemoveTrack } from "../../../actions"
 import { useSong } from "../../../hooks/useSong"
 import { Localized } from "../../../localize/useLocalization"
 import { useArrangeView } from "../hooks/useArrangeView"
+import { useDuplicateTrack } from "../hooks/useDuplicateTrack"
+import { useInsertTrack } from "../hooks/useInsertTrack"
 
 export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
   const { handleClose } = props

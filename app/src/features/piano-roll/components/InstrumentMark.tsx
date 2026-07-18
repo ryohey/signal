@@ -2,12 +2,12 @@ import styled from "@emotion/styled"
 import type { TrackEventOf } from "@signal-app/core"
 import type { ProgramChangeEvent } from "midifile-ts"
 import { type FC, useCallback, useMemo, useState } from "react"
-import { InstrumentBrowser } from "../../../components/InstrumentBrowser/InstrumentBrowser"
 import type { TickTransform } from "../../../entities/transform/TickTransform"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTrack } from "../../../hooks/useTrack"
+import { InstrumentBrowser } from "../../instrument-browser"
 import {
   InstrumentEmoji,
   InstrumentName,

@@ -1,6 +1,8 @@
+import { noteOffMidiEvent, noteOnMidiEvent } from "@signal-app/core"
 import { useCallback } from "react"
-import { useStartNote, useStopNote } from "../actions"
 import { usePianoRoll } from "../features/piano-roll/hooks/usePianoRoll"
+import { usePlayer } from "./usePlayer"
+import { useStores } from "./useStores"
 import { useTrack } from "./useTrack"
 
 const playingNoteRef = {
@@ -8,6 +10,50 @@ const playingNoteRef = {
     noteNumber: number
     timeout?: NodeJS.Timeout
   } | null,
+}
+
+const useStartNote = () => {
+  const { synthGroup } = useStores()
+  const { sendEvent } = usePlayer()
+
+  return useCallback(
+    (
+      {
+        channel,
+        noteNumber,
+        velocity,
+      }: {
+        noteNumber: number
+        velocity: number
+        channel: number
+      },
+      delayTime = 0,
+    ) => {
+      synthGroup.activate()
+      sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
+    },
+    [synthGroup, sendEvent],
+  )
+}
+
+const useStopNote = () => {
+  const { sendEvent } = usePlayer()
+
+  return useCallback(
+    (
+      {
+        channel,
+        noteNumber,
+      }: {
+        noteNumber: number
+        channel: number
+      },
+      delayTime = 0,
+    ) => {
+      sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
+    },
+    [sendEvent],
+  )
 }
 
 export function usePreviewNote() {

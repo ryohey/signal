@@ -14,6 +14,7 @@ import {
   useTransposeSelection,
 } from "./selection"
 import { usePianoRoll } from "./usePianoRoll"
+import { usePianoRollVelocityDialog } from "./usePianoRollVelocityDialog"
 
 export function usePianoRollGlobalKeyboardShortcuts() {
   const { selectedNoteIds } = usePianoRoll()
@@ -65,7 +66,8 @@ function useElectronShortcuts() {
   const selectPreviousNote = useSelectPreviousNote()
   const quantizeSelectedNotes = useQuantizeSelectedNotes()
   const transposeSelection = useTransposeSelection()
-  const { setOpenTransposeDialog, setOpenVelocityDialog } = usePianoRoll()
+  const { setOpenTransposeDialog } = usePianoRoll()
+  const { setOpen: setOpenVelocityDialog } = usePianoRollVelocityDialog()
 
   useEffect(() => {
     if (isRunningInElectron()) {

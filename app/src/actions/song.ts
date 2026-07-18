@@ -1,11 +1,4 @@
-import {
-  duplicateTrack as duplicateTrackCmd,
-  emptySong,
-  insertNewTrack as insertNewTrackCmd,
-  Song,
-  TrackId,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
+import { emptySong, Song, TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
 import {
@@ -14,7 +7,6 @@ import {
 } from "../features/piano-roll/hooks/usePianoRoll"
 import { useTrackList } from "../features/track-list/hooks/useTrackList"
 import { useAutoSave } from "../hooks/useAutoSave"
-import { useSongCommand } from "../hooks/useCommand"
 import { useHistory } from "../hooks/useHistory"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
@@ -174,30 +166,4 @@ export const useRemoveTrack = () => {
 export const useSelectTrack = () => {
   const { setSelectedTrackId } = usePianoRoll()
   return setSelectedTrackId
-}
-
-export const useInsertTrack = () => {
-  const { pushHistory } = useHistory()
-  const insertNewTrack = useSongCommand(insertNewTrackCmd)
-
-  return useCallback(
-    (trackIndex: number) => {
-      pushHistory()
-      insertNewTrack(trackIndex)
-    },
-    [pushHistory, insertNewTrack],
-  )
-}
-
-export const useDuplicateTrack = () => {
-  const { pushHistory } = useHistory()
-  const duplicateTrack = useSongCommand(duplicateTrackCmd)
-
-  return useCallback(
-    (trackId: TrackId) => {
-      pushHistory()
-      duplicateTrack(trackId)
-    },
-    [duplicateTrack, pushHistory],
-  )
 }

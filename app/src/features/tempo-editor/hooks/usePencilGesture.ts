@@ -1,30 +1,49 @@
 import {
   bpmToUSecPerBeat,
   isSetTempoEvent,
+  Range,
   setTempoMidiEvent,
+  updateEventsInRange,
 } from "@signal-app/core"
 import { useCallback } from "react"
-import { useUpdateEventsInRange } from "../../../actions"
 import { Point } from "../../../entities/geometry/Point"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
+import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"
+
+const useUpdateTempoEventsInRange = () => {
+  const { quantizeFloor, quantizeUnit } = useQuantizer()
+  const mutate = useMutateConductorTrack()
+
+  return useCallback(
+    (valueRange: Range, tickRange: Range) => {
+      mutate(
+        updateEventsInRange(
+          isSetTempoEvent,
+          (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v)),
+          quantizeFloor,
+          quantizeUnit,
+          valueRange,
+          tickRange,
+        ),
+      )
+    },
+    [mutate, quantizeFloor, quantizeUnit],
+  )
+}
 
 export const usePencilGesture = (): MouseDownHandler<
   [Point, TempoCoordTransform]
 > => {
   const { pushHistory } = useHistory()
   const { quantizeRound } = useQuantizer()
-  const { id: conductorTrackId, createOrUpdate } = useConductorTrack()
-  const updateEventsInRange = useUpdateEventsInRange(
-    conductorTrackId,
-    isSetTempoEvent,
-    (v) => setTempoMidiEvent(0, bpmToUSecPerBeat(v)),
-  )
+  const { createOrUpdate } = useConductorTrack()
+  const updateTempoEventsInRange = useUpdateTempoEventsInRange()
 
   return useCallback(
     (e, startPoint, transform) => {
@@ -54,13 +73,16 @@ export const usePencilGesture = (): MouseDownHandler<
           )
           const tick = transform.getTick(local.x)
 
-          updateEventsInRange(lastValue, value, lastTick, tick)
+          updateTempoEventsInRange(
+            Range.fromUnordered(lastValue, value),
+            Range.fromUnordered(lastTick, tick),
+          )
 
           lastTick = tick
           lastValue = value
         },
       })
     },
-    [pushHistory, quantizeRound, createOrUpdate, updateEventsInRange],
+    [pushHistory, quantizeRound, createOrUpdate, updateTempoEventsInRange],
   )
 }

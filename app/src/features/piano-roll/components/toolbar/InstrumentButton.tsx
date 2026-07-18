@@ -1,8 +1,8 @@
 import { ToolbarButton } from "@signal-app/ui"
 import { type FC, useState } from "react"
-import { InstrumentBrowser } from "../../../../components/InstrumentBrowser/InstrumentBrowser"
 import { useTrack } from "../../../../hooks/useTrack"
 import { categoryEmojis, getCategoryIndex } from "../../../../midi/GM"
+import { InstrumentBrowser } from "../../../instrument-browser"
 import { InstrumentName } from "../../../track-list/components/InstrumentName"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 

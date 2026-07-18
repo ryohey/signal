@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { FC, useState } from "react"
 import { useTrack } from "../../../hooks/useTrack"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
+import { useSetTrackName } from "../hooks/useSetTrackName"
 import { TrackName } from "./TrackName"
 
 const TrackNameWrapper = styled.span`
@@ -31,7 +32,8 @@ const Input = styled.input`
 
 export const TrackNameInput: FC = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { name, setName } = useTrack(selectedTrackId)
+  const { name } = useTrack(selectedTrackId)
+  const setName = useSetTrackName(selectedTrackId)
   const [isEditing, setEditing] = useState(false)
 
   return (

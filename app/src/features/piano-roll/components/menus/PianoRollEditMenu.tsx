@@ -15,10 +15,11 @@ import {
   useTransposeSelection,
 } from "../../hooks/selection"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRollVelocityDialog } from "../../hooks/usePianoRollVelocityDialog"
 
 export const PianoRollEditMenu: FC = () => {
-  const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
-    usePianoRoll()
+  const { selectedNoteIds, setOpenTransposeDialog } = usePianoRoll()
+  const { setOpen: setOpenVelocityDialog } = usePianoRollVelocityDialog()
   const copySelection = useCopySelection()
   const pasteSelection = usePasteSelection()
   const deleteSelection = useDeleteSelection()

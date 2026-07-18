@@ -88,7 +88,7 @@ export function useTempoEditor() {
 // atoms
 const mouseModeAtom = atom<"pencil" | "selection">("pencil")
 const selectionAtom = atom<TempoSelection | null>(null)
-const selectedEventIdsAtom = atom<number[]>([])
+const selectedEventIdsAtom = atom<readonly number[]>([])
 
 // actions
 const resetSelectionAtom = atom(null, (_get, set) => {

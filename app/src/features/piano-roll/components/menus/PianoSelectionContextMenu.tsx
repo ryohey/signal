@@ -17,12 +17,13 @@ import {
   useTransposeSelection,
 } from "../../hooks/selection"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRollVelocityDialog } from "../../hooks/usePianoRollVelocityDialog"
 
 export const PianoSelectionContextMenu: FC<ContextMenuProps> = React.memo(
   (props) => {
     const { handleClose } = props
-    const { selectedNoteIds, setOpenTransposeDialog, setOpenVelocityDialog } =
-      usePianoRoll()
+    const { selectedNoteIds, setOpenTransposeDialog } = usePianoRoll()
+    const { setOpen: setOpenVelocityDialog } = usePianoRollVelocityDialog()
     const isNoteSelected = selectedNoteIds.length > 0
 
     const copySelection = useCopySelection()

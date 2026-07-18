@@ -1,10 +1,5 @@
 import { useCallback, useMemo } from "react"
-import {
-  useFastForwardOneBar,
-  useRewindOneBar,
-  useStop,
-  useToggleRecording,
-} from "../actions"
+import { useFastForwardOneBar, useRewindOneBar, useStop } from "../actions"
 import { hasFSAccess } from "../actions/file"
 import { fileInputID } from "../components/Navigation/LegacyFileMenu"
 import { useLocalization } from "../localize/useLocalization"
@@ -15,6 +10,7 @@ import { useRootView } from "./useRootView"
 import { useRouter } from "./useRouter"
 import { useSong } from "./useSong"
 import { useSongFile } from "./useSongFile"
+import { useToggleRecording } from "./useToggleRecording"
 
 export const useGlobalKeyboardShortcut = () => {
   const { setOpenHelpDialog } = useRootView()

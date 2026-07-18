@@ -1,6 +1,6 @@
 import { useCallback } from "react"
-import { usePlayer } from "../hooks/usePlayer"
-import { useStores } from "../hooks/useStores"
+import { usePlayer } from "./usePlayer"
+import { useStores } from "./useStores"
 
 export const useToggleRecording = () => {
   const { midiRecorder } = useStores()

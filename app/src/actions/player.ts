@@ -1,14 +1,8 @@
-import { Measure, noteOffMidiEvent, noteOnMidiEvent } from "@signal-app/core"
+import { Measure } from "@signal-app/core"
 import { useCallback } from "react"
-import {
-  usePianoRoll,
-  usePianoRollTickScroll,
-} from "../features/piano-roll/hooks/usePianoRoll"
+import { usePianoRollTickScroll } from "../features/piano-roll/hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useStores } from "../hooks/useStores"
-import { useTrackMute } from "../hooks/useTrackMute"
-import { useToggleGhostTrack } from "./track"
 
 export const useStop = () => {
   const { setScrollLeftInTicks } = usePianoRollTickScroll()
@@ -80,95 +74,4 @@ export const useFastForwardOneBar = () => {
     setPosition,
     setScrollLeftInPixels,
   ])
-}
-
-export const useNextTrack = () => {
-  const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
-  const { tracks } = useSong()
-
-  return useCallback(() => {
-    setSelectedTrackIndex(Math.min(selectedTrackIndex + 1, tracks.length - 1))
-  }, [selectedTrackIndex, setSelectedTrackIndex, tracks.length])
-}
-
-export const usePreviousTrack = () => {
-  const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
-
-  return useCallback(() => {
-    setSelectedTrackIndex(Math.max(selectedTrackIndex - 1, 1))
-  }, [selectedTrackIndex, setSelectedTrackIndex])
-}
-
-export const useToggleSolo = () => {
-  const { toggleSolo } = useTrackMute()
-  const { selectedTrackId } = usePianoRoll()
-
-  return useCallback(
-    () => toggleSolo(selectedTrackId),
-    [toggleSolo, selectedTrackId],
-  )
-}
-
-export const useToggleMute = () => {
-  const { toggleMute } = useTrackMute()
-  const { selectedTrackId } = usePianoRoll()
-
-  return useCallback(
-    () => toggleMute(selectedTrackId),
-    [toggleMute, selectedTrackId],
-  )
-}
-
-export const useToggleGhost = () => {
-  const { selectedTrackId } = usePianoRoll()
-  const toggleGhostTrack = useToggleGhostTrack()
-
-  return useCallback(
-    () => toggleGhostTrack(selectedTrackId),
-    [toggleGhostTrack, selectedTrackId],
-  )
-}
-
-export const useStartNote = () => {
-  const { synthGroup } = useStores()
-  const { sendEvent } = usePlayer()
-
-  return useCallback(
-    (
-      {
-        channel,
-        noteNumber,
-        velocity,
-      }: {
-        noteNumber: number
-        velocity: number
-        channel: number
-      },
-      delayTime = 0,
-    ) => {
-      synthGroup.activate()
-      sendEvent(noteOnMidiEvent(0, channel, noteNumber, velocity), delayTime)
-    },
-    [synthGroup, sendEvent],
-  )
-}
-
-export const useStopNote = () => {
-  const { sendEvent } = usePlayer()
-
-  return useCallback(
-    (
-      {
-        channel,
-        noteNumber,
-      }: {
-        noteNumber: number
-        channel: number
-      },
-      delayTime = 0,
-    ) => {
-      sendEvent(noteOffMidiEvent(0, channel, noteNumber, 0), delayTime)
-    },
-    [sendEvent],
-  )
 }

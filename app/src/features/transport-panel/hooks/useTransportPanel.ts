@@ -4,11 +4,11 @@ import {
   useFastForwardOneBar,
   useRewindOneBar,
   useStop,
-  useToggleRecording,
 } from "../../../actions"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
 import { useStores } from "../../../hooks/useStores"
+import { useToggleRecording } from "../../../hooks/useToggleRecording"
 import { useCanRecord } from "../../midi-device/hooks/useMIDIDevice"
 
 export function useTransportPanel() {

@@ -14,6 +14,7 @@ import { range } from "lodash"
 import { FC, useEffect, useState } from "react"
 import { useTrack } from "../../../hooks/useTrack"
 import { Localized } from "../../../localize/useLocalization"
+import { useSetTrackName } from "../hooks/useSetTrackName"
 import { TrackName } from "./TrackName"
 
 export interface TrackDialogProps {
@@ -53,7 +54,8 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   open,
   onClose,
 }) => {
-  const { name, channel, setName, setChannel } = useTrack(trackId)
+  const setName = useSetTrackName(trackId)
+  const { name, channel, setChannel } = useTrack(trackId)
   const [_name, _setName] = useState(name)
   const [_channel, _setChannel] = useState(channel)
 

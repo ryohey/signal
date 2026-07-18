@@ -13,7 +13,7 @@ export interface LineGraphItemsProps {
   scrollLeft: number
   items: (Point & { id: number })[]
   controlPoints: (Rect & { id: number })[]
-  selectedEventIds: number[]
+  selectedEventIds: readonly number[]
   lineWidth: number
   zIndex: number
   onMouseDownItem?: (e: MouseEvent, itemId: number) => void

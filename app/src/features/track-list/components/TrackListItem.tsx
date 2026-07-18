@@ -12,18 +12,16 @@ import React, {
   useRef,
   useState,
 } from "react"
-import {
-  useSelectTrack,
-  useToggleAllGhostTracks,
-  useToggleGhostTrack,
-} from "../../../actions"
-import { InstrumentBrowser } from "../../../components/InstrumentBrowser/InstrumentBrowser"
+import { useSelectTrack } from "../../../actions"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { useRouter } from "../../../hooks/useRouter"
+import { useToggleGhostTrack } from "../../../hooks/useToggleGhostTrack"
 import { useTrack } from "../../../hooks/useTrack"
 import { useTrackMute } from "../../../hooks/useTrackMute"
+import { InstrumentBrowser } from "../../instrument-browser"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { useMIDIActivity } from "../hooks/useMIDIActivity"
+import { useToggleAllGhostTracks } from "../hooks/useToggleAllGhostTracks"
 import { InstrumentEmoji, InstrumentName } from "./InstrumentName"
 import { TrackDialog } from "./TrackDialog"
 import { TrackListContextMenu } from "./TrackListContextMenu"

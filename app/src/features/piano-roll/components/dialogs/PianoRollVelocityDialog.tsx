@@ -1,33 +1,29 @@
 import { BatchUpdateOperation } from "@signal-app/core"
 import { useCallback } from "react"
-import { useBatchUpdateSelectedNotesVelocity } from "../../../../actions"
 import { VelocityDialog } from "../../../../components/VelocityDialog/VelocityDialog"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRollVelocityDialog } from "../../hooks/usePianoRollVelocityDialog"
 
 export const PianoRollVelocityDialog = () => {
-  const { openVelocityDialog, newNoteVelocity, setOpenVelocityDialog } =
-    usePianoRoll()
-  const batchUpdateSelectedNotesVelocity = useBatchUpdateSelectedNotesVelocity()
+  const { newNoteVelocity } = usePianoRoll()
+  const { isOpen, setOpen, updateVelocity } = usePianoRollVelocityDialog()
 
-  const onClose = useCallback(
-    () => setOpenVelocityDialog(false),
-    [setOpenVelocityDialog],
-  )
+  const onClose = useCallback(() => setOpen(false), [setOpen])
 
   const onClickOK = useCallback(
     (value: number, operationType: BatchUpdateOperation["type"]) => {
-      batchUpdateSelectedNotesVelocity({
+      updateVelocity({
         type: operationType,
         value,
       })
-      setOpenVelocityDialog(false)
+      setOpen(false)
     },
-    [setOpenVelocityDialog, batchUpdateSelectedNotesVelocity],
+    [setOpen, updateVelocity],
   )
 
   return (
     <VelocityDialog
-      open={openVelocityDialog}
+      open={isOpen}
       value={newNoteVelocity}
       onClickOK={onClickOK}
       onClose={onClose}

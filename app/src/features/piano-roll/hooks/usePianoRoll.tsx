@@ -166,9 +166,6 @@ export function usePianoRoll() {
     get openTransposeDialog() {
       return useAtomValue(openTransposeDialogAtom, { store })
     },
-    get openVelocityDialog() {
-      return useAtomValue(openVelocityDialogAtom, { store })
-    },
     get newNoteVelocity() {
       return useAtomValue(newNoteVelocityAtom, { store })
     },
@@ -181,7 +178,6 @@ export function usePianoRoll() {
     resetSelection: useSetAtom(resetSelectionAtom, { store }),
     setNotGhostTrackIds: useSetAtom(notGhostTrackIdsAtom, { store }),
     setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom, { store }),
-    setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom, { store }),
     setKeySignature: useSetAtom(keySignatureAtom, { store }),
     setMouseMode: useSetAtom(mouseModeAtom, { store }),
     addPreviewingNoteNumbers: useSetAtom(addPreviewingNoteNumbersAtom, {
@@ -242,7 +238,6 @@ const notGhostTrackIdsAtom = atom<ReadonlySet<TrackId>>(new Set<TrackId>())
 const newNoteVelocityAtom = atom<number>(100)
 const keySignatureAtom = atom<KeySignature | null>(null)
 const openTransposeDialogAtom = atom<boolean>(false)
-const openVelocityDialogAtom = atom<boolean>(false)
 const previewingNoteNumbersAtom = atom<ReadonlySet<number>>(new Set<number>())
 const activePaneAtom = atom<"notes" | "control" | null>(null)
 

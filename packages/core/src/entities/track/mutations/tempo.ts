@@ -14,7 +14,7 @@ import {
 } from "./basic"
 
 export const moveTempoEvents = (
-  eventIds: number[],
+  eventIds: readonly number[],
   deltaTick: number,
   deltaValue: number,
   maxBPM: number,

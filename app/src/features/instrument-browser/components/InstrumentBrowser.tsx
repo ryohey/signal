@@ -13,17 +13,12 @@ import {
 } from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
 import React, { type FC, useCallback, useEffect, useState } from "react"
-import { InstrumentName } from "../../features/track-list/components/InstrumentName"
-import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
-import { useTrack } from "../../hooks/useTrack"
-import { Localized } from "../../localize/useLocalization"
+import { useTrack } from "../../../hooks/useTrack"
+import { Localized } from "../../../localize/useLocalization"
+import { InstrumentName } from "../../track-list/components/InstrumentName"
+import { useInstrumentBrowser } from "../hooks/useInstrumentBrowser"
 import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName"
 import { SelectBox } from "./SelectBox"
-
-export interface InstrumentSetting {
-  readonly programNumber: number
-  readonly isRhythmTrack: boolean
-}
 
 const Finder = styled.div`
   display: flex;

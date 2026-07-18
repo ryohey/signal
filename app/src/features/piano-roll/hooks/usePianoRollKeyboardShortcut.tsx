@@ -1,17 +1,50 @@
-import { useMemo } from "react"
-import {
-  useNextTrack,
-  usePreviousTrack,
-  useToggleGhost,
-  useToggleMute,
-  useToggleSolo,
-} from "../../../actions"
+import { useCallback, useMemo } from "react"
 import { useKeyboardShortcut } from "../../../hooks/useKeyboardShortcut"
+import { useSong } from "../../../hooks/useSong"
+import { useTrackMute } from "../../../hooks/useTrackMute"
 import { useSelectAllNotes } from "./selection"
 import { useNoteCoordTransform } from "./useNoteCoordTransform"
 import { usePianoRoll } from "./usePianoRoll"
+import { useToggleGhost } from "./useToggleGhost"
 
 const SCROLL_DELTA = 24
+
+const useToggleMute = () => {
+  const { toggleMute } = useTrackMute()
+  const { selectedTrackId } = usePianoRoll()
+
+  return useCallback(
+    () => toggleMute(selectedTrackId),
+    [toggleMute, selectedTrackId],
+  )
+}
+
+const useToggleSolo = () => {
+  const { toggleSolo } = useTrackMute()
+  const { selectedTrackId } = usePianoRoll()
+
+  return useCallback(
+    () => toggleSolo(selectedTrackId),
+    [toggleSolo, selectedTrackId],
+  )
+}
+
+const useNextTrack = () => {
+  const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
+  const { tracks } = useSong()
+
+  return useCallback(() => {
+    setSelectedTrackIndex(Math.min(selectedTrackIndex + 1, tracks.length - 1))
+  }, [selectedTrackIndex, setSelectedTrackIndex, tracks.length])
+}
+
+const usePreviousTrack = () => {
+  const { selectedTrackIndex, setSelectedTrackIndex } = usePianoRoll()
+
+  return useCallback(() => {
+    setSelectedTrackIndex(Math.max(selectedTrackIndex - 1, 1))
+  }, [selectedTrackIndex, setSelectedTrackIndex])
+}
 
 export const usePianoRollKeyboardShortcut = () => {
   const { setMouseMode } = usePianoRoll()
