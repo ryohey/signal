@@ -1,4 +1,5 @@
 import { mapValues } from "lodash"
+import { isEventInRange } from "../../../helpers/filterEvents"
 import {
   ArrangeEventsClipboardData,
   BatchUpdateOperation,
@@ -8,10 +9,10 @@ import {
   Track,
   TrackEvent,
   transposeNotes,
-} from "../entities"
-import { ArrangeSelection } from "../entities/selection/ArrangeSelection"
-import { ArrangePoint } from "../entities/transform/ArrangePoint"
-import { isEventInRange } from "../helpers/filterEvents"
+} from "../.."
+import { ArrangeSelection } from "../../selection/ArrangeSelection"
+import { ArrangePoint } from "../../transform/ArrangePoint"
+import { SongTracksCommand } from "./type"
 
 const runTrackTransaction = <T>(tracks: readonly Track[], fn: () => T): T => {
   const runInAllTracks = (index: number): T => {
@@ -26,11 +27,11 @@ const runTrackTransaction = <T>(tracks: readonly Track[], fn: () => T): T => {
 
 // returns moved event ids
 export const moveEventsBetweenTracks =
-  (tracks: readonly Track[]) =>
   (
     eventIdForTrackIndex: { [trackIndex: number]: number[] },
     delta: ArrangePoint,
-  ) => {
+  ): SongTracksCommand<{ [trackIndex: number]: number[] }> =>
+  (tracks) => {
     return runTrackTransaction(tracks, () => {
       const updates = []
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
@@ -73,9 +74,12 @@ export const moveEventsBetweenTracks =
   }
 
 export const batchUpdateArrangeNotesVelocity =
-  (tracks: readonly Track[]) =>
-  (selection: ArrangeSelection, operation: BatchUpdateOperation) => {
-    const eventIdForTrackIndex = getEventsInSelection(tracks)(selection)
+  (
+    selection: ArrangeSelection,
+    operation: BatchUpdateOperation,
+  ): SongTracksCommand<void> =>
+  (tracks) => {
+    const eventIdForTrackIndex = getEventsInSelection(selection)(tracks)
     runTrackTransaction(tracks, () => {
       for (const [trackIndexStr, selectedEventIdsValue] of Object.entries(
         eventIdForTrackIndex,
@@ -88,10 +92,10 @@ export const batchUpdateArrangeNotesVelocity =
   }
 
 export const duplicateSelection =
-  (tracks: readonly Track[]) =>
-  (selection: ArrangeSelection): ArrangeSelection => {
+  (selection: ArrangeSelection): SongTracksCommand<ArrangeSelection> =>
+  (tracks) => {
     const deltaTick = selection.toTick - selection.fromTick
-    const selectedEventIds = getEventsInSelection(tracks)(selection)
+    const selectedEventIds = getEventsInSelection(selection)(tracks)
 
     runTrackTransaction(tracks, () => {
       for (const [trackIndexStr, eventIds] of Object.entries(
@@ -119,8 +123,9 @@ export const duplicateSelection =
   }
 
 export const deleteSelection =
-  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
-    const selectedEventIds = getEventsInSelection(tracks)(selection)
+  (selection: ArrangeSelection): SongTracksCommand<void> =>
+  (tracks) => {
+    const selectedEventIds = getEventsInSelection(selection)(tracks)
     runTrackTransaction(tracks, () => {
       for (const trackIndex in selectedEventIds) {
         tracks[trackIndex].removeEvents(selectedEventIds[trackIndex])
@@ -129,9 +134,9 @@ export const deleteSelection =
   }
 
 export const transposeSelection =
-  (tracks: readonly Track[]) =>
-  (selection: ArrangeSelection, deltaPitch: number) => {
-    const selectedEventIds = getEventsInSelection(tracks)(selection)
+  (selection: ArrangeSelection, deltaPitch: number): SongTracksCommand<void> =>
+  (tracks) => {
+    const selectedEventIds = getEventsInSelection(selection)(tracks)
 
     runTrackTransaction(tracks, () => {
       for (const trackIndexStr in selectedEventIds) {
@@ -147,9 +152,11 @@ export const transposeSelection =
   }
 
 export const getArrangeClipboardDataForSelection =
-  (tracks: readonly Track[]) =>
-  (selection: ArrangeSelection): ArrangeEventsClipboardData => {
-    const selectedEventIds = getEventsInSelection(tracks)(selection)
+  (
+    selection: ArrangeSelection,
+  ): SongTracksCommand<ArrangeEventsClipboardData> =>
+  (tracks) => {
+    const selectedEventIds = getEventsInSelection(selection)(tracks)
 
     const events = mapValues(selectedEventIds, (ids, trackIndex) => {
       const track = tracks[parseInt(trackIndex, 10)]
@@ -166,12 +173,12 @@ export const getArrangeClipboardDataForSelection =
   }
 
 export const pasteClipboardDataAt =
-  (tracks: readonly Track[]) =>
   (
     data: ArrangeEventsClipboardData,
     position: number,
     selectedTrackIndex: number,
-  ) => {
+  ): SongTracksCommand<void> =>
+  (tracks) => {
     runTrackTransaction(tracks, () => {
       for (const trackIndex in data.events) {
         const events = data.events[trackIndex].map((note) => ({
@@ -195,7 +202,10 @@ export const pasteClipboardDataAt =
 
 // returns { trackIndex: [eventId] }
 export const getEventsInSelection =
-  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
+  (
+    selection: ArrangeSelection,
+  ): SongTracksCommand<{ [key: number]: number[] }> =>
+  (tracks) => {
     const ids: { [key: number]: number[] } = {}
     for (
       let trackIndex = selection.fromTrackIndex;
@@ -212,7 +222,8 @@ export const getEventsInSelection =
   }
 
 export const hasSelectionNotes =
-  (tracks: readonly Track[]) => (selection: ArrangeSelection) => {
-    const selectedEventIds = getEventsInSelection(tracks)(selection)
+  (selection: ArrangeSelection): SongTracksCommand<boolean> =>
+  (tracks) => {
+    const selectedEventIds = getEventsInSelection(selection)(tracks)
     return Object.values(selectedEventIds).some((ids) => ids.length > 0)
   }

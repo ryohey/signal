@@ -7,6 +7,7 @@ import {
   notesToClipboardData,
   PianoNotesClipboardDataSchema,
   quantizeNotes,
+  removeEvents,
   transposeNotes,
 } from "@signal-app/core"
 import { useCallback } from "react"
@@ -14,7 +15,6 @@ import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
-import { useTrack } from "../../../hooks/useTrack"
 import { useTrackQuery } from "../../../hooks/useTrackQuery"
 import {
   readClipboardData,
@@ -87,7 +87,7 @@ export const useDeleteSelection = () => {
     setSelection,
     setSelectedNoteIds,
   } = usePianoRoll()
-  const { removeEvents } = useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
   return useCallback(() => {
@@ -99,14 +99,14 @@ export const useDeleteSelection = () => {
 
     // 選択範囲と選択されたノートを削除
     // Remove selected notes and selected notes
-    removeEvents(selectedNoteIds)
+    mutate(removeEvents(selectedNoteIds))
     setSelection(null)
     setSelectedNoteIds([])
   }, [
     selectedNoteIds,
     selection,
     pushHistory,
-    removeEvents,
+    mutate,
     setSelection,
     setSelectedNoteIds,
   ])

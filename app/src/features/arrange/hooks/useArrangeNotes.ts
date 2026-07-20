@@ -1,4 +1,4 @@
-import { isNoteEvent, NoteEvent, TrackId } from "@signal-app/core"
+import { ArrangeNote, getArrangeNotes } from "@signal-app/core"
 import { combineSubscription } from "@signal-app/observable"
 import { useCallback, useMemo } from "react"
 import { useDerivedValue } from "../../../hooks/useDerivedValue"
@@ -7,14 +7,6 @@ import { useArrangeNoteTransform } from "./useArrangeNoteTransform"
 import { useArrangeTransform } from "./useArrangeTransform"
 
 const NOTE_RECT_HEIGHT = 1
-
-interface ArrangeNote {
-  tick: number
-  duration: number
-  event: NoteEvent
-  trackId: TrackId
-  trackIndex: number
-}
 
 export function useArrangeNotes() {
   const { trackTransform } = useArrangeTransform()
@@ -31,13 +23,7 @@ export function useArrangeNotes() {
     useCallback(
       () =>
         tracks.flatMap((track, index) =>
-          track.events.filter(isNoteEvent).map((event) => ({
-            tick: event.tick,
-            duration: event.duration,
-            event,
-            trackId: track.id,
-            trackIndex: index,
-          })),
+          track.query(getArrangeNotes(track.id, index)),
         ),
       [tracks],
     ),

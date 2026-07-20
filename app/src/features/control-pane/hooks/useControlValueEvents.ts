@@ -1,24 +1,20 @@
 import {
+  getControlEventsInRangeWithPrevious,
   isControllerEventWithType,
   isPitchBendEvent,
   TrackEventOf,
 } from "@signal-app/core"
-import { maxBy } from "lodash"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useMemo } from "react"
-import { isNotUndefined } from "../../../helpers/array"
-import { useEventView } from "../../../hooks/useEventView"
+import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import { useTrack } from "../../../hooks/useTrack"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { useControlPane } from "./useControlPane"
 
 export function useControlValueEvents() {
   const { controlMode } = useControlPane()
-  const { transform, scrollLeft } = useTickScroll()
+  const { tickRange } = useTickScroll()
   const { selectedTrackId } = usePianoRoll()
-  const windowedEvents = useEventView()
-  const { events: selectedTrackEvents } = useTrack(selectedTrackId)
 
   const filter = useMemo(() => {
     switch (controlMode.type) {
@@ -31,25 +27,13 @@ export function useControlValueEvents() {
     }
   }, [controlMode])
 
-  const events = useMemo(
-    () => windowedEvents.filter(filter),
-    [windowedEvents, filter],
+  const query = useMemo(
+    () => getControlEventsInRangeWithPrevious(filter, tickRange),
+    [filter, tickRange],
   )
 
-  // controller events in the outside of the visible area
-  const prevEvent = useMemo(() => {
-    const controllerEvents = selectedTrackEvents.filter(filter)
-    const tickStart = transform.getTick(scrollLeft)
-
-    return maxBy(
-      controllerEvents.filter((e) => e.tick < tickStart),
-      (e) => e.tick,
-    )
-  }, [filter, scrollLeft, transform, selectedTrackEvents])
-
-  const controlValueEvents = useMemo(() => {
-    return [prevEvent, ...events].filter(isNotUndefined)
-  }, [events, prevEvent])
+  const controlValueEvents =
+    useSyncTrackQuery(selectedTrackId, query, filter) ?? []
 
   return controlValueEvents as (
     | TrackEventOf<ControllerEvent>

@@ -1,19 +1,21 @@
 import { flow } from "lodash"
-import { isEventInRange, map } from "../../../helpers"
+import { filter, isEventInRange, map } from "../../../helpers"
 import { PianoNotesClipboardData } from "../../clipboard/clipboardTypes"
 import { isNoteEvent, moveEvent } from "../../event"
 import { TrackEvent } from "../../event/TrackEvent"
 import { Range } from "../../geometry/Range"
 import { getNotesDuration, quantizeNote, transposeNote } from "../../note"
-import { getNotesByIds } from "../queries"
-import { TrackEventsMutator } from "../Track"
-import { addEvents, updateEvents } from "./basic"
+import { getAll, getNotesByIds } from "../queries"
+import { addEvents, updateEvents } from "./composed"
+import { TrackEventsMutator } from "./type"
 
 export const transposeNotes =
   (noteIds: readonly number[], deltaPitch: number): TrackEventsMutator =>
   (events) => {
-    const notes = getNotesByIds(noteIds)(events)
-    const transposedNotes = notes.map(transposeNote(deltaPitch))
+    const transposedNotes = flow(
+      getNotesByIds(noteIds),
+      map(transposeNote(deltaPitch)),
+    )(events)
     return updateEvents(transposedNotes)(events)
   }
 
@@ -76,7 +78,7 @@ export const updateVelocitiesInRange =
     const notes =
       selectedNoteIds.length > 0
         ? getNotesByIds(selectedNoteIds)(events)
-        : events.getArray().filter(isNoteEvent)
+        : flow(getAll, filter(isNoteEvent))(events)
 
     const eventsToUpdate = notes.filter(
       isEventInRange(Range.create(minTick, maxTick)),

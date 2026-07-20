@@ -42,14 +42,13 @@ flowchart LR
 Signal follows a strict app/core boundary:
 
 - App layer (`app`) uses Jotai for UI and feature state composition.
-- Core domain (`@signal-app/core`) uses MobX internally.
-- MobX is not exposed as a public app-facing API.
+- Core domain (`@signal-app/core`) keeps its internal state implementation private.
 - App sync with core state is done via `useSyncExternalStore`-compatible subscriptions.
 
 Why this matters:
 
 - Keeps React integration stable and explicit.
-- Prevents MobX implementation details from leaking into feature code.
+- Prevents core implementation details from leaking into feature code.
 - Enables future core internal changes with minimal app-level breakage.
 
 ## 4. Package Architecture

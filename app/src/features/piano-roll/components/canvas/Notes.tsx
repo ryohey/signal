@@ -1,5 +1,7 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
+import { removeEvents } from "@signal-app/core"
 import React, { FC, useCallback, useMemo } from "react"
+import { useMutateTrack } from "../../../../hooks/useCommand"
 import { useTrack } from "../../../../hooks/useTrack"
 import { useSettings } from "../../../setting/hooks/useSettings"
 import { useAddNoteToSelectionGesture } from "../../gestures/useAddNoteToSelectionGesture"
@@ -81,7 +83,7 @@ const _Notes: FC<NotesContentProps> = ({ zIndex, notes }) => {
 
 const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
   const { selectedNoteIds, selectedTrackId } = usePianoRoll()
-  const { removeEvent } = useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const dragNoteCenterGesture = useDragNoteCenterGesture()
   const dragNoteLeftGesture = useDragNoteLeftGesture()
   const dragNoteRightGesture = useDragNoteRightGesture()
@@ -114,7 +116,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
           break
         }
         case 2:
-          removeEvent(item.id)
+          mutate(removeEvents([item.id]))
           break
         default:
           return null
@@ -122,7 +124,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
     },
     [
       selectedNoteIds,
-      removeEvent,
+      mutate,
       dragNoteCenterGesture,
       dragNoteLeftGesture,
       dragNoteRightGesture,
@@ -136,10 +138,10 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
       // Right click to remove note while dragging
       if (e.buttons === 2) {
         e.stopPropagation()
-        removeEvent(item.id)
+        mutate(removeEvents([item.id]))
       }
     },
-    [removeEvent],
+    [mutate],
   )
 
   return (

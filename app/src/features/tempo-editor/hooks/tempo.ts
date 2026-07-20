@@ -1,12 +1,12 @@
 import {
   addClipboardTempoEvents,
   duplicateEvents,
+  removeEvents,
   TempoEventsClipboardDataSchema,
   tempoEventsToClipboardData,
 } from "@signal-app/core"
 import { useCallback } from "react"
 import { useMutateConductorTrack } from "../../../hooks/useCommand"
-import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useConductorTrackQuery } from "../../../hooks/useTrackQuery"
@@ -18,7 +18,7 @@ import {
 import { useTempoEditor } from "./useTempoEditor"
 
 export const useDeleteTempoSelection = () => {
-  const { removeEvents } = useConductorTrack()
+  const mutate = useMutateConductorTrack()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useTempoEditor()
 
@@ -31,7 +31,7 @@ export const useDeleteTempoSelection = () => {
 
     // 選択範囲と選択されたノートを削除
     // Remove selected notes and selected notes
-    removeEvents(selectedEventIds)
+    mutate(removeEvents(selectedEventIds))
     setSelection(null)
   }
 }
@@ -64,7 +64,7 @@ export const usePasteTempoSelection = () => {
       }
 
       pushHistory()
-      mutate(addClipboardTempoEvents(data, position))
+      mutate(addClipboardTempoEvents(data, position)) ?? []
     },
     [pushHistory, mutate, position],
   )
@@ -83,7 +83,7 @@ export const useCutTempoSelection = () => {
 export const useDuplicateTempoSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
-  const mutateConductorTrack = useMutateConductorTrack()
+  const mutate = useMutateConductorTrack()
 
   return () => {
     if (selectedEventIds.length === 0) {
@@ -92,8 +92,7 @@ export const useDuplicateTempoSelection = () => {
 
     pushHistory()
 
-    const addedEventIds =
-      mutateConductorTrack(duplicateEvents(selectedEventIds)) ?? []
+    const addedEventIds = mutate(duplicateEvents(selectedEventIds)) ?? []
 
     // select the created events
     setSelectedEventIds(addedEventIds)

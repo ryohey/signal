@@ -1,14 +1,14 @@
 import {
   getProgramNumberEvent,
-  Track,
+  isProgramChangeEvent,
   TrackColor,
-  TrackEvent,
   TrackId,
 } from "@signal-app/core"
 import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
+import { useSyncTrackQuery } from "./useSyncTrackQuery"
 import { useTrackMute } from "./useTrackMute"
 
 const noop = () => () => {}
@@ -33,14 +33,8 @@ export function useTrack(id: TrackId) {
     },
     get programNumber() {
       const { position } = usePlayer()
-      return useSyncExternalStore(
-        track?.onProgramChangeEventsChanged.subscribe ?? noop,
-        useCallback(
-          () =>
-            getProgramNumberEvent(position)(track?.events ?? [])?.value ?? 0,
-          [track, position],
-        ),
-      )
+      const query = useMemo(() => getProgramNumberEvent(position), [position])
+      return useSyncTrackQuery(id, query, isProgramChangeEvent)?.value ?? 0
     },
     get name() {
       return useSyncExternalStore(
@@ -95,55 +89,6 @@ export function useTrack(id: TrackId) {
       (channel: number | undefined) => {
         if (track) {
           track.channel = channel
-        }
-      },
-      [track],
-    ),
-    ...useTrackEvents(track),
-  }
-}
-
-export function useTrackEvents(track: Track | undefined) {
-  return {
-    removeEvent: useCallback(
-      (eventId: number) => {
-        if (track) {
-          track.removeEvent(eventId)
-        }
-      },
-      [track],
-    ),
-    removeEvents: useCallback(
-      (eventIds: readonly number[]) => {
-        if (track) {
-          track.removeEvents(eventIds)
-        }
-      },
-      [track],
-    ),
-    createOrUpdate: useCallback(
-      <T extends TrackEvent>(
-        newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
-      ) => {
-        if (track) {
-          return track.createOrUpdate(newEvent)
-        }
-      },
-      [track],
-    ),
-    updateEvent: useCallback(
-      <T extends TrackEvent>(id: number, obj: Partial<T>): T | null => {
-        if (track) {
-          return track.updateEvent(id, obj)
-        }
-        return null
-      },
-      [track],
-    ),
-    updateEvents: useCallback(
-      (events: Partial<TrackEvent>[]) => {
-        if (track) {
-          track.updateEvents(events)
         }
       },
       [track],

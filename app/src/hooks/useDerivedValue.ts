@@ -1,49 +1,5 @@
-import { Emitter, Unsubscribe } from "@signal-app/observable"
-import { useMemo, useSyncExternalStore } from "react"
-
-interface DerivedValueOptions<T> {
-  subscribeSource: (onSourceChange: () => void) => Unsubscribe
-  deriveValue: () => T
-}
-
-class DerivedValue<T> {
-  private readonly onChanged = new Emitter()
-  private readonly subscribeSource: (onSourceChange: () => void) => Unsubscribe
-  private readonly deriveValue: () => T
-  private unsubscribeSource: Unsubscribe | null = null
-  private value: T
-
-  constructor(options: DerivedValueOptions<T>) {
-    this.subscribeSource = options.subscribeSource
-    this.deriveValue = options.deriveValue
-    this.value = this.deriveValue()
-  }
-
-  subscribe = (listener: () => void) => {
-    const unsubscribe = this.onChanged.subscribe(listener)
-    if (this.onChanged.listenerCount === 1) {
-      this.unsubscribeSource = this.subscribeSource(this.handleSourceChanged)
-    }
-    return () => {
-      unsubscribe()
-      if (this.onChanged.listenerCount === 0) {
-        this.unsubscribeSource?.()
-        this.unsubscribeSource = null
-      }
-    }
-  }
-
-  getSnapshot = () => this.value
-
-  private handleSourceChanged = () => {
-    const nextValue = this.deriveValue()
-    if (Object.is(nextValue, this.value)) {
-      return
-    }
-    this.value = nextValue
-    this.onChanged.emit()
-  }
-}
+import { Unsubscribe } from "@signal-app/observable"
+import { useCallback, useRef, useSyncExternalStore } from "react"
 
 /**
  * Subscribes to an external source and exposes a derived value through
@@ -59,9 +15,42 @@ export function useDerivedValue<T>(
   subscribeSource: (onSourceChange: () => void) => Unsubscribe,
   deriveValue: () => T,
 ): T {
-  const derivedValue = useMemo(
-    () => new DerivedValue({ subscribeSource, deriveValue }),
-    [subscribeSource, deriveValue],
+  const deriveValueRef = useRef(deriveValue)
+
+  const valueRef = useRef<{ initialized: boolean; value: T | undefined }>({
+    initialized: false,
+    value: undefined,
+  })
+
+  if (!valueRef.current.initialized) {
+    valueRef.current = {
+      initialized: true,
+      value: deriveValue(),
+    }
+  }
+
+  if (deriveValueRef.current !== deriveValue) {
+    deriveValueRef.current = deriveValue
+    const nextValue = deriveValue()
+    if (!Object.is(nextValue, valueRef.current.value)) {
+      valueRef.current.value = nextValue
+    }
+  }
+
+  const subscribe = useCallback(
+    (listener: () => void) =>
+      subscribeSource(() => {
+        const nextValue = deriveValueRef.current()
+        if (Object.is(nextValue, valueRef.current.value)) {
+          return
+        }
+        valueRef.current.value = nextValue
+        listener()
+      }),
+    [subscribeSource],
   )
-  return useSyncExternalStore(derivedValue.subscribe, derivedValue.getSnapshot)
+
+  const getSnapshot = useCallback(() => valueRef.current.value as T, [])
+
+  return useSyncExternalStore(subscribe, getSnapshot)
 }

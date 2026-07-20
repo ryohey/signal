@@ -10,14 +10,14 @@ import { usePianoRoll } from "./usePianoRoll"
 const PAN_CENTER = 64
 
 export function usePanSlider() {
-  const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
+  const { selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { channel } = useTrack(trackId)
   const mutateTrack = useMutateTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
   const query = useMemo(() => getPan(position), [position])
-  const currentPanEvent = useSyncTrackQuery(selectedTrack, query, isPanEvent)
+  const currentPanEvent = useSyncTrackQuery(trackId, query, isPanEvent)
 
   const setTrackPan = useCallback(
     (pan: number) => {

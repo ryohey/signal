@@ -1,6 +1,7 @@
 import { isNoteEvent, NoteEvent } from "../../event"
-import { TrackEventsMutator } from "../Track"
+import { getEventById } from "../queries/basic"
 import { updateEvent } from "./basic"
+import { TrackEventsMutator } from "./type"
 
 export const dragNote =
   (
@@ -12,7 +13,7 @@ export const dragNote =
     draggablePosition: "left" | "right" | "center",
   ): TrackEventsMutator<NoteEvent | null> =>
   (events) => {
-    const note = events.get(noteId)
+    const note = getEventById(noteId)(events)
     if (note === undefined || !isNoteEvent(note)) {
       return null
     }

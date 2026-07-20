@@ -15,18 +15,14 @@ import { usePianoRoll } from "../hooks/usePianoRoll"
 const DEFAULT_VOLUME = 100
 
 export function useVolumeSlider() {
-  const { selectedTrack, selectedTrackId: trackId } = usePianoRoll()
+  const { selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { channel } = useTrack(trackId)
   const mutateTrack = useMutateTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
   const query = useMemo(() => getVolume(position), [position])
-  const currentVolumeEvent = useSyncTrackQuery(
-    selectedTrack,
-    query,
-    isVolumeEvent,
-  )
+  const currentVolumeEvent = useSyncTrackQuery(trackId, query, isVolumeEvent)
 
   const setTrackVolume = useCallback(
     (volume: number) => {

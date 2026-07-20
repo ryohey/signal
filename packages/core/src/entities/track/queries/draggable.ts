@@ -2,8 +2,9 @@ import { max, min } from "lodash"
 import { MaxNoteNumber } from "../../../helpers"
 import { isNoteEvent } from "../../event"
 import { Range } from "../../geometry/Range"
-import { TrackEventsQuery } from "./basic"
+import { getEventById } from "./basic"
 import { getNotesByIds } from "./note"
+import { TrackEventsQuery } from "./type"
 
 interface NotePoint {
   readonly tick: number
@@ -16,7 +17,7 @@ export const getDraggablePosition =
     position: "left" | "center" | "right",
   ): TrackEventsQuery<NotePoint | null> =>
   (events) => {
-    const note = events.get(noteId)
+    const note = getEventById(noteId)(events)
     if (note === undefined || !isNoteEvent(note)) {
       return null
     }
@@ -44,7 +45,7 @@ export const getDraggableArea =
     noteNumberRange: Range
   } | null> =>
   (events) => {
-    const note = events.get(noteId)
+    const note = getEventById(noteId)(events)
     if (note === undefined || !isNoteEvent(note)) {
       return null
     }

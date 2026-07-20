@@ -1,21 +1,21 @@
+import { getEventsByIdsOrAll } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useMemo } from "react"
-import { useTrack } from "../../../hooks/useTrack"
+import { useTrackQuery } from "../../../hooks/useTrackQuery"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 
 export function useEventList() {
   return {
     get events() {
       const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-      const { events: trackEvents } = useTrack(selectedTrackId)
+      const queryTrack = useTrackQuery(selectedTrackId)
+      const query = useMemo(
+        () => getEventsByIdsOrAll(selectedNoteIds),
+        [selectedNoteIds],
+      )
       return useMemo(() => {
-        if (selectedNoteIds.length > 0) {
-          return trackEvents.filter(
-            (event) => selectedNoteIds.indexOf(event.id) >= 0,
-          )
-        }
-        return trackEvents
-      }, [trackEvents, selectedNoteIds])
+        return queryTrack(query) ?? []
+      }, [queryTrack, query])
     },
     get isOpen() {
       return useAtomValue(showEventListAtom)

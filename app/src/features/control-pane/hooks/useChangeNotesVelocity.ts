@@ -1,24 +1,27 @@
+import { updateEvents } from "@signal-app/core"
 import { useCallback } from "react"
+import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
-import { useTrack } from "../../../hooks/useTrack"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 
 export const useChangeNotesVelocity = () => {
   const { selectedTrackId, setNewNoteVelocity } = usePianoRoll()
-  const { updateEvents } = useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const { pushHistory } = useHistory()
 
   return useCallback(
     (noteIds: number[], velocity: number) => {
       pushHistory()
-      updateEvents(
-        noteIds.map((id) => ({
-          id,
-          velocity: velocity,
-        })),
+      mutate(
+        updateEvents(
+          noteIds.map((id) => ({
+            id,
+            velocity,
+          })),
+        ),
       )
       setNewNoteVelocity(velocity)
     },
-    [pushHistory, updateEvents, setNewNoteVelocity],
+    [pushHistory, mutate, setNewNoteVelocity],
   )
 }

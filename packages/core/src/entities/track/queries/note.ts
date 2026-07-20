@@ -4,7 +4,18 @@ import { PianoNotesClipboardData } from "../../clipboard/clipboardTypes"
 import { isNoteEvent, NoteEvent } from "../../event"
 import { Range } from "../../geometry/Range"
 import { isNoteInRange, sortedNotes } from "../../note"
-import { getEventsByIds, TrackEventsQuery } from "./basic"
+import { TrackId } from "../Track"
+import { getAll } from "./basic"
+import { getEventsByIds } from "./composed"
+import { TrackEventsQuery } from "./type"
+
+export type ArrangeNote = {
+  readonly tick: number
+  readonly duration: number
+  readonly event: NoteEvent
+  readonly trackId: TrackId
+  readonly trackIndex: number
+}
 
 export type NoteSelection = {
   readonly fromTick: number
@@ -39,12 +50,27 @@ export const notesToClipboardData =
   }
 
 const getAllNotes = (): TrackEventsQuery<readonly NoteEvent[]> =>
-  flow((events) => events.getArray(), filter(isNoteEvent))
+  flow(getAll, filter(isNoteEvent))
 
 export const getAllNoteIds = (): TrackEventsQuery<readonly number[]> =>
   flow(
     getAllNotes(),
     map((e) => e.id),
+  )
+
+export const getArrangeNotes = (
+  trackId: TrackId,
+  trackIndex: number,
+): TrackEventsQuery<readonly ArrangeNote[]> =>
+  flow(
+    getAllNotes(),
+    map((event) => ({
+      tick: event.tick,
+      duration: event.duration,
+      event,
+      trackId,
+      trackIndex,
+    })),
   )
 
 const getNotesInSelection = (
@@ -77,7 +103,7 @@ export const getNeighborNote =
     if (selectedNoteIds.length === 0) {
       return null
     }
-    const allNotes = events.getArray().filter(isNoteEvent)
+    const allNotes = flow(getAll, filter(isNoteEvent))(events)
     const selectedNotes = sortedNotes(getNotesByIds(selectedNoteIds)(events))
     if (selectedNotes.length === 0) {
       return null

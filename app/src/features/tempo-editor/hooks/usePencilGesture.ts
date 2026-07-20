@@ -1,5 +1,6 @@
 import {
   bpmToUSecPerBeat,
+  createOrUpdate,
   isSetTempoEvent,
   Range,
   setTempoMidiEvent,
@@ -11,7 +12,6 @@ import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useMutateConductorTrack } from "../../../hooks/useCommand"
-import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"
@@ -42,7 +42,7 @@ export const usePencilGesture = (): MouseDownHandler<
 > => {
   const { pushHistory } = useHistory()
   const { quantizeRound } = useQuantizer()
-  const { createOrUpdate } = useConductorTrack()
+  const mutate = useMutateConductorTrack()
   const updateTempoEventsInRange = useUpdateTempoEventsInRange()
 
   return useCallback(
@@ -57,7 +57,7 @@ export const usePencilGesture = (): MouseDownHandler<
         ...setTempoMidiEvent(0, Math.round(bpm)),
         tick: quantizeRound(pos.tick),
       }
-      createOrUpdate(event)
+      mutate(createOrUpdate(event))
 
       let lastTick = pos.tick
       let lastValue = pos.bpm
@@ -83,6 +83,6 @@ export const usePencilGesture = (): MouseDownHandler<
         },
       })
     },
-    [pushHistory, quantizeRound, createOrUpdate, updateTempoEventsInRange],
+    [pushHistory, quantizeRound, mutate, updateTempoEventsInRange],
   )
 }

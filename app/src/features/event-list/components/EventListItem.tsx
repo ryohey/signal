@@ -1,7 +1,7 @@
-import { TrackEvent } from "@signal-app/core"
+import { removeEvents, TrackEvent, updateEvent } from "@signal-app/core"
 import isEqual from "lodash/isEqual"
 import React, { FC, useCallback } from "react"
-import { useTrack } from "../../../hooks/useTrack"
+import { useMutateTrack } from "../../../hooks/useCommand"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { getEventController } from "../lib/EventController"
 import { Cell, Row } from "./EventList"
@@ -24,25 +24,25 @@ const equalEventListItemProps = (
 export const EventListItem: FC<EventListItemProps> = React.memo(
   ({ item, style, onClick }) => {
     const { selectedTrackId } = usePianoRoll()
-    const { removeEvent, updateEvent } = useTrack(selectedTrackId)
+    const mutate = useMutateTrack(selectedTrackId)
 
     const controller = getEventController(item)
 
     const onDelete = useCallback(
       (e: TrackEvent) => {
-        removeEvent(e.id)
+        mutate(removeEvents([e.id]))
       },
-      [removeEvent],
+      [mutate],
     )
 
     const onChangeTick = useCallback(
       (input: string) => {
         const value = parseInt(input, 10)
         if (!Number.isNaN(value)) {
-          updateEvent(item.id, { tick: Math.max(0, value) })
+          mutate(updateEvent(item.id, { tick: Math.max(0, value) }))
         }
       },
-      [updateEvent, item],
+      [mutate, item],
     )
 
     const onChangeGate = useCallback(
@@ -52,10 +52,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.gate.update(value)
         if (obj !== null) {
-          updateEvent(item.id, obj)
+          mutate(updateEvent(item.id, obj))
         }
       },
-      [controller, updateEvent, item],
+      [controller, mutate, item],
     )
 
     const onChangeValue = useCallback(
@@ -65,10 +65,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.value.update(value)
         if (obj !== null) {
-          updateEvent(item.id, obj)
+          mutate(updateEvent(item.id, obj))
         }
       },
-      [controller, updateEvent, item],
+      [controller, mutate, item],
     )
 
     return (

@@ -15,8 +15,6 @@ import { Branded } from "../../types"
 import { getColorEvent, getMaxTick, getTrackNameEvent } from "../event"
 import {
   isNoteEvent,
-  isProgramChangeEvent,
-  isSetTempoEvent,
   isTimeSignatureEvent,
   isTrackNameEvent,
 } from "../event/identify"
@@ -26,20 +24,17 @@ import {
 } from "../event/signalEvents"
 import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
 import * as TrackEvents from "./mutations"
-import { TrackEventsQuery } from "./queries/basic"
+import { TrackEventsMutator } from "./mutations/type"
+import { TrackEventsQuery } from "./queries/type"
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
 
-export type TrackEventsMutator<R = void> = (
-  events: TickOrderedArray<TrackEvent>,
-) => R
-
 type TrackEventPredicate = (event: TrackEvent) => boolean
 
 type FilteredEventsObserver = {
+  predicate: TrackEventPredicate
   emitter: Emitter
-  observable: Observable
 }
 
 type SerializedTrack = {
@@ -64,15 +59,10 @@ export class Track {
   private readonly _channel = new ObservableValue<number | undefined>(undefined)
 
   private readonly _onEventsChanged = new Emitter()
-  private readonly _onProgramChangeEventsChanged = new Emitter()
-  private readonly _onSetTempoEventsChanged = new Emitter()
   private readonly _onIsRhythmTrackChanged = new Emitter()
   private readonly _onIsConductorTrackChanged = new Emitter()
   private readonly _onChanged: Observable
-  private readonly _filteredEventsObservers = new Map<
-    TrackEventPredicate,
-    FilteredEventsObserver
-  >()
+  private readonly _filteredEventsObservers = new Set<FilteredEventsObserver>()
 
   private unsubscribeReaction: Unsubscribe | null = null
 
@@ -110,18 +100,6 @@ export class Track {
   private didEventsChanged = (changedEvents: readonly TrackEvent[]) => {
     this.emitFilteredEventsChanged(changedEvents)
 
-    if (
-      this._onProgramChangeEventsChanged.listenerCount > 0 &&
-      changedEvents.some(isProgramChangeEvent)
-    ) {
-      this._onProgramChangeEventsChanged.emit()
-    }
-    if (
-      this._onSetTempoEventsChanged.listenerCount > 0 &&
-      changedEvents.some(isSetTempoEvent)
-    ) {
-      this._onSetTempoEventsChanged.emit()
-    }
     if (changedEvents.some(isTrackNameEvent)) {
       const nextName = getTrackNameEvent(this.events)?.text
       this._name.set(nextName)
@@ -140,10 +118,10 @@ export class Track {
       return
     }
 
-    for (const [predicate, observer] of this._filteredEventsObservers) {
+    for (const observer of this._filteredEventsObservers) {
       if (
         observer.emitter.listenerCount > 0 &&
-        changedEvents.some((event) => predicate(event))
+        changedEvents.some((event) => observer.predicate(event))
       ) {
         observer.emitter.emit()
       }
@@ -154,10 +132,6 @@ export class Track {
     this._eventsSnapshot = [...this.events]
     this.didEventsChanged(this.events)
     this.setupReactions()
-  }
-
-  get onProgramChangeEventsChanged() {
-    return this._onProgramChangeEventsChanged
   }
 
   get onChanged(): Observable {
@@ -184,10 +158,6 @@ export class Track {
     return this._endOfTrack.onChanged
   }
 
-  get onSetTempoEventsChanged() {
-    return this._onSetTempoEventsChanged
-  }
-
   get onTimeSignatureEventsChanged() {
     return this._timeSignatureEvents.onChanged
   }
@@ -204,28 +174,19 @@ export class Track {
     return this._onEventsChanged
   }
 
-  observeEventsChanged(predicate: TrackEventPredicate): Observable {
-    const found = this._filteredEventsObservers.get(predicate)
-    if (found !== undefined) {
-      return found.observable
-    }
-
+  subscribeEventsChanged(
+    predicate: TrackEventPredicate,
+    listener: () => void,
+  ): Unsubscribe {
     const emitter = new Emitter()
-    const observable: Observable = {
-      subscribe: (listener) => {
-        const unsubscribe = emitter.subscribe(listener)
-        return () => {
-          unsubscribe()
-          if (emitter.listenerCount === 0) {
-            this._filteredEventsObservers.delete(predicate)
-          }
-        }
-      },
+    const observer: FilteredEventsObserver = { predicate, emitter }
+    this._filteredEventsObservers.add(observer)
+    const unsubscribe = emitter.subscribe(listener)
+
+    return () => {
+      unsubscribe()
+      this._filteredEventsObservers.delete(observer)
     }
-
-    this._filteredEventsObservers.set(predicate, { emitter, observable })
-
-    return observable
   }
 
   get timeSignatureEvents() {

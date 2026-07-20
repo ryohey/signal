@@ -2,14 +2,11 @@ import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { ControlEventsClipboardData } from "../../clipboard/clipboardTypes"
 import { getControllerEventWithType } from "../../event/selectors"
 import { TrackEventOf } from "../../event/TrackEvent"
-import { getEventsByIds } from "../queries/basic"
-import { TrackEventsMutator } from "../Track"
-import {
-  combineMutators,
-  createOrUpdate,
-  updateEvent,
-  updateOrAdd,
-} from "./basic"
+import { getEventsByIds } from "../queries/composed"
+import { updateEvent } from "./basic"
+import { createOrUpdate, updateOrAdd } from "./composed"
+import { combineMutators } from "./higherOrder"
+import { TrackEventsMutator } from "./type"
 
 const setControllerValue = (
   controllerType: number,

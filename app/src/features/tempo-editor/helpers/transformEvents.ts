@@ -4,13 +4,13 @@ import { TempoGraphItem } from "../components/TempoGraphItem"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"
 
 export const transformEvents = (
-  events: TrackEventOf<SetTempoEvent>[],
+  events: readonly TrackEventOf<SetTempoEvent>[],
   transform: TempoCoordTransform,
   maxX: number,
 ): TempoGraphItem[] => {
   // まず位置だけ計算する
   // Calculate only position
-  const items = events
+  const items = [...events]
     .sort((a, b) => a.tick - b.tick)
     .map((e) => {
       const bpm = (60 * 1000000) / e.microsecondsPerBeat

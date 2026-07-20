@@ -1,14 +1,19 @@
-import { isNotUndefined } from "../../../helpers"
 import { TrackEvent } from "../../event/TrackEvent"
+import { TrackEventsContext } from "../TrackEventsContext"
+import { TrackEventsQuery } from "./type"
 
-interface ReadOnlyTrackEvents {
+type QueryTrackEvents = TrackEventsContext & {
   get(id: number): TrackEvent | undefined
   getArray(): readonly TrackEvent[]
 }
 
-export type TrackEventsQuery<T> = (events: ReadOnlyTrackEvents) => T
+const asQueryTrackEvents = (events: TrackEventsContext): QueryTrackEvents =>
+  events as QueryTrackEvents
 
-export const getEventsByIds =
-  (ids: readonly number[]): TrackEventsQuery<readonly TrackEvent[]> =>
+export const getEventById =
+  (id: number): TrackEventsQuery<TrackEvent | undefined> =>
   (events) =>
-    ids.map((id) => events.get(id)).filter(isNotUndefined)
+    asQueryTrackEvents(events).get(id)
+
+export const getAll: TrackEventsQuery<readonly TrackEvent[]> = (events) =>
+  asQueryTrackEvents(events).getArray()

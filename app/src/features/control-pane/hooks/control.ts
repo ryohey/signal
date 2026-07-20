@@ -4,13 +4,13 @@ import {
   duplicateEvents,
   getControlClipboardDataForSelection,
   pasteClipboardDataAtPosition,
+  removeEvents,
 } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
-import { useTrack } from "../../../hooks/useTrack"
 import {
   readClipboardData,
   readJSONFromClipboard,
@@ -40,7 +40,7 @@ export const useCreateOrUpdateControlEventsValue = () => {
 
 export const useDeleteControlSelection = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { removeEvents } = useTrack(selectedTrackId)
+  const mutate = useMutateTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()
 
@@ -52,9 +52,9 @@ export const useDeleteControlSelection = () => {
     pushHistory()
 
     // Remove selected notes and selected notes
-    removeEvents(selectedEventIds)
+    mutate(removeEvents(selectedEventIds))
     setSelection(null)
-  }, [selectedEventIds, removeEvents, pushHistory, setSelection])
+  }, [selectedEventIds, mutate, pushHistory, setSelection])
 }
 
 export const useCopyControlSelection = () => {

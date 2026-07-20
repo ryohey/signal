@@ -1,7 +1,6 @@
 import { isEventInRange, Range } from "@signal-app/core"
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react"
 import { useBeats } from "./useBeats"
-import { useConductorTrack } from "./useConductorTrack"
 import { useSong } from "./useSong"
 import { useTickScroll } from "./useTickScroll"
 

@@ -1,38 +1,39 @@
-import { getTempo, setTempo } from "@signal-app/core"
+import {
+  getTempo,
+  isSetTempoEvent,
+  setTempo,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { DEFAULT_TEMPO } from "@signal-app/player"
-import { useCallback, useMemo, useSyncExternalStore } from "react"
+import { useCallback, useMemo } from "react"
 import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
-
-const noop = () => () => {}
+import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
 
 export function useTempoForm() {
   const { conductorTrack } = useSong()
   const { position, setCurrentTempo } = usePlayer()
-  const mutateConductorTrack = useMutateConductorTrack()
+  const mutate = useMutateConductorTrack()
 
   return {
     get tempo() {
       const { position } = usePlayer()
-      const events = useSyncExternalStore(
-        conductorTrack?.onSetTempoEventsChanged.subscribe ?? noop,
-        useCallback(
-          () => conductorTrack?.getEventsSnapshot() ?? [],
-          [conductorTrack],
-        ),
-      )
-      return useMemo(
-        () => getTempo(events, position) ?? DEFAULT_TEMPO,
-        [events, position],
+      const query = useMemo(() => getTempo(position), [position])
+      return (
+        useSyncTrackQuery(
+          conductorTrack?.id ?? UNASSIGNED_TRACK_ID,
+          query,
+          isSetTempoEvent,
+        ) ?? DEFAULT_TEMPO
       )
     },
     changeTempo: useCallback(
       (bpm: number) => {
-        mutateConductorTrack(setTempo(bpm, position))
+        mutate(setTempo(bpm, position))
         setCurrentTempo(bpm)
       },
-      [mutateConductorTrack, position, setCurrentTempo],
+      [mutate, position, setCurrentTempo],
     ),
   }
 }

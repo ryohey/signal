@@ -14,7 +14,7 @@ Provides MIDI event scheduling and playback components for Signal.
 
 - `Player`
   - Core playback controller with `play`, `stop`, `reset`, `position`, loop controls, and channel-wide panic helpers (`allSoundsOff`).
-  - Emits subscribe-style observables (`onPositionChanged`, `onIsPlayingChanged`, `onLoopChanged`) through a MobX adapter.
+  - Emits subscribe-style observables (`onPositionChanged`, `onIsPlayingChanged`, `onLoopChanged`) through reactive adapters.
 - `EventScheduler<E>`
   - Look-ahead scheduler converting tick windows to timestamped events.
   - Supports loop boundary stitching and loop-end cleanup event injection.
@@ -46,5 +46,5 @@ Provides MIDI event scheduling and playback components for Signal.
 ## Libraries and External Factors
 
 - Dependencies: `spessasynth_core`, `spessasynth_lib`.
-- Peer dependencies: `midifile-ts`, `mobx`, `lodash`.
+- Peer dependencies: `midifile-ts`, `lodash`.
 - Requires Web Audio APIs (AudioContext/OfflineAudioContext + AudioWorklet); autoplay policies and browser support can affect startup timing.

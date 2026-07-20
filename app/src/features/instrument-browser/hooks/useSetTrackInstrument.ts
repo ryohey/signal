@@ -1,53 +1,32 @@
 import {
-  addEvent,
-  getProgramNumberEvent,
-  isProgramChangeEvent,
+  hasProgramChangeEventAfter,
   programChangeMidiEvent,
-  TrackEventOf,
+  setProgramNumberAt,
+  setProgramNumberById,
   TrackId,
-  updateEvent,
 } from "@signal-app/core"
-import { ProgramChangeEvent } from "midifile-ts"
 import { useCallback } from "react"
 import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useTrack } from "../../../hooks/useTrack"
+import { useTrackQuery } from "../../../hooks/useTrackQuery"
 
 export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
   const { sendEvent, position } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel, getEvents } = useTrack(trackId)
+  const { channel } = useTrack(trackId)
   const mutate = useMutateTrack(trackId)
+  const query = useTrackQuery(trackId)
 
   return useCallback(
     (programNumber: number) => {
       pushHistory()
 
-      let targetEventId: number | undefined = eventId
-
-      if (eventId === undefined) {
-        // get last program change event before position
-        const programNumberEvent = mutate(
-          (events) =>
-            getProgramNumberEvent(position)(events.getArray()) ??
-            addEvent<TrackEventOf<ProgramChangeEvent>>({
-              ...programChangeMidiEvent(0, 0, programNumber),
-              tick: 0,
-            })(events),
-        )
-        targetEventId = programNumberEvent?.id
-      }
-
-      if (targetEventId === undefined) {
-        return
-      }
-
-      const targetEvent = mutate(
-        updateEvent<TrackEventOf<ProgramChangeEvent>>(targetEventId, {
-          value: programNumber,
-        }),
-      )
+      const targetEvent =
+        eventId === undefined
+          ? mutate(setProgramNumberAt(position, programNumber))
+          : mutate(setProgramNumberById(eventId, programNumber))
 
       if (!targetEvent) {
         return
@@ -57,14 +36,13 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
 
       // If the player position is after the insertion position and there are no other program change events, reflect immediately
       if (channel !== undefined && position >= tick) {
-        const hasOtherProgramChangeEvents = getEvents()
-          .filter(isProgramChangeEvent)
-          .some((e) => e.tick > tick)
+        const hasOtherProgramChangeEvents =
+          query(hasProgramChangeEventAfter(tick)) ?? false
         if (!hasOtherProgramChangeEvents) {
           sendEvent(programChangeMidiEvent(0, channel, programNumber))
         }
       }
     },
-    [pushHistory, channel, sendEvent, position, getEvents, eventId, mutate],
+    [pushHistory, channel, sendEvent, position, eventId, mutate, query],
   )
 }

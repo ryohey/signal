@@ -50,8 +50,7 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 **Core Domain (`/packages/core`):**
 
-- MobX is used internally in core domain models/stores
-- Core does not expose MobX internals directly to app UI
+- Core keeps its internal state implementation private
 - App synchronization is done via `useSyncExternalStore`-compatible subscriptions
 
 Representative core modules:
@@ -102,7 +101,7 @@ Note: The static website project has been moved to a separate repository and is 
 ### Technology Stack
 
 - **Frontend:** React 19, TypeScript, Jotai, Emotion CSS-in-JS
-- **Core State Engine:** MobX (internal to `@signal-app/core`)
+- **Core State Engine:** Internal reactive domain engine (encapsulated within `@signal-app/core`)
 - **Audio:** Web Audio API, SoundFont synthesis, WebMIDI API
 - **Graphics:** WebGL for performance-critical rendering
 - **Build/Quality:** Vite, Turbo (monorepo), Biome

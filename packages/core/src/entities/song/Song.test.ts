@@ -33,7 +33,7 @@ describe("Song", () => {
     expect(tracks[3].channel).toBe(1)
     expect(tracks[17].channel).toBe(15)
 
-    expect(getTempo(tracks[0].events, 240)).toBe(128)
+    expect(getTempo(240)(tracks[0].events)).toBe(128)
     expect(getVolume(193)(tracks[2].events)?.value).toBe(100)
     expect(getPan(192)(tracks[2].events)?.value).toBe(1)
     expect(getProgramNumberEvent(189)(tracks[2].events)?.value).toBe(29)

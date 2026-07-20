@@ -143,12 +143,14 @@ describe("Track", () => {
     let panChanges = 0
     let volumeChanges = 0
 
-    const unsubscribePan = track
-      .observeEventsChanged(isPanEvent)
-      .subscribe(() => panChanges++)
-    const unsubscribeVolume = track
-      .observeEventsChanged(isVolumeEvent)
-      .subscribe(() => volumeChanges++)
+    const unsubscribePan = track.subscribeEventsChanged(
+      isPanEvent,
+      () => panChanges++,
+    )
+    const unsubscribeVolume = track.subscribeEventsChanged(
+      isVolumeEvent,
+      () => volumeChanges++,
+    )
 
     track.addEvent<TrackEventOf<ControllerEvent>>({
       type: "channel",
@@ -170,5 +172,86 @@ describe("Track", () => {
 
     unsubscribePan()
     unsubscribeVolume()
+  })
+
+  it("should not notify predicate observers for non-matching events", () => {
+    const track = emptyTrack(1)
+    let panChanges = 0
+
+    const unsubscribePan = track.subscribeEventsChanged(
+      isPanEvent,
+      () => panChanges++,
+    )
+
+    track.addEvent<NoteEvent>({
+      type: "channel",
+      subtype: "note",
+      tick: 0,
+      duration: 120,
+      velocity: 100,
+      noteNumber: 60,
+    })
+
+    expect(panChanges).toBe(0)
+
+    unsubscribePan()
+  })
+
+  it("should notify multiple listeners subscribed to the same predicate", () => {
+    const track = emptyTrack(1)
+    let firstListenerChanges = 0
+    let secondListenerChanges = 0
+
+    const unsubscribeFirst = track.subscribeEventsChanged(
+      isPanEvent,
+      () => firstListenerChanges++,
+    )
+    const unsubscribeSecond = track.subscribeEventsChanged(
+      isPanEvent,
+      () => secondListenerChanges++,
+    )
+
+    track.addEvent<TrackEventOf<ControllerEvent>>({
+      type: "channel",
+      subtype: "controller",
+      tick: 0,
+      controllerType: 10,
+      value: 64,
+    })
+
+    expect(firstListenerChanges).toBe(1)
+    expect(secondListenerChanges).toBe(1)
+
+    unsubscribeFirst()
+    unsubscribeSecond()
+  })
+
+  it("should continue notifying after unsubscribe and re-subscribe", () => {
+    const track = emptyTrack(1)
+    let changes = 0
+
+    const unsubscribeFirst = track.subscribeEventsChanged(
+      isPanEvent,
+      () => changes++,
+    )
+
+    unsubscribeFirst()
+
+    const unsubscribeSecond = track.subscribeEventsChanged(
+      isPanEvent,
+      () => changes++,
+    )
+
+    track.addEvent<TrackEventOf<ControllerEvent>>({
+      type: "channel",
+      subtype: "controller",
+      tick: 0,
+      controllerType: 10,
+      value: 80,
+    })
+
+    expect(changes).toBe(1)
+
+    unsubscribeSecond()
   })
 })

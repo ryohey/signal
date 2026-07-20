@@ -22,8 +22,7 @@ The app workspace contains the React application for composing, editing, arrangi
 Signal follows a strict app/core state boundary:
 
 - The app layer uses Jotai for UI-driven state composition.
-- The core domain engine uses MobX internally in `packages/core`.
-- MobX internals are not exposed outside core.
+- The core domain engine keeps its internal state implementation private.
 - App synchronization with core is done through `useSyncExternalStore`-compatible adapters.
 
 This policy keeps React integration predictable and prevents framework-specific leakage.
@@ -34,7 +33,7 @@ Each feature in `src/features` should:
 
 - Own feature UI, hooks, and feature-specific entities.
 - Depend on stable package interfaces.
-- Avoid direct imports of core MobX internals.
+- Avoid direct imports of core internal state implementation details.
 
 ## Related Documents
 

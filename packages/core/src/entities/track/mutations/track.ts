@@ -1,17 +1,15 @@
+import { flow } from "lodash"
 import { AnyEvent } from "midifile-ts"
-import { closedRange } from "../../../helpers"
+import { closedRange, filter, map } from "../../../helpers"
 import { getRedundantEvents, getTickSpan } from "../../event"
 import { TrackEvent } from "../../event/TrackEvent"
 import { moveEvent } from "../../event/transforms"
 import { Range } from "../../geometry/Range"
-import { getEventsByIds } from "../queries/basic"
-import { TrackEventsMutator } from "../Track"
-import {
-  addEvents,
-  combineMutators,
-  createOrUpdate,
-  removeEvents,
-} from "./basic"
+import { getAll } from "../queries/basic"
+import { getEventsByIds } from "../queries/composed"
+import { addEvents, createOrUpdate, removeEvents } from "./composed"
+import { combineMutators } from "./higherOrder"
+import { TrackEventsMutator } from "./type"
 
 export const duplicateEvents =
   (eventIds: readonly number[]): TrackEventsMutator<number[]> =>
@@ -33,9 +31,12 @@ export const removeRedundantEvents =
     event: T & { subtype?: string; controllerType?: number },
   ): TrackEventsMutator =>
   (events) => {
-    const eventsIdsToRemove = getRedundantEvents(event)(events.getArray())
-      .filter((e) => e.id !== event.id)
-      .map((e) => e.id)
+    const eventsIdsToRemove = flow(
+      getAll,
+      getRedundantEvents(event),
+      filter((e) => e.id !== event.id),
+      map((e) => e.id),
+    )(events)
     removeEvents(eventsIdsToRemove)(events)
   }
 
@@ -85,15 +86,16 @@ export const updateEventsInRangeWithEasing =
     const eventUpdateStartTick = Math.min(startTick, quantizedStartTick)
     const eventUpdateEndTick = Math.max(endTick, quantizedEndTick)
 
-    const filteredEvents = events
-      .getArray()
-      .filter(filterEvent)
-      .filter(
+    const filteredEvents = flow(
+      getAll,
+      filter(filterEvent),
+      filter(
         (e) =>
           e.tick !== startTick &&
           e.tick >= eventUpdateStartTick &&
           e.tick <= eventUpdateEndTick,
-      )
+      ),
+    )(events)
 
     removeEvents(filteredEvents.map((e) => e.id))(events)
 

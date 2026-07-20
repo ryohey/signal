@@ -22,11 +22,7 @@ export const useAddTimeSignature = () => {
       const measureStartTick = getMeasureStartTick(tick)
 
       // prevent duplication
-      if (
-        query((events) =>
-          hasTimeSignatureAt(measureStartTick)(events.getArray()),
-        )
-      ) {
+      if (query(hasTimeSignatureAt(measureStartTick))) {
         return
       }
 

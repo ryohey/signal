@@ -1,37 +1,26 @@
-import { Song, Track, TrackEventsMutator, TrackId } from "@signal-app/core"
+import {
+  SongCommand,
+  SongTracksCommand,
+  TrackEventsMutator,
+  TrackId,
+} from "@signal-app/core"
 import { useCallback } from "react"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
 export function useSongCommand<A extends unknown[], R>(
-  cmd: (song: Song) => (...a: A) => R,
+  cmd: (...a: A) => SongCommand<R>,
 ): (...a: A) => R {
   const { songStore } = useStores()
-  return useCallback((...a: A) => cmd(songStore.song)(...a), [songStore, cmd])
+  return useCallback((...a: A) => cmd(...a)(songStore.song), [songStore, cmd])
 }
 
 export function useTracksCommand<A extends unknown[], R>(
-  cmd: (tracks: readonly Track[]) => (...a: A) => R,
+  cmd: (...a: A) => SongTracksCommand<R>,
 ): (...a: A) => R {
   const { songStore } = useStores()
   return useCallback(
-    (...a: A) => cmd(songStore.song.tracks)(...a),
-    [songStore, cmd],
-  )
-}
-
-export function useConductorTrackCommand<A extends unknown[], R>(
-  cmd: (track: Track) => (...a: A) => R,
-): (...a: A) => R | undefined {
-  const { songStore } = useStores()
-  return useCallback(
-    (...a: A) => {
-      const conductorTrack = songStore.song.conductorTrack
-      if (!conductorTrack) {
-        return undefined
-      }
-      return cmd(conductorTrack)(...a)
-    },
+    (...a: A) => cmd(...a)(songStore.song.tracks),
     [songStore, cmd],
   )
 }
