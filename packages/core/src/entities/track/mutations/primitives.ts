@@ -55,7 +55,11 @@ export const addEvent =
     if ("subtype" in e && e.subtype === "endOfTrack") {
       throw new Error("endOfTrack event is added")
     }
-    return asMutableTrackEvents(events).create({
+    const newEvent = asMutableTrackEvents(events).create({
       ...omit(e, ["deltaTime", "channel"]),
     } as T) as T
+    if (process.env.NODE_ENV !== "production") {
+      validateMidiEvent(newEvent)
+    }
+    return newEvent
   }
