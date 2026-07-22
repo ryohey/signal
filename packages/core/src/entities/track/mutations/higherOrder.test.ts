@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent, updateEvent } from "./basic"
 import { combineMutators } from "./higherOrder"
+import { addEvent, updateEvent } from "./primitives"
 
 describe("track mutations/higherOrder", () => {
   it("combineMutators executes mutators in order and returns each result", () => {

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent, removeEvent, updateEvent } from "./basic"
+import { addEvent, removeEvent, updateEvent } from "./primitives"
 
-describe("track mutations/basic", () => {
+describe("track mutations/primitives", () => {
   it("addEvent should create a note event", () => {
     const events = new TickOrderedArray<TrackEvent>()
 

@@ -2,7 +2,7 @@ import { max, min } from "lodash"
 import { MaxNoteNumber } from "../../../helpers"
 import { isNoteEvent } from "../../event"
 import { Range } from "../../geometry/Range"
-import { getEventById } from "./basic"
+import { getEventById } from "./primitives"
 import { getNotesByIds } from "./note"
 import { TrackEventsQuery } from "./type"
 

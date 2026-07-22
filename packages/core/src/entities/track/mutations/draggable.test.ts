@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
+import { addEvent } from "./primitives"
 import { dragNote } from "./draggable"
 
 describe("track mutations/draggable", () => {

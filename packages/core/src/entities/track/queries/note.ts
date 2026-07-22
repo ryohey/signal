@@ -5,7 +5,7 @@ import { isNoteEvent, NoteEvent } from "../../event"
 import { Range } from "../../geometry/Range"
 import { isNoteInRange, sortedNotes } from "../../note"
 import { TrackId } from "../Track"
-import { getAll } from "./basic"
+import { getAll } from "./primitives"
 import { getEventsByIds } from "./composed"
 import { TrackEventsQuery } from "./type"
 

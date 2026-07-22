@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
 import { batchUpdateNotesVelocity } from "./batch"
+import { addEvent } from "./primitives"
 
 describe("track mutations/batch", () => {
   it("batchUpdateNotesVelocity applies operation and clamps velocity", () => {

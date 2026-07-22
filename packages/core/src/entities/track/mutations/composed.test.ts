@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
 import {
   addEvents,
   createOrUpdate,
@@ -9,6 +8,7 @@ import {
   updateEvents,
   updateOrAdd,
 } from "./composed"
+import { addEvent } from "./primitives"
 
 describe("track mutations/composed", () => {
   it("addEvents should add multiple note events", () => {

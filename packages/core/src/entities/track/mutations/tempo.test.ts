@@ -4,7 +4,7 @@ import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { isSetTempoEvent, isTimeSignatureEvent } from "../../event/identify"
 import { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
+import { addEvent } from "./primitives"
 import {
   addClipboardTempoEvents,
   addTimeSignature,

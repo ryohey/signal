@@ -4,7 +4,7 @@ import { filter, isEventInRange, map } from "../../../helpers"
 import { TempoEventsClipboardData } from "../../clipboard/clipboardTypes"
 import { isSetTempoEvent, TrackEventOf } from "../../event"
 import { Range } from "../../geometry/Range"
-import { getAll } from "./basic"
+import { getAll } from "./primitives"
 import { getEventsByIds } from "./composed"
 import { TrackEventsQuery } from "./type"
 

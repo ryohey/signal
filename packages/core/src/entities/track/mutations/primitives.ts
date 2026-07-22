@@ -26,7 +26,6 @@ export const updateEvent =
     obj: Partial<T>,
   ): TrackEventsMutator<T | null> =>
   (events) => {
-    console.log(`updateEvent: ${id}`)
     const anObj = getEventById(id)(events)
     if (anObj === undefined) {
       console.warn(`unknown id: ${id}`)

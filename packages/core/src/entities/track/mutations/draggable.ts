@@ -1,6 +1,6 @@
 import { isNoteEvent, NoteEvent } from "../../event"
-import { getEventById } from "../queries/basic"
-import { updateEvent } from "./basic"
+import { getEventById } from "../queries/primitives"
+import { updateEvent } from "./primitives"
 import { TrackEventsMutator } from "./type"
 
 export const dragNote =

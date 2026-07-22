@@ -1,6 +1,6 @@
 import { isNotUndefined } from "../../../helpers"
 import { TrackEvent } from "../../event/TrackEvent"
-import { getAll, getEventById } from "./basic"
+import { getAll, getEventById } from "./primitives"
 import { TrackEventsQuery } from "./type"
 
 export const getEventsByIds =

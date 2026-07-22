@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { isProgramChangeEvent } from "../../event/identify"
 import { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
+import { addEvent } from "./primitives"
 import { setProgramNumberAt, setProgramNumberById } from "./program"
 
 describe("track mutations/program", () => {

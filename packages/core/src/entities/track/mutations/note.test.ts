@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { isNoteEvent } from "../../event/identify"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
-import { addEvent } from "./basic"
+import { addEvent } from "./primitives"
 import { addClipboardNotes, duplicateNotes, quantizeNotes } from "./note"
 
 describe("track mutations/note", () => {

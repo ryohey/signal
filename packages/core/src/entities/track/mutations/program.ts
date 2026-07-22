@@ -2,8 +2,8 @@ import { ProgramChangeEvent } from "midifile-ts"
 import { programChangeMidiEvent } from "../../../midi"
 import { TrackEventOf } from "../../event/TrackEvent"
 import { findProgramChangeEventAtOrBefore } from "../queries/program"
-import { updateEvent } from "./basic"
 import { updateOrAdd } from "./composed"
+import { updateEvent } from "./primitives"
 import { TrackEventsMutator } from "./type"
 
 export const setProgramNumberAt = (

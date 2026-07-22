@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
 import { addEvent } from "../mutations"
-import { getAll } from "./basic"
+import { getAll } from "./primitives"
 
-describe("track queries/basic", () => {
+describe("track queries/primitives", () => {
   it("getAll returns all events in track order", () => {
     const events = new TickOrderedArray<TrackEvent>()
 

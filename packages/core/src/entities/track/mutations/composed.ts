@@ -3,8 +3,8 @@ import { isNotUndefined } from "../../../helpers"
 import { getRedundantEvents } from "../../event/selectors"
 import { TrackEvent } from "../../event/TrackEvent"
 import { getAll } from "../queries"
-import { addEvent, removeEvent, updateEvent } from "./basic"
 import { combineMutators } from "./higherOrder"
+import { addEvent, removeEvent, updateEvent } from "./primitives"
 import { TrackEventsMutator } from "./type"
 
 export const updateEvents = (
