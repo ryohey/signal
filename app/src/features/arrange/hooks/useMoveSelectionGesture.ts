@@ -4,9 +4,8 @@ import {
   getEventsInSelection as getEventsInSelectionCmd,
   moveEventsBetweenTracks as moveEventsBetweenTracksCmd,
 } from "@signal-app/core"
+import { Point, Rect } from "@signal-app/geometry"
 import { useCallback } from "react"
-import { Point } from "../../../entities/geometry/Point"
-import { Rect } from "../../../entities/geometry/Rect"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"

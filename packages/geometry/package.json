@@ -1,0 +1,22 @@
+{
+  "name": "@signal-app/geometry",
+  "version": "0.1.0",
+  "description": "Geometry primitives for Signal packages",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "biome lint .",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write"
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vitest": "4.1.5"
+  }
+}

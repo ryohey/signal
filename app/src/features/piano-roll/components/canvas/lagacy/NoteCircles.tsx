@@ -1,7 +1,7 @@
 import { GLNode, useTransform } from "@ryohey/webgl-react"
+import { Rect } from "@signal-app/geometry"
 import { vec4 } from "gl-matrix"
 import { FC } from "react"
-import { Rect } from "../../../../../entities/geometry/Rect"
 import { DrumNoteShader } from "./DrumNoteShader"
 import { IColorData } from "./NoteShader"
 

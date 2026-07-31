@@ -1,6 +1,6 @@
+import { Rect } from "@signal-app/geometry"
 import { clamp } from "lodash"
 import { MaxNoteNumber } from "../../../Constants"
-import { Rect } from "../../../entities/geometry/Rect"
 import { NoteCoordTransform } from "./NoteCoordTransform"
 import { NotePoint } from "./NotePoint"
 

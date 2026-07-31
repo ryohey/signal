@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
+import { Point } from "@signal-app/geometry"
 import ArrowDropUp from "mdi-react/ArrowDropUpIcon"
 import React, { FC, useRef } from "react"
-import { Point } from "../../entities/geometry/Point"
 import { observeDrag, observeDrag2 } from "../../helpers/observeDrag"
 
 export const BAR_WIDTH = 17

@@ -5,8 +5,8 @@ import {
   uniformMat4,
   uniformVec4,
 } from "@ryohey/webgl-react/legacy"
+import { Rect } from "@signal-app/geometry"
 import { vec4 } from "gl-matrix"
-import { Rect } from "../../../../../entities/geometry/Rect"
 
 export interface IColorData {
   color: vec4

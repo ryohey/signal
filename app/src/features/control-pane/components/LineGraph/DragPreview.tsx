@@ -1,5 +1,5 @@
+import { Point } from "@signal-app/geometry"
 import { CSSProperties, useMemo } from "react"
-import { type Point } from "../../../../entities/geometry/Point"
 
 export interface DragPreviewProps {
   start: Point

@@ -1,7 +1,7 @@
 import { HitArea } from "@ryohey/webgl-react"
+import { Rect } from "@signal-app/geometry"
 import { useCallback, useMemo } from "react"
 import { Selection } from "../../../../components/GLNodes/Selection"
-import { Rect } from "../../../../entities/geometry/Rect"
 import { getClientPos } from "../../../../helpers/mouseEvent"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { useArrangeTransform } from "../../hooks/useArrangeTransform"

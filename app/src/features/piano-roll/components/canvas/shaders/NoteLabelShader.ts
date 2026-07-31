@@ -6,7 +6,7 @@ import {
   uniformVec4,
   VertexArray,
 } from "@ryohey/webgl-react"
-import { Rect } from "../../../../../entities/geometry/Rect"
+import { Rect } from "@signal-app/geometry"
 
 export interface INoteLabelData {
   velocity: number // 0-127

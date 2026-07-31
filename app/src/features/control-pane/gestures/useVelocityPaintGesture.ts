@@ -1,6 +1,6 @@
 import { updateVelocitiesInRange } from "@signal-app/core"
+import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
-import { Point } from "../../../entities/geometry/Point"
 import { usePianoRoll } from "../../../features/piano-roll/hooks/usePianoRoll"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"

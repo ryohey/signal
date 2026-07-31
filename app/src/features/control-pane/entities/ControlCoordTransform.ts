@@ -1,5 +1,4 @@
-import { Point } from "../../../entities/geometry/Point"
-import { Rect } from "../../../entities/geometry/Rect"
+import { Point, Rect } from "@signal-app/geometry"
 import { TickTransform } from "../../../entities/transform/TickTransform"
 import { ItemValue } from "../components/LineGraph/LineGraph"
 import { ControlSelection } from "./ControlSelection"

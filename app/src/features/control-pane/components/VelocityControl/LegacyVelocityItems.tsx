@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react"
 import { Rectangles } from "@ryohey/webgl-react"
+import { Rect } from "@signal-app/geometry"
 import Color from "color"
 import { FC } from "react"
-import { Rect } from "../../../../entities/geometry/Rect"
 import { colorToVec4 } from "../../../../gl/color"
 import { IVelocityData } from "./VelocityShader"
 

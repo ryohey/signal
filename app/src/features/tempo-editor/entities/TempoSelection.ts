@@ -1,4 +1,4 @@
-import { Rect } from "../../../entities/geometry/Rect"
+import { Rect } from "@signal-app/geometry"
 import { TempoCoordTransform } from "./TempoCoordTransform"
 
 export interface TempoSelection {
