@@ -1,6 +1,7 @@
 import {
   getTempo,
   isSetTempoEvent,
+  selectorToQuery,
   setTempo,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
@@ -19,7 +20,10 @@ export function useTempoForm() {
   return {
     get tempo() {
       const { position } = usePlayer()
-      const query = useMemo(() => getTempo(position), [position])
+      const query = useMemo(
+        () => selectorToQuery(getTempo(position)),
+        [position],
+      )
       return (
         useSyncTrackQuery(
           conductorTrack?.id ?? UNASSIGNED_TRACK_ID,

@@ -1,4 +1,9 @@
-import { filter, isSetTempoEvent, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import {
+  filter,
+  isSetTempoEvent,
+  selectorToQuery,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { useMemo } from "react"
 import { useSong } from "../../../hooks/useSong"
 import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
@@ -6,7 +11,7 @@ import { useTickScroll } from "../../../hooks/useTickScroll"
 import { transformEvents } from "../helpers/transformEvents"
 import { useTempoTransform } from "./useTempoTransform"
 
-const filterSetTempoEvent = filter(isSetTempoEvent)
+const filterSetTempoEvent = selectorToQuery(filter(isSetTempoEvent))
 
 export function useTempoItems() {
   const { transform } = useTempoTransform()

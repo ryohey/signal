@@ -2,6 +2,7 @@ import {
   getControlEventsInRangeWithPrevious,
   isControllerEventWithType,
   isPitchBendEvent,
+  selectorToQuery,
   TrackEventOf,
 } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
@@ -28,7 +29,8 @@ export function useControlValueEvents() {
   }, [controlMode])
 
   const query = useMemo(
-    () => getControlEventsInRangeWithPrevious(filter, tickRange),
+    () =>
+      selectorToQuery(getControlEventsInRangeWithPrevious(filter, tickRange)),
     [filter, tickRange],
   )
 

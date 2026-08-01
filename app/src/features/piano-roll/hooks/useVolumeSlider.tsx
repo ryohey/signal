@@ -1,6 +1,7 @@
 import {
   getVolume,
   isVolumeEvent,
+  selectorToQuery,
   setVolume,
   volumeMidiEvent,
 } from "@signal-app/core"
@@ -21,7 +22,7 @@ export function useVolumeSlider() {
   const { channel } = useTrack(trackId)
   const mutateTrack = useMutateTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
-  const query = useMemo(() => getVolume(position), [position])
+  const query = useMemo(() => selectorToQuery(getVolume(position)), [position])
   const currentVolumeEvent = useSyncTrackQuery(trackId, query, isVolumeEvent)
 
   const setTrackVolume = useCallback(

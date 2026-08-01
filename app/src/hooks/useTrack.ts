@@ -1,6 +1,7 @@
 import {
   getProgramNumberEvent,
   isProgramChangeEvent,
+  selectorToQuery,
   TrackColor,
   TrackId,
 } from "@signal-app/core"
@@ -33,7 +34,10 @@ export function useTrack(id: TrackId) {
     },
     get programNumber() {
       const { position } = usePlayer()
-      const query = useMemo(() => getProgramNumberEvent(position), [position])
+      const query = useMemo(
+        () => selectorToQuery(getProgramNumberEvent(position)),
+        [position],
+      )
       return useSyncTrackQuery(id, query, isProgramChangeEvent)?.value ?? 0
     },
     get name() {

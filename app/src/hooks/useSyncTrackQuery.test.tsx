@@ -2,6 +2,7 @@ import {
   emptyTrack,
   isPanEvent,
   NoteEvent,
+  selectorToQuery,
   TrackEvent,
   TrackEventOf,
 } from "@signal-app/core"
@@ -17,7 +18,7 @@ describe("useSyncTrackQueryInternal", () => {
     const { result } = renderHook(() =>
       useSyncTrackQueryInternal(
         track,
-        (events) => events.filter(isPanEvent).length,
+        selectorToQuery((events) => events.filter(isPanEvent).length),
         isPanEvent,
       ),
     )
@@ -28,7 +29,9 @@ describe("useSyncTrackQueryInternal", () => {
   it("updates only when predicate-matching events change", () => {
     const track = emptyTrack(0)
     const query = vi.fn(
-      (events: readonly TrackEvent[]) => events.filter(isPanEvent).length,
+      selectorToQuery<readonly TrackEvent[], number>(
+        (events) => events.filter(isPanEvent).length,
+      ),
     )
 
     const { result } = renderHook(() =>
@@ -66,14 +69,16 @@ describe("useSyncTrackQueryInternal", () => {
     expect(query).toHaveBeenCalledTimes(2)
   })
 
-  it("falls back to empty events when track is undefined", () => {
-    const query = vi.fn((events: readonly unknown[]) => events.length)
+  it("returns undefined and does not call query when track is undefined", () => {
+    const query = vi.fn(
+      selectorToQuery<readonly unknown[], number>((events) => events.length),
+    )
 
     const { result } = renderHook(() =>
       useSyncTrackQueryInternal(undefined, query, isPanEvent),
     )
 
-    expect(result.current).toBe(0)
-    expect(query).toHaveBeenCalledTimes(1)
+    expect(result.current).toBeUndefined()
+    expect(query).not.toHaveBeenCalled()
   })
 })
