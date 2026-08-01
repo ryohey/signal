@@ -23,7 +23,7 @@ export const useOpenFile = () => {
           types: [
             {
               description: "MIDI file",
-              accept: { "audio/midi": [".mid"] },
+              accept: { "audio/midi": [".mid", ".midi"] },
             },
           ],
         })
