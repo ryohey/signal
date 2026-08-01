@@ -55,6 +55,7 @@ export class EventScheduler<E extends SchedulableEvent> {
   private _prevTime: number | undefined = undefined
   private _isStopScheduled = false
   private _scheduledSeekTick: number | null = null
+  private _enqueuedEvents: readonly Omit<E, "tick">[] = []
 
   constructor(
     private readonly eventSource: EventSchedulerSource<E>,
@@ -86,6 +87,11 @@ export class EventScheduler<E extends SchedulableEvent> {
 
   scheduleStop() {
     this._isStopScheduled = true
+  }
+
+  // enqueue events to be prepended to the next readNextEvents() result.
+  enqueueEvents(events: readonly Omit<E, "tick">[]) {
+    this._enqueuedEvents = this._enqueuedEvents.concat(events)
   }
 
   readNextEvents(bpm: number, timestamp: number): SchedulerResult<E> {
@@ -157,6 +163,17 @@ export class EventScheduler<E extends SchedulableEvent> {
       }
     }
 
+    const prependedEvents: WithTimestamp<E>[] = []
+
+    if (this._enqueuedEvents.length > 0) {
+      prependedEvents.push(
+        ...this._enqueuedEvents.map((e) =>
+          withTimestamp(nowTick)({ ...e, tick: nowTick } as E),
+        ),
+      )
+      this._enqueuedEvents = []
+    }
+
     if (jump) {
       const offset = endTick - jump.from
       const endTick2 = jump.to + offset
@@ -165,6 +182,7 @@ export class EventScheduler<E extends SchedulableEvent> {
       this._scheduledTick = endTick2
 
       const events = [
+        ...prependedEvents,
         ...getEventsInRange(startTick, jump.from, nowTick),
         ...this.createLoopEndEvents().map((e) =>
           withTimestamp(currentTick)({ ...e, tick: jump.to } as E),
@@ -183,7 +201,10 @@ export class EventScheduler<E extends SchedulableEvent> {
       this._scheduledTick = endTick
 
       return {
-        events: getEventsInRange(startTick, endTick, nowTick),
+        events: [
+          ...prependedEvents,
+          ...getEventsInRange(startTick, endTick, nowTick),
+        ],
         shouldStop: this._scheduledTick >= this.eventSource.endOfSong,
       }
     }

@@ -99,9 +99,12 @@ export class Player {
   }
 
   allSoundsOffChannel = (ch: number) => {
-    this.sendEvent(
-      controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
-    )
+    this.scheduler?.enqueueEvents([
+      {
+        ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
+        trackId: null,
+      },
+    ])
   }
 
   allSoundsOff = () => {
@@ -121,14 +124,14 @@ export class Player {
   private allNotesOffEvents(): DistributiveOmit<PlayerEvent, "tick">[] {
     return range(0, this.numberOfChannels).map((ch) => ({
       ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_NOTES_OFF, 0),
-      trackId: -1, // do not mute
+      trackId: null, // do not mute
     }))
   }
 
   private allSoundsOffEvents(): DistributiveOmit<PlayerEvent, "tick">[] {
     return range(0, this.numberOfChannels).map((ch) => ({
       ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
-      trackId: -1, // do not mute
+      trackId: null, // do not mute
     }))
   }
 
@@ -234,7 +237,7 @@ export class Player {
         e.type === "dividedSysEx"
       ) {
         const delayTime = (time - timestamp) / 1000
-        this.sendEvent(e, delayTime, timestamp, e.trackId)
+        this.sendEvent(e, delayTime, timestamp, e.trackId ?? undefined)
       } else {
         this.applyPlayerEvent(e)
       }

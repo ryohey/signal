@@ -41,7 +41,7 @@ export class EventSource implements IEventSource {
       const statusEvents = getStatusEvents(t.events, tick)
       return statusEvents.map((e) => ({
         ...e,
-        trackId: -1,
+        trackId: null,
       }))
     })
   }
