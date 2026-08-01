@@ -2,7 +2,7 @@ import { type Observable, ObservableValue } from "@signal-app/observable"
 import range from "lodash/range.js"
 import throttle from "lodash/throttle.js"
 import { AnyEvent, MIDIControlEvents } from "midifile-ts"
-import { EventScheduler } from "./EventScheduler.js"
+import { EventScheduler, EventSchedulerSource } from "./EventScheduler.js"
 import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js"
 import { PlayerEvent } from "./PlayerEvent.js"
 import { SendableEvent, SynthOutput } from "./SynthOutput.js"
@@ -18,12 +18,7 @@ const TIMER_INTERVAL = 50
 const LOOK_AHEAD_TIME = 50
 export const DEFAULT_TEMPO = 120
 
-export interface IEventSource {
-  timebase: number
-  endOfSong: number
-  getEvents(startTick: number, endTick: number): PlayerEvent[]
-  getCurrentStateEvents(tick: number): SendableEvent[]
-}
+export type IEventSource = EventSchedulerSource<PlayerEvent>
 
 export class Player {
   private scheduler: EventScheduler<PlayerEvent> | null = null
@@ -58,6 +53,7 @@ export class Player {
     this.scheduler = new EventScheduler<PlayerEvent>(
       this.eventSource,
       () => this.allNotesOffEvents(),
+      () => this.allSoundsOffEvents(),
       this._currentTick.value,
       TIMER_INTERVAL + LOOK_AHEAD_TIME,
     )
@@ -76,15 +72,10 @@ export class Player {
     }
     tick = Math.min(Math.max(Math.floor(tick), 0), this.eventSource.endOfSong)
     if (this.scheduler) {
-      this.scheduler.seek(tick)
+      this.scheduler.scheduleSeek(tick)
+    } else {
+      this._currentTick.set(tick)
     }
-    this._currentTick.set(tick)
-
-    if (this.isPlaying) {
-      this.scheduler?.scheduleStop(this.allSoundsOffEvents())
-    }
-
-    this.sendCurrentStateEvents()
   }
 
   get position() {
@@ -166,16 +157,7 @@ export class Player {
   }
 
   stop = () => {
-    if (this.scheduler === null) {
-      return
-    }
-
-    // Defer the all-sounds-off to the next timer tick instead of sending it
-    // immediately. Sending it right away can schedule it earlier than a
-    // note-on that was dispatched moments ago with a future timestamp
-    // (within the scheduler's look-ahead window), so the note-on would end
-    // up sounding after the all-sounds-off and never actually stop.
-    this.scheduler.scheduleStop(this.allSoundsOffEvents())
+    this.scheduler?.scheduleStop()
   }
 
   private finalizeStop() {
@@ -192,20 +174,6 @@ export class Player {
     this.resetControllers()
     this.stop()
     this._currentTick.set(0)
-  }
-
-  /*
-   to restore synthesizer state (e.g. pitch bend)
-   collect all previous state events
-   and send them to the synthesizer
-  */
-  sendCurrentStateEvents = () => {
-    this.eventSource
-      .getCurrentStateEvents(this._currentTick.value)
-      .forEach((e) => {
-        this.applyPlayerEvent(e)
-        this.sendEvent(e)
-      })
   }
 
   get currentTempo() {
