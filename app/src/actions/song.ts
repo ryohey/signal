@@ -27,7 +27,7 @@ export const useSetSong = () => {
   const { setSong } = useSong()
   const { clear: clearHistory } = useHistory()
   const { reset: resetTrackMute } = useTrackMute()
-  const { stop, reset, setPosition } = usePlayer()
+  const { stop, reset, setPosition, setLoop } = usePlayer()
   const { setOpen: setShowTrackList } = useTrackList()
   const {
     setNotGhostTrackIds,
@@ -60,6 +60,7 @@ export const useSetSong = () => {
 
       stop()
       reset()
+      setLoop(null)
       setPosition(0)
     },
     [
@@ -69,6 +70,7 @@ export const useSetSong = () => {
       stop,
       reset,
       setPosition,
+      setLoop,
       setNotGhostTrackIds,
       setScrollLeftInPixels,
       setShowTrackList,

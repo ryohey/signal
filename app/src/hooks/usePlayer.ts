@@ -1,3 +1,4 @@
+import { LoopSetting } from "@signal-app/player"
 import { useCallback, useSyncExternalStore } from "react"
 import { useStores } from "./useStores"
 
@@ -33,6 +34,12 @@ export function usePlayer() {
     play: player.play,
     stop: player.stop,
     reset: player.reset,
+    setLoop: useCallback(
+      (loop: LoopSetting | null) => {
+        player.loop = loop
+      },
+      [player],
+    ),
     sendEvent: player.sendEvent,
     toggleEnableLoop: player.toggleEnableLoop,
     setLoopBegin: player.setLoopBegin,
