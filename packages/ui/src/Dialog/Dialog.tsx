@@ -9,6 +9,7 @@ import {
   Portal,
   DialogProps as Props,
   Root,
+  Title,
 } from "@radix-ui/react-dialog"
 import {
   ComponentPropsWithoutRef,
@@ -107,8 +108,9 @@ export const Dialog: FC<DialogProps> = ({ children, style, ...props }) => (
   </Root>
 )
 
-export const DialogTitle = styled.div`
+export const DialogTitle = styled(Title)`
   font-size: 1.25rem;
+  font-weight: 600;
   color: var(--color-text);
   margin-bottom: 1.5rem;
 `
