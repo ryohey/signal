@@ -128,8 +128,6 @@ export const useCloudFile = () => {
         }
         const newSong = emptySong()
         setSong(newSong)
-        await createSong(newSong)
-        toast.success(localized["song-created"])
       } catch (e) {
         toast.error((e as Error).message)
       }
