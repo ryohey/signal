@@ -50,6 +50,10 @@ export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
     [theme.textColor, theme.backgroundColor, theme.isLightContent],
   )
 
+  if (!texture) {
+    return null
+  }
+
   return (
     <GLNode
       shader={NoteLabelShader}
