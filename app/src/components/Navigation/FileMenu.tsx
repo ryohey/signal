@@ -5,61 +5,36 @@ import { useSongFile } from "../../hooks/useSongFile"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 
-export const FileMenu: FC<{ close: () => void }> = ({ close }) => {
+export const FileMenu: FC = () => {
   const { fileHandle } = useSong()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
 
-  const onClickNew = async () => {
-    close()
-    await createNewSong()
-  }
-
-  const onClickOpen = async () => {
-    close()
-    await openSong()
-  }
-
-  const onClickSave = async () => {
-    close()
-    await saveSong()
-  }
-
-  const onClickSaveAs = async () => {
-    close()
-    await saveAsSong()
-  }
-
-  const onClickDownload = async () => {
-    close()
-    await downloadSong()
-  }
-
   return (
     <>
-      <MenuItem onClick={onClickNew}>
+      <MenuItem onClick={createNewSong}>
         <Localized name="new-song" />
         <HotKey>{envString.altOrOption}+N</HotKey>
       </MenuItem>
 
       <MenuDivider />
 
-      <MenuItem onClick={onClickOpen}>
+      <MenuItem onClick={openSong}>
         <Localized name="open-song" />
         <HotKey>{envString.cmdOrCtrl}+O</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickSave} disabled={fileHandle === null}>
+      <MenuItem onClick={saveSong} disabled={fileHandle === null}>
         <Localized name="save-song" />
         <HotKey>{envString.cmdOrCtrl}+S</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickSaveAs}>
+      <MenuItem onClick={saveAsSong}>
         <Localized name="save-as" />
         <HotKey>{envString.cmdOrCtrl}+Shift+S</HotKey>
       </MenuItem>
 
-      <MenuItem onClick={onClickDownload}>
+      <MenuItem onClick={downloadSong}>
         <Localized name="download-midi" />
       </MenuItem>
     </>

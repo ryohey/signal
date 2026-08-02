@@ -20,7 +20,6 @@ import {
 import { useArrangeView } from "../hooks/useArrangeView"
 
 export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
-  const { handleClose } = props
   const { selection, setOpenVelocityDialog, setOpenTransposeDialog } =
     useArrangeView()
   const hasSelectionNotes = useTracksCommand(hasSelectionNotesCmd)
@@ -38,15 +37,13 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
 
   const onClickVelocity = useCallback(() => {
     setOpenVelocityDialog(true)
-    handleClose()
-  }, [handleClose, setOpenVelocityDialog])
+  }, [setOpenVelocityDialog])
 
   return (
     <ContextMenu {...props}>
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeCopySelection()
           arrangeDeleteSelection()
         }}
@@ -58,7 +55,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeCopySelection()
         }}
         disabled={!isNoteSelected}
@@ -69,7 +65,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangePasteSelection()
         }}
       >
@@ -79,7 +74,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeDuplicateSelection()
         }}
         disabled={!isNoteSelected}
@@ -90,7 +84,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeDeleteSelection()
         }}
         disabled={!isNoteSelected}
@@ -102,7 +95,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeTransposeSelection(12)
         }}
         disabled={!isNoteSelected}
@@ -112,7 +104,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           arrangeTransposeSelection(-12)
         }}
         disabled={!isNoteSelected}
@@ -122,7 +113,6 @@ export const ArrangeContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem
         onClick={(e) => {
           e.stopPropagation()
-          handleClose()
           setOpenTransposeDialog(true)
         }}
         disabled={!isNoteSelected}

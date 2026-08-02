@@ -24,39 +24,24 @@ export const FileInput: FC<
   </>
 )
 
-export const LegacyFileMenu: FC<{ close: () => void }> = ({ close }) => {
+export const LegacyFileMenu: FC = () => {
   const { createNewSong, openSongLegacy, downloadSong } = useSongFile()
-
-  const onClickNew = async () => {
-    close()
-    await createNewSong()
-  }
-
-  const onClickOpen = async (e: ChangeEvent<HTMLInputElement>) => {
-    close()
-    await openSongLegacy(e)
-  }
-
-  const onClickSave = async () => {
-    close()
-    await downloadSong()
-  }
 
   return (
     <>
-      <MenuItem onClick={onClickNew}>
+      <MenuItem onClick={createNewSong}>
         <Localized name="new-song" />
       </MenuItem>
 
       <MenuDivider />
 
-      <FileInput onChange={onClickOpen} accept=".mid,audio/midi">
+      <FileInput onChange={openSongLegacy} accept=".mid,audio/midi">
         <MenuItem>
           <Localized name="open-song" />
         </MenuItem>
       </FileInput>
 
-      <MenuItem onClick={onClickSave}>
+      <MenuItem onClick={downloadSong}>
         <Localized name="save-song" />
       </MenuItem>
     </>

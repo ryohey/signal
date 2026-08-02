@@ -23,7 +23,6 @@ const _RulerContextMenu: FC<RulerContextMenuProps> = ({
   selectedTimeSignatureEventIds,
   ...props
 }) => {
-  const { handleClose } = props
   const { setLoopBegin, setLoopEnd } = usePlayer()
   const mutate = useMutateConductorTrack()
   const addTimeSignature = useAddTimeSignature()
@@ -34,23 +33,19 @@ const _RulerContextMenu: FC<RulerContextMenuProps> = ({
 
   const onClickAddTimeSignature = useCallback(() => {
     setOpenTimeSignatureDialog(true)
-    handleClose()
-  }, [handleClose])
+  }, [])
 
   const onClickRemoveTimeSignature = useCallback(() => {
     mutate(removeEvents(Array.from(selectedTimeSignatureEventIds)))
-    handleClose()
-  }, [mutate, selectedTimeSignatureEventIds, handleClose])
+  }, [mutate, selectedTimeSignatureEventIds])
 
   const onClickSetLoopStart = useCallback(() => {
     setLoopBegin(tick)
-    handleClose()
-  }, [tick, setLoopBegin, handleClose])
+  }, [tick, setLoopBegin])
 
   const onClickSetLoopEnd = useCallback(() => {
     setLoopEnd(tick)
-    handleClose()
-  }, [tick, setLoopEnd, handleClose])
+  }, [tick, setLoopEnd])
 
   const closeOpenTimeSignatureDialog = useCallback(() => {
     setOpenTimeSignatureDialog(false)

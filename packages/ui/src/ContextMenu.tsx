@@ -1,7 +1,8 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { FC, ReactNode, useCallback, useEffect } from "react"
+import { FC, ReactNode, useCallback, useEffect, useMemo } from "react"
+import { MenuContextProvider } from "./Menu"
 import { Positioned } from "./Positioned"
 
 export const ContextMenuHotKey = styled.div`
@@ -68,6 +69,17 @@ export const ContextMenu: FC<ContextMenuProps> = ({
     }
   }, [isOpen, handleClose])
 
+  const contextValue = useMemo(
+    () => ({
+      onOpenChange: (open: boolean) => {
+        if (!open) {
+          handleClose()
+        }
+      },
+    }),
+    [handleClose],
+  )
+
   if (!isOpen) {
     return <></>
   }
@@ -80,7 +92,9 @@ export const ContextMenu: FC<ContextMenuProps> = ({
       <Wrapper onClick={handleClose}>
         <FocusScope>
           <Content left={fixedX} top={position.y} onClick={onClickContent}>
-            <List>{children}</List>
+            <MenuContextProvider value={contextValue}>
+              <List>{children}</List>
+            </MenuContextProvider>
           </Content>
         </FocusScope>
       </Wrapper>

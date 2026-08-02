@@ -16,7 +16,6 @@ import {
 import { useControlPane } from "../hooks/useControlPane"
 
 export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
-  const { handleClose } = props
   const { selectedEventIds } = useControlPane()
   const isEventSelected = selectedEventIds.length > 0
   const copyControlSelection = useCopyControlSelection()
@@ -27,28 +26,23 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
   const onClickCut = useCallback(() => {
     copyControlSelection()
     deleteControlSelection()
-    handleClose()
-  }, [copyControlSelection, deleteControlSelection, handleClose])
+  }, [copyControlSelection, deleteControlSelection])
 
   const onClickCopy = useCallback(() => {
     copyControlSelection()
-    handleClose()
-  }, [copyControlSelection, handleClose])
+  }, [copyControlSelection])
 
   const onClickPaste = useCallback(() => {
     pasteControlSelection()
-    handleClose()
-  }, [pasteControlSelection, handleClose])
+  }, [pasteControlSelection])
 
   const onClickDuplicate = useCallback(() => {
     duplicateControlSelection()
-    handleClose()
-  }, [duplicateControlSelection, handleClose])
+  }, [duplicateControlSelection])
 
   const onClickDelete = useCallback(() => {
     deleteControlSelection()
-    handleClose()
-  }, [deleteControlSelection, handleClose])
+  }, [deleteControlSelection])
 
   return (
     <ContextMenu {...props}>

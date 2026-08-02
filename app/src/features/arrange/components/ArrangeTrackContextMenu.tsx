@@ -8,7 +8,6 @@ import { useDuplicateTrack } from "../hooks/useDuplicateTrack"
 import { useInsertTrack } from "../hooks/useInsertTrack"
 
 export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
-  const { handleClose } = props
   const { selectedTrackIndex, selectedTrackId } = useArrangeView()
   const { tracks } = useSong()
   const insertTrack = useInsertTrack()
@@ -21,7 +20,6 @@ export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
         onClick={(e) => {
           e.stopPropagation()
           insertTrack(selectedTrackIndex + 1)
-          handleClose()
         }}
       >
         <Localized name="add-track" />
@@ -33,7 +31,6 @@ export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
             onClick={(e) => {
               e.stopPropagation()
               removeTrack(selectedTrackId)
-              handleClose()
             }}
           >
             <Localized name="delete-track" />
@@ -44,7 +41,6 @@ export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
           onClick={(e) => {
             e.stopPropagation()
             duplicateTrack(selectedTrackId)
-            handleClose()
           }}
         >
           <Localized name="duplicate-track" />

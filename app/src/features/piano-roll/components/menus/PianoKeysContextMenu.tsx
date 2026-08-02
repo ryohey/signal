@@ -5,7 +5,6 @@ import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { KeySignatureDialog } from "../dialogs/KeySignatureDialog"
 
 export const PianoKeysContextMenu: FC<ContextMenuProps> = (props) => {
-  const { handleClose } = props
   const { keySignature, setKeySignature } = usePianoRoll()
   const [isKeySignatureDialogOpen, setKeySignatureDialogOpen] = useState(false)
 
@@ -18,12 +17,10 @@ export const PianoKeysContextMenu: FC<ContextMenuProps> = (props) => {
     }
 
     setKeySignatureDialogOpen(true)
-    handleClose()
   }
 
   const onClickHideScale = () => {
     setKeySignature(null)
-    handleClose()
   }
 
   return (

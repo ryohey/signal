@@ -10,13 +10,22 @@ import {
   Trigger,
 } from "@radix-ui/react-dropdown-menu"
 import { FocusScope } from "@radix-ui/react-focus-scope"
-import React, { FC, PropsWithChildren } from "react"
+import React, { FC, PropsWithChildren, useContext, useMemo } from "react"
 
 export type MenuProps = PropsWithChildren<{
   open?: boolean
   onOpenChange?: (open: boolean) => void
   trigger: React.ReactNode
 }>
+
+export interface MenuContextValue {
+  onOpenChange(open: boolean): void
+}
+
+const MenuContext = React.createContext<MenuContextValue | undefined>(undefined)
+export const MenuContextProvider = MenuContext.Provider
+
+export const useMenuContext = () => useContext(MenuContext)
 
 const StyledContent = styled(Content)`
   min-width: 8rem;
@@ -42,6 +51,13 @@ export const Menu: FC<MenuProps> = ({
   onOpenChange,
   children,
 }) => {
+  const contextValue: MenuContextValue = useMemo(
+    () => ({
+      onOpenChange: onOpenChange ?? (() => {}),
+    }),
+    [onOpenChange],
+  )
+
   return (
     <Root open={open} onOpenChange={onOpenChange}>
       <Trigger asChild>{trigger}</Trigger>
@@ -49,7 +65,9 @@ export const Menu: FC<MenuProps> = ({
       <Portal>
         <StyledContent>
           <FocusScope asChild>
-            <List>{children}</List>
+            <MenuContextProvider value={contextValue}>
+              <List>{children}</List>
+            </MenuContextProvider>
           </FocusScope>
         </StyledContent>
       </Portal>
@@ -79,22 +97,30 @@ const StyledLi = styled.li`
   }
 `
 
-export type MenuItemProps = React.DetailedHTMLProps<
-  React.LiHTMLAttributes<HTMLLIElement>,
-  HTMLLIElement
-> & {
+export interface MenuItemProps {
+  children: React.ReactNode
+  onClick?: (e: React.MouseEvent) => void
   disabled?: boolean
 }
 
 export const MenuItem: FC<MenuItemProps> = ({
   children,
+  onClick,
   disabled = false,
-  ...props
-}) => (
-  <StyledLi {...props} data-disabled={disabled}>
-    {children}
-  </StyledLi>
-)
+}) => {
+  const contextValue = useMenuContext()
+  const handleClick = (e: React.MouseEvent) => {
+    if (!disabled && onClick) {
+      onClick(e)
+      contextValue?.onOpenChange(false)
+    }
+  }
+  return (
+    <StyledLi data-disabled={disabled} onClick={handleClick}>
+      {children}
+    </StyledLi>
+  )
+}
 
 export const MenuDivider = styled.hr`
   border: none;

@@ -21,7 +21,6 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
   const { addTrack } = useTrackList()
   const removeTrack = useRemoveTrack()
 
-  const { handleClose } = props
   const [isDialogOpened, setDialogOpened] = useState(false)
   const [isColorPickerOpened, setColorPickerOpened] = useState(false)
 
@@ -54,7 +53,6 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
           onClick={(e) => {
             e.stopPropagation()
             onClickAdd()
-            handleClose()
           }}
         >
           <Localized name="add-track" />
@@ -63,7 +61,6 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
           onClick={(e) => {
             e.stopPropagation()
             onClickDelete()
-            handleClose()
           }}
         >
           <Localized name="delete-track" />
@@ -72,7 +69,6 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
           onClick={(e) => {
             e.stopPropagation()
             onClickProperty()
-            handleClose()
           }}
         >
           <Localized name="property" />
@@ -81,7 +77,6 @@ export const TrackListContextMenu: FC<TrackListContextMenuProps> = ({
           onClick={(e) => {
             e.stopPropagation()
             onClickChangeTrackColor()
-            handleClose()
           }}
         >
           <Localized name="change-track-color" />

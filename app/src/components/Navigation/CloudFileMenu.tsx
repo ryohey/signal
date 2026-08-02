@@ -1,12 +1,12 @@
 import { MenuDivider, MenuItem } from "@signal-app/ui"
-import { ChangeEvent, FC } from "react"
+import { FC } from "react"
 import { hasFSAccess } from "../../actions/file"
 import { useCloudFile } from "../../features/cloud-file/hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"
 import { Localized } from "../../localize/useLocalization"
 import { FileInput } from "./LegacyFileMenu"
 
-export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
+export const CloudFileMenu: FC = () => {
   const { cloudSongId, isSaved } = useSong()
   const isCloudSaved = cloudSongId !== null
   const {
@@ -21,79 +21,34 @@ export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
     publishSong,
   } = useCloudFile()
 
-  const onClickNew = async () => {
-    close()
-    await createNewSong()
-  }
-
-  const onClickOpen = async () => {
-    close()
-    await openSong()
-  }
-
-  const onClickSave = async () => {
-    close()
-    await saveSong()
-  }
-
-  const onClickSaveAs = async () => {
-    close()
-    await saveAsSong()
-  }
-
-  const onClickRename = async () => {
-    close()
-    await renameSong()
-  }
-
-  const onClickImportLegacy = async (e: ChangeEvent<HTMLInputElement>) => {
-    close()
-    await importSongLegacy(e)
-  }
-
-  const onClickImport = async () => {
-    close()
-    await importSong()
-  }
-
-  const onClickExport = async () => {
-    close()
-    await exportSong()
-  }
-
-  const onClickPublish = async () => {
-    close()
-    await publishSong()
-  }
-
   return (
     <>
-      <MenuItem onClick={onClickNew}>
+      <MenuItem onClick={createNewSong}>
         <Localized name="new-song" />
       </MenuItem>
 
       <MenuDivider />
 
-      <MenuItem onClick={onClickOpen}>
+      <MenuItem onClick={openSong}>
         <Localized name="open-song" />
       </MenuItem>
 
-      <MenuItem onClick={onClickSave} disabled={isSaved}>
+      <MenuItem onClick={saveSong} disabled={isSaved}>
         <Localized name="save-song" />
       </MenuItem>
 
-      <MenuItem onClick={onClickSaveAs} disabled={!isCloudSaved}>
+      <MenuItem onClick={saveAsSong} disabled={!isCloudSaved}>
         <Localized name="save-as" />
       </MenuItem>
 
-      <MenuItem onClick={onClickRename} disabled={!isCloudSaved}>
+      <MenuItem onClick={renameSong} disabled={!isCloudSaved}>
         <Localized name="rename" />
       </MenuItem>
 
       <MenuDivider />
 
       {!hasFSAccess && (
-        <FileInput onChange={onClickImportLegacy}>
+        <FileInput onChange={importSongLegacy}>
           <MenuItem>
             <Localized name="import-midi" />
           </MenuItem>
@@ -101,18 +56,18 @@ export const CloudFileMenu: FC<{ close: () => void }> = ({ close }) => {
       )}
 
       {hasFSAccess && (
-        <MenuItem onClick={onClickImport}>
+        <MenuItem onClick={importSong}>
           <Localized name="import-midi" />
         </MenuItem>
       )}
 
-      <MenuItem onClick={onClickExport}>
+      <MenuItem onClick={exportSong}>
         <Localized name="export-midi" />
       </MenuItem>
 
       <MenuDivider />
 
-      <MenuItem onClick={onClickPublish} disabled={!isCloudSaved}>
+      <MenuItem onClick={publishSong} disabled={!isCloudSaved}>
         <Localized name="publish" />
       </MenuItem>
     </>

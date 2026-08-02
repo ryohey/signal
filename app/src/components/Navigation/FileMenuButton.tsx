@@ -21,17 +21,13 @@ export const FileMenuButton: FC = () => {
   const theme = useTheme()
   const [isOpen, setOpen] = useState(false)
 
-  const handleClose = useCallback(() => setOpen(false), [])
-
   const onClickExportWav = useCallback(() => {
-    handleClose()
     exportSong("WAV")
-  }, [handleClose, exportSong])
+  }, [exportSong])
 
   const onClickExportMp3 = useCallback(() => {
-    handleClose()
     exportSong("MP3")
-  }, [handleClose, exportSong])
+  }, [exportSong])
 
   return (
     <Menu
@@ -46,18 +42,17 @@ export const FileMenuButton: FC = () => {
         </Tab>
       }
     >
-      {user === null && hasFSAccess && <FileMenu close={handleClose} />}
+      {user === null && hasFSAccess && <FileMenu />}
 
-      {user === null && !hasFSAccess && <LegacyFileMenu close={handleClose} />}
+      {user === null && !hasFSAccess && <LegacyFileMenu />}
 
-      {user && <CloudFileMenu close={handleClose} />}
+      {user && <CloudFileMenu />}
 
       {user === null && (
         <>
           <MenuDivider />
           <MenuItem
             onClick={() => {
-              handleClose()
               setOpenSignInDialog(true)
             }}
           >
