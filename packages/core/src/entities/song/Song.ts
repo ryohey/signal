@@ -5,6 +5,7 @@ import {
   ObservableValue,
   switchSubscription,
 } from "@signal-app/observable"
+import { PlayerEvent } from "@signal-app/player"
 import { Measure } from "../measure/Measure"
 import { Track, TrackId } from "../track"
 import { collectAllEvents } from "./collectAllEvents"
@@ -38,6 +39,9 @@ export class Song {
   private lastTrackId = 0
   private readonly _measures = new ObservableValue<Measure[]>([])
   private readonly _onEndOfSongChanged = new Emitter()
+
+  private allEventsCache: readonly PlayerEvent[] = []
+  private isAllEventsCacheDirty = true
 
   private unsubscribeSubscriptions: (() => void) | null = null
 
@@ -93,6 +97,13 @@ export class Song {
         ),
       )(() => {
         this.refreshConductorTrack()
+      }),
+      switchSubscription(this.onTracksChanged.subscribe, () =>
+        combineSubscription(
+          this.tracks.map((track) => track.onChanged.subscribe),
+        ),
+      )(() => {
+        this.isAllEventsCacheDirty = true
       }),
     ]
 
@@ -260,7 +271,12 @@ export class Song {
   }
 
   get allEvents() {
-    return collectAllEvents(this.tracks)
+    if (!this.isAllEventsCacheDirty) {
+      return this.allEventsCache
+    }
+    this.allEventsCache = collectAllEvents(this.tracks)
+    this.isAllEventsCacheDirty = false
+    return this.allEventsCache
   }
 
   serialize() {

@@ -5,7 +5,7 @@ import { playerEventsToMIDI } from "./playerEventsToMidi.js"
 
 export const renderAudio = async (
   soundFontData: ArrayBuffer,
-  events: PlayerEvent[],
+  events: readonly PlayerEvent[],
   timebase: number,
   sampleRate: number,
   options: {

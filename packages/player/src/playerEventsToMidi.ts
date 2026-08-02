@@ -1,7 +1,8 @@
 import {
   MIDIBuilder,
-  type MIDIMessageType, MIDIMessageTypes
-} from "spessasynth_core";
+  type MIDIMessageType,
+  MIDIMessageTypes,
+} from "spessasynth_core"
 import type { PlayerEvent } from "./PlayerEvent.js"
 
 function addEvent(midi: MIDIBuilder, track: number, e: PlayerEvent) {
@@ -60,7 +61,7 @@ function addEvent(midi: MIDIBuilder, track: number, e: PlayerEvent) {
 }
 
 export function playerEventsToMIDI(
-  events: PlayerEvent[],
+  events: readonly PlayerEvent[],
   timeDivision: number,
 ): MIDIBuilder {
   // No toSorted??
