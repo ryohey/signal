@@ -7,6 +7,8 @@
     "build": "npm run build:app",
     "build:app": "turbo build && cpx \"app/dist/**/*\" dist",
     "serve": "npx http-server dist",
+    "mcp": "npm run start -w @signal-app/mcp",
+    "test:mcp": "npm test -w @signal-app/mcp",
     "test": "turbo test",
     "lint": "biome lint .",
     "format": "biome format . --write",

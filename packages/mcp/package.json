@@ -1,0 +1,28 @@
+{
+  "name": "@signal-app/mcp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outfile=dist/server.mjs",
+    "start": "npm run build && node dist/server.mjs",
+    "test": "npm run build && vitest run src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@signal-app/core": "*",
+    "midifile-ts": "1.5.2",
+    "mobx": "^6.15.0",
+    "spessasynth_core": "latest",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "esbuild": "^0.27.3",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

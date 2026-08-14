@@ -59,6 +59,12 @@ By setting these constraints, signal aims to offer a streamlined and distraction
    ```
 2. The application should now be running on [http://localhost:3000](http://localhost:3000).
 
+### Running as a headless MCP server
+
+Signal's MIDI engine can also run without the web application or a browser. The
+headless MCP server can edit MIDI projects and render them directly to MP3 or
+WAV. See [HEADLESS_MCP.md](./HEADLESS_MCP.md) for setup and supported tools.
+
 ### Running via Docker
 > [!NOTE] 
 > with docker, `npm install` and `npm run build` will not be necessary, and you will only need to install **docker**, then **clone the repository**, then run the command specified below.
