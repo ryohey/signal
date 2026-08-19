@@ -3,7 +3,6 @@ import { atom, useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
 import { atomEffect } from "jotai-effect"
-import { cloneDeep } from "lodash"
 import {
   createContext,
   useCallback,
@@ -13,6 +12,7 @@ import {
 } from "react"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { addedSet, deletedSet } from "../../../helpers/set"
+import { historyAtom } from "../../../hooks/historyAtom"
 import { BeatsProvider, createBeatsScope } from "../../../hooks/useBeats"
 import { EventViewProvider } from "../../../hooks/useEventView"
 import {
@@ -213,8 +213,6 @@ export function usePianoRoll() {
     toggleTool: useSetAtom(toggleToolAtom, { store }),
     setNewNoteVelocity: useSetAtom(newNoteVelocityAtom, { store }),
     setActivePane: useSetAtom(activePaneAtom, { store }),
-    serializeState: useSetAtom(serializeAtom, { store }),
-    restoreState: useSetAtom(restoreAtom, { store }),
   }
 }
 
@@ -230,9 +228,9 @@ export function usePianoRollQuantizer() {
 
 // atoms
 const mouseModeAtom = atom<"pencil" | "selection">("pencil")
-const selectedTrackIdAtom = atom<TrackId>(UNASSIGNED_TRACK_ID)
-const selectionAtom = atom<Selection | null>(null)
-const selectedNoteIdsAtom = atom<readonly number[]>([])
+const selectedTrackIdAtom = historyAtom(atom<TrackId>(UNASSIGNED_TRACK_ID))
+const selectionAtom = historyAtom(atom<Selection | null>(null))
+const selectedNoteIdsAtom = historyAtom(atom<readonly number[]>([]))
 const lastNoteDurationAtom = atom<number | null>(null)
 const notGhostTrackIdsAtom = atom<ReadonlySet<TrackId>>(new Set<TrackId>())
 const newNoteVelocityAtom = atom<number>(100)
@@ -260,31 +258,6 @@ const getSelectionAtom = atom(null, (get) => get(selectionAtom))
 const getSelectedNoteIdsAtom = atom(null, (get) => get(selectedNoteIdsAtom))
 const toggleToolAtom = atom(null, (_get, set) =>
   set(mouseModeAtom, (prev) => (prev === "pencil" ? "selection" : "pencil")),
-)
-const serializeAtom = atom(null, (get) => ({
-  selection: cloneDeep(get(selectionAtom)),
-  selectedNoteIds: cloneDeep(get(selectedNoteIdsAtom)),
-  selectedTrackId: get(selectedTrackIdAtom),
-}))
-const restoreAtom = atom(
-  null,
-  (
-    _get,
-    set,
-    {
-      selection,
-      selectedNoteIds,
-      selectedTrackId,
-    }: {
-      selection: Selection | null
-      selectedNoteIds: readonly number[]
-      selectedTrackId: TrackId
-    },
-  ) => {
-    set(selectionAtom, selection)
-    set(selectedNoteIdsAtom, selectedNoteIds)
-    set(selectedTrackIdAtom, selectedTrackId)
-  },
 )
 
 // effects

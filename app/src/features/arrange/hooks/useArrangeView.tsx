@@ -1,8 +1,8 @@
 import { ArrangeSelection } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { Store } from "jotai/vanilla/store"
-import { cloneDeep } from "lodash"
 import { createContext, useContext, useMemo } from "react"
+import { historyAtom } from "../../../hooks/historyAtom"
 import { BeatsProvider, createBeatsScope } from "../../../hooks/useBeats"
 import {
   createQuantizerScope,
@@ -102,8 +102,6 @@ export function useArrangeView() {
     resetSelection: useSetAtom(resetSelectionAtom),
     setOpenTransposeDialog: useSetAtom(openTransposeDialogAtom),
     setOpenVelocityDialog: useSetAtom(openVelocityDialogAtom),
-    serializeState: useSetAtom(serializeAtom),
-    restoreState: useSetAtom(restoreAtom),
   }
 }
 
@@ -118,7 +116,7 @@ export const useArrangeTrackScroll = () => {
 }
 
 // atoms
-const selectionAtom = atom<ArrangeSelection | null>(null)
+const selectionAtom = historyAtom(atom<ArrangeSelection | null>(null))
 const selectedTrackIndexAtom = atom(0)
 const openTransposeDialogAtom = atom(false)
 const openVelocityDialogAtom = atom(false)
@@ -127,20 +125,3 @@ const openVelocityDialogAtom = atom(false)
 const resetSelectionAtom = atom(null, (_get, set) => {
   set(selectionAtom, null)
 })
-const serializeAtom = atom(null, (get) => ({
-  selection: cloneDeep(get(selectionAtom)),
-}))
-const restoreAtom = atom(
-  null,
-  (
-    _get,
-    set,
-    {
-      selection,
-    }: {
-      selection: ArrangeSelection | null
-    },
-  ) => {
-    set(selectionAtom, selection)
-  },
-)
