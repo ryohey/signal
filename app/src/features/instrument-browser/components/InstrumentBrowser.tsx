@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import type { CheckedState } from "@radix-ui/react-checkbox"
-import { removeEvents, type TrackEventOf, type TrackId } from "@signal-app/core"
+import { type TrackEventOf, type TrackId } from "@signal-app/core"
 import {
   Button,
   Checkbox,
@@ -13,7 +13,6 @@ import {
 } from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
 import React, { type FC, useCallback, useEffect, useState } from "react"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useTrack } from "../../../hooks/useTrack"
 import { Localized } from "../../../localize/useLocalization"
 import { InstrumentName } from "../../track-list/components/InstrumentName"
@@ -61,7 +60,6 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
     programNumber: initialProgramNumber,
     isRhythmTrack: initialIsRhythmTrack,
   } = useTrack(trackId)
-  const mutate = useMutateTrack(trackId)
   const [setting, setSetting] = useState({
     programNumber: initialProgramNumber ?? 0,
     isRhythmTrack: initialIsRhythmTrack ?? false,
@@ -74,6 +72,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
     insertInstrumentChangeAtCurrentPosition,
     changeInstrument,
     onClickOK,
+    onClickDelete,
     changeRhythmTrack,
   } = useInstrumentBrowser(setting, targetEvent?.id)
 
@@ -136,11 +135,9 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   }, [onOpenChange, insertInstrumentChangeAtCurrentPosition, programNumber])
 
   const handleClickDelete = useCallback(() => {
-    if (targetEvent !== undefined) {
-      mutate(removeEvents([targetEvent.id]))
-    }
+    onClickDelete()
     onOpenChange(false)
-  }, [targetEvent, mutate, onOpenChange])
+  }, [onClickDelete, onOpenChange])
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
