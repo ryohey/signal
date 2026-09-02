@@ -149,6 +149,23 @@ describe("useDerivedValue", () => {
     expect(deriveValue).toHaveBeenCalledTimes(2)
   })
 
+  it("recomputes when deriveValue's reference changes, even if the source never notifies", () => {
+    const source = new Emitter<void>()
+    const subscribeSource = vi.fn(source.subscribe)
+
+    const { result, rerender } = renderHook(
+      ({ base }: { base: number }) =>
+        useDerivedValue(subscribeSource, () => base * 2),
+      { initialProps: { base: 1 } },
+    )
+
+    expect(result.current).toBe(2)
+
+    rerender({ base: 5 })
+
+    expect(result.current).toBe(10)
+  })
+
   it("switches source subscription when subscribeSource changes", () => {
     const sourceA = new Emitter<void>()
     const sourceB = new Emitter<void>()
