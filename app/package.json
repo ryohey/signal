@@ -52,6 +52,7 @@
     "@signal-app/geometry": "*",
     "@signal-app/observable": "*",
     "@signal-app/player": "*",
+    "@signal-app/tempo-editor": "*",
     "@signal-app/ui": "*",
     "color": "^5.0.3",
     "dialog-hooks": "*",

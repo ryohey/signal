@@ -1,26 +1,20 @@
-import { TrackEventOf } from "@signal-app/core"
-import { SetTempoEvent } from "midifile-ts"
+import { TempoItem } from "@signal-app/tempo-editor"
 import { TempoGraphItem } from "../components/TempoGraphItem"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"
 
 export const transformEvents = (
-  events: readonly TrackEventOf<SetTempoEvent>[],
+  tempoItems: readonly TempoItem[],
   transform: TempoCoordTransform,
   maxX: number,
 ): TempoGraphItem[] => {
   // まず位置だけ計算する
   // Calculate only position
-  const items = [...events]
-    .sort((a, b) => a.tick - b.tick)
-    .map((e) => {
-      const bpm = (60 * 1000000) / e.microsecondsPerBeat
-      return {
-        id: e.id,
-        x: Math.round(transform.getX(e.tick)),
-        y: Math.round(transform.getY(bpm)),
-        microsecondsPerBeat: e.microsecondsPerBeat,
-      }
-    })
+  const items = tempoItems.map((item) => ({
+    id: item.id,
+    x: Math.round(transform.getX(item.tick)),
+    y: Math.round(transform.getY(item.bpm)),
+    bpm: item.bpm,
+  }))
 
   // 次のイベント位置まで延びるように大きさを設定する
   // Set size to extend to the next event position
@@ -34,7 +28,7 @@ export const transformEvents = (
         width: nextX - e.x,
         height: transform.height - e.y + 1, // fit to screen bottom
       },
-      microsecondsPerBeat: e.microsecondsPerBeat,
+      bpm: e.bpm,
     }
   })
 }

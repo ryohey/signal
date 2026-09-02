@@ -1,34 +1,7 @@
-import {
-  filter,
-  isSetTempoEvent,
-  selectorToQuery,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
-import { useMemo } from "react"
-import { useSong } from "../../../hooks/useSong"
-import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
-import { useTickScroll } from "../../../hooks/useTickScroll"
-import { transformEvents } from "../helpers/transformEvents"
-import { useTempoTransform } from "./useTempoTransform"
-
-const filterSetTempoEvent = selectorToQuery(filter(isSetTempoEvent))
+import { useDerivedValue } from "../../../hooks/useDerivedValue"
+import { useTempoEditorService } from "./useTempoEditor"
 
 export function useTempoItems() {
-  const { transform } = useTempoTransform()
-  const { conductorTrack } = useSong()
-  const tempoEvents =
-    useSyncTrackQuery(
-      conductorTrack?.id ?? UNASSIGNED_TRACK_ID,
-      filterSetTempoEvent,
-      isSetTempoEvent,
-    ) ?? []
-  const { canvasWidth, scrollLeft } = useTickScroll()
-  const items = useMemo(
-    () => transformEvents(tempoEvents, transform, canvasWidth + scrollLeft),
-    [tempoEvents, transform, canvasWidth, scrollLeft],
-  )
-
-  return {
-    items,
-  }
+  const tempoEditor = useTempoEditorService()
+  return useDerivedValue(tempoEditor.observeItems, tempoEditor.listItems)
 }

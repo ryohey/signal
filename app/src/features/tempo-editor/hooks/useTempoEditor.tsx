@@ -1,17 +1,11 @@
-import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { TempoEditor } from "@signal-app/tempo-editor"
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import { Store } from "jotai/vanilla/store"
-import { createContext, useContext, useMemo } from "react"
+import { createContext, useContext } from "react"
 import { historyAtom } from "../../../hooks/historyAtom"
-import { BeatsProvider, createBeatsScope } from "../../../hooks/useBeats"
-import {
-  createQuantizerScope,
-  QuantizerProvider,
-} from "../../../hooks/useQuantizer"
-import {
-  createTickScrollScope,
-  TickScrollProvider,
-  useTickScroll,
-} from "../../../hooks/useTickScroll"
+import { BeatsProvider } from "../../../hooks/useBeats"
+import { QuantizerProvider } from "../../../hooks/useQuantizer"
+import { TickScrollProvider, useTickScroll } from "../../../hooks/useTickScroll"
 import { TempoSelection } from "../entities/TempoSelection"
 
 type TempoEditorStore = {
@@ -21,33 +15,9 @@ type TempoEditorStore = {
 }
 
 // biome-ignore lint/style/noNonNullAssertion: we assume the provider is always used
-const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
-
-export function TempoEditorProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const store = useStore()
-
-  const tempoEditorStore = useMemo(() => {
-    // should match the order in TempoEditorScope
-    const tickScrollScope = createTickScrollScope(store)
-    const quantizerScope = createQuantizerScope(tickScrollScope)
-    const beatsScope = createBeatsScope(quantizerScope)
-    return {
-      tickScrollScope,
-      quantizerScope,
-      beatsScope,
-    }
-  }, [store])
-
-  return (
-    <TempoEditorStoreContext.Provider value={tempoEditorStore}>
-      {children}
-    </TempoEditorStoreContext.Provider>
-  )
-}
+export const TempoEditorStoreContext = createContext<TempoEditorStore>(null!)
+// biome-ignore lint/style/noNonNullAssertion: we assume the provider is always used
+export const TempoEditorContext = createContext<TempoEditor>(null!)
 
 export function TempoEditorScope({ children }: { children: React.ReactNode }) {
   const { tickScrollScope, quantizerScope, beatsScope } = useContext(
@@ -66,6 +36,10 @@ export function TempoEditorScope({ children }: { children: React.ReactNode }) {
 export function useTempoTickScroll() {
   const { tickScrollScope } = useContext(TempoEditorStoreContext)
   return useTickScroll(tickScrollScope)
+}
+
+export function useTempoEditorService() {
+  return useContext(TempoEditorContext)
 }
 
 export function useTempoEditor() {

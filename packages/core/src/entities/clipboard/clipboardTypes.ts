@@ -30,12 +30,3 @@ export const ControlEventsClipboardDataSchema = z.object({
 export type ControlEventsClipboardData = z.infer<
   typeof ControlEventsClipboardDataSchema
 >
-
-export const TempoEventsClipboardDataSchema = z.object({
-  type: z.literal("tempo_events"),
-  events: z.array(z.any().describe("TrackEventOf<SetTempoEvent>")),
-})
-
-export type TempoEventsClipboardData = z.infer<
-  typeof TempoEventsClipboardDataSchema
->

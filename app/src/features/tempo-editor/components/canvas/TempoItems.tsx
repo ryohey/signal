@@ -1,13 +1,14 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { bpmToUSecPerBeat, uSecPerBeatToBPM } from "@signal-app/core"
 import { Rect } from "@signal-app/geometry"
 import { FC, useCallback, useMemo } from "react"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { LineGraphItems } from "../../../control-pane/components/LineGraph/LineGraphItems"
+import { transformEvents } from "../../helpers/transformEvents"
 import { useChangeTempo } from "../../hooks/useChangeTempo"
 import { useDragSelectionGesture } from "../../hooks/useDragSelectionGesture"
 import { useTempoEditor } from "../../hooks/useTempoEditor"
 import { useTempoItems } from "../../hooks/useTempoItems"
+import { useTempoTransform } from "../../hooks/useTempoTransform"
 import { TempoGraphItem } from "../TempoGraphItem"
 
 const CIRCLE_RADIUS = 4
@@ -19,10 +20,16 @@ export interface TempoItemsProps {
 
 export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
   const { mouseMode, selectedEventIds } = useTempoEditor()
-  const { items } = useTempoItems()
-  const { scrollLeft } = useTickScroll()
+  const tempoItems = useTempoItems()
+  const { transform } = useTempoTransform()
+  const { scrollLeft, contentWidth } = useTickScroll()
   const dragSelectionGesture = useDragSelectionGesture()
   const changeTempo = useChangeTempo()
+
+  const items = useMemo(
+    () => transformEvents(tempoItems, transform, contentWidth),
+    [tempoItems, transform, contentWidth],
+  )
 
   // draggable hit areas for each tempo changes
   const controlPoints = useMemo(
@@ -50,8 +57,7 @@ export const TempoItems: FC<TempoItemsProps> = ({ width, zIndex }) => {
     (e: WheelEvent, item: TempoGraphItem) => {
       const event = items.filter((ev) => ev.id === item.id)[0]
       const movement = e.deltaY > 0 ? -1 : 1
-      const bpm = uSecPerBeatToBPM(event.microsecondsPerBeat)
-      changeTempo(event.id, Math.floor(bpmToUSecPerBeat(bpm + movement)))
+      changeTempo(event.id, Math.max(1, Math.floor(event.bpm + movement)))
     },
     [items, changeTempo],
   )

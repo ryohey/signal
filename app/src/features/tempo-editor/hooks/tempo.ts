@@ -1,24 +1,16 @@
-import {
-  addClipboardTempoEvents,
-  duplicateEvents,
-  removeEvents,
-  TempoEventsClipboardDataSchema,
-  tempoEventsToClipboardData,
-} from "@signal-app/core"
+import { ClipboardDataSchema } from "@signal-app/tempo-editor"
 import { useCallback } from "react"
-import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
-import { useConductorTrackQuery } from "../../../hooks/useTrackQuery"
 import {
   readClipboardData,
   readJSONFromClipboard,
   writeClipboardData,
 } from "../../../services/Clipboard"
-import { useTempoEditor } from "./useTempoEditor"
+import { useTempoEditor, useTempoEditorService } from "./useTempoEditor"
 
 export const useDeleteTempoSelection = () => {
-  const mutate = useMutateConductorTrack()
+  const tempoEditor = useTempoEditorService()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useTempoEditor()
 
@@ -29,44 +21,42 @@ export const useDeleteTempoSelection = () => {
 
     pushHistory()
 
-    // 選択範囲と選択されたノートを削除
-    // Remove selected notes and selected notes
-    mutate(removeEvents(selectedEventIds))
+    tempoEditor.removeItems(selectedEventIds)
     setSelection(null)
   }
 }
 
 export const useCopyTempoSelection = () => {
+  const tempoEditor = useTempoEditorService()
   const { selectedEventIds } = useTempoEditor()
-  const query = useConductorTrackQuery()
 
   return useCallback(async () => {
-    const data = query(tempoEventsToClipboardData(selectedEventIds))
+    const data = tempoEditor.getItemsClipboardData(selectedEventIds)
     if (!data) {
       return
     }
     await writeClipboardData(data)
-  }, [query, selectedEventIds])
+  }, [tempoEditor, selectedEventIds])
 }
 
 export const usePasteTempoSelection = () => {
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
-  const mutate = useMutateConductorTrack()
+  const tempoEditor = useTempoEditorService()
 
   return useCallback(
     async (e?: ClipboardEvent) => {
       const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
-      const { data } = TempoEventsClipboardDataSchema.safeParse(obj)
+      const { data } = ClipboardDataSchema.safeParse(obj)
 
       if (!data) {
         return
       }
 
       pushHistory()
-      mutate(addClipboardTempoEvents(data, position)) ?? []
+      tempoEditor.pasteItemsAtPosition(data, position)
     },
-    [pushHistory, mutate, position],
+    [pushHistory, tempoEditor, position],
   )
 }
 
@@ -81,9 +71,9 @@ export const useCutTempoSelection = () => {
 }
 
 export const useDuplicateTempoSelection = () => {
+  const tempoEditor = useTempoEditorService()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useTempoEditor()
-  const mutate = useMutateConductorTrack()
 
   return () => {
     if (selectedEventIds.length === 0) {
@@ -92,7 +82,7 @@ export const useDuplicateTempoSelection = () => {
 
     pushHistory()
 
-    const addedEventIds = mutate(duplicateEvents(selectedEventIds)) ?? []
+    const addedEventIds = tempoEditor.duplicateItems(selectedEventIds)
 
     // select the created events
     setSelectedEventIds(addedEventIds)

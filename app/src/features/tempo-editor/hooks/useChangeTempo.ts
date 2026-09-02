@@ -1,21 +1,15 @@
-import { TrackEventOf, updateEvent } from "@signal-app/core"
-import type { SetTempoEvent } from "midifile-ts"
 import { useCallback } from "react"
-import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
+import { useTempoEditorService } from "./useTempoEditor"
 
 export const useChangeTempo = () => {
-  const mutate = useMutateConductorTrack()
+  const tempoEditor = useTempoEditorService()
   const { pushHistory } = useHistory()
   return useCallback(
-    (id: number, microsecondsPerBeat: number) => {
+    (id: number, bpm: number) => {
       pushHistory()
-      mutate(
-        updateEvent<TrackEventOf<SetTempoEvent>>(id, {
-          microsecondsPerBeat,
-        }),
-      )
+      tempoEditor.setBpm(id, bpm)
     },
-    [mutate, pushHistory],
+    [tempoEditor, pushHistory],
   )
 }

@@ -1,28 +1,20 @@
 import { Point } from "@signal-app/geometry"
-import {
-  getSetTempoEventsByIds,
-  moveTempoEvents,
-  removeRedundantEventsForEventIds,
-} from "@signal-app/core"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useMutateConductorTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useConductorTrackQuery } from "../../../hooks/useTrackQuery"
-import { useTempoEditor } from "./useTempoEditor"
+import { useTempoEditor, useTempoEditorService } from "./useTempoEditor"
 import { useTempoTransform } from "./useTempoTransform"
 
 export const useDragSelectionGesture = (): MouseDownHandler<[number]> => {
   const { pushHistory } = useHistory()
   const { setSelectedEventIds, selectedEventIds: _selectedEventIds } =
     useTempoEditor()
+  const tempoEditor = useTempoEditorService()
   const { transform, getLocal } = useTempoTransform()
   const { quantizeRound } = useQuantizer()
-  const mutate = useMutateConductorTrack()
-  const query = useConductorTrackQuery()
 
   return useCallback(
     (e: MouseEvent, hitEventId: number) => {
@@ -35,10 +27,7 @@ export const useDragSelectionGesture = (): MouseDownHandler<[number]> => {
         setSelectedEventIds(selectedEventIds)
       }
 
-      const events =
-        query(getSetTempoEventsByIds(selectedEventIds))?.map((e) => ({
-          ...e, // copy
-        })) ?? []
+      const events = tempoEditor.getItemsByIds(selectedEventIds)
 
       const draggedEvent = events.find((ev) => ev.id === hitEventId)
       if (draggedEvent === undefined) {
@@ -65,25 +54,18 @@ export const useDragSelectionGesture = (): MouseDownHandler<[number]> => {
 
           const deltaValue = pos.bpm - start.bpm
 
-          console.log(
-            `deltaTick: ${deltaTick}, quantizedDeltaTick: ${quantizedDeltaTick}, deltaValue: ${deltaValue}`,
-          )
-
-          mutate(
-            moveTempoEvents(
-              selectedEventIds,
-              quantizedDeltaTick - lastDeltaTick,
-              deltaValue - lastDeltaValue,
-              transform.maxBPM,
-            ),
+          tempoEditor.moveItems(
+            selectedEventIds,
+            quantizedDeltaTick - lastDeltaTick,
+            deltaValue - lastDeltaValue,
+            transform.maxBPM,
           )
 
           lastDeltaTick = quantizedDeltaTick
           lastDeltaValue = deltaValue
         },
         onMouseUp: () => {
-          // Find events with the same tick and remove it
-          mutate(removeRedundantEventsForEventIds(selectedEventIds))
+          tempoEditor.removeRedundantItems(selectedEventIds)
         },
       })
     },
@@ -93,9 +75,8 @@ export const useDragSelectionGesture = (): MouseDownHandler<[number]> => {
       _selectedEventIds,
       transform,
       setSelectedEventIds,
-      query,
       quantizeRound,
-      mutate,
+      tempoEditor,
     ],
   )
 }
