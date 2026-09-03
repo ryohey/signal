@@ -7,6 +7,7 @@ import { matrixFromTranslation } from "../../../../helpers/matrix"
 import { useBeats } from "../../../../hooks/useBeats"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { VelocityTransform } from "../../entities/VelocityTransform"
+import { useDragVelocityGesture } from "../../gestures/useDragVelocityGesture"
 import { useVelocityPaintGesture } from "../../gestures/useVelocityPaintGesture"
 import { VelocityItems } from "./VelocityItems"
 
@@ -21,9 +22,8 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
     () => new VelocityTransform(height),
     [height],
   )
-  const velocityPaintGesture = useVelocityPaintGesture({
-    velocityTransform: velocityTransform,
-  })
+  const velocityPaintGesture = useVelocityPaintGesture(velocityTransform)
+  const dragVelocityGesture = useDragVelocityGesture(velocityTransform)
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-scrollLeft, 0),
     [scrollLeft],
@@ -43,7 +43,11 @@ export const VelocityControlCanvas: FC<{ width: number; height: number }> = ({
       onMouseDown={velocityPaintGesture}
     >
       <Transform matrix={scrollXMatrix}>
-        <VelocityItems velocityTransform={velocityTransform} zIndex={1} />
+        <VelocityItems
+          onMouseDown={dragVelocityGesture}
+          velocityTransform={velocityTransform}
+          zIndex={1}
+        />
         <Beats height={height} beats={beats} zIndex={2} />
         <Cursor x={cursorX} height={height} zIndex={4} />
       </Transform>

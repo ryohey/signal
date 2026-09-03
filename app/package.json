@@ -47,6 +47,7 @@
     "@sentry/react": "^10.39.0",
     "@signal-app/api": "*",
     "@signal-app/community": "*",
+    "@signal-app/control-editor": "*",
     "@signal-app/core": "*",
     "@signal-app/firebaseui-web-react": "*",
     "@signal-app/geometry": "*",

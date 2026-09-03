@@ -1,22 +1,19 @@
-import { updateVelocitiesInRange } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import { usePianoRoll } from "../../../features/piano-roll/hooks/usePianoRoll"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { VelocityTransform } from "../entities/VelocityTransform"
+import { useVelocityEditor } from "../hooks/useVelocityEditor"
 
-export const useVelocityPaintGesture = ({
-  velocityTransform,
-}: {
-  velocityTransform: VelocityTransform
-}): MouseDownHandler<[], React.MouseEvent> => {
+export const useVelocityPaintGesture = (
+  velocityTransform: VelocityTransform,
+): MouseDownHandler<[], React.MouseEvent> => {
   const { transform } = useTickScroll()
   const { scrollLeft } = useTickScroll()
-  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
-  const mutateTrack = useMutateTrack(selectedTrackId)
+  const { selectedNoteIds } = usePianoRoll()
+  const velocityEditor = useVelocityEditor()
 
   return useCallback(
     (ev: React.MouseEvent) => {
@@ -41,20 +38,18 @@ export const useVelocityPaintGesture = ({
           const tick = transform.getTick(local.x)
           const value = calcValue(e)
 
-          mutateTrack(
-            updateVelocitiesInRange(
-              selectedNoteIds,
-              lastTick,
-              lastValue,
-              tick,
-              value,
-            ),
+          velocityEditor.updateVelocityInRange(
+            selectedNoteIds,
+            lastTick,
+            lastValue,
+            tick,
+            value,
           )
           lastTick = tick
           lastValue = value
         },
       })
     },
-    [scrollLeft, mutateTrack, selectedNoteIds, transform, velocityTransform],
+    [scrollLeft, velocityEditor, selectedNoteIds, transform, velocityTransform],
   )
 }

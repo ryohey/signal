@@ -1,186 +1,66 @@
-import styled from "@emotion/styled"
-import useComponentSize from "@rehooks/component-size"
-import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import React, { FC, useCallback, useRef } from "react"
-import { useRootView } from "../../../hooks/useRootView"
+import { ValueEventType } from "@signal-app/control-editor"
+import { FC } from "react"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import {
-  ControlMode,
-  controlModeKey,
-  isEqualControlMode,
-} from "../entities/ControlMode"
+import { ControlEditorProvider } from "../context/ControlEditorProvider"
+import { VelocityEditorProvider } from "../context/VelocityEditorProvider"
 import { useControlPane } from "../hooks/useControlPane"
 import { useControlPaneGlobalKeyboardShortcut } from "../hooks/useControlPaneGlobalKeyboardShortcut"
 import { useControlPaneKeyboardShortcut } from "../hooks/useControlPaneKeyboardShortcut"
-import { ControlName } from "./ControlName"
+import { ControlLayout } from "./ControlLayout"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
 import { PencilModeSelector } from "./PencilModeSelector"
 import PianoVelocityControl from "./VelocityControl/VelocityControl"
-
-interface TabBarProps {
-  onSelect: (mode: ControlMode) => void
-  selectedMode: ControlMode
-}
-
-const TabButtonBase = styled.div`
-  background: transparent;
-  -webkit-appearance: none;
-  padding: 0.5em 0.8em;
-  color: var(--color-text-secondary);
-  outline: none;
-  font-size: 0.75rem;
-  cursor: default;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  &:hover {
-    background: var(--color-highlight);
-  }
-`
-
-const TabButton = styled(TabButtonBase)`
-  min-width: 4rem;
-  overflow: hidden;
-  border-bottom: 1px solid;
-  border-color: transparent;
-  color: var(--color-text-secondary);
-
-  &[data-selected="true"] {
-    border-color: var(--color-theme);
-    color: var(--color-text);
-  }
-`
-
-const NoWrap = styled.span`
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-`
-
-const Toolbar = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  height: 2rem;
-  flex-shrink: 0;
-  overflow-x: auto;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`
-
-const TabBar: FC<TabBarProps> = React.memo(({ onSelect, selectedMode }) => {
-  const { setOpenControlSettingDialog } = useRootView()
-  const { controlModes } = useControlPane()
-
-  return (
-    <Toolbar>
-      {controlModes.map((mode) => (
-        <TabButton
-          data-selected={isEqualControlMode(selectedMode, mode)}
-          onMouseDown={() => onSelect(mode)}
-          key={controlModeKey(mode)}
-        >
-          <NoWrap>
-            <ControlName mode={mode} />
-          </NoWrap>
-        </TabButton>
-      ))}
-      <TabButtonBase onClick={() => setOpenControlSettingDialog(true)}>
-        <DotsHorizontalIcon style={{ width: "1rem" }} />
-      </TabButtonBase>
-    </Toolbar>
-  )
-})
-
-const Parent = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-background);
-  outline: none;
-`
-
-const Content = styled.div`
-  flex-grow: 1;
-  position: relative;
-
-  > canvas,
-  > .LineGraph {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-`
-
-const TabBarWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: stretch;
-`
-
-const TabBarScrollArea = styled.div`
-  flex: 1;
-  overflow: hidden;
-`
-
-const TAB_HEIGHT = 32
-const BORDER_WIDTH = 1
 
 export interface ControlPaneProps {
   axisWidth: number
 }
 
-const ControlPane: FC<ControlPaneProps> = ({ axisWidth }) => {
-  const ref = useRef(null)
-  const containerSize = useComponentSize(ref)
-  const { setActivePane, mouseMode } = usePianoRoll()
-  const { controlMode: mode, setControlMode } = useControlPane()
+const VelocityGraph: FC<ControlPaneProps> = ({ axisWidth }) => {
+  return (
+    <VelocityEditorProvider>
+      <ControlLayout
+        axisWidth={axisWidth}
+        content={(props) => <PianoVelocityControl {...props} />}
+      />
+    </VelocityEditorProvider>
+  )
+}
+
+const ControllerGraph: FC<ControlPaneProps & { type: ValueEventType }> = ({
+  axisWidth,
+  type,
+}) => {
+  const { mouseMode } = usePianoRoll()
+  const { controlMode: mode } = useControlPane()
   const keyboardShortcutProps = useControlPaneKeyboardShortcut()
-
-  const onFocus = useCallback(() => setActivePane("control"), [setActivePane])
-  const onBlur = useCallback(() => setActivePane(null), [setActivePane])
-
   useControlPaneGlobalKeyboardShortcut()
-
-  const controlSize = {
-    width: containerSize.width - axisWidth - BORDER_WIDTH,
-    height: containerSize.height - TAB_HEIGHT,
-    axisWidth,
-  }
-
-  const control = (() => {
-    switch (mode.type) {
-      case "velocity":
-        return <PianoVelocityControl {...controlSize} />
-      default:
-        return <ValueEventGraph {...controlSize} type={mode} />
-    }
-  })()
 
   const showPencilModeSelector =
     mouseMode === "pencil" && mode.type !== "velocity"
 
   return (
-    <Parent
-      ref={ref}
+    <ControlLayout
       {...keyboardShortcutProps}
-      tabIndex={0}
-      onFocus={onFocus}
-      onBlur={onBlur}
-    >
-      <TabBarWrapper style={{ paddingLeft: axisWidth }}>
-        <TabBarScrollArea>
-          <TabBar onSelect={setControlMode} selectedMode={mode} />
-        </TabBarScrollArea>
-        {showPencilModeSelector && <PencilModeSelector />}
-      </TabBarWrapper>
-      <Content>{control}</Content>
-    </Parent>
+      axisWidth={axisWidth}
+      content={(props) => <ValueEventGraph {...props} type={type} />}
+      toolbarTrailing={showPencilModeSelector && <PencilModeSelector />}
+    />
   )
 }
 
-export default ControlPane
+const ControlPaneWrapper: FC<ControlPaneProps> = (props) => {
+  const { controlMode: mode } = useControlPane()
+
+  switch (mode.type) {
+    case "velocity":
+      return <VelocityGraph {...props} />
+    default:
+      return (
+        <ControlEditorProvider type={mode}>
+          <ControllerGraph {...props} type={mode} />
+        </ControlEditorProvider>
+      )
+  }
+}
+
+export default ControlPaneWrapper

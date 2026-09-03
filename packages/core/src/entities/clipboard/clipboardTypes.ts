@@ -21,12 +21,3 @@ export const ArrangeEventsClipboardDataSchema = z.object({
 export type ArrangeEventsClipboardData = z.infer<
   typeof ArrangeEventsClipboardDataSchema
 >
-
-export const ControlEventsClipboardDataSchema = z.object({
-  type: z.literal("control_events"),
-  events: z.array(z.any().describe("TrackEvent")),
-})
-
-export type ControlEventsClipboardData = z.infer<
-  typeof ControlEventsClipboardDataSchema
->

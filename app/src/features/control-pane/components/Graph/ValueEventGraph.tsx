@@ -1,8 +1,7 @@
+import { ValueEventType } from "@signal-app/control-editor"
 import { Size } from "@signal-app/geometry"
 import { MIDIControlEvents } from "midifile-ts"
 import React, { FC, useMemo } from "react"
-import { ValueEventType } from "../../entities/ValueEventType"
-import { useControlValueEvents } from "../../hooks/useControlValueEvents"
 import LineGraphControl from "../LineGraph/LineGraph"
 
 export type ValueEventGraphProps = Size & {
@@ -48,8 +47,6 @@ const labelFormatterForType = (
 
 export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
   ({ width, height, type, axisWidth }) => {
-    const events = useControlValueEvents()
-
     const axis = useMemo(() => axisForType(type), [type])
     const maxValue = useMemo(() => maxValueForType(type), [type])
     const labelFormatter = useMemo(() => labelFormatterForType(type), [type])
@@ -59,10 +56,8 @@ export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
         width={width}
         height={height}
         maxValue={maxValue}
-        events={events}
         axis={axis}
         axisWidth={axisWidth}
-        eventType={type}
         axisLabelFormatter={labelFormatter}
       />
     )

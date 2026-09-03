@@ -1,66 +1,52 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback, GLNode, HitArea, useTransform } from "@ryohey/webgl-react"
-import { isNoteEvent } from "@signal-app/core"
+import { VelocityItem } from "@signal-app/control-editor"
 import { Rect } from "@signal-app/geometry"
 import Color from "color"
 import { FC, useCallback, useMemo } from "react"
 import { colorToVec4, enhanceContrast } from "../../../../gl/color"
-import { observeDrag } from "../../../../helpers/observeDrag"
-import { useEventView } from "../../../../hooks/useEventView"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { usePianoRoll } from "../../../piano-roll/hooks/usePianoRoll"
 import { VelocityTransform } from "../../entities/VelocityTransform"
-import { useChangeNotesVelocity } from "../../hooks/useChangeNotesVelocity"
+import { useVelocityItems } from "../../hooks/useVelocityItems"
 import { LegacyVelocityItems } from "./LegacyVelocityItems"
 import { IVelocityData, VelocityShader } from "./VelocityShader"
 
 export interface VelocityItemsProps {
   velocityTransform: VelocityTransform
+  onMouseDown: (e: MouseEvent, noteId: number) => void
   zIndex?: number
 }
 
+const itemWidth = 5
+
 export const VelocityItems: FC<VelocityItemsProps> = ({
   velocityTransform,
+  onMouseDown,
   ...props
 }) => {
-  const { selectedNoteIds } = usePianoRoll()
+  const velocityItems = useVelocityItems()
   const { transform } = useTickScroll()
-  const windowedEvents = useEventView()
-  const changeNotesVelocity = useChangeNotesVelocity()
+  const { selectedNoteIds } = usePianoRoll()
 
-  const items = useMemo(
-    () =>
-      windowedEvents.filter(isNoteEvent).map((note) => {
-        const x = transform.getX(note.tick)
-        const itemWidth = 5
-        return {
-          id: note.id,
-          x,
-          y: velocityTransform.getY(note.velocity),
-          width: itemWidth,
-          height: velocityTransform.getHeight(note.velocity),
-          isSelected: selectedNoteIds.includes(note.id),
-        }
-      }),
-    [windowedEvents, velocityTransform, transform, selectedNoteIds],
+  const transformEvent = useCallback(
+    (item: VelocityItem) => {
+      const x = transform.getX(item.tick)
+      return {
+        id: item.id,
+        x,
+        y: velocityTransform.getY(item.velocity),
+        width: itemWidth,
+        height: velocityTransform.getHeight(item.velocity),
+        isSelected: selectedNoteIds.includes(item.id),
+      }
+    },
+    [selectedNoteIds, transform, velocityTransform],
   )
 
-  const onMouseDown = useCallback(
-    (e: MouseEvent, noteId: number) => {
-      const startY = e.clientY - e.offsetY
-      const calcValue = (e: MouseEvent) => {
-        const offsetY = e.clientY - startY
-        return velocityTransform.getVelocity(offsetY)
-      }
-
-      e.stopPropagation()
-      changeNotesVelocity([noteId], calcValue(e))
-
-      observeDrag({
-        onMouseMove: (e) => changeNotesVelocity([noteId], calcValue(e)),
-      })
-    },
-    [changeNotesVelocity, velocityTransform],
+  const items = useMemo(
+    () => velocityItems.map(transformEvent),
+    [velocityItems, transformEvent],
   )
 
   return (

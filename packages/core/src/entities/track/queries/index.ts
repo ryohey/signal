@@ -1,5 +1,4 @@
 export * from "./composed"
-export * from "./controller"
 export * from "./draggable"
 export * from "./note"
 export * from "./primitives"

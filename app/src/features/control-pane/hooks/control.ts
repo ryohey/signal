@@ -1,14 +1,5 @@
-import {
-  ControlEventsClipboardDataSchema,
-  createOrUpdateControllerEventsValue,
-  duplicateEvents,
-  getControlClipboardDataForSelection,
-  pasteClipboardDataAtPosition,
-  removeEvents,
-} from "@signal-app/core"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
+import { ClipboardDataSchema, ValueEventType } from "@signal-app/control-editor"
 import { useCallback } from "react"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import {
@@ -16,33 +7,29 @@ import {
   readJSONFromClipboard,
   writeClipboardData,
 } from "../../../services/Clipboard"
-import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
+import { useControlEditor } from "./useControlEditor"
 import { useControlPane } from "./useControlPane"
 
 export const useCreateOrUpdateControlEventsValue = () => {
-  const { selectedTrackId } = usePianoRoll()
-  const mutate = useMutateTrack(selectedTrackId)
+  const controlEditor = useControlEditor()
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
   const { selectedEventIds } = useControlPane()
 
   return useCallback(
-    <T extends ControllerEvent | PitchBendEvent>(event: T) => {
+    (value: number) => {
       pushHistory()
 
-      mutate(
-        createOrUpdateControllerEventsValue(selectedEventIds, event, position),
-      )
+      controlEditor.createOrUpdateItemValue(selectedEventIds, value, position)
     },
-    [selectedEventIds, mutate, position, pushHistory],
+    [selectedEventIds, controlEditor, position, pushHistory],
   )
 }
 
 export const useDeleteControlSelection = () => {
-  const { selectedTrackId } = usePianoRoll()
-  const mutate = useMutateTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()
+  const controlEditor = useControlEditor()
 
   return useCallback(() => {
     if (selectedEventIds.length === 0) {
@@ -51,49 +38,49 @@ export const useDeleteControlSelection = () => {
 
     pushHistory()
 
-    // Remove selected notes and selected notes
-    mutate(removeEvents(selectedEventIds))
+    controlEditor.removeItems(selectedEventIds)
     setSelection(null)
-  }, [selectedEventIds, mutate, pushHistory, setSelection])
+  }, [selectedEventIds, controlEditor, pushHistory, setSelection])
 }
 
 export const useCopyControlSelection = () => {
-  const { selectedTrackId } = usePianoRoll()
   const { selectedEventIds } = useControlPane()
-  const mutate = useMutateTrack(selectedTrackId)
+  const controlEditor = useControlEditor()
 
   return useCallback(async () => {
     if (selectedEventIds.length === 0) {
       return
     }
-    const data = mutate(getControlClipboardDataForSelection(selectedEventIds))
+    const data = controlEditor.getItemsClipboardData(selectedEventIds)
     if (!data) {
       return
     }
 
     await writeClipboardData(data)
-  }, [selectedEventIds, mutate])
+  }, [selectedEventIds, controlEditor])
 }
 
 export const usePasteControlSelection = () => {
-  const { selectedTrackId } = usePianoRoll()
   const { position } = usePlayer()
   const { pushHistory } = useHistory()
-  const mutate = useMutateTrack(selectedTrackId)
+  const controlEditor = useControlEditor()
 
   return useCallback(
     async (e?: ClipboardEvent) => {
       const obj = e ? readJSONFromClipboard(e) : await readClipboardData()
-      const { data } = ControlEventsClipboardDataSchema.safeParse(obj)
+      const { data } = ClipboardDataSchema.safeParse(obj)
 
-      if (!data) {
+      if (
+        !data ||
+        !ValueEventType.equals(data.valueEventType, controlEditor.type)
+      ) {
         return
       }
 
       pushHistory()
-      mutate(pasteClipboardDataAtPosition(data, position))
+      controlEditor.pasteItemsAtPosition(data, position)
     },
-    [mutate, position, pushHistory],
+    [controlEditor, position, pushHistory],
   )
 }
 
@@ -108,10 +95,9 @@ export const useCutControlSelection = () => {
 }
 
 export const useDuplicateControlSelection = () => {
-  const { selectedTrackId } = usePianoRoll()
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelectedEventIds } = useControlPane()
-  const mutate = useMutateTrack(selectedTrackId)
+  const controlEditor = useControlEditor()
 
   return useCallback(() => {
     if (selectedEventIds.length === 0) {
@@ -121,7 +107,7 @@ export const useDuplicateControlSelection = () => {
     pushHistory()
 
     // select the created events
-    const addedEventIds = mutate(duplicateEvents(selectedEventIds)) ?? []
-    setSelectedEventIds(addedEventIds)
-  }, [selectedEventIds, pushHistory, setSelectedEventIds, mutate])
+    const addedEventIds = controlEditor.duplicateItems(selectedEventIds)
+    setSelectedEventIds([...addedEventIds])
+  }, [selectedEventIds, controlEditor, pushHistory, setSelectedEventIds])
 }

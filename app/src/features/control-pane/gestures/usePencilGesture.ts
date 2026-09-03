@@ -1,50 +1,43 @@
-import { Range, updateEventsInRange } from "@signal-app/core"
+import { Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
+import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { ControlCoordTransform } from "../entities/ControlCoordTransform"
-import { ValueEventType } from "../entities/ValueEventType"
+import { useControlEditor } from "../hooks/useControlEditor"
 import { useControlPane } from "../hooks/useControlPane"
-import { useCreateEvent } from "../hooks/useCreateEvent"
 
-const useUpdateValueEvents = (type: ValueEventType) => {
-  const { selectedTrackId } = usePianoRoll()
-  const mutate = useMutateTrack(selectedTrackId)
+const useUpdateValueEvents = () => {
   const { quantizeFloor, quantizeUnit } = useQuantizer()
+  const controlEditor = useControlEditor()
 
   return useCallback(
-    (valueRange: Range, tickRange: Range) => {
-      mutate(
-        updateEventsInRange(
-          ValueEventType.getEventPredicate(type),
-          ValueEventType.getEventFactory(type),
-          quantizeFloor,
-          quantizeUnit,
-          valueRange,
-          tickRange,
-        ),
-      )
-    },
-    [mutate, type, quantizeFloor, quantizeUnit],
+    (valueRange: Range, tickRange: Range) =>
+      controlEditor.updateItemsInRange(
+        valueRange,
+        tickRange,
+        quantizeFloor,
+        quantizeUnit,
+      ),
+    [controlEditor, quantizeFloor, quantizeUnit],
   )
 }
 
-export const usePencilGesture = (
-  type: ValueEventType,
-): MouseDownHandler<[Point, ControlCoordTransform]> => {
+export const usePencilGesture = (): MouseDownHandler<
+  [Point, ControlCoordTransform]
+> => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { setSelectedEventIds, setSelection } = useControlPane()
-  const createTrackEvent = useCreateEvent()
+  const controlEditor = useControlEditor()
+  const { sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const updateValueEvents = useUpdateValueEvents(type)
-  const eventFactory = ValueEventType.getEventFactory(type)
+  const updateValueEvents = useUpdateValueEvents()
 
   return useCallback(
     (e, startPoint, transform) => {
@@ -58,8 +51,8 @@ export const usePencilGesture = (
       const startClientPos = getClientPos(e)
       const pos = transform.fromPosition(startPoint)
 
-      const event = eventFactory(pos.value)
-      createTrackEvent(event, pos.tick)
+      controlEditor.addItem({ tick: pos.tick, value: pos.value })
+      sendEvent(controlEditor.createPreviewEvent(pos.value))
 
       let lastTick = pos.tick
       let lastValue = pos.value
@@ -86,8 +79,8 @@ export const usePencilGesture = (
       })
     },
     [
-      createTrackEvent,
-      eventFactory,
+      controlEditor,
+      sendEvent,
       pushHistory,
       setPianoRollSelection,
       setSelectedEventIds,

@@ -1,5 +1,3 @@
-// abstraction layer for pitch-bend and controller events
-
 import {
   controllerMidiEvent,
   isControllerEventWithType,

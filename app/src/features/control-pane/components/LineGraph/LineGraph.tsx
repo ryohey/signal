@@ -1,7 +1,4 @@
-import { TrackEventOf } from "@signal-app/core"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import React, { useCallback } from "react"
-import { ValueEventType } from "../../entities/ValueEventType"
+import React from "react"
 import { useCreateOrUpdateControlEventsValue } from "../../hooks/control"
 import { GraphAxis } from "./GraphAxis"
 import { LineGraphCanvas } from "./LineGraphCanvas"
@@ -11,12 +8,10 @@ export interface ItemValue {
   value: number
 }
 
-export interface LineGraphProps<T extends ControllerEvent | PitchBendEvent> {
+export interface LineGraphProps {
   width: number
   height: number
   maxValue: number
-  events: TrackEventOf<T>[]
-  eventType: ValueEventType
   lineWidth?: number
   circleRadius?: number
   axis: number[]
@@ -24,10 +19,8 @@ export interface LineGraphProps<T extends ControllerEvent | PitchBendEvent> {
   axisLabelFormatter?: (value: number) => string
 }
 
-const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
+const LineGraph = ({
   maxValue,
-  events,
-  eventType,
   width,
   height,
   lineWidth = 2,
@@ -35,16 +28,8 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
   axis,
   axisWidth,
   axisLabelFormatter = (v) => v.toString(),
-}: LineGraphProps<T>) => {
+}: LineGraphProps) => {
   const createOrUpdateControlEventsValue = useCreateOrUpdateControlEventsValue()
-
-  const onClickAxis = useCallback(
-    (value: number) => {
-      const event = ValueEventType.getEventFactory(eventType)(value)
-      createOrUpdateControlEventsValue(event)
-    },
-    [eventType, createOrUpdateControlEventsValue],
-  )
 
   return (
     <div
@@ -56,7 +41,7 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
         width={axisWidth}
         values={axis}
         valueFormatter={axisLabelFormatter}
-        onClick={onClickAxis}
+        onClick={createOrUpdateControlEventsValue}
       />
       <LineGraphCanvas
         width={width}
@@ -64,8 +49,6 @@ const LineGraph = <T extends ControllerEvent | PitchBendEvent>({
         maxValue={maxValue}
         lineWidth={lineWidth}
         circleRadius={circleRadius}
-        events={events}
-        eventType={eventType}
       />
     </div>
   )

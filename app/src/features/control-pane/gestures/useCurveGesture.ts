@@ -1,15 +1,14 @@
-import { Range, updateEventsInRangeWithEasing } from "@signal-app/core"
+import { Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback, useState } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { ControlCoordTransform } from "../entities/ControlCoordTransform"
-import { ValueEventType } from "../entities/ValueEventType"
+import { useControlEditor } from "../hooks/useControlEditor"
 import { useControlPane } from "../hooks/useControlPane"
 
 export type CurveDragState = { start: Point; end: Point }
@@ -23,39 +22,31 @@ export const curveEasings: Record<CurveType, (t: number) => number> = {
   easeOut: (t) => (Math.sin((t * Math.PI) / 2) + t * (2 - t)) / 2,
 }
 
-const useUpdateValueEventsWithCurve = (
-  type: ValueEventType,
-  curveType: CurveType,
-) => {
-  const { selectedTrackId } = usePianoRoll()
+const useUpdateValueEventsWithCurve = (curveType: CurveType) => {
   const { quantizeFloor, quantizeUnit } = useQuantizer()
-  const mutate = useMutateTrack(selectedTrackId)
+  const controlEditor = useControlEditor()
   const easing = curveEasings[curveType]
 
   return useCallback(
     (valueRange: Range, tickRange: Range) => {
-      mutate(
-        updateEventsInRangeWithEasing(
-          ValueEventType.getEventPredicate(type),
-          ValueEventType.getEventFactory(type),
-          quantizeFloor,
-          quantizeUnit,
-          valueRange,
-          tickRange,
-          easing,
-        ),
+      controlEditor.updateItemsInRangeWithEasing(
+        valueRange,
+        tickRange,
+        quantizeFloor,
+        quantizeUnit,
+        easing,
       )
     },
-    [mutate, type, quantizeFloor, quantizeUnit, easing],
+    [controlEditor, quantizeFloor, quantizeUnit, easing],
   )
 }
 
-export const useCurveGesture = (type: ValueEventType, curveType: CurveType) => {
+export const useCurveGesture = (curveType: CurveType) => {
   const { setSelection: setPianoRollSelection, setSelectedNoteIds } =
     usePianoRoll()
   const { setSelectedEventIds, setSelection } = useControlPane()
   const { pushHistory } = useHistory()
-  const updateValueEvents = useUpdateValueEventsWithCurve(type, curveType)
+  const updateValueEvents = useUpdateValueEventsWithCurve(curveType)
   const [curveDragState, setCurveDragState] = useState<CurveDragState | null>(
     null,
   )

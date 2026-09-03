@@ -1,8 +1,7 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { isEventInRange, Range, TrackEventOf } from "@signal-app/core"
+import { isEventInRange, Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
-import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { MouseEventHandler, useCallback, useMemo } from "react"
 import { Beats } from "../../../../components/GLNodes/Beats"
 import { Cursor } from "../../../../components/GLNodes/Cursor"
@@ -12,37 +11,32 @@ import { useContextMenu } from "../../../../hooks/useContextMenu"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { usePianoRoll } from "../../../piano-roll/hooks/usePianoRoll"
 import { ControlCoordTransform } from "../../entities/ControlCoordTransform"
-import { ValueEventType } from "../../entities/ValueEventType"
 import { useCreateSelectionGesture } from "../../gestures/useCreateSelectionGesture"
 import { curveEasings, useCurveGesture } from "../../gestures/useCurveGesture"
 import { usePencilGesture } from "../../gestures/usePencilGesture"
 import { useControlPane } from "../../hooks/useControlPane"
+import { useControlValueEvents } from "../../hooks/useControlValueEvents"
 import { ControlSelectionContextMenu } from "../ControlSelectionContextMenu"
 import { ControlLineGraphItems } from "./ControlLineGraphItems"
 import { DragPreview } from "./DragPreview"
 import { LineGraphSelection } from "./LineGraphSelection"
 
-export interface LineGraphCanvasProps<
-  T extends ControllerEvent | PitchBendEvent,
-> {
+export interface LineGraphCanvasProps {
   width: number
   height: number
   maxValue: number
-  events: TrackEventOf<T>[]
-  eventType: ValueEventType
   lineWidth?: number
   circleRadius?: number
 }
 
-export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
+export const LineGraphCanvas = ({
   width,
   height,
   maxValue,
-  eventType,
-  events,
   lineWidth = 2,
   circleRadius = 4,
-}: LineGraphCanvasProps<T>) => {
+}: LineGraphCanvasProps) => {
+  const events = useControlValueEvents()
   const { mouseMode } = usePianoRoll()
   const { controlPencilMode, controlCurveType } = useControlPane()
   const beats = useBeats()
@@ -50,11 +44,9 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   const { cursorX, transform: tickTransform, scrollLeft } = useTickScroll()
   const effectiveCurveType =
     controlPencilMode === "line" ? "linear" : controlCurveType
-  const handlePencilMouseDown = usePencilGesture(eventType)
-  const { gesture: curveGesture, curveDragState } = useCurveGesture(
-    eventType,
-    effectiveCurveType,
-  )
+  const handlePencilMouseDown = usePencilGesture()
+  const { gesture: curveGesture, curveDragState } =
+    useCurveGesture(effectiveCurveType)
   const createSelectionGesture = useCreateSelectionGesture()
   const { onContextMenu, menuProps } = useContextMenu()
 
