@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { FC } from "react"
 import { useAutoFocus } from "../../../hooks/useAutoFocus"
+import { ArrangeEditorProvider } from "../context/ArrangeEditorProvider"
 import { ArrangeViewScope } from "../hooks/useArrangeView"
 import { useArrangeViewGlobalKeyboardShortcut } from "../hooks/useArrangeViewGlobalKeyboardShortcut"
 import { useArrangeViewKeyboardShortcut } from "../hooks/useArrangeViewKeyboardShortcut"
@@ -38,8 +39,10 @@ const Content: FC = () => {
 
 export const ArrangeEditor: FC = () => {
   return (
-    <ArrangeViewScope>
-      <Content />
-    </ArrangeViewScope>
+    <ArrangeEditorProvider>
+      <ArrangeViewScope>
+        <Content />
+      </ArrangeViewScope>
+    </ArrangeEditorProvider>
   )
 }

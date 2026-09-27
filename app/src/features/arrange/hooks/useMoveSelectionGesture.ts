@@ -1,18 +1,12 @@
-import {
-  ArrangePoint,
-  ArrangeSelection,
-  getEventsInSelection as getEventsInSelectionCmd,
-  moveEventsBetweenTracks as moveEventsBetweenTracksCmd,
-} from "@signal-app/core"
+import { ArrangePoint, ArrangeSelection } from "@signal-app/arrange-editor"
 import { Point, Rect } from "@signal-app/geometry"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { useTracksCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useSong } from "../../../hooks/useSong"
+import { useArrangeEditor } from "./useArrangeEditor"
 import { useArrangeTransform } from "./useArrangeTransform"
 import { useArrangeView } from "./useArrangeView"
 
@@ -24,9 +18,7 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
   const { selection: _selection, setSelection } = useArrangeView()
   const { trackTransform } = useArrangeTransform()
   const { quantizeRound } = useQuantizer()
-  const { tracks } = useSong()
-  const getEventsInSelection = useTracksCommand(getEventsInSelectionCmd)
-  const moveEventsBetweenTracks = useTracksCommand(moveEventsBetweenTracksCmd)
+  const arrangeEditor = useArrangeEditor()
 
   return useCallback(
     (_e, startClientPos, selectionRect) => {
@@ -35,7 +27,7 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
       }
       let isMoved = false
       let selection = _selection
-      let selectedEventIds = getEventsInSelection(selection)
+      let selectedEventIds = arrangeEditor.getEventIdsInSelection(selection)
 
       observeDrag({
         onMouseMove: (e) => {
@@ -62,7 +54,8 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
           // clamp
           point = ArrangePoint.clamp(
             point,
-            tracks.length - (selection.toTrackIndex - selection.fromTrackIndex),
+            arrangeEditor.getTrackCount() -
+              (selection.toTrackIndex - selection.fromTrackIndex),
           )
 
           const delta = ArrangePoint.sub(
@@ -77,7 +70,7 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
           // Move selection range
           selection = ArrangeSelection.moved(selection, delta)
 
-          selectedEventIds = moveEventsBetweenTracks(selectedEventIds, delta)
+          selectedEventIds = arrangeEditor.moveEvents(selectedEventIds, delta)
 
           setSelection(selection)
         },
@@ -87,11 +80,9 @@ export const useMoveSelectionGesture = (): MouseDownHandler<
       pushHistory,
       quantizeRound,
       trackTransform,
-      tracks,
       setSelection,
       _selection,
-      getEventsInSelection,
-      moveEventsBetweenTracks,
+      arrangeEditor,
     ],
   )
 }

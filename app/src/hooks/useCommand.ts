@@ -1,9 +1,4 @@
-import {
-  SongCommand,
-  SongTracksCommand,
-  TrackEventsMutator,
-  TrackId,
-} from "@signal-app/core"
+import { SongCommand, TrackEventsMutator, TrackId } from "@signal-app/core"
 import { useCallback } from "react"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
@@ -13,16 +8,6 @@ export function useSongCommand<A extends unknown[], R>(
 ): (...a: A) => R {
   const { songStore } = useStores()
   return useCallback((...a: A) => cmd(...a)(songStore.song), [songStore, cmd])
-}
-
-export function useTracksCommand<A extends unknown[], R>(
-  cmd: (...a: A) => SongTracksCommand<R>,
-): (...a: A) => R {
-  const { songStore } = useStores()
-  return useCallback(
-    (...a: A) => cmd(...a)(songStore.song.tracks),
-    [songStore, cmd],
-  )
 }
 
 export function useMutateTrack(

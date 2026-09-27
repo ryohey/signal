@@ -1,4 +1,4 @@
-import { ArrangeSelection } from "@signal-app/core"
+import { ArrangeSelection } from "@signal-app/arrange-editor"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { Store } from "jotai/vanilla/store"
 import { createContext, useContext, useMemo } from "react"
@@ -19,8 +19,6 @@ import {
   TrackScrollProvider,
   useTrackScroll,
 } from "./useTrackScroll"
-
-export type { ArrangeSelection } from "@signal-app/core"
 
 type ArrangeViewStore = {
   quantizerScope: Store

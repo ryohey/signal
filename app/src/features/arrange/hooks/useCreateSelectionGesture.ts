@@ -1,4 +1,4 @@
-import { ArrangePoint, ArrangeSelection } from "@signal-app/core"
+import { ArrangePoint, ArrangeSelection } from "@signal-app/arrange-editor"
 import { Point } from "@signal-app/geometry"
 import { MouseEvent, useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -6,7 +6,7 @@ import { getClientPos } from "../../../helpers/mouseEvent"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useSong } from "../../../hooks/useSong"
+import { useArrangeEditor } from "./useArrangeEditor"
 import { useArrangeTransform } from "./useArrangeTransform"
 import { useArrangeView } from "./useArrangeView"
 
@@ -19,7 +19,7 @@ export const useCreateSelectionGesture = (): MouseDownHandler<
     useArrangeView()
   const { trackTransform } = useArrangeTransform()
   const { quantizeRound, quantizeFloor, quantizeCeil } = useQuantizer()
-  const { tracks } = useSong()
+  const arrangeEditor = useArrangeEditor()
 
   const selectionFromPoints = useCallback(
     (start: ArrangePoint, end: ArrangePoint) =>
@@ -27,9 +27,9 @@ export const useCreateSelectionGesture = (): MouseDownHandler<
         start,
         end,
         { quantizeFloor, quantizeCeil },
-        tracks.length,
+        arrangeEditor.getTrackCount(),
       ),
-    [quantizeFloor, quantizeCeil, tracks.length],
+    [quantizeFloor, quantizeCeil, arrangeEditor],
   )
 
   return useCallback(

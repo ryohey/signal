@@ -1,15 +1,15 @@
 import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
 import { FC } from "react"
 import { useRemoveTrack } from "../../../actions"
-import { useSong } from "../../../hooks/useSong"
 import { Localized } from "../../../localize/useLocalization"
+import { useArrangeTrackCount } from "../hooks/useArrangeTrackCount"
 import { useArrangeView } from "../hooks/useArrangeView"
 import { useDuplicateTrack } from "../hooks/useDuplicateTrack"
 import { useInsertTrack } from "../hooks/useInsertTrack"
 
 export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
   const { selectedTrackIndex, selectedTrackId } = useArrangeView()
-  const { tracks } = useSong()
+  const trackCount = useArrangeTrackCount()
   const insertTrack = useInsertTrack()
   const removeTrack = useRemoveTrack()
   const duplicateTrack = useDuplicateTrack()
@@ -25,7 +25,7 @@ export const ArrangeTrackContextMenu: FC<ContextMenuProps> = (props) => {
         <Localized name="add-track" />
       </MenuItem>
       {selectedTrackIndex > 0 &&
-        tracks.length > 2 &&
+        trackCount > 2 &&
         selectedTrackId !== undefined && (
           <MenuItem
             onClick={(e) => {

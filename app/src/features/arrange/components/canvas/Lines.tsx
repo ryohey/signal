@@ -5,7 +5,7 @@ import Color from "color"
 import { range } from "lodash"
 import { FC, useCallback, useMemo } from "react"
 import { colorToVec4 } from "../../../../gl/color"
-import { useSong } from "../../../../hooks/useSong"
+import { useArrangeTrackCount } from "../../hooks/useArrangeTrackCount"
 import { useArrangeTransform } from "../../hooks/useArrangeTransform"
 
 export const Lines: FC<{ width: number; zIndex: number }> = ({
@@ -13,7 +13,6 @@ export const Lines: FC<{ width: number; zIndex: number }> = ({
   zIndex,
 }) => {
   const { trackTransform } = useArrangeTransform()
-  const { tracks } = useSong()
   const theme = useTheme()
 
   const hline = useCallback(
@@ -26,7 +25,7 @@ export const Lines: FC<{ width: number; zIndex: number }> = ({
     [width],
   )
 
-  const trackCount = tracks.length
+  const trackCount = useArrangeTrackCount()
 
   const rects = useMemo(
     () =>

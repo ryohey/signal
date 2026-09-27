@@ -2,11 +2,11 @@ import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
 import { Store } from "jotai/vanilla/store"
 import { createScope } from "jotai-scope"
 import { clamp } from "lodash"
-import { createContext, useContext, useEffect, useMemo } from "react"
+import { createContext, useContext, useEffect } from "react"
 import { Layout } from "../../../Constants"
 import { BAR_WIDTH } from "../../../components/inputs/ScrollBar"
-import { useSong } from "../../../hooks/useSong"
 import { TrackTransform } from "../entities/TrackTransform"
+import { useArrangeTrackCount } from "./useArrangeTrackCount"
 
 const DEFAULT_TRACK_HEIGHT = 64
 const SCALE_Y_MIN = 0.5
@@ -35,8 +35,7 @@ export function TrackScrollProvider({
   scope: Store
   children: React.ReactNode
 }) {
-  const { tracks } = useSong()
-  const trackCount = useMemo(() => tracks.length, [tracks])
+  const trackCount = useArrangeTrackCount()
   const setTrackCount = useSetAtom(trackCountAtom, { store: scope })
 
   // keep trackCountAtom updated

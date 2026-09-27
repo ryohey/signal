@@ -1,8 +1,6 @@
-import { ArrangeNote, getArrangeNotes } from "@signal-app/core"
-import { combineSubscription } from "@signal-app/observable"
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import { useDerivedValue } from "../../../hooks/useDerivedValue"
-import { useSong } from "../../../hooks/useSong"
+import { useArrangeEditor } from "./useArrangeEditor"
 import { useArrangeNoteTransform } from "./useArrangeNoteTransform"
 import { useArrangeTransform } from "./useArrangeTransform"
 
@@ -11,27 +9,16 @@ const NOTE_RECT_HEIGHT = 1
 export function useArrangeNotes() {
   const { trackTransform } = useArrangeTransform()
   const { transform } = useArrangeNoteTransform()
-  const { tracks } = useSong()
-  const events: ArrangeNote[] = useDerivedValue(
-    useMemo(
-      () =>
-        combineSubscription(
-          tracks.map((track) => track.onEventsChanged.subscribe),
-        ),
-      [tracks],
-    ),
-    useCallback(
-      () =>
-        tracks.flatMap((track, index) =>
-          track.query(getArrangeNotes(track.id, index)),
-        ),
-      [tracks],
-    ),
+  const arrangeEditor = useArrangeEditor()
+
+  const notes = useDerivedValue(
+    arrangeEditor.observeItems,
+    arrangeEditor.listNotes,
   )
 
   return useMemo(
     () =>
-      events.map((e) => {
+      notes.map((e) => {
         const rect = transform.getRect(e.event)
         return {
           ...rect,
@@ -39,6 +26,6 @@ export function useArrangeNotes() {
           y: trackTransform.getY(e.trackIndex) + rect.y,
         }
       }),
-    [events, transform, trackTransform],
+    [notes, transform, trackTransform],
   )
 }

@@ -1,10 +1,11 @@
-import { ArrangeSelection, Range } from "@signal-app/core"
+import { ArrangeSelection } from "@signal-app/arrange-editor"
+import { Range } from "@signal-app/core"
 import { MouseEvent, useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag } from "../../../helpers/observeDrag"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useSong } from "../../../hooks/useSong"
 import { useTickScroll } from "../../../hooks/useTickScroll"
+import { useArrangeEditor } from "./useArrangeEditor"
 import { useArrangeView } from "./useArrangeView"
 
 export const useRulerSelectionGesture = (): MouseDownHandler<
@@ -13,24 +14,26 @@ export const useRulerSelectionGesture = (): MouseDownHandler<
 > => {
   const { resetSelection, setSelection } = useArrangeView()
   const { quantizeFloor, quantizeCeil } = useQuantizer()
-  const { tracks } = useSong()
+  const arrangeEditor = useArrangeEditor()
   const { transform, scrollLeft } = useTickScroll()
 
   const selectionFromTickRange = useCallback(
-    (range: Range) =>
-      ArrangeSelection.fromPoints(
+    (range: Range) => {
+      const trackCount = arrangeEditor.getTrackCount()
+      return ArrangeSelection.fromPoints(
         {
           tick: range[0],
           trackIndex: 0,
         },
         {
           tick: range[1],
-          trackIndex: tracks.length,
+          trackIndex: trackCount,
         },
         { quantizeFloor, quantizeCeil },
-        tracks.length,
-      ),
-    [quantizeFloor, quantizeCeil, tracks.length],
+        trackCount,
+      )
+    },
+    [quantizeFloor, quantizeCeil, arrangeEditor],
   )
 
   let selection: ArrangeSelection | null = null
