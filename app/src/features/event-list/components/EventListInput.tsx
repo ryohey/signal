@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
+import { EventInputProp } from "@signal-app/event-list-editor"
 import { FC, useCallback, useState } from "react"
-import { EventInputProp } from "../lib/EventController"
 
 type EventListInputProps = EventInputProp & {
   type: "number" | "text"

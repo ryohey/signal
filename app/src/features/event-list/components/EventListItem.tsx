@@ -1,16 +1,14 @@
-import { removeEvents, TrackEvent, updateEvent } from "@signal-app/core"
+import type { EventListItem as EventListItemData } from "@signal-app/event-list-editor"
 import isEqual from "lodash/isEqual"
 import React, { FC, useCallback } from "react"
-import { useMutateTrack } from "../../../hooks/useCommand"
-import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import { getEventController } from "../lib/EventController"
+import { useEventListEditor } from "../hooks/useEventListEditor"
 import { Cell, Row } from "./EventList"
 import { EventListInput } from "./EventListInput"
 
 interface EventListItemProps {
-  item: TrackEvent
+  item: EventListItemData
   style?: React.CSSProperties
-  onClick?: (e: React.MouseEvent, ev: TrackEvent) => void
+  onClick?: (e: React.MouseEvent, item: EventListItemData) => void
 }
 
 const equalEventListItemProps = (
@@ -23,26 +21,24 @@ const equalEventListItemProps = (
 
 export const EventListItem: FC<EventListItemProps> = React.memo(
   ({ item, style, onClick }) => {
-    const { selectedTrackId } = usePianoRoll()
-    const mutate = useMutateTrack(selectedTrackId)
-
-    const controller = getEventController(item)
+    const editor = useEventListEditor()
+    const { controller } = item
 
     const onDelete = useCallback(
-      (e: TrackEvent) => {
-        mutate(removeEvents([e.id]))
+      (target: EventListItemData) => {
+        editor.removeEvent(target.id)
       },
-      [mutate],
+      [editor],
     )
 
     const onChangeTick = useCallback(
       (input: string) => {
         const value = parseInt(input, 10)
         if (!Number.isNaN(value)) {
-          mutate(updateEvent(item.id, { tick: Math.max(0, value) }))
+          editor.updateEvent(item.id, { tick: Math.max(0, value) })
         }
       },
-      [mutate, item],
+      [editor, item],
     )
 
     const onChangeGate = useCallback(
@@ -52,10 +48,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.gate.update(value)
         if (obj !== null) {
-          mutate(updateEvent(item.id, obj))
+          editor.updateEvent(item.id, obj)
         }
       },
-      [controller, mutate, item],
+      [controller, editor, item],
     )
 
     const onChangeValue = useCallback(
@@ -65,10 +61,10 @@ export const EventListItem: FC<EventListItemProps> = React.memo(
         }
         const obj = controller.value.update(value)
         if (obj !== null) {
-          mutate(updateEvent(item.id, obj))
+          editor.updateEvent(item.id, obj)
         }
       },
-      [controller, mutate, item],
+      [controller, editor, item],
     )
 
     return (

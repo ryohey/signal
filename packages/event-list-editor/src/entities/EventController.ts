@@ -4,7 +4,7 @@ import {
   uSecPerBeatToBPM,
 } from "@signal-app/core"
 import { clamp, flow } from "lodash"
-import { controllerTypeString } from "../../../helpers/noteNumberString"
+import { MIDIControlEventNames } from "midifile-ts"
 
 export interface EventInputProp {
   type: "text" | "number"
@@ -16,7 +16,8 @@ export type EventValueUpdator = {
   update: (value: string) => Record<string, unknown> | null
 }
 
-// Abstraction Layer for manipulating TrackEvent on EventList
+// Abstraction Layer for describing how a TrackEvent's fields should be
+// displayed and edited, independent of the event's own subtype union.
 export type EventController = {
   name: string
   gate?: EventInputProp & EventValueUpdator
@@ -119,6 +120,10 @@ export function getEventController<T extends TrackEvent>(
     default:
       return { name: "Unknown" }
   }
+}
+
+function controllerTypeString(controllerType: number): string {
+  return MIDIControlEventNames[controllerType]
 }
 
 const nanToNull = (value: number) => {

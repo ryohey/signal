@@ -1,9 +1,10 @@
 import styled from "@emotion/styled"
-import { TrackEvent } from "@signal-app/core"
+import { EventListItem as EventListItemData } from "@signal-app/event-list-editor"
 import { FC } from "react"
 import { List, type RowComponentProps } from "react-window"
 import { Localized } from "../../../localize/useLocalization"
-import { useEventList } from "../hooks/useEventList"
+import { EventListProvider } from "../context/EventListProvider"
+import { useEventListItems } from "../hooks/useEventListItems"
 import { EventListItem } from "./EventListItem"
 
 const Container = styled.div`
@@ -39,7 +40,15 @@ export const Cell = styled.div`
 `
 
 const EventList: FC = () => {
-  const { events } = useEventList()
+  return (
+    <EventListProvider>
+      <EventListContent />
+    </EventListProvider>
+  )
+}
+
+const EventListContent: FC = () => {
+  const items = useEventListItems()
 
   return (
     <Container>
@@ -61,9 +70,9 @@ const EventList: FC = () => {
       </Header>
       <List
         rowComponent={ItemRenderer}
-        rowCount={events.length}
+        rowCount={items.length}
         rowHeight={35}
-        rowProps={{ events }}
+        rowProps={{ items }}
       />
     </Container>
   )
@@ -72,10 +81,10 @@ const EventList: FC = () => {
 const ItemRenderer = ({
   index,
   style,
-  events,
-}: RowComponentProps<{ events: readonly TrackEvent[] }>) => {
-  const e = events[index]
-  return <EventListItem style={style} item={e} key={e.id} />
+  items,
+}: RowComponentProps<{ items: readonly EventListItemData[] }>) => {
+  const item = items[index]
+  return <EventListItem style={style} item={item} key={item.id} />
 }
 
 export default EventList
