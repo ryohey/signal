@@ -47,7 +47,6 @@ type SerializedTrack = {
 export class Track {
   private readonly _id = new ObservableValue<TrackId>(UNASSIGNED_TRACK_ID)
   private _events = new TickOrderedArray<TrackEvent>()
-  private _eventsSnapshot: TrackEvent[] = []
   private readonly _name = new ObservableValue<string | undefined>(undefined)
   private readonly _color = new ObservableValue<
     SignalTrackColorEvent | undefined
@@ -80,8 +79,6 @@ export class Track {
   private setupReactions() {
     this.unsubscribeReaction?.()
     this.unsubscribeReaction = this._events.onChange.subscribe((change) => {
-      this._eventsSnapshot = [...this._events.getArray()]
-
       const changedEvents = ("added" in change ? change.added : []).concat(
         "removed" in change ? change.removed : [],
       )
@@ -129,7 +126,6 @@ export class Track {
   }
 
   afterDeserialize() {
-    this._eventsSnapshot = [...this.events]
     this.didEventsChanged(this.events)
     this.setupReactions()
   }
@@ -230,10 +226,6 @@ export class Track {
     if (wasConductorTrack !== this.isConductorTrack) {
       this._onIsConductorTrackChanged.emit()
     }
-  }
-
-  getEventsSnapshot = (): readonly TrackEvent[] => {
-    return this._eventsSnapshot
   }
 
   addEvents<T extends TrackEvent>(events: Omit<T, "id">[]): T[] {
