@@ -4,13 +4,6 @@ import { NoteNumber } from "../unit"
 
 export type NoteTransform = (note: NoteEvent) => NoteEvent
 
-export const quantizeNote =
-  (quantizeRound: (tick: number) => number): NoteTransform =>
-  (note) => ({
-    ...note,
-    tick: quantizeRound(note.tick),
-  })
-
 export const transposeNote =
   (deltaPitch: number): NoteTransform =>
   (note) => ({
@@ -43,23 +36,4 @@ export const batchUpdateNoteVelocity =
       1,
       127,
     ),
-  })
-
-export const sortedNotes = (
-  notes: readonly NoteEvent[],
-): readonly NoteEvent[] =>
-  [...notes].sort((a, b) => {
-    if (a.tick < b.tick) {
-      return -1
-    }
-    if (a.tick > b.tick) {
-      return 1
-    }
-    if (a.noteNumber < b.noteNumber) {
-      return -1
-    }
-    if (a.noteNumber > b.noteNumber) {
-      return 1
-    }
-    return 0
   })

@@ -1,8 +1,5 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
-import { removeEvents } from "@signal-app/core"
 import React, { FC, useCallback, useMemo } from "react"
-import { useMutateTrack } from "../../../../hooks/useCommand"
-import { useTrack } from "../../../../hooks/useTrack"
 import { useSettings } from "../../../setting/hooks/useSettings"
 import { useAddNoteToSelectionGesture } from "../../gestures/useAddNoteToSelectionGesture"
 import {
@@ -11,9 +8,11 @@ import {
   useDragNoteRightGesture,
 } from "../../gestures/useDragNoteEdgeGesture"
 import { useRemoveNoteFromSelectionGesture } from "../../gestures/useRemoveNoteFromSelectionGesture"
+import { useIsRhythmTrack } from "../../hooks/useIsRhythmTrack"
 import { useNoteColor } from "../../hooks/useNoteColor"
 import { PianoNoteItem, useNotes } from "../../hooks/useNotes"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { usePianoRollEditor } from "../../hooks/usePianoRollEditor"
 import { LegacyNotes } from "./lagacy/LegacyNotes"
 import { NoteCircles } from "./NoteCircles"
 import { NoteLabels } from "./NoteLabels"
@@ -46,8 +45,7 @@ export const NotesContent: FC<NotesContentProps> = (props) => {
 }
 
 const _Notes: FC<NotesContentProps> = ({ zIndex, notes }) => {
-  const { selectedTrackId } = usePianoRoll()
-  const { isRhythmTrack } = useTrack(selectedTrackId)
+  const isRhythmTrack = useIsRhythmTrack()
   const { borderColor, inactiveColor, activeColor, selectedColor } =
     useNoteColor()
   const { showNoteLabels } = useSettings()
@@ -82,8 +80,8 @@ const _Notes: FC<NotesContentProps> = ({ zIndex, notes }) => {
 }
 
 const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
-  const { selectedNoteIds, selectedTrackId } = usePianoRoll()
-  const mutate = useMutateTrack(selectedTrackId)
+  const { selectedNoteIds } = usePianoRoll()
+  const { removeNote } = usePianoRollEditor()
   const dragNoteCenterGesture = useDragNoteCenterGesture()
   const dragNoteLeftGesture = useDragNoteLeftGesture()
   const dragNoteRightGesture = useDragNoteRightGesture()
@@ -116,7 +114,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
           break
         }
         case 2:
-          mutate(removeEvents([item.id]))
+          removeNote(item.id)
           break
         default:
           return null
@@ -124,7 +122,7 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
     },
     [
       selectedNoteIds,
-      mutate,
+      removeNote,
       dragNoteCenterGesture,
       dragNoteLeftGesture,
       dragNoteRightGesture,
@@ -138,10 +136,10 @@ const NoteHitAreas: FC<NotesContentProps> = ({ zIndex, notes }) => {
       // Right click to remove note while dragging
       if (e.buttons === 2) {
         e.stopPropagation()
-        mutate(removeEvents([item.id]))
+        removeNote(item.id)
       }
     },
-    [mutate],
+    [removeNote],
   )
 
   return (

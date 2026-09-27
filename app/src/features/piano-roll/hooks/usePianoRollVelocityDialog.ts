@@ -1,24 +1,21 @@
-import {
-  BatchUpdateOperation,
-  batchUpdateNotesVelocity,
-} from "@signal-app/core"
+import { BatchUpdateOperation } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePianoRoll } from "./usePianoRoll"
+import { usePianoRollEditor } from "./usePianoRollEditor"
 
 const useBatchUpdateSelectedNotesVelocity = () => {
-  const { selectedTrackId, selectedNoteIds } = usePianoRoll()
+  const { selectedNoteIds } = usePianoRoll()
   const { pushHistory } = useHistory()
-  const mutate = useMutateTrack(selectedTrackId)
+  const pianoRollEditor = usePianoRollEditor()
 
   return useCallback(
     (operation: BatchUpdateOperation) => {
       pushHistory()
-      mutate(batchUpdateNotesVelocity(selectedNoteIds, operation))
+      pianoRollEditor.batchUpdateNotesVelocity(selectedNoteIds, operation)
     },
-    [selectedNoteIds, pushHistory, mutate],
+    [selectedNoteIds, pushHistory, pianoRollEditor],
   )
 }
 

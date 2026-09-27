@@ -1,7 +1,8 @@
-import { isNoteEvent, NoteEvent } from "@signal-app/core"
 import { Rect } from "@signal-app/geometry"
+import { NoteEvent } from "@signal-app/pianoroll-editor"
 import { useCallback, useMemo } from "react"
-import { useEventView } from "../../../hooks/useEventView"
+import { useNoteEvents } from "./useEventView"
+import { useIsRhythmTrack } from "./useIsRhythmTrack"
 import { useNoteCoordTransform } from "./useNoteCoordTransform"
 import { usePianoRoll } from "./usePianoRoll"
 
@@ -13,23 +14,26 @@ export type PianoNoteItem = Rect & {
 }
 
 export function useNotes(): PianoNoteItem[] {
-  const { selectedTrack, selectedNoteIds } = usePianoRoll()
+  const { selectedNoteIds } = usePianoRoll()
   const { transform } = useNoteCoordTransform()
-  const noteEvents = useEventView().filter(isNoteEvent)
-
+  const isRhythmTrack = useIsRhythmTrack()
+  const noteEvents = useNoteEvents()
   const getRect = useCallback(
     (e: NoteEvent) =>
-      selectedTrack?.isRhythmTrack
-        ? transform.getDrumRect(e)
-        : transform.getRect(e),
-    [transform, selectedTrack?.isRhythmTrack],
+      isRhythmTrack ? transform.getDrumRect(e) : transform.getRect(e),
+    [transform, isRhythmTrack],
+  )
+
+  const selectedNoteIdSet = useMemo(
+    () => new Set(selectedNoteIds),
+    [selectedNoteIds],
   )
 
   const notes = useMemo(
     () =>
       noteEvents.map((e) => {
         const bounds = getRect(e)
-        const isSelected = selectedNoteIds.includes(e.id)
+        const isSelected = selectedNoteIdSet.has(e.id)
         return {
           ...bounds,
           id: e.id,
@@ -38,7 +42,7 @@ export function useNotes(): PianoNoteItem[] {
           isSelected,
         }
       }),
-    [noteEvents, getRect, selectedNoteIds],
+    [noteEvents, getRect, selectedNoteIdSet],
   )
 
   return notes

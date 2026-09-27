@@ -1,13 +1,13 @@
-import { addEvent, NoteEvent, NoteNumber } from "@signal-app/core"
+import { NoteNumber } from "@signal-app/core"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useSong } from "../../../hooks/useSong"
 import { useTrack } from "../../../hooks/useTrack"
 import { useNoteCoordTransform } from "../hooks/useNoteCoordTransform"
 import { usePianoRoll } from "../hooks/usePianoRoll"
+import { usePianoRollEditor } from "../hooks/usePianoRollEditor"
 import { useDragNoteCenterGesture } from "./useDragNoteEdgeGesture"
 
 export const useCreateNoteGesture = (): MouseDownHandler => {
@@ -15,7 +15,7 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
   const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound, quantizeFloor, quantizeUnit } = useQuantizer()
   const { channel, isRhythmTrack } = useTrack(selectedTrackId)
-  const mutate = useMutateTrack(selectedTrackId)
+  const pianoRollEditor = usePianoRollEditor()
   const { timebase } = useSong()
   const { pushHistory } = useHistory()
   const dragNoteCenterAction = useDragNoteCenterGesture()
@@ -43,16 +43,12 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
         ? timebase / 8 // 32th note in the rhythm track
         : (lastNoteDuration ?? quantizeUnit)
 
-      const note = mutate(
-        addEvent<NoteEvent>({
-          type: "channel",
-          subtype: "note",
-          noteNumber: noteNumber,
-          tick: quantizedTick,
-          velocity: newNoteVelocity,
-          duration,
-        }),
-      )
+      const note = pianoRollEditor.addNote({
+        noteNumber: noteNumber,
+        tick: quantizedTick,
+        velocity: newNoteVelocity,
+        duration,
+      })
 
       if (note === undefined) {
         return
@@ -71,7 +67,7 @@ export const useCreateNoteGesture = (): MouseDownHandler => {
       timebase,
       newNoteVelocity,
       lastNoteDuration,
-      mutate,
+      pianoRollEditor,
       pushHistory,
       dragNoteCenterAction,
     ],

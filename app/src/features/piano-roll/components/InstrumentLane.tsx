@@ -1,9 +1,8 @@
 import styled from "@emotion/styled"
-import { isProgramChangeEvent } from "@signal-app/core"
 import { Positioned } from "@signal-app/ui"
 import { type FC, useMemo } from "react"
-import { useEventView } from "../../../hooks/useEventView"
 import { useTickScroll } from "../../../hooks/useTickScroll"
+import { useProgramChangeEvents } from "../hooks/useEventView"
 import { InstrumentMark } from "./InstrumentMark"
 
 export interface InstrumentLaneProps {
@@ -17,10 +16,8 @@ const Container = styled.div`
 `
 
 export const InstrumentLane: FC<InstrumentLaneProps> = ({ width }) => {
-  const events = useEventView()
   const { scrollLeft, transform } = useTickScroll()
-
-  const programChangeEvents = events.filter(isProgramChangeEvent)
+  const programChangeEvents = useProgramChangeEvents()
 
   const style = useMemo(
     () => ({

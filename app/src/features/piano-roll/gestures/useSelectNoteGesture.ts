@@ -1,22 +1,21 @@
-import { getNoteIdsInSelection } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { useTrackQuery } from "../../../hooks/useTrackQuery"
 import { useControlPane } from "../../control-pane/hooks/useControlPane"
 import { Selection } from "../entities/Selection"
 import { useNoteCoordTransform } from "../hooks/useNoteCoordTransform"
 import { usePianoRoll } from "../hooks/usePianoRoll"
+import { usePianoRollEditor } from "../hooks/usePianoRollEditor"
 
 export const useSelectNoteGesture = (): MouseDownHandler => {
-  const { setSelection, selectedTrackId, setSelectedNoteIds } = usePianoRoll()
+  const { setSelection, setSelectedNoteIds } = usePianoRoll()
   const { transform, getLocal } = useNoteCoordTransform()
   const { quantizeRound } = useQuantizer()
   let { selection } = usePianoRoll()
-  const query = useTrackQuery(selectedTrackId)
+  const pianoRollEditor = usePianoRollEditor()
   const { isPlaying, setPosition } = usePlayer()
   const { setSelectedEventIds } = useControlPane()
 
@@ -49,14 +48,14 @@ export const useSelectNoteGesture = (): MouseDownHandler => {
 
           // 選択範囲を確定して選択範囲内のノートを選択状態にする
           // Confirm the selection and select the notes in the selection state
-          setSelectedNoteIds(query(getNoteIdsInSelection(selection)) ?? [])
+          setSelectedNoteIds(pianoRollEditor.getNoteIdsInSelection(selection))
 
           setSelection(null)
         },
       })
     },
     [
-      query,
+      pianoRollEditor,
       isPlaying,
       quantizeRound,
       setPosition,

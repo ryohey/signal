@@ -52,6 +52,7 @@
     "@signal-app/firebaseui-web-react": "*",
     "@signal-app/geometry": "*",
     "@signal-app/observable": "*",
+    "@signal-app/pianoroll-editor": "*",
     "@signal-app/player": "*",
     "@signal-app/tempo-editor": "*",
     "@signal-app/ui": "*",

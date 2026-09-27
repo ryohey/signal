@@ -1,33 +1,19 @@
 import { TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
-import { atom, useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { Store } from "jotai/vanilla/store"
 import { atomEffect } from "jotai-effect"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
 import { KeySignature } from "../../../entities/scale/KeySignature"
 import { addedSet, deletedSet } from "../../../helpers/set"
 import { historyAtom } from "../../../hooks/historyAtom"
-import { BeatsProvider, createBeatsScope } from "../../../hooks/useBeats"
-import { EventViewProvider } from "../../../hooks/useEventView"
-import {
-  createQuantizerScope,
-  QuantizerProvider,
-  useQuantizer,
-} from "../../../hooks/useQuantizer"
+import { BeatsProvider } from "../../../hooks/useBeats"
+import { QuantizerProvider, useQuantizer } from "../../../hooks/useQuantizer"
 import { useSong } from "../../../hooks/useSong"
 import { useStores } from "../../../hooks/useStores"
-import {
-  createTickScrollScope,
-  TickScrollProvider,
-  useTickScroll,
-} from "../../../hooks/useTickScroll"
+import { TickScrollProvider, useTickScroll } from "../../../hooks/useTickScroll"
 import { Selection } from "../entities/Selection"
+import { EventViewProvider } from "./useEventView"
 
 type PianoRollStore = {
   quantizerScope: Store
@@ -36,67 +22,15 @@ type PianoRollStore = {
 }
 
 // biome-ignore lint/style/noNonNullAssertion: we ensure the context is provided in PianoRollProvider
-const PianoRollStoreContext = createContext<PianoRollStore>(null!)
-
-export function PianoRollProvider({ children }: { children: React.ReactNode }) {
-  const store = useStore()
-
-  const pianoRollStore = useMemo(() => {
-    // should match the order in PianoRollScope
-    const tickScrollScope = createTickScrollScope(store)
-    const quantizerScope = createQuantizerScope(tickScrollScope)
-    const beatsScope = createBeatsScope(quantizerScope)
-    return {
-      quantizerScope,
-      tickScrollScope,
-      beatsScope,
-    }
-  }, [store])
-
-  return (
-    <PianoRollStoreContext.Provider value={pianoRollStore}>
-      <PianoRollProviderInner>{children}</PianoRollProviderInner>
-    </PianoRollStoreContext.Provider>
-  )
-}
-
-function PianoRollProviderInner({ children }: { children: React.ReactNode }) {
-  const { songStore, midiMonitor, midiRecorder } = useStores()
-  const store = useStore()
-  const { selectedTrack, selectedTrackId, setSelectedTrackId } = usePianoRoll()
-
-  useAtom(resetSelectionEffectAtom, { store })
-
-  // Initially select the first track that is not a conductor track
-  useEffect(() => {
-    setSelectedTrackId(
-      songStore.song.tracks.find((t) => !t.isConductorTrack)?.id ??
-        UNASSIGNED_TRACK_ID,
-    )
-  }, [setSelectedTrackId, songStore])
-
-  // sync MIDIMonitor channel with selected track
-  useEffect(() => {
-    midiMonitor.channel = selectedTrack?.channel ?? 0
-  }, [midiMonitor, selectedTrack])
-
-  // sync MIDIRecorder trackId with selected track
-  useEffect(() => {
-    midiRecorder.trackId = selectedTrackId ?? UNASSIGNED_TRACK_ID
-  }, [midiRecorder, selectedTrackId])
-
-  return children
-}
+export const PianoRollStoreContext = createContext<PianoRollStore>(null!)
 
 export function PianoRollScope({ children }: { children: React.ReactNode }) {
   const { quantizerScope, tickScrollScope, beatsScope } = useContext(
     PianoRollStoreContext,
   )
-  const { selectedTrackId } = usePianoRoll()
-
   return (
     <TickScrollProvider scope={tickScrollScope} minScaleX={0.15} maxScaleX={15}>
-      <EventViewProvider trackId={selectedTrackId}>
+      <EventViewProvider>
         <QuantizerProvider scope={quantizerScope} quantize={8}>
           <BeatsProvider scope={beatsScope}>{children}</BeatsProvider>
         </QuantizerProvider>
@@ -121,14 +55,6 @@ export function usePianoRoll() {
     },
     get selection() {
       return useAtomValue(selectionAtom, { store })
-    },
-    get selectedTrack() {
-      const { tracks } = useSong()
-      const selectedTrackId = useAtomValue(selectedTrackIdAtom, { store })
-      return useMemo(
-        () => tracks.find((track) => track.id === selectedTrackId),
-        [tracks, selectedTrackId],
-      )
     },
     get selectedTrackId() {
       return useAtomValue(selectedTrackIdAtom, { store })
@@ -263,7 +189,7 @@ const toggleToolAtom = atom(null, (_get, set) =>
 // effects
 
 // reset selection when change track or mouse mode
-const resetSelectionEffectAtom = atomEffect((get, set) => {
+export const resetSelectionEffectAtom = atomEffect((get, set) => {
   // observe change track or mouse mode
   get(selectedTrackIdAtom)
   get(mouseModeAtom)

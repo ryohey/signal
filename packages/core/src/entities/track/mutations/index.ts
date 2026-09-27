@@ -1,7 +1,6 @@
 export * from "./batch"
 export * from "./composed"
 export * from "./controller"
-export * from "./draggable"
 export * from "./higherOrder"
 export * from "./note"
 export * from "./primitives"

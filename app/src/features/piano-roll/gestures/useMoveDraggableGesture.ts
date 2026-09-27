@@ -1,5 +1,6 @@
-import { isNotNullOrUndefined, NoteEvent, Range } from "@signal-app/core"
+import { isNotNullOrUndefined, Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
+import { NoteEvent } from "@signal-app/pianoroll-editor"
 import { useCallback } from "react"
 import { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
