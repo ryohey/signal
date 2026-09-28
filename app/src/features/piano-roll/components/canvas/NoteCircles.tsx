@@ -20,7 +20,7 @@ export const NoteCircles: FC<NoteCirclesProps> = ({
   selectedColor,
   inactiveColor,
   activeColor,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

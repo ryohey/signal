@@ -73,7 +73,7 @@ export const VelocityItems: FC<VelocityItemsProps> = ({
 const _VelocityItems: FC<{
   rects: (Rect & IVelocityData)[]
   zIndex?: number
-}> = ({ rects, zIndex }) => {
+}> = ({ rects, zIndex = 0 }) => {
   const projectionMatrix = useTransform()
   const theme = useTheme()
   const baseColor = Color(theme.themeColor)

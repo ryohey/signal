@@ -19,7 +19,7 @@ export const HorizontalGrid: FC<HorizontalGridProps> = ({
   highlightedColor,
   laneColors,
   height,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

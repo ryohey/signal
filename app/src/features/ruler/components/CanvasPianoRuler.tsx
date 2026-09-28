@@ -137,7 +137,7 @@ export interface PianoRulerProps {
   rulerBeats: RulerBeat[]
   timeSignatures: RulerTimeSignature[]
   loop: LoopSetting | null
-  onMouseDown?: React.MouseEventHandler<HTMLCanvasElement>
+  onMouseDown?: React.MouseEventHandler<HTMLCanvasElement> | undefined
   onClickTimeSignature: (
     e: React.MouseEvent<HTMLCanvasElement>,
     timeSignature: RulerTimeSignature,
@@ -145,8 +145,8 @@ export interface PianoRulerProps {
   ) => void
   onClickRuler: (e: React.MouseEvent<HTMLCanvasElement>, tick: number) => void
   onRightClick: (e: React.MouseEvent<HTMLCanvasElement>, tick: number) => void
-  style?: React.CSSProperties
-  className?: string
+  style?: React.CSSProperties | undefined
+  className?: string | undefined
 }
 
 export const CanvasPianoRuler: FC<PianoRulerProps> = ({

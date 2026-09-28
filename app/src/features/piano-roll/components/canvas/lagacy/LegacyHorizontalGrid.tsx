@@ -19,7 +19,7 @@ export const LegacyHorizontalGrid: FC<LegacyHorizontalGridProps> = ({
   highlightedColor,
   blackLaneColor,
   height,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

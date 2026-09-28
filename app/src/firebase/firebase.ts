@@ -11,14 +11,20 @@ import {
   getFunctions,
 } from "firebase/functions"
 
-const firebaseConfig = {
+// Drops keys whose value is undefined, so optional config fields stay absent.
+const definedOnly = <T extends object>(obj: T) =>
+  Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined),
+  ) as { [K in keyof T]?: Exclude<T[K], undefined> }
+
+const firebaseConfig = definedOnly({
   apiKey: process.env["FIREBASE_API_KEY"],
   authDomain: process.env["FIREBASE_AUTH_DOMAIN"],
   projectId: process.env["FIREBASE_PROJECT_ID"],
   storageBucket: process.env["FIREBASE_STORAGE_BUCKET"],
   messagingSenderId: process.env["FIREBASE_MESSAGING_SENDER_ID"],
   appId: process.env["FIREBASE_APP_ID"],
-}
+})
 
 const modules = (() => {
   try {

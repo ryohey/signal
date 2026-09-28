@@ -16,7 +16,7 @@ export const VerticalLines: FC<VerticalLinesProps> = ({
   color,
   height,
   lineWidth,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

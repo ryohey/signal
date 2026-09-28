@@ -14,7 +14,7 @@ export interface NoteCirclesProps {
 export const NoteCircles: FC<NoteCirclesProps> = ({
   rects,
   strokeColor,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

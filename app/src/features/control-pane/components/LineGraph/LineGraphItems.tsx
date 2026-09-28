@@ -102,7 +102,7 @@ const LineGraphItemHitArea: FC<{
   bounds: Rect
   itemId: number
   zIndex: number
-  onMouseDown?: (e: MouseEvent, itemId: number) => void
+  onMouseDown?: ((e: MouseEvent, itemId: number) => void) | undefined
 }> = ({ bounds, itemId, zIndex, onMouseDown }) => {
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {

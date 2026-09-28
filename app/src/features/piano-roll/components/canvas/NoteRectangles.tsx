@@ -19,7 +19,7 @@ export const NoteRectangles: FC<NoteRectanglesProps> = ({
   inactiveColor,
   activeColor,
   selectedColor,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

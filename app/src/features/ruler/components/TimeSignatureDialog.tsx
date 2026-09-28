@@ -14,8 +14,8 @@ import React, { FC, useEffect, useState } from "react"
 import { Localized } from "../../../localize/useLocalization"
 
 export interface TimeSignatureDialogProps {
-  initialNumerator?: number
-  initialDenominator?: number
+  initialNumerator?: number | undefined
+  initialDenominator?: number | undefined
   open: boolean
   onClose: () => void
   onClickOK: (timeSignature: { numerator: number; denominator: number }) => void

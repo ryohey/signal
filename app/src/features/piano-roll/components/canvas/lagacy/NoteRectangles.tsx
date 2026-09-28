@@ -13,7 +13,7 @@ export interface NoteRectanglesProps {
 export const NoteRectangles: FC<NoteRectanglesProps> = ({
   rects,
   strokeColor,
-  zIndex,
+  zIndex = 0,
 }) => {
   const projectionMatrix = useTransform()
 

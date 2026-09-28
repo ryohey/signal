@@ -12,7 +12,7 @@ export interface NoteLabelProps {
   zIndex?: number
 }
 
-export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex }) => {
+export const NoteLabels: FC<NoteLabelProps> = ({ rects, zIndex = 0 }) => {
   const renderer = useRenderer()
   const [texture, setTexture] = useState<WebGLTexture | null>(null)
   const projectionMatrix = useTransform()
