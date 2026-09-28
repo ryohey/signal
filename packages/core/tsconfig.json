@@ -1,21 +1,8 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["webmidi", "node"],
-    "sourceMap": true,
-    "declaration": true,
-    "target": "esnext",
-    "module": "esnext",
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "moduleResolution": "Bundler",
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "lib": ["es2019", "dom", "ESNext.Collection"],
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "useDefineForClassFields": true,
-    "resolveJsonModule": true,
-    "strict": true
+    "types": ["node", "webmidi"],
+    "jsx": "react-jsx"
   },
   "include": ["src/**/*"]
 }

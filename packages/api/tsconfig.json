@@ -1,19 +1,4 @@
 {
-  "compilerOptions": {
-    "sourceMap": true,
-    "declaration": true,
-    "target": "esnext",
-    "module": "esnext",
-    "esModuleInterop": true,
-    "moduleResolution": "Bundler",
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "lib": ["es2019", "dom"],
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "useDefineForClassFields": true,
-    "resolveJsonModule": true,
-    "strict": true
-  },
+  "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"]
 }
