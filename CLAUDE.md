@@ -56,7 +56,9 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 Representative core modules:
 
 - `SongStore` - Current song lifecycle and change notifications
-- Mutation/query modules - Song/track mutation orchestration (`SongCommand`/`SongTracksCommand`, `TrackEventsMutator`/`TrackEventsQuery`), built on by per-domain Editor facade packages (e.g. `@signal-app/tempo-editor`'s `createTempoEditor`) exposing query/mutate/observe for app-side use
+- `Track` - Event storage with named read/write methods (`getEvents`, `addEvent`, `updateEvents`, `transaction`, ...); its internal query/mutate functions are private
+- `SongCommand` - Song-level operations such as adding and reordering tracks
+- Per-domain Editor facade packages (e.g. `@signal-app/tempo-editor`'s `createTempoEditor`) build on `Track` and expose plain query/mutation/observe methods for app-side use
 - MIDI/device services and repositories
 
 **Key Views:**
@@ -71,9 +73,14 @@ Representative core modules:
 - `@signal-app/player` - Audio playback engine with SoundFont synthesis
 - `@signal-app/api` - Firebase/Cloud integration for song storage
 - `@signal-app/community` - Community features and song sharing
+- `@signal-app/pianoroll-editor` - Editor facade for piano roll note editing
+- `@signal-app/arrange-editor` - Editor facade for multi-track arrange editing
 - `@signal-app/control-editor` - Editor facade for pitchBend/controller automation lanes
 - `@signal-app/velocity-editor` - Editor facade for the note velocity lane
 - `@signal-app/tempo-editor` - Editor facade for tempo automation
+- `@signal-app/event-list-editor` - Editor facade for the event list panel
+- `@signal-app/observable` - Framework-independent observable primitives
+- `@signal-app/geometry` - Point/size/rect geometry primitives
 - `dialog-hooks` - React hooks for modal dialogs
 - `@signal-app/firebaseui-web-react` - Firebase authentication UI wrapper
 - `@signal-app/ui` - Shared design-system-like UI components
