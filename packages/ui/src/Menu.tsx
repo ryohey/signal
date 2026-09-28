@@ -45,12 +45,8 @@ const List = styled.ul`
   outline: none;
 `
 
-export const Menu: FC<MenuProps> = ({
-  trigger,
-  open,
-  onOpenChange,
-  children,
-}) => {
+export const Menu: FC<MenuProps> = ({ trigger, children, ...rootProps }) => {
+  const { onOpenChange } = rootProps
   const contextValue: MenuContextValue = useMemo(
     () => ({
       onOpenChange: onOpenChange ?? (() => {}),
@@ -59,7 +55,7 @@ export const Menu: FC<MenuProps> = ({
   )
 
   return (
-    <Root open={open} onOpenChange={onOpenChange}>
+    <Root {...rootProps}>
       <Trigger asChild>{trigger}</Trigger>
 
       <Portal>

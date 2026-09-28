@@ -23,14 +23,9 @@ const List = styled.ul`
   margin: 0;
 `
 
-export const Menu: FC<MenuProps> = ({
-  trigger,
-  open,
-  onOpenChange,
-  children,
-}) => {
+export const Menu: FC<MenuProps> = ({ trigger, children, ...rootProps }) => {
   return (
-    <Root open={open} onOpenChange={onOpenChange}>
+    <Root {...rootProps}>
       <Trigger asChild>{trigger}</Trigger>
 
       <Portal>

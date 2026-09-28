@@ -57,7 +57,7 @@ export const DropdownButton: FC<DropdownButtonProps> = ({
           <MenuItem
             key={`${action.label}-${index}`}
             onClick={action.onClick}
-            disabled={action.disabled}
+            disabled={action.disabled ?? false}
           >
             {action.label}
           </MenuItem>

@@ -76,7 +76,7 @@ export const Slider: FC<SliderProps> = ({
 }) => (
   <StyledRoot
     value={[value]}
-    defaultValue={defaultValue !== undefined ? [defaultValue] : undefined}
+    {...(defaultValue !== undefined && { defaultValue: [defaultValue] })}
     onValueChange={(value) => onChange(value[0])}
     {...props}
   >
