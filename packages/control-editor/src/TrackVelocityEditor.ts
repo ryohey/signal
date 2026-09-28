@@ -3,7 +3,6 @@ import {
   isNoteEvent,
   Range,
   Track,
-  updateEvents,
   updateVelocitiesInRange,
 } from "@signal-app/core"
 import { Unsubscribe } from "@signal-app/observable"
@@ -30,7 +29,7 @@ export class TrackVelocityEditor {
     this.track.subscribeEventsChanged(isNoteEvent, listener)
 
   setVelocity = (noteIds: readonly number[], velocity: number): void => {
-    this.track.mutate(updateEvents(noteIds.map((id) => ({ id, velocity }))))
+    this.track.updateEvents(noteIds.map((id) => ({ id, velocity })))
   }
 
   updateVelocityInRange = (

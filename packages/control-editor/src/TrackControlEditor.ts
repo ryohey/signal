@@ -36,12 +36,10 @@ export class TrackControlEditor {
   }
 
   addItem = (item: Omit<ControlItem, "id">): ControlItem => {
-    const event = this.track.mutate(
-      createOrUpdateTrackEvent<ControlEvent>({
-        ...this.factory(item.value),
-        tick: item.tick,
-      }),
-    )
+    const event = this.track.createOrUpdate<ControlEvent>({
+      ...this.factory(item.value),
+      tick: item.tick,
+    })
     return controlEventToItem(event)
   }
 
@@ -50,7 +48,7 @@ export class TrackControlEditor {
   }
 
   updateItem = (item: ControlItem): void => {
-    this.track.mutate(updateEvent(item.id, item))
+    this.track.updateEvent(item.id, item)
   }
 
   observeItems = (listener: () => void): Unsubscribe =>

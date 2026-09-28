@@ -1,10 +1,4 @@
-import {
-  getEventsByIdsOrAll,
-  removeEvents,
-  Track,
-  TrackEvent,
-  updateEvent,
-} from "@signal-app/core"
+import { getEventsByIdsOrAll, Track, TrackEvent } from "@signal-app/core"
 import { ObservableValue, Unsubscribe } from "@signal-app/observable"
 import { getEventController } from "./entities/EventController"
 import { EventListItem } from "./entities/EventListItem"
@@ -63,10 +57,10 @@ export class TrackEventListEditor {
   }
 
   removeEvent = (id: number): void => {
-    this.track.mutate(removeEvents([id]))
+    this.track.removeEvents([id])
   }
 
   updateEvent = (id: number, patch: Record<string, unknown>): void => {
-    this.track.mutate(updateEvent(id, patch))
+    this.track.updateEvent(id, patch)
   }
 }

@@ -1,12 +1,10 @@
 import {
-  addEvent,
   filter,
   getAll,
   getEventById,
   isNoteEvent,
   Track,
   NoteEvent as TrackNoteEvent,
-  updateEvent,
 } from "@signal-app/core"
 import { flow } from "lodash"
 import { NoteEvent } from "./entities"
@@ -33,16 +31,14 @@ export class TrackNoteMapper
   // mutation
 
   addNote = (note: Omit<NoteEvent, "id">) =>
-    this.track.mutate(
-      addEvent<TrackNoteEvent>({
-        ...note,
-        type: "channel",
-        subtype: "note",
-      } as const),
-    )
+    this.track.addEvent<TrackNoteEvent>({
+      ...note,
+      type: "channel",
+      subtype: "note",
+    } as const)
 
   removeNote = (id: number) => this.track.removeEvent(id)
 
   updateNote = (update: Partial<NoteEvent> & { id: number }) =>
-    this.track.mutate(updateEvent(update.id, update)) as NoteEvent
+    this.track.updateEvent(update.id, update) as NoteEvent
 }
