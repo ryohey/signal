@@ -34,7 +34,6 @@ catalog:
   "@testing-library/user-event": 14.6.1
   "@types/aria-query": 5.0.4
   "@types/color": 4.2.0
-  "@types/jest": 30.0.0
   "@types/lodash": 4.17.23
   "@types/node": 25.6.0
   "@types/react": 19.2.14
@@ -49,11 +48,9 @@ catalog:
   concurrently: 9.2.1
   copyfiles: 2.4.1
   cpx: 1.5.0
-  dotenv: 17.3.1
   firebase: 12.9.0
   firebaseui: 6.1.0
   gl-matrix: 3.4.4
-  globals: 17.3.0
   jotai-effect: 2.2.3
   jotai-optics: 0.4.0
   jotai-scope: 0.10.0
@@ -67,16 +64,13 @@ catalog:
   react-dom: 19.2.4
   react-helmet-async: 2.0.5
   react-number-format: 5.4.4
-  react-refresh: 0.18.0
   react-share: 5.2.2
   react-window: 2.2.7
   react: 19.2.4
   rimraf: 6.1.3
   spessasynth_core: 4.3.22
   spessasynth_lib: 4.3.3
-  ts-loader: 9.5.4
   turbo: 2.8.10
-  typescript-eslint: 8.56.0
   typescript: 6.0.3
   use-l10n: 0.0.4
   use-sync-external-store: 1.6.0
