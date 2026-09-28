@@ -11,6 +11,15 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "declaration": true,
-    "types": ["node"]
+    "types": ["node"],
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false
   }
 }
