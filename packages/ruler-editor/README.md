@@ -6,7 +6,7 @@ Editor facade for the timeline ruler. Edits a song's time signatures.
 
 ## Entry Point
 
-`createRulerEditor(song)` returns a `RulerEditor`. `getTimeSignatures` returns `TimeSignatureItem`s (`id`, `tick`, `numerator`, `denominator`) and keeps the same array until they change. `addTimeSignature` snaps to the start of the measure and skips a measure that already has one. `observeTimeSignatures` subscribes to changes.
+`createRulerEditor(song, conductorTrack)` returns a `RulerEditor`. `getTimeSignatures` returns `TimeSignatureItem`s (`id`, `tick`, `numerator`, `denominator`) and keeps the same array until they change. `addTimeSignature` snaps to the start of the measure and skips a measure that already has one. `observeTimeSignatures` subscribes to changes.
 
 ## Responsibilities
 
@@ -16,5 +16,5 @@ Editor facade for the timeline ruler. Edits a song's time signatures.
 
 ## Design Notes
 
-- Time signatures live on the conductor track, but measure boundaries depend on the whole song. The editor wraps the song, not one track, and follows conductor track changes.
+- Time signatures live on the conductor track, but measure boundaries depend on song-wide values (timebase and measures). The editor takes both. Create a new editor when the conductor track changes.
 - Callers see only plain methods. The song and tracks stay hidden.

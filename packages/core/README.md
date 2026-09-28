@@ -6,7 +6,7 @@ The central sequencer domain: songs, tracks, and events, with the operations, co
 
 ## Entry Point
 
-`Track` is the central class. It holds a track's events and properties, such as name, channel, and color, and publishes changes as subscriptions, such as `onEventsChanged`. Callers read and write events through named methods, such as `getEvents`, `addEvent`, and `updateEvents`, and group writes with `transaction`. The functions behind those methods stay internal. `Song` owns the list of tracks and song-wide values, such as timebase and measures.
+`Track` is the central class. It holds a track's events and properties, such as name, channel, and color, and publishes changes as subscriptions, such as `onEventsChanged`. Callers read and write events through named methods, such as `getEvents`, `addEvent`, and `updateEvents`, and group writes with `transaction`. The functions behind those methods stay internal. `Song` owns the list of tracks and song-wide values, such as timebase and measures, and provides track operations such as `addNewTrack`, `duplicateTrack`, and `moveTrack`.
 
 ## Responsibilities
 

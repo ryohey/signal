@@ -123,7 +123,7 @@ Note: The static website project has been moved to a separate repository and is 
 
 - Component co-location pattern: related files grouped by feature
 - Shared utilities in `/helpers` and `/services`
-- Domain entities in `/entities` (geometry, beats, selections, transforms)
+- App-side domain entities in `/entities` (scales, tick transforms); shared geometry lives in `@signal-app/geometry`
 - WebGL shaders and rendering code in `/gl` and component-specific shader directories
 
 ### Rendering and Performance Policy
