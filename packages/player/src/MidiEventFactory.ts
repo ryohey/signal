@@ -17,12 +17,12 @@ export function controllerMidiEvent(
 }
 
 export function gsResetMidiEvent(
-    deltaTime: number,
-    data: number[],
+  deltaTime: number,
+  data: number[],
 ): SysExEvent {
   return {
     deltaTime,
     type: "sysEx",
-    data
+    data,
   }
 }
