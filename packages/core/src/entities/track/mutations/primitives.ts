@@ -1,4 +1,5 @@
 import { isEqual, omit } from "lodash"
+import { isDevelopment } from "../../../helpers/isDevelopment"
 import { TrackEvent } from "../../event/TrackEvent"
 import { validateMidiEvent } from "../../event/validate"
 import { getEventById } from "../queries"
@@ -27,7 +28,7 @@ export const updateEvent =
     }
     events.update(id, newObj)
 
-    if (process.env.NODE_ENV !== "production") {
+    if (isDevelopment()) {
       validateMidiEvent(newObj)
     }
 
@@ -48,7 +49,7 @@ export const addEvent =
     const newEvent = events.create({
       ...omit(e, ["deltaTime", "channel"]),
     } as T) as T
-    if (process.env.NODE_ENV !== "production") {
+    if (isDevelopment()) {
       validateMidiEvent(newEvent)
     }
     return newEvent

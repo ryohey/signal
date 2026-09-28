@@ -1,3 +1,5 @@
+import { isDevelopment } from "../../helpers/isDevelopment"
+
 export type Range = readonly [number, number]
 
 export namespace Range {
@@ -10,7 +12,7 @@ export namespace Range {
   }
 
   export function create(start: number, end: number): Range {
-    if (process.env.NODE_ENV !== "production" && start > end) {
+    if (isDevelopment() && start > end) {
       throw new Error(
         `Range.create requires start <= end, but got start=${start}, end=${end}`,
       )
