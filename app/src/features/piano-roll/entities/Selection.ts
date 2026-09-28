@@ -1,8 +1,8 @@
 import { Rect } from "@signal-app/geometry"
+import { NotePoint } from "@signal-app/pianoroll-editor"
 import { clamp } from "lodash"
 import { MaxNoteNumber } from "../../../Constants"
 import { NoteCoordTransform } from "./NoteCoordTransform"
-import { NotePoint } from "./NotePoint"
 
 export interface Selection {
   readonly fromTick: number

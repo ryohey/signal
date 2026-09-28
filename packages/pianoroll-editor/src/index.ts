@@ -1,4 +1,5 @@
 export * from "./createPianoRollEditor"
 export * from "./entities/clipboardTypes"
+export * from "./entities/NotePoint"
 export * from "./entities/note/NoteEvent"
 export * from "./type"
