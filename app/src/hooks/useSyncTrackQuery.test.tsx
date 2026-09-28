@@ -2,7 +2,7 @@ import {
   emptyTrack,
   isPanEvent,
   NoteEvent,
-  selectorToQuery,
+  Track,
   TrackEventOf,
 } from "@signal-app/core"
 import { act, renderHook } from "@testing-library/react"
@@ -17,7 +17,7 @@ describe("useSyncTrackQueryInternal", () => {
     const { result } = renderHook(() =>
       useSyncTrackQueryInternal(
         track,
-        selectorToQuery((events) => events.filter(isPanEvent).length),
+        (track: Track) => track.events.filter(isPanEvent).length,
         isPanEvent,
       ),
     )
@@ -28,7 +28,7 @@ describe("useSyncTrackQueryInternal", () => {
   it("updates only when predicate-matching events change", () => {
     const track = emptyTrack(0)
     const query = vi.fn(
-      selectorToQuery<number>((events) => events.filter(isPanEvent).length),
+      (track: Track) => track.events.filter(isPanEvent).length,
     )
 
     const { result } = renderHook(() =>
@@ -67,7 +67,7 @@ describe("useSyncTrackQueryInternal", () => {
   })
 
   it("returns undefined and does not call query when track is undefined", () => {
-    const query = vi.fn(selectorToQuery<number>((events) => events.length))
+    const query = vi.fn((track: Track) => track.events.length)
 
     const { result } = renderHook(() =>
       useSyncTrackQueryInternal(undefined, query, isPanEvent),

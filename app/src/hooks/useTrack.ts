@@ -1,7 +1,5 @@
 import {
-  getProgramNumberEvent,
   isProgramChangeEvent,
-  selectorToQuery,
   TrackColor,
   TrackEvent,
   TrackId,
@@ -10,14 +8,13 @@ import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
-import { useSyncTrackQuery } from "./useSyncTrackQuery"
 import { useTrackMute } from "./useTrackMute"
 
 const noop = () => () => {}
 
 export function useTrack(id: TrackId) {
-  const { tracks } = useSong()
-  const track = useMemo(() => tracks.find((t) => t.id === id), [tracks, id])
+  const { getTrack } = useSong()
+  const track = getTrack(id)
 
   return {
     get isRhythmTrack() {
@@ -34,11 +31,16 @@ export function useTrack(id: TrackId) {
     },
     get programNumber() {
       const { position } = usePlayer()
-      const query = useMemo(
-        () => selectorToQuery(getProgramNumberEvent(position)),
-        [position],
+      const subscribe = useCallback(
+        (listener: () => void) =>
+          track?.subscribeEventsChanged(isProgramChangeEvent, listener) ?? noop,
+        [track],
       )
-      return useSyncTrackQuery(id, query, isProgramChangeEvent)?.value ?? 0
+      const getSnapshot = useCallback(
+        () => track?.getProgramChangeEvent(position)?.value ?? 0,
+        [position, track],
+      )
+      return useSyncExternalStore(subscribe, getSnapshot)
     },
     get name() {
       return useSyncExternalStore(

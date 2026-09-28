@@ -12,7 +12,15 @@ import {
   TickOrderedArray,
 } from "../../data/OrdererdArray/TickOrderedArray"
 import { Branded } from "../../types"
-import { getColorEvent, getMaxTick, getTrackNameEvent } from "../event"
+import {
+  getColorEvent,
+  getMaxTick,
+  getPan,
+  getProgramChangeEvent,
+  getTempo,
+  getTrackNameEvent,
+  getVolume,
+} from "../event"
 import {
   isNoteEvent,
   isTimeSignatureEvent,
@@ -24,19 +32,26 @@ import {
 } from "../event/signalEvents"
 import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
 import * as TrackEvents from "./mutations"
-import { setPan, setVolume } from "./mutations/controller"
-import { setProgramNumberAt, setProgramNumberById } from "./mutations/program"
-import { setColor, setName, setTempo } from "./mutations/setter"
-import { addTimeSignature } from "./mutations/timeSignature"
-import { TrackEventsMutator } from "./mutations/type"
+import {
+  addTimeSignature,
+  batchUpdateNotesVelocity,
+  setColor,
+  setName,
+  setPan,
+  setProgramNumberAt,
+  setProgramNumberById,
+  setTempo,
+  setVolume,
+  TrackEventsMutator,
+} from "./mutations"
 import {
   getAll,
   getEventById,
   getEventsByIds,
   hasProgramChangeEventAfter,
   hasTimeSignatureAt,
+  TrackEventsQuery,
 } from "./queries"
-import { TrackEventsQuery } from "./queries/type"
 import { TrackEventStore } from "./TrackEventStore"
 
 export type TrackId = Branded<number, "TrackId">
@@ -259,16 +274,20 @@ export class Track implements TrackEventStore {
     return this._events.transaction(() => fn(this._events))
   }
 
-  query = <R>(fn: TrackEventsQuery<R>): R => {
+  private query = <R>(fn: TrackEventsQuery<R>): R => {
     return fn(this._events)
   }
 
   /* queries */
 
-  getEvents = flow(getAll, this.query)
+  getEvents = () => this.query(getAll)
   getEventById = flow(getEventById, this.query)
   getEventsByIds = flow(getEventsByIds, this.query)
   hasProgramChangeEventAfter = flow(hasProgramChangeEventAfter, this.query)
+  getProgramChangeEvent = (tick: number) =>
+    getProgramChangeEvent(tick)(this.events)
+  getVolume = (tick: number) => getVolume(tick)(this.events)
+  getPan = (tick: number) => getPan(tick)(this.events)
 
   /* mutations */
 
@@ -287,11 +306,13 @@ export class Track implements TrackEventStore {
   setProgramNumberById = flow(setProgramNumberById, this.mutate)
   setPan = flow(setPan, this.mutate)
   setVolume = flow(setVolume, this.mutate)
+  batchUpdateNotesVelocity = flow(batchUpdateNotesVelocity, this.mutate)
 
   /* conductor track features */
 
   hasTimeSignatureAt = flow(hasTimeSignatureAt, this.query)
   addTimeSignature = flow(addTimeSignature, this.mutate)
+  getTempo = (tick: number) => getTempo(tick)(this.events)
   setTempo = flow(setTempo, this.mutate)
 
   /* helper */

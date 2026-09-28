@@ -1,10 +1,10 @@
 import {
-  getVolume,
   isVolumeEvent,
-  selectorToQuery,
+  Track,
+  TrackId,
   volumeMidiEvent,
 } from "@signal-app/core"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useState } from "react"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
@@ -13,14 +13,22 @@ import { usePianoRoll } from "../hooks/usePianoRoll"
 
 const DEFAULT_VOLUME = 100
 
+function useCurrentVolume(trackId: TrackId) {
+  const { position } = usePlayer()
+  const query = useCallback(
+    (track: Track) => track.getVolume(position)?.value,
+    [position],
+  )
+  return useSyncTrackQuery(trackId, query, isVolumeEvent)
+}
+
 export function useVolumeSlider() {
   const { selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
   const { channel, setVolume } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
-  const query = useMemo(() => selectorToQuery(getVolume(position)), [position])
-  const currentVolumeEvent = useSyncTrackQuery(trackId, query, isVolumeEvent)
+  const currentVolume = useCurrentVolume(trackId)
 
   const setTrackVolume = useCallback(
     (volume: number) => {
@@ -39,7 +47,7 @@ export function useVolumeSlider() {
   )
 
   return {
-    value: currentVolumeEvent?.value ?? DEFAULT_VOLUME,
+    value: currentVolume ?? DEFAULT_VOLUME,
     setValue: setTrackVolume,
     onPointerDown: useCallback(() => {
       // record history only when dragging starts

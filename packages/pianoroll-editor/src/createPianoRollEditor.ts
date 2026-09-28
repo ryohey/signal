@@ -1,9 +1,4 @@
-import {
-  batchUpdateNotesVelocity,
-  Song,
-  TrackEventsMutator,
-  TrackId,
-} from "@signal-app/core"
+import { Song, TrackId } from "@signal-app/core"
 import { dragNote, getDraggableArea, getDraggablePosition } from "./draggable"
 import { NoteEvent } from "./entities"
 import { getTrackOrThrow } from "./getTrackOrThrow"
@@ -71,6 +66,6 @@ export const createPianoRollEditor = (song: Song, trackId: TrackId) => {
     quantizeNotes: bindMutation(quantizeNotes),
     removeNotes: bindMutation(removeNotes),
     transposeNotes: bindMutation(transposeNotes),
-    batchUpdateNotesVelocity: batchUpdateNotesVelocity(track),
+    batchUpdateNotesVelocity: track.batchUpdateNotesVelocity,
   }
 }

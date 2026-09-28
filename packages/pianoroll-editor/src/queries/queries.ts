@@ -1,9 +1,10 @@
-import { filter, isNotUndefined, map, NoteSelection } from "@signal-app/core"
+import { filter, isNotUndefined, map } from "@signal-app/core"
 import { flow } from "lodash"
 import {
   filterNotesInSelection,
   findNeighborNote,
   type NoteEvent,
+  NoteSelection,
   toId,
 } from "../entities"
 import type { PianoRollEditorQuery } from "./type"

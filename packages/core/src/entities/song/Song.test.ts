@@ -5,7 +5,7 @@ import { songFromMidi, songToMidi, timeSignatureMidiEvent } from "../../midi"
 import { toTrackEvents } from "../../midi/toTrackEvents"
 import {
   getPan,
-  getProgramNumberEvent,
+  getProgramChangeEvent,
   getTempo,
   getVolume,
 } from "../event/selectors"
@@ -36,7 +36,7 @@ describe("Song", () => {
     expect(getTempo(240)(tracks[0].events)).toBe(128)
     expect(getVolume(193)(tracks[2].events)?.value).toBe(100)
     expect(getPan(192)(tracks[2].events)?.value).toBe(1)
-    expect(getProgramNumberEvent(189)(tracks[2].events)?.value).toBe(29)
+    expect(getProgramChangeEvent(189)(tracks[2].events)?.value).toBe(29)
   })
 
   it("should be serializable", () => {

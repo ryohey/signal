@@ -1,20 +1,15 @@
-import {
-  addEvent,
-  NoteEvent,
-  TrackEventsMutator,
-  updateEvent,
-} from "@signal-app/core"
+import { NoteEvent, TrackEventStore } from "@signal-app/core"
 
-export const addNote = (
-  note: Omit<NoteEvent, "id">,
-): TrackEventsMutator<NoteEvent> =>
-  addEvent({
-    ...note,
-    type: "channel",
-    subtype: "note",
-  } as const)
+export const addNote =
+  (note: Omit<NoteEvent, "id">) =>
+  (track: TrackEventStore): NoteEvent =>
+    track.addEvent({
+      ...note,
+      type: "channel",
+      subtype: "note",
+    } as const)
 
-export const updateNote = (
-  id: number,
-  update: Partial<NoteEvent>,
-): TrackEventsMutator<NoteEvent | null> => updateEvent(id, update)
+export const updateNote =
+  (id: number, update: Partial<NoteEvent>) =>
+  (track: TrackEventStore): NoteEvent | null =>
+    track.updateEvent(id, update)

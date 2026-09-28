@@ -1,11 +1,6 @@
-import {
-  getTempo,
-  isSetTempoEvent,
-  selectorToQuery,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
+import { isSetTempoEvent, Track, UNASSIGNED_TRACK_ID } from "@signal-app/core"
 import { DEFAULT_TEMPO } from "@signal-app/player"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
@@ -19,8 +14,8 @@ export function useTempoForm() {
   return {
     get tempo() {
       const { position } = usePlayer()
-      const query = useMemo(
-        () => selectorToQuery(getTempo(position)),
+      const query = useCallback(
+        (track: Track) => track.getTempo(position),
         [position],
       )
       return (

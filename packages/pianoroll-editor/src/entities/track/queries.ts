@@ -1,20 +1,12 @@
-import {
-  filter,
-  getAll,
-  getEventById,
-  isNoteEvent,
-  NoteEvent,
-  TrackEventsQuery,
-} from "@signal-app/core"
-import { flow } from "lodash"
+import { isNoteEvent, NoteEvent, TrackEventStore } from "@signal-app/core"
 
-export const getAllNotes = (): TrackEventsQuery<readonly NoteEvent[]> =>
-  flow(getAll, filter(isNoteEvent))
+export const getAllNotes = () => (track: TrackEventStore) =>
+  track.getEvents().filter(isNoteEvent)
 
 export const getNoteById =
-  (id: number): TrackEventsQuery<NoteEvent | undefined> =>
-  (context) => {
-    const event = getEventById(id)(context)
+  (id: number) =>
+  (track: TrackEventStore): NoteEvent | undefined => {
+    const event = track.getEventById(id)
     if (event && isNoteEvent(event)) {
       return event
     }

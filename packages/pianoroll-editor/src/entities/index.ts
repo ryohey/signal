@@ -1,3 +1,6 @@
 export * from "./clipboardTypes"
+export * from "./NotePoint"
+export * from "./NoteSelection"
+export * from "./NoteSelection"
 export * from "./note"
 export * from "./track"

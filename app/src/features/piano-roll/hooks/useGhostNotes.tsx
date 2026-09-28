@@ -2,8 +2,7 @@ import {
   isEventOverlapRange,
   isNoteEvent,
   Range,
-  selectorToQuery,
-  TrackEventsQuery,
+  TrackEventStore,
   TrackId,
 } from "@signal-app/core"
 import { NoteEvent } from "@signal-app/pianoroll-editor"
@@ -13,12 +12,10 @@ import { useTickScroll } from "../../../hooks/useTickScroll"
 import { useTrack } from "../../../hooks/useTrack"
 import { useNoteCoordTransform } from "./useNoteCoordTransform"
 
-const ghostNotesQuery = (
-  tickRange: Range,
-): TrackEventsQuery<readonly NoteEvent[]> =>
-  selectorToQuery((events) =>
-    events.filter(isEventOverlapRange(tickRange)).filter(isNoteEvent),
-  )
+const ghostNotesQuery =
+  (tickRange: Range) =>
+  (track: TrackEventStore): readonly NoteEvent[] =>
+    track.getEvents().filter(isEventOverlapRange(tickRange)).filter(isNoteEvent)
 
 export function useGhostNotes(trackId: TrackId) {
   const { transform } = useNoteCoordTransform()

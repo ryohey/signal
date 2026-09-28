@@ -41,7 +41,7 @@ export const getTempoEvent = (tick: number) =>
 export const getTimeSignatureEvent = (tick: number) =>
   flow(filter(isTimeSignatureEvent), filter(isTickBefore(tick)), getLast)
 
-export const getProgramNumberEvent = (tick: number) =>
+export const getProgramChangeEvent = (tick: number) =>
   flow(filter(isProgramChangeEvent), filter(isTickBefore(tick)), getLast)
 
 export const getControllerEventWithType = (
