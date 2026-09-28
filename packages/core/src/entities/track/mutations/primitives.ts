@@ -2,22 +2,12 @@ import { isEqual, omit } from "lodash"
 import { TrackEvent } from "../../event/TrackEvent"
 import { validateMidiEvent } from "../../event/validate"
 import { getEventById } from "../queries"
-import { TrackEventsContext } from "../TrackEventsContext"
 import { TrackEventsMutator } from "./type"
-
-type MutableTrackEvents = TrackEventsContext & {
-  remove(id: number): readonly TrackEvent[]
-  update(id: number, updatedElement: Partial<TrackEvent>): readonly TrackEvent[]
-  create(event: Omit<TrackEvent, "id">): TrackEvent
-}
-
-const asMutableTrackEvents = (events: TrackEventsContext): MutableTrackEvents =>
-  events as MutableTrackEvents
 
 export const removeEvent =
   (id: number): TrackEventsMutator =>
   (events) => {
-    asMutableTrackEvents(events).remove(id)
+    events.remove(id)
   }
 
 export const updateEvent =
@@ -35,7 +25,7 @@ export const updateEvent =
     if (isEqual(newObj, anObj)) {
       return null
     }
-    asMutableTrackEvents(events).update(id, newObj)
+    events.update(id, newObj)
 
     if (process.env.NODE_ENV !== "production") {
       validateMidiEvent(newObj)
@@ -55,7 +45,7 @@ export const addEvent =
     if ("subtype" in e && e.subtype === "endOfTrack") {
       throw new Error("endOfTrack event is added")
     }
-    const newEvent = asMutableTrackEvents(events).create({
+    const newEvent = events.create({
       ...omit(e, ["deltaTime", "channel"]),
     } as T) as T
     if (process.env.NODE_ENV !== "production") {

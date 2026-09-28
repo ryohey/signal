@@ -1,3 +1,8 @@
-import { TrackEventsContext } from "../TrackEventsContext"
+import { TrackEvent } from "../../event/TrackEvent"
 
-export type TrackEventsQuery<T> = (events: TrackEventsContext) => T
+export interface TrackEventsQueryContext {
+  get(id: number): TrackEvent | undefined
+  getArray(): readonly TrackEvent[]
+}
+
+export type TrackEventsQuery<T> = (events: TrackEventsQueryContext) => T
