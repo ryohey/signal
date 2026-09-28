@@ -10,7 +10,7 @@ export default class DrawCanvas extends Component<DrawCanvasProps> {
   private canvas: HTMLCanvasElement | undefined
   private ctx: CanvasRenderingContext2D | undefined
 
-  componentDidMount() {
+  override componentDidMount() {
     const ctx = this.canvas?.getContext("2d")
     if (ctx === null) {
       throw new Error("failed to getContext 2d")
@@ -19,7 +19,7 @@ export default class DrawCanvas extends Component<DrawCanvasProps> {
     this.drawCanvas()
   }
 
-  componentDidUpdate() {
+  override componentDidUpdate() {
     this.drawCanvas()
   }
 
@@ -32,7 +32,7 @@ export default class DrawCanvas extends Component<DrawCanvasProps> {
     }
   }
 
-  render() {
+  override render() {
     const { width, height, draw: _draw, style, ...props } = this.props
     return (
       <canvas

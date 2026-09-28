@@ -24,6 +24,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
     "isolatedModules": true,
