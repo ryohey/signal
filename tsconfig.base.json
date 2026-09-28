@@ -23,6 +23,7 @@
     "allowUnusedLabels": false,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true
   }
 }
