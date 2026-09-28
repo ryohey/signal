@@ -5,12 +5,12 @@ import {
   MenuItem,
 } from "@signal-app/ui"
 import React, { FC, useCallback, useState } from "react"
-import { useConductorTrack } from "../../../../hooks/useConductorTrack"
-import { usePlayer } from "../../../../hooks/usePlayer"
-import { envString } from "../../../../localize/envString"
-import { Localized } from "../../../../localize/useLocalization"
-import { useAddTimeSignature } from "../../hooks/useAddTimeSignature"
-import { TimeSignatureDialog } from "../dialogs/TimeSignatureDialog"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
+import { usePlayer } from "../../../hooks/usePlayer"
+import { envString } from "../../../localize/envString"
+import { Localized } from "../../../localize/useLocalization"
+import { useAddTimeSignature } from "../hooks/useAddTimeSignature"
+import { TimeSignatureDialog } from "./TimeSignatureDialog"
 
 export interface RulerContextMenuProps extends ContextMenuProps {
   tick: number

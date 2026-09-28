@@ -1,8 +1,8 @@
 import { isEventInRange, Range } from "@signal-app/core"
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react"
-import { useBeats } from "./useBeats"
-import { useSong } from "./useSong"
-import { useTickScroll } from "./useTickScroll"
+import { useBeats } from "../../../hooks/useBeats"
+import { useSong } from "../../../hooks/useSong"
+import { useTickScroll } from "../../../hooks/useTickScroll"
 
 export interface RulerBeat {
   label: string | null

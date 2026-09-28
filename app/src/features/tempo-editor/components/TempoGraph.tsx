@@ -7,7 +7,7 @@ import {
   HorizontalScrollBar,
 } from "../../../components/inputs/ScrollBar"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import CanvasPianoRuler from "../../piano-roll/components/PianoRuler"
+import { Ruler } from "../../ruler"
 import { useTempoTransform } from "../hooks/useTempoTransform"
 import { TempoGraphCanvas } from "./canvas/TempoGraphCanvas"
 import { TempoGraphAxis } from "./TempoGraphAxis"
@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 
 const AXIS_WIDTH = 64
 
-const StyledRuler = styled(CanvasPianoRuler)`
+const StyledRuler = styled(Ruler)`
   position: absolute;
   left: ${AXIS_WIDTH}px;
   top: 0;

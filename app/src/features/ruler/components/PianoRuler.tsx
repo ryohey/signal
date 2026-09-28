@@ -1,11 +1,11 @@
 import React, { FC, useCallback, useState } from "react"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { usePlayer } from "../../../hooks/usePlayer"
-import { RulerTimeSignature, useRuler } from "../../../hooks/useRuler"
+import { RulerTimeSignature, useRuler } from "../hooks/useRuler"
 import { useUpdateTimeSignature } from "../hooks/useUpdateTimeSignature"
 import { CanvasPianoRuler } from "./CanvasPianoRuler"
-import { TimeSignatureDialog } from "./dialogs/TimeSignatureDialog"
-import { RulerContextMenu } from "./menus/RulerContextMenu"
+import { RulerContextMenu } from "./RulerContextMenu"
+import { TimeSignatureDialog } from "./TimeSignatureDialog"
 
 export interface PianoRulerProps {
   onMouseDown?: React.MouseEventHandler<HTMLCanvasElement>
@@ -19,7 +19,11 @@ interface TimeSignatureDialogState {
   denominator: number
 }
 
-const PianoRuler: FC<PianoRulerProps> = ({ onMouseDown, style, className }) => {
+export const Ruler: FC<PianoRulerProps> = ({
+  onMouseDown,
+  style,
+  className,
+}) => {
   const { onContextMenu, menuProps } = useContextMenu()
   const [timeSignatureDialogState, setTimeSignatureDialogState] =
     useState<TimeSignatureDialogState | null>(null)
@@ -114,5 +118,3 @@ const PianoRuler: FC<PianoRulerProps> = ({ onMouseDown, style, className }) => {
     </>
   )
 }
-
-export default PianoRuler

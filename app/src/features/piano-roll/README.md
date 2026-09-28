@@ -10,7 +10,7 @@ The main note editing surface.
 
 ## Responsibilities
 
-- Draw the note grid, notes, keyboard, and ruler.
+- Draw the note grid, notes, and keyboard.
 - Create, select, move, resize, and delete notes.
 - Show other tracks' notes as ghost notes.
 - Quantize, transpose, copy, and paste notes. Preview notes while editing.

@@ -11,7 +11,7 @@ import {
 } from "@signal-app/ui"
 import { range } from "lodash"
 import React, { FC, useEffect, useState } from "react"
-import { Localized } from "../../../../localize/useLocalization"
+import { Localized } from "../../../localize/useLocalization"
 
 export interface TimeSignatureDialogProps {
   initialNumerator?: number

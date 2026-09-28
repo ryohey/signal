@@ -89,6 +89,7 @@ This section intentionally stays lightweight. See each feature README for detail
 - [app/src/features/export/README.md](app/src/features/export/README.md)
 - [app/src/features/midi-device/README.md](app/src/features/midi-device/README.md)
 - [app/src/features/piano-roll/README.md](app/src/features/piano-roll/README.md)
+- [app/src/features/ruler/README.md](app/src/features/ruler/README.md)
 - [app/src/features/setting/README.md](app/src/features/setting/README.md)
 - [app/src/features/soundfont/README.md](app/src/features/soundfont/README.md)
 - [app/src/features/tempo-editor/README.md](app/src/features/tempo-editor/README.md)

@@ -2,11 +2,11 @@ import styled from "@emotion/styled"
 import { Positioned } from "@signal-app/ui"
 import { FC } from "react"
 import { Layout } from "../../../Constants"
+import { Ruler } from "../../ruler"
 import { useKeyScroll } from "../hooks/useKeyScroll"
 import { PianoRollCanvas } from "./canvas/PianoRollCanvas"
 import { InstrumentLane } from "./InstrumentLane"
 import { PianoKeys } from "./PianoKeys"
-import CanvasPianoRuler from "./PianoRuler"
 
 export interface PianoRollStageProps {
   width: number
@@ -41,7 +41,7 @@ export const PianoRollStage: FC<PianoRollStageProps> = ({
       </Positioned>
       <LeftTopSpace width={keyWidth} />
       <RulerPosition left={keyWidth}>
-        <CanvasPianoRuler />
+        <Ruler />
       </RulerPosition>
       <Positioned top={Layout.rulerHeight} left={keyWidth}>
         <InstrumentLane width={width} />

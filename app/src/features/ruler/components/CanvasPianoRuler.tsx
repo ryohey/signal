@@ -6,9 +6,9 @@ import { Layout } from "../../../Constants"
 import DrawCanvas from "../../../components/DrawCanvas"
 import { TickTransform } from "../../../entities/transform/TickTransform"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { RulerBeat, RulerTimeSignature } from "../../../hooks/useRuler"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Theme } from "../../../theme/Theme"
+import { RulerBeat, RulerTimeSignature } from "../hooks/useRuler"
 
 const textPadding = 2
 const TIME_SIGNATURE_HIT_WIDTH = 20
