@@ -26,6 +26,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,

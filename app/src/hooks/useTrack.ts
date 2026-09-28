@@ -4,7 +4,7 @@ import {
   TrackEvent,
   TrackId,
 } from "@signal-app/core"
-import { useCallback, useMemo, useSyncExternalStore } from "react"
+import { useCallback, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
