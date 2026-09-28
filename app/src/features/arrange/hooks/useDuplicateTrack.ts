@@ -1,11 +1,11 @@
-import { duplicateTrack as duplicateTrackCmd, TrackId } from "@signal-app/core"
+import { TrackId } from "@signal-app/core"
 import { useCallback } from "react"
-import { useSongCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
+import { useSong } from "../../../hooks/useSong"
 
 export const useDuplicateTrack = () => {
   const { pushHistory } = useHistory()
-  const duplicateTrack = useSongCommand(duplicateTrackCmd)
+  const { duplicateTrack } = useSong()
 
   return useCallback(
     (trackId: TrackId) => {

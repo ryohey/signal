@@ -97,6 +97,38 @@ describe("Song", () => {
     expect(song.tracks[2].id).toBe(3)
   })
 
+  it("addNewTrack and insertNewTrack add empty tracks", () => {
+    const song = emptySong()
+    const count = song.tracks.length
+
+    song.addNewTrack()
+    song.insertNewTrack(1)
+
+    expect(song.tracks.length).toBe(count + 2)
+    expect(song.tracks[1].isConductorTrack).toBe(false)
+  })
+
+  it("duplicateTrack inserts a copy after the track", () => {
+    const song = emptySong()
+    const source = song.tracks[1]
+
+    song.duplicateTrack(source.id)
+
+    expect(song.tracks[2].id).not.toBe(source.id)
+    expect(song.tracks[2].events.length).toBe(source.events.length)
+  })
+
+  it("moveTrack moves a track to the position of another", () => {
+    const song = emptySong()
+    song.addNewTrack()
+    const [, first, second] = song.tracks
+
+    song.moveTrack(second.id, first.id)
+
+    expect(song.tracks[1]).toBe(second)
+    expect(song.tracks[2]).toBe(first)
+  })
+
   it("should restore measures when opening midi", () => {
     const song = emptySong()
     song.timebase = 960

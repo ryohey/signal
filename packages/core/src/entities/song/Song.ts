@@ -8,6 +8,7 @@ import {
 import { PlayerEvent } from "@signal-app/player"
 import { Measure } from "../measure/Measure"
 import { Track, TrackId } from "../track"
+import { emptyTrack } from "../track/TrackFactory"
 import { collectAllEvents } from "./collectAllEvents"
 
 const END_MARGIN = 480 * 30
@@ -154,11 +155,40 @@ export class Song {
     this.tracks = this.tracks.filter((t) => t.id !== id)
   }
 
-  moveTrack(from: number, to: number) {
+  // Moves the track to the position of `overId`.
+  moveTrack(id: TrackId, overId: TrackId) {
+    const from = this.tracks.findIndex((t) => t.id === id)
+    const to = this.tracks.findIndex((t) => t.id === overId)
+    if (from === -1 || to === -1) {
+      return
+    }
     const tracks = [...this.tracks]
     const [track] = tracks.splice(from, 1)
     tracks.splice(to, 0, track)
     this.tracks = tracks
+  }
+
+  addNewTrack() {
+    this.addTrack(emptyTrack(this.nextChannel()))
+  }
+
+  insertNewTrack(index: number) {
+    this.insertTrack(emptyTrack(this.nextChannel()), index)
+  }
+
+  // Inserts a copy of the track right after it.
+  duplicateTrack(id: TrackId) {
+    const index = this.tracks.findIndex((t) => t.id === id)
+    if (index === -1) {
+      return
+    }
+    const newTrack = this.tracks[index].clone()
+    newTrack.channel = undefined
+    this.insertTrack(newTrack, index + 1)
+  }
+
+  private nextChannel() {
+    return Math.min(this.tracks.length - 1, 0xf)
   }
 
   get tracks(): readonly Track[] {

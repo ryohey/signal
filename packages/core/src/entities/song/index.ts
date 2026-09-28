@@ -1,4 +1,3 @@
 export * from "./collectAllEvents"
-export * from "./commands"
 export * from "./Song"
 export * from "./SongFactory"

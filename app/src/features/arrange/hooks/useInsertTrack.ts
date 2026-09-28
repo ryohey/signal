@@ -1,11 +1,10 @@
-import { insertNewTrack as insertNewTrackCmd } from "@signal-app/core"
 import { useCallback } from "react"
-import { useSongCommand } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
+import { useSong } from "../../../hooks/useSong"
 
 export const useInsertTrack = () => {
   const { pushHistory } = useHistory()
-  const insertNewTrack = useSongCommand(insertNewTrackCmd)
+  const { insertNewTrack } = useSong()
 
   return useCallback(
     (trackIndex: number) => {

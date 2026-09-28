@@ -95,6 +95,27 @@ export const useSong = () => {
       },
       [song],
     ),
+    addNewTrack: useCallback(() => {
+      song.addNewTrack()
+    }, [song]),
+    insertNewTrack: useCallback(
+      (index: number) => {
+        song.insertNewTrack(index)
+      },
+      [song],
+    ),
+    duplicateTrack: useCallback(
+      (trackId: TrackId) => {
+        song.duplicateTrack(trackId)
+      },
+      [song],
+    ),
+    moveTrack: useCallback(
+      (id: TrackId, overId: TrackId) => {
+        song.moveTrack(id, overId)
+      },
+      [song],
+    ),
     removeTrack: useCallback(
       (trackId: TrackId) => {
         song.removeTrack(trackId)

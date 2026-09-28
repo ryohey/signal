@@ -57,7 +57,7 @@ Representative core modules:
 
 - `SongStore` - Current song lifecycle and change notifications
 - `Track` - Event storage with named read/write methods (`getEvents`, `addEvent`, `updateEvents`, `transaction`, ...); its internal query/mutate functions are private
-- `SongCommand` - Song-level operations such as adding and reordering tracks
+- `Song` - Track list with song-level methods such as `addNewTrack`, `duplicateTrack`, and `moveTrack`
 - Per-domain Editor facade packages (e.g. `@signal-app/tempo-editor`'s `createTempoEditor`) build on `Track` and expose plain query/mutation/observe methods for app-side use
 - MIDI/device services and repositories
 
