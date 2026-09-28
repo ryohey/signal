@@ -73,36 +73,42 @@ function useElectronShortcuts() {
     if (isRunningInElectron()) {
       return window.electronAPI.onDuplicate(duplicateSelection)
     }
+    return undefined
   }, [duplicateSelection])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onDelete(deleteSelection)
     }
+    return undefined
   }, [deleteSelection])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onSelectAll(selectAllNotes)
     }
+    return undefined
   }, [selectAllNotes])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onSelectNextNote(selectNextNote)
     }
+    return undefined
   }, [selectNextNote])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onSelectPreviousNote(selectPreviousNote)
     }
+    return undefined
   }, [selectPreviousNote])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onQuantize(quantizeSelectedNotes)
     }
+    return undefined
   }, [quantizeSelectedNotes])
 
   useEffect(() => {
@@ -111,6 +117,7 @@ function useElectronShortcuts() {
         transposeSelection(12),
       )
     }
+    return undefined
   }, [transposeSelection])
 
   useEffect(() => {
@@ -119,17 +126,20 @@ function useElectronShortcuts() {
         transposeSelection(-12),
       )
     }
+    return undefined
   }, [transposeSelection])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onTranspose(() => setOpenTransposeDialog(true))
     }
+    return undefined
   }, [setOpenTransposeDialog])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onVelocity(() => setOpenVelocityDialog(true))
     }
+    return undefined
   }, [setOpenVelocityDialog])
 }

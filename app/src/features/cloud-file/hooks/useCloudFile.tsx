@@ -170,7 +170,7 @@ export const useCloudFile = () => {
         if (text !== null && text.length > 0) {
           setName(text)
         } else {
-          return Promise.resolve(false)
+          return
         }
         if (cloudSongId !== null) {
           await updateSong(getSong())

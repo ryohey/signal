@@ -331,6 +331,8 @@ function CurveIcon({ type }: { type: CurveType }) {
       return <EaseInIcon />
     case "easeOut":
       return <EaseOutIcon />
+    case "linear":
+      return null
   }
 }
 
@@ -340,5 +342,7 @@ function CurveLabel({ type }: { type: CurveType }) {
       return <Localized name="curve-ease-in" />
     case "easeOut":
       return <Localized name="curve-ease-out" />
+    case "linear":
+      return null
   }
 }

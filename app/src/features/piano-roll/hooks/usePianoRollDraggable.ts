@@ -41,7 +41,7 @@ export function usePianoRollDraggable() {
         }
         case "selection": {
           if (selection === null) {
-            return
+            return undefined
           }
           switch (draggable.position) {
             case "center": {
@@ -55,7 +55,7 @@ export function usePianoRollDraggable() {
             }
             case "left": {
               if (position.tick === undefined) {
-                return
+                return undefined
               }
               setSelection({
                 ...selection,
@@ -65,7 +65,7 @@ export function usePianoRollDraggable() {
             }
             case "right": {
               if (position.tick === undefined) {
-                return
+                return undefined
               }
               setSelection({
                 ...selection,
@@ -74,7 +74,7 @@ export function usePianoRollDraggable() {
               break
             }
           }
-          break
+          return undefined
         }
       }
     },

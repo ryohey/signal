@@ -35,17 +35,20 @@ export function useGlobalClipboardEvents({
     if (isRunningInElectron()) {
       return window.electronAPI.onCopy(onCopy)
     }
+    return undefined
   }, [onCopy])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onCut(onCut)
     }
+    return undefined
   }, [onCut])
 
   useEffect(() => {
     if (isRunningInElectron()) {
       return window.electronAPI.onPaste(onPaste)
     }
+    return undefined
   }, [onPaste])
 }
