@@ -1,7 +1,12 @@
 import React, { FC, useCallback, useState } from "react"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { usePlayer } from "../../../hooks/usePlayer"
-import { RulerTimeSignature, useRuler } from "../hooks/useRuler"
+import { useRuler } from "../hooks/useRuler"
+import { useRulerBeats } from "../hooks/useRulerBeats"
+import {
+  RulerTimeSignature,
+  useTimeSignatures,
+} from "../hooks/useTimeSignatures"
 import { useUpdateTimeSignature } from "../hooks/useUpdateTimeSignature"
 import { CanvasPianoRuler } from "./CanvasPianoRuler"
 import { RulerContextMenu } from "./RulerContextMenu"
@@ -30,14 +35,13 @@ export const Ruler: FC<PianoRulerProps> = ({
   const [rightClickTick, setRightClickTick] = useState(0)
   const { loop, setLoopBegin, setLoopEnd, setPosition } = usePlayer()
   const updateTimeSignature = useUpdateTimeSignature()
-
+  const rulerBeats = useRulerBeats()
   const {
-    rulerBeats,
-    timeSignatures,
     selectedTimeSignatureEventIds,
     selectTimeSignature,
     clearSelectedTimeSignature,
   } = useRuler()
+  const timeSignatures = useTimeSignatures({ selectedTimeSignatureEventIds })
 
   const onClickTimeSignature = useCallback(
     (e: React.MouseEvent, timeSignature: RulerTimeSignature, tick: number) => {

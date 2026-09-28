@@ -8,7 +8,8 @@ import { TickTransform } from "../../../entities/transform/TickTransform"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTickScroll } from "../../../hooks/useTickScroll"
 import { Theme } from "../../../theme/Theme"
-import { RulerBeat, RulerTimeSignature } from "../hooks/useRuler"
+import { RulerBeat } from "../hooks/useRulerBeats"
+import { RulerTimeSignature } from "../hooks/useTimeSignatures"
 
 const textPadding = 2
 const TIME_SIGNATURE_HIT_WIDTH = 20
