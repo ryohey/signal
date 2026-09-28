@@ -1,17 +1,16 @@
-import { updateEvent } from "@signal-app/core"
 import { useCallback } from "react"
-import { useMutateConductorTrack } from "../../../hooks/useCommand"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
 
 export const useUpdateTimeSignature = () => {
-  const mutate = useMutateConductorTrack()
+  const { updateEvent } = useConductorTrack()
   const { pushHistory } = useHistory()
 
   return useCallback(
     (id: number, numerator: number, denominator: number) => {
       pushHistory()
-      mutate(updateEvent(id, { numerator, denominator }))
+      updateEvent(id, { numerator, denominator })
     },
-    [pushHistory, mutate],
+    [pushHistory, updateEvent],
   )
 }

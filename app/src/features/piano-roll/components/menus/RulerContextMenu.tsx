@@ -1,4 +1,3 @@
-import { removeEvents } from "@signal-app/core"
 import {
   ContextMenu,
   ContextMenuProps,
@@ -6,7 +5,7 @@ import {
   MenuItem,
 } from "@signal-app/ui"
 import React, { FC, useCallback, useState } from "react"
-import { useMutateConductorTrack } from "../../../../hooks/useCommand"
+import { useConductorTrack } from "../../../../hooks/useConductorTrack"
 import { usePlayer } from "../../../../hooks/usePlayer"
 import { envString } from "../../../../localize/envString"
 import { Localized } from "../../../../localize/useLocalization"
@@ -24,7 +23,7 @@ const _RulerContextMenu: FC<RulerContextMenuProps> = ({
   ...props
 }) => {
   const { setLoopBegin, setLoopEnd } = usePlayer()
-  const mutate = useMutateConductorTrack()
+  const { removeEvents } = useConductorTrack()
   const addTimeSignature = useAddTimeSignature()
   const [isOpenTimeSignatureDialog, setOpenTimeSignatureDialog] =
     useState(false)
@@ -36,8 +35,8 @@ const _RulerContextMenu: FC<RulerContextMenuProps> = ({
   }, [])
 
   const onClickRemoveTimeSignature = useCallback(() => {
-    mutate(removeEvents(Array.from(selectedTimeSignatureEventIds)))
-  }, [mutate, selectedTimeSignatureEventIds])
+    removeEvents(Array.from(selectedTimeSignatureEventIds))
+  }, [removeEvents, selectedTimeSignatureEventIds])
 
   const onClickSetLoopStart = useCallback(() => {
     setLoopBegin(tick)

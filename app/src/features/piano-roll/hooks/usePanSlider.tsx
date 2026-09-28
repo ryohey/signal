@@ -3,10 +3,8 @@ import {
   isPanEvent,
   panMidiEvent,
   selectorToQuery,
-  setPan,
 } from "@signal-app/core"
 import { useCallback, useMemo, useState } from "react"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
@@ -19,8 +17,7 @@ export function usePanSlider() {
   const { selectedTrackId: trackId } = usePianoRoll()
   const { position, sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel } = useTrack(trackId)
-  const mutateTrack = useMutateTrack(trackId)
+  const { channel, setPan } = useTrack(trackId)
   const [isDragging, setIsDragging] = useState(false)
   const query = useMemo(() => selectorToQuery(getPan(position)), [position])
   const currentPanEvent = useSyncTrackQuery(trackId, query, isPanEvent)
@@ -32,13 +29,13 @@ export function usePanSlider() {
         pushHistory()
       }
 
-      mutateTrack(setPan(pan, position))
+      setPan(pan, position)
 
       if (channel !== undefined) {
         sendEvent(panMidiEvent(0, channel, pan))
       }
     },
-    [pushHistory, mutateTrack, position, sendEvent, channel, isDragging],
+    [pushHistory, setPan, position, sendEvent, channel, isDragging],
   )
 
   return {

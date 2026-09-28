@@ -1,35 +1,26 @@
-import {
-  addTimeSignature,
-  getMeasureStartTick as getMeasureStartTickCmd,
-  hasTimeSignatureAt,
-} from "@signal-app/core"
+import { getMeasureStartTick as getMeasureStartTickCmd } from "@signal-app/core"
 import { useCallback } from "react"
-import {
-  useMutateConductorTrack,
-  useSongCommand,
-} from "../../../hooks/useCommand"
+import { useSongCommand } from "../../../hooks/useCommand"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
-import { useConductorTrackQuery } from "../../../hooks/useTrackQuery"
 
 export const useAddTimeSignature = () => {
   const { pushHistory } = useHistory()
   const getMeasureStartTick = useSongCommand(getMeasureStartTickCmd)
-  const mutate = useMutateConductorTrack()
-  const query = useConductorTrackQuery()
+  const { hasTimeSignatureAt, addTimeSignature } = useConductorTrack()
 
   return useCallback(
     (tick: number, numerator: number, denominator: number) => {
       const measureStartTick = getMeasureStartTick(tick)
 
       // prevent duplication
-      if (query(hasTimeSignatureAt(measureStartTick))) {
+      if (hasTimeSignatureAt(measureStartTick)) {
         return
       }
 
       pushHistory()
-
-      mutate(addTimeSignature(measureStartTick, numerator, denominator))
+      addTimeSignature(measureStartTick, numerator, denominator)
     },
-    [pushHistory, getMeasureStartTick, mutate, query],
+    [pushHistory, getMeasureStartTick, addTimeSignature, hasTimeSignatureAt],
   )
 }

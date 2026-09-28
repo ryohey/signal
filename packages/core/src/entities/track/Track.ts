@@ -24,7 +24,12 @@ import {
 } from "../event/signalEvents"
 import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
 import * as TrackEvents from "./mutations"
+import { setPan, setVolume } from "./mutations/controller"
+import { setProgramNumberAt, setProgramNumberById } from "./mutations/program"
+import { setColor, setName, setTempo } from "./mutations/setter"
+import { addTimeSignature } from "./mutations/timeSignature"
 import { TrackEventsMutator } from "./mutations/type"
+import { hasProgramChangeEventAfter, hasTimeSignatureAt } from "./queries"
 import { TrackEventsQuery } from "./queries/type"
 
 export type TrackId = Branded<number, "TrackId">
@@ -251,6 +256,10 @@ export class Track {
     return fn(this._events)
   }
 
+  /* queries */
+
+  hasProgramChangeEventAfter = flow(hasProgramChangeEventAfter, this.query)
+
   /* mutations */
 
   addEvent = flow(TrackEvents.addEvent, this.mutate)
@@ -262,8 +271,18 @@ export class Track {
   )
   removeEvents = flow(TrackEvents.removeEvents, this.mutate)
   createOrUpdate = flow(TrackEvents.createOrUpdate, this.mutate)
-  setColor = flow(TrackEvents.setColor, this.mutate)
-  setName = flow(TrackEvents.setName, this.mutate)
+  setColor = flow(setColor, this.mutate)
+  setName = flow(setName, this.mutate)
+  setProgramNumberAt = flow(setProgramNumberAt, this.mutate)
+  setProgramNumberById = flow(setProgramNumberById, this.mutate)
+  setPan = flow(setPan, this.mutate)
+  setVolume = flow(setVolume, this.mutate)
+
+  /* conductor track features */
+
+  hasTimeSignatureAt = flow(hasTimeSignatureAt, this.query)
+  addTimeSignature = flow(addTimeSignature, this.mutate)
+  setTempo = flow(setTempo, this.mutate)
 
   /* helper */
 

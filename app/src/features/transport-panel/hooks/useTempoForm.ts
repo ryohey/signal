@@ -2,12 +2,11 @@ import {
   getTempo,
   isSetTempoEvent,
   selectorToQuery,
-  setTempo,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
 import { DEFAULT_TEMPO } from "@signal-app/player"
 import { useCallback, useMemo } from "react"
-import { useMutateConductorTrack } from "../../../hooks/useCommand"
+import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useSong } from "../../../hooks/useSong"
 import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
@@ -15,7 +14,7 @@ import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
 export function useTempoForm() {
   const { conductorTrack } = useSong()
   const { position, setCurrentTempo } = usePlayer()
-  const mutate = useMutateConductorTrack()
+  const { setTempo } = useConductorTrack()
 
   return {
     get tempo() {
@@ -34,10 +33,10 @@ export function useTempoForm() {
     },
     changeTempo: useCallback(
       (bpm: number) => {
-        mutate(setTempo(bpm, position))
+        setTempo(bpm, position)
         setCurrentTempo(bpm)
       },
-      [mutate, position, setCurrentTempo],
+      [setTempo, position, setCurrentTempo],
     ),
   }
 }

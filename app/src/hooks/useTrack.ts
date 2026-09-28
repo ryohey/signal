@@ -3,6 +3,7 @@ import {
   isProgramChangeEvent,
   selectorToQuery,
   TrackColor,
+  TrackEvent,
   TrackId,
 } from "@signal-app/core"
 import { useCallback, useMemo, useSyncExternalStore } from "react"
@@ -67,6 +68,24 @@ export function useTrack(id: TrackId) {
       const isSolo = TrackMute.isSolo(id)(trackMute)
       return isSolo
     },
+    updateEvent: useCallback(
+      <T extends TrackEvent>(id: number, obj: Partial<T>) => {
+        track?.updateEvent(id, obj)
+      },
+      [track],
+    ),
+    removeEvent: useCallback(
+      (id: number) => {
+        track?.removeEvent(id)
+      },
+      [track],
+    ),
+    removeEvents: useCallback(
+      (ids: readonly number[]) => {
+        track?.removeEvents(ids)
+      },
+      [track],
+    ),
     setColor: useCallback(
       (color: TrackColor | null) => {
         track?.setColor(color)
@@ -84,6 +103,36 @@ export function useTrack(id: TrackId) {
         if (track) {
           track.channel = channel
         }
+      },
+      [track],
+    ),
+    setProgramNumberAt: useCallback(
+      (tick: number, programNumber: number) => {
+        return track?.setProgramNumberAt(tick, programNumber)
+      },
+      [track],
+    ),
+    setProgramNumberById: useCallback(
+      (eventId: number, programNumber: number) => {
+        return track?.setProgramNumberById(eventId, programNumber)
+      },
+      [track],
+    ),
+    hasProgramChangeEventAfter: useCallback(
+      (tick: number) => {
+        return track?.hasProgramChangeEventAfter(tick) ?? false
+      },
+      [track],
+    ),
+    setPan: useCallback(
+      (pan: number, tick: number) => {
+        track?.setPan(pan, tick)
+      },
+      [track],
+    ),
+    setVolume: useCallback(
+      (volume: number, tick: number) => {
+        track?.setVolume(volume, tick)
       },
       [track],
     ),

@@ -1,8 +1,7 @@
-import { programChangeMidiEvent, removeEvents } from "@signal-app/core"
+import { programChangeMidiEvent } from "@signal-app/core"
 import { difference, range } from "lodash"
 import { useCallback, useMemo } from "react"
 import { isNotUndefined } from "../../../helpers/array"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
 import { useSong } from "../../../hooks/useSong"
@@ -18,8 +17,8 @@ export function useInstrumentBrowser(
   targetEventId?: number,
 ) {
   const { selectedTrackId } = usePianoRoll()
-  const { isRhythmTrack, channel, setChannel } = useTrack(selectedTrackId)
-  const mutate = useMutateTrack(selectedTrackId)
+  const { isRhythmTrack, channel, setChannel, removeEvents } =
+    useTrack(selectedTrackId)
   const { isPlaying, sendEvent } = usePlayer()
   const setTrackInstrumentAction = useSetTrackInstrument(
     selectedTrackId,
@@ -68,9 +67,9 @@ export function useInstrumentBrowser(
 
   const onClickDelete = useCallback(() => {
     if (targetEventId !== undefined) {
-      mutate(removeEvents([targetEventId]))
+      removeEvents([targetEventId])
     }
-  }, [targetEventId, mutate])
+  }, [targetEventId, removeEvents])
 
   const selectedCategoryIndex = isRhythmTrack
     ? 0

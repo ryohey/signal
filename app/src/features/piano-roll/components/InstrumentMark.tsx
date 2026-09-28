@@ -1,12 +1,12 @@
 import styled from "@emotion/styled"
-import { removeEvents, type TrackEventOf, updateEvent } from "@signal-app/core"
+import { type TrackEventOf } from "@signal-app/core"
 import type { ProgramChangeEvent } from "midifile-ts"
 import { type FC, useCallback, useMemo, useState } from "react"
 import type { TickTransform } from "../../../entities/transform/TickTransform"
 import { observeDrag2 } from "../../../helpers/observeDrag"
-import { useMutateTrack } from "../../../hooks/useCommand"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
+import { useTrack } from "../../../hooks/useTrack"
 import { InstrumentBrowser } from "../../instrument-browser"
 import {
   InstrumentEmoji,
@@ -47,7 +47,7 @@ export const InstrumentMark: FC<{
   }, [transform, event.tick])
   const [isOpenInstrumentBrowser, setIsOpenInstrumentBrowser] = useState(false)
   const { selectedTrackId } = usePianoRoll()
-  const mutate = useMutateTrack(selectedTrackId)
+  const { removeEvents, updateEvent } = useTrack(selectedTrackId)
   const { pushHistory } = useHistory()
   const { quantizeRound } = useQuantizer()
 
@@ -58,9 +58,9 @@ export const InstrumentMark: FC<{
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      mutate(removeEvents([event.id]))
+      removeEvents([event.id])
     },
-    [event.id, mutate],
+    [event.id, removeEvents],
   )
 
   const handleMouseDown = useCallback(
@@ -81,11 +81,11 @@ export const InstrumentMark: FC<{
           }
           const deltaTick = transform.getTick(delta.x)
           const newTick = Math.max(0, quantizeRound(startTick + deltaTick))
-          mutate(updateEvent(event.id, { tick: newTick }))
+          updateEvent(event.id, { tick: newTick })
         },
       })
     },
-    [event.id, event.tick, transform, mutate, pushHistory, quantizeRound],
+    [event.id, event.tick, transform, updateEvent, pushHistory, quantizeRound],
   )
 
   return (
