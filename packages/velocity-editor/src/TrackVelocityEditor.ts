@@ -38,14 +38,12 @@ export class TrackVelocityEditor {
     endTick: number,
     endValue: number,
   ): void => {
-    this.track.mutate(
-      updateVelocitiesInRange(
-        noteIds,
-        startTick,
-        startValue,
-        endTick,
-        endValue,
-      ),
-    )
+    updateVelocitiesInRange(
+      noteIds,
+      startTick,
+      startValue,
+      endTick,
+      endValue,
+    )(this.track)
   }
 }
