@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@signal-app/core": "*",
-    "@signal-app/observable": "*",
-    "lodash": "^4.17.23"
+    "@signal-app/observable": "*"
   }
 }
