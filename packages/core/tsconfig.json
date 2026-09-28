@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node", "webmidi"],
     "jsx": "react-jsx"
   },
   "include": ["src/**/*"]

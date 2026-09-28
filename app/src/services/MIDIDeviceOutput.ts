@@ -1,10 +1,10 @@
 import { SendableEvent, SynthOutput } from "@signal-app/player"
 import { serialize } from "midifile-ts"
 
-export default class MIDIOutput implements SynthOutput {
-  readonly midiOutput: WebMidi.MIDIOutput
+export default class MIDIDeviceOutput implements SynthOutput {
+  readonly midiOutput: MIDIOutput
 
-  constructor(midiOutput: WebMidi.MIDIOutput) {
+  constructor(midiOutput: MIDIOutput) {
     this.midiOutput = midiOutput
   }
 

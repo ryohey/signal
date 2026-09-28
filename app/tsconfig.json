@@ -4,7 +4,6 @@
       "react",
       "react-dom",
       "node",
-      "webmidi",
       "wicg-file-system-access",
       "web-bluetooth",
       "vite-plugin-svgr/client"

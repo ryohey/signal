@@ -106,7 +106,7 @@ Note: The static website project has been moved to a separate repository and is 
 
 - Web Audio API context management in `RootStore`
 - SoundFont-based synthesis via `SoundFontSynth`
-- Real-time MIDI input/output through `MIDIInput`/`MIDIOutput`
+- Real-time MIDI input/output through `MIDIInput`/`MIDIDeviceOutput`
 - Audio rendering for export via `renderAudio`
 
 ### Technology Stack

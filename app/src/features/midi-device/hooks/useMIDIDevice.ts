@@ -3,7 +3,7 @@ import { useAtomCallback } from "jotai/utils"
 import { useCallback, useEffect, useSyncExternalStore } from "react"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useStores } from "../../../hooks/useStores"
-import MIDIOutput from "../../../services/MIDIOutput"
+import MIDIDeviceOutput from "../../../services/MIDIDeviceOutput"
 
 export interface Device {
   id: string
@@ -77,9 +77,9 @@ export function useMIDIDevice() {
             throw new Error("Web MIDI API is not supported by your browser")
           }
 
-          const midiAccess = (await navigator.requestMIDIAccess({
+          const midiAccess = await navigator.requestMIDIAccess({
             sysex: true,
-          })) as WebMidi.MIDIAccess
+          })
 
           midiAccess.onstatechange = () => {
             set(inputsAtom, Array.from(midiAccess.inputs.values()))
@@ -133,7 +133,7 @@ export function useMIDIDevice() {
   }
 }
 
-const formatName = (device: WebMidi.MIDIPort) =>
+const formatName = (device: MIDIPort) =>
   (device?.name ?? "") +
   ((device.manufacturer?.length ?? 0) > 0 ? `(${device.manufacturer})` : "")
 
@@ -156,8 +156,8 @@ export const useCanRecord = () => {
 // atoms
 const isLoadingAtom = atom(false)
 const requestErrorAtom = atom<Error | null>(null)
-const inputsAtom = atom<readonly WebMidi.MIDIInput[]>([])
-const outputsAtom = atom<readonly WebMidi.MIDIOutput[]>([])
+const inputsAtom = atom<readonly MIDIInput[]>([])
+const outputsAtom = atom<readonly MIDIOutput[]>([])
 
 // sync synthGroup.output to enabledOutputIds/isFactorySoundEnabled
 function useSyncOutputDevices() {
@@ -177,7 +177,7 @@ function useSyncOutputDevices() {
     allSoundsOff()
 
     const midiDeviceEntries = outputs.map((device) => ({
-      synth: new MIDIOutput(device),
+      synth: new MIDIDeviceOutput(device),
       isEnabled: enabledOutputs[device.id],
     }))
 

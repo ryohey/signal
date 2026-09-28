@@ -14,7 +14,7 @@ export class MIDIInput {
 
   constructor(private readonly midiDeviceStore: MIDIDeviceStore) {}
 
-  connect(midiAccess: WebMidi.MIDIAccess) {
+  connect(midiAccess: MIDIAccess) {
     for (const input of midiAccess.inputs.values()) {
       input.onmidimessage = (event) => {
         if (this.midiDeviceStore.enabledInputs[input.id]) {
