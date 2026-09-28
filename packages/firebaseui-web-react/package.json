@@ -11,6 +11,7 @@
   },
   "scripts": {
     "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
     "lint:fix": "biome check . --write",
     "format": "biome format . --write"
   },

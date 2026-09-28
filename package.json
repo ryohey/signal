@@ -13,6 +13,7 @@
     "format": "turbo format",
     "format:check": "turbo format:check",
     "check": "turbo check",
+    "typecheck": "turbo typecheck",
     "firebase": "npm --prefix functions run build && firebase emulators:start",
     "firebase:deploy": "firebase deploy",
     "dev:electron": "concurrently \"npm run dev -w app\" \"npm run dev --prefix electron\"",

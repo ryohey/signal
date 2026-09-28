@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint` - Run lint tasks via Turbo
 - `npm run format` - Run format tasks via Turbo
 - `npm run check` - Run check tasks via Turbo
+- `npm run typecheck` - Run TypeScript type-check across all packages and app via Turbo
 
 ### App-specific Commands
 
