@@ -72,6 +72,7 @@ Representative core modules:
 - `@signal-app/api` - Firebase/Cloud integration for song storage
 - `@signal-app/community` - Community features and song sharing
 - `@signal-app/control-editor` - Editor facade for pitchBend/controller automation lanes
+- `@signal-app/velocity-editor` - Editor facade for the note velocity lane
 - `@signal-app/tempo-editor` - Editor facade for tempo automation
 - `dialog-hooks` - React hooks for modal dialogs
 - `@signal-app/firebaseui-web-react` - Firebase authentication UI wrapper

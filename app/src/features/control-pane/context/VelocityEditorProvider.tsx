@@ -1,4 +1,4 @@
-import { createVelocityEditor } from "@signal-app/control-editor"
+import { createVelocityEditor } from "@signal-app/velocity-editor"
 import { FC, ReactNode, useMemo } from "react"
 import { useSong } from "../../../hooks/useSong"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"

@@ -8,14 +8,13 @@ import { Unsubscribe } from "@signal-app/observable"
 import { VelocityItem } from "./entities/VelocityItem"
 import { updateVelocitiesInRange } from "./trackMutations/note"
 
-// Velocity is control-pane's own lane (alongside pitchBend/controller
-// lanes), but it edits NoteEvent.velocity, not a ValueEventType-shaped
-// value event - it doesn't fit TrackControlEditor's per-ValueEventType
-// scoping, so it's a separate, smaller facade instead of a third
-// ValueEventType variant. Like TrackControlEditor, it does the simplest
-// correct thing (read the track's full event list per query) rather than
-// point-free primitives/composed mutators, since there's no batch business
-// logic to compose here beyond single delegations to core Track mutators.
+// Velocity is one of control-pane's lanes (alongside the pitchBend/controller
+// lanes served by @signal-app/control-editor), but it edits NoteEvent.velocity
+// rather than a ValueEventType-shaped value event, so it has its own facade.
+// It does the simplest correct thing (read the track's full event list per
+// query) rather than point-free primitives/composed mutators, since there's no
+// batch business logic to compose here beyond single delegations to core Track
+// mutators.
 export class TrackVelocityEditor {
   constructor(private readonly track: Track) {}
 

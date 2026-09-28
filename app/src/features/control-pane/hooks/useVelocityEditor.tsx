@@ -1,4 +1,4 @@
-import { VelocityEditor } from "@signal-app/control-editor"
+import { VelocityEditor } from "@signal-app/velocity-editor"
 import { createContext, useContext } from "react"
 
 export const VelocityEditorContext = createContext<VelocityEditor | undefined>(

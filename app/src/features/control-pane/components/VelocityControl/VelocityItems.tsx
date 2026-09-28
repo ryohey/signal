@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback, GLNode, HitArea, useTransform } from "@ryohey/webgl-react"
-import { VelocityItem } from "@signal-app/control-editor"
+import { VelocityItem } from "@signal-app/velocity-editor"
 import { Rect } from "@signal-app/geometry"
 import Color from "color"
 import { FC, useCallback, useMemo } from "react"

@@ -19,6 +19,7 @@ Active package modules in `packages` are:
 - `@signal-app/arrange-editor`
 - `@signal-app/community`
 - `@signal-app/control-editor`
+- `@signal-app/velocity-editor`
 - `@signal-app/core`
 - `dialog-hooks`
 - `@signal-app/event-list-editor`
@@ -66,6 +67,7 @@ This section intentionally stays lightweight. See each package README for detail
 - [packages/arrange-editor/README.md](packages/arrange-editor/README.md)
 - [packages/community/README.md](packages/community/README.md)
 - [packages/control-editor/README.md](packages/control-editor/README.md)
+- [packages/velocity-editor/README.md](packages/velocity-editor/README.md)
 - [packages/core/README.md](packages/core/README.md)
 - [packages/dialog-hooks/README.md](packages/dialog-hooks/README.md)
 - [packages/event-list-editor/README.md](packages/event-list-editor/README.md)
@@ -95,7 +97,7 @@ This section intentionally stays lightweight. See each feature README for detail
 
 ## 6. Cross-Cutting Architectural Patterns
 
-- Mutation/query based domain commands (core), with per-domain Editor facade packages (`@signal-app/tempo-editor`'s `createTempoEditor`, `@signal-app/control-editor`'s `createControlEditor`, `@signal-app/pianoroll-editor`'s `createPianoRollEditor`, `@signal-app/arrange-editor`'s `createArrangeEditor`, `@signal-app/event-list-editor`'s `createEventListEditor`) providing bound query/mutate methods (or, for `event-list-editor`, a plain class - see §6.3) plus an observe subscription, without exposing `Song`/`Track` internals or the concrete editor class.
+- Mutation/query based domain commands (core), with per-domain Editor facade packages (`@signal-app/tempo-editor`'s `createTempoEditor`, `@signal-app/control-editor`'s `createControlEditor`, `@signal-app/velocity-editor`'s `createVelocityEditor`, `@signal-app/pianoroll-editor`'s `createPianoRollEditor`, `@signal-app/arrange-editor`'s `createArrangeEditor`, `@signal-app/event-list-editor`'s `createEventListEditor`) providing bound query/mutate methods (or, for `event-list-editor`, a plain class - see §6.3) plus an observe subscription, without exposing `Song`/`Track` internals or the concrete editor class.
 - Feature-scoped state providers for timeline/editor concerns (app).
 - Promise-based interaction UX via `dialog-hooks`.
 - Repository abstraction for cloud/data boundaries.
@@ -172,12 +174,12 @@ Related implementation techniques used across core:
 
 ### 6.3 Editor Facade Packages as an Optimization Boundary
 
-Per-domain Editor facade packages (`@signal-app/tempo-editor`, `@signal-app/control-editor`, `@signal-app/pianoroll-editor`, `@signal-app/arrange-editor`, `@signal-app/event-list-editor`, and future ones following the same shape) exist for more than giving React a DTO instead of a raw `TrackEvent`/`midifile-ts` shape. The plain-method object returned by each `createXEditor` (for example `createTempoEditor(conductorTrack): TempoEditor`) is the *only* sanctioned access path between `app` and a domain's underlying storage.
+Per-domain Editor facade packages (`@signal-app/tempo-editor`, `@signal-app/control-editor`, `@signal-app/velocity-editor`, `@signal-app/pianoroll-editor`, `@signal-app/arrange-editor`, `@signal-app/event-list-editor`, and future ones following the same shape) exist for more than giving React a DTO instead of a raw `TrackEvent`/`midifile-ts` shape. The plain-method object returned by each `createXEditor` (for example `createTempoEditor(conductorTrack): TempoEditor`) is the *only* sanctioned access path between `app` and a domain's underlying storage.
 
 Primary structure:
 
 - `query`/`mutate` are an internal wiring detail, not part of the app-facing surface, for the four editors whose domain has complex enough business logic to warrant the point-free primitives/composed split (§6.2): each package's `XEditorQuery`/`XEditorMutator` functions (`getItemsInRangeWithPrevious`, `addItem`, ...) - typed to take the package's concrete `TrackXEditor` class, not an opaque branded context (§6.2) - are bound once, inside `createXEditor`, into flat top-level methods (`editor.getItemsInRangeWithPrevious(range)`, `editor.addItem(item)`). `app` calls those bound methods and never sees a `query`/`mutate` function or a `TrackXEditor` instance directly. `@signal-app/event-list-editor` is the exception: its domain is a generic, heterogeneous-by-design event inspector with no per-note-shaped batch logic to compose, so `TrackEventListEditor` is a plain class - each method is a single delegation to an existing core `Track` mutator/query - and `createEventListEditor` just constructs it, with no query/mutate binding step. See that package's README for the rationale.
-- App code reaches a domain's data exclusively through those bound methods plus an observe subscription (`observeItems` for `tempo-editor`/`control-editor`/`arrange-editor`; per-concern observables — `onNotesChanged`, `onWindowedEventsChanged`, `onIsRhythmTrackChanged` — for `pianoroll-editor`, which also owns its own windowing via `updateTickRange`; `onItemsChanged`/`updateSelectedIds` for `event-list-editor`, which owns its own selection-based filtering the same way). App code never reads a `Track`'s raw event array or filters by event subtype itself.
+- App code reaches a domain's data exclusively through those bound methods plus an observe subscription (`observeItems` for `tempo-editor`/`control-editor`/`velocity-editor`/`arrange-editor`; per-concern observables — `onNotesChanged`, `onWindowedEventsChanged`, `onIsRhythmTrackChanged` — for `pianoroll-editor`, which also owns its own windowing via `updateTickRange`; `onItemsChanged`/`updateSelectedIds` for `event-list-editor`, which owns its own selection-based filtering the same way). App code never reads a `Track`'s raw event array or filters by event subtype itself.
 - What a bound query/mutate method (or, for `event-list-editor`, a plain method) does internally to satisfy a request — which data structure it reads, which algorithm it uses to search or filter — is free to change without changing the method's signature or its call sites.
 
 What this means in practice:

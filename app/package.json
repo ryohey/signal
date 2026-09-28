@@ -57,6 +57,7 @@
     "@signal-app/player": "*",
     "@signal-app/tempo-editor": "*",
     "@signal-app/ui": "*",
+    "@signal-app/velocity-editor": "*",
     "color": "^5.0.3",
     "dialog-hooks": "*",
     "firebase": "^12.9.0",
