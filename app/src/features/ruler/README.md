@@ -6,7 +6,7 @@ The timeline ruler shown above the piano roll, arrange view, and tempo graph.
 
 ## Entry Point
 
-`PianoRuler` is the ruler component. It draws beats, time signatures, and the loop range on `CanvasPianoRuler`. Clicking seeks the playback position. Its context menu adds time signatures, and double-clicking a time signature opens `TimeSignatureDialog` to edit it.
+`Ruler` is the ruler component. It provides the ruler editor and draws beats, time signatures, and the loop range on `CanvasPianoRuler`. Clicking seeks the playback position. Its context menu adds time signatures, and double-clicking a time signature opens `TimeSignatureDialog` to edit it.
 
 ## Responsibilities
 
@@ -17,4 +17,5 @@ The timeline ruler shown above the piano roll, arrange view, and tempo graph.
 ## Design Notes
 
 - The ruler follows the scroll and zoom of the timeline feature that hosts it, so every timeline shares one ruler implementation.
+- Time signature edits use the ruler editor package. The feature holds only UI state, such as the selected time signature.
 - Time signature changes are song edits and are part of undo and redo.

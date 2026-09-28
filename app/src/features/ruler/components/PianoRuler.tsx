@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState } from "react"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { usePlayer } from "../../../hooks/usePlayer"
+import { RulerEditorProvider } from "../context/RulerEditorProvider"
 import { useRuler } from "../hooks/useRuler"
 import { useRulerBeats } from "../hooks/useRulerBeats"
 import {
@@ -24,7 +25,7 @@ interface TimeSignatureDialogState {
   denominator: number
 }
 
-export const Ruler: FC<PianoRulerProps> = ({
+const RulerContent: FC<PianoRulerProps> = ({
   onMouseDown,
   style,
   className,
@@ -122,3 +123,9 @@ export const Ruler: FC<PianoRulerProps> = ({
     </>
   )
 }
+
+export const Ruler: FC<PianoRulerProps> = (props) => (
+  <RulerEditorProvider>
+    <RulerContent {...props} />
+  </RulerEditorProvider>
+)

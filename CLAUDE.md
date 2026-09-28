@@ -78,6 +78,7 @@ Representative core modules:
 - `@signal-app/control-editor` - Editor facade for pitchBend/controller automation lanes
 - `@signal-app/velocity-editor` - Editor facade for the note velocity lane
 - `@signal-app/tempo-editor` - Editor facade for tempo automation
+- `@signal-app/ruler-editor` - Editor facade for the timeline ruler's time signatures
 - `@signal-app/event-list-editor` - Editor facade for the event list panel
 - `@signal-app/observable` - Framework-independent observable primitives
 - `@signal-app/geometry` - Point/size/rect geometry primitives

@@ -1,16 +1,16 @@
 import { useCallback } from "react"
-import { useConductorTrack } from "../../../hooks/useConductorTrack"
 import { useHistory } from "../../../hooks/useHistory"
+import { useRulerEditor } from "./useRulerEditor"
 
 export const useUpdateTimeSignature = () => {
-  const { updateEvent } = useConductorTrack()
+  const { updateTimeSignature } = useRulerEditor()
   const { pushHistory } = useHistory()
 
   return useCallback(
     (id: number, numerator: number, denominator: number) => {
       pushHistory()
-      updateEvent(id, { numerator, denominator })
+      updateTimeSignature(id, numerator, denominator)
     },
-    [pushHistory, updateEvent],
+    [pushHistory, updateTimeSignature],
   )
 }

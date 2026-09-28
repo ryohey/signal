@@ -299,8 +299,6 @@ export class Track implements TrackEventStore {
 
   /* conductor track features */
 
-  hasTimeSignatureAt = flow(Queries.hasTimeSignatureAt, this.query)
-  addTimeSignature = flow(Mutations.addTimeSignature, this.mutate)
   getTempo = (tick: number) => getTempo(tick)(this.events)
   setTempo = flow(Mutations.setTempo, this.mutate)
 

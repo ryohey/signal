@@ -55,6 +55,7 @@
     "@signal-app/observable": "*",
     "@signal-app/pianoroll-editor": "*",
     "@signal-app/player": "*",
+    "@signal-app/ruler-editor": "*",
     "@signal-app/tempo-editor": "*",
     "@signal-app/ui": "*",
     "@signal-app/velocity-editor": "*",

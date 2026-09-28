@@ -1,7 +1,8 @@
 import { isEventInRange } from "@signal-app/core"
-import { useCallback, useMemo, useSyncExternalStore } from "react"
-import { useSong } from "../../../hooks/useSong"
+import { useMemo } from "react"
+import { useDerivedValue } from "../../../hooks/useDerivedValue"
 import { useTickScroll } from "../../../hooks/useTickScroll"
+import { useRulerEditor } from "./useRulerEditor"
 
 export interface RulerTimeSignature {
   id: number
@@ -11,17 +12,9 @@ export interface RulerTimeSignature {
   isSelected: boolean
 }
 
-const noop = () => () => {}
-
-function useTimeSignatureEvents() {
-  const { conductorTrack } = useSong()
-  return useSyncExternalStore(
-    conductorTrack?.onTimeSignatureEventsChanged.subscribe ?? noop,
-    useCallback(
-      () => conductorTrack?.timeSignatureEvents ?? [],
-      [conductorTrack],
-    ),
-  )
+function useTimeSignatureItems() {
+  const { getTimeSignatures, observeTimeSignatures } = useRulerEditor()
+  return useDerivedValue(observeTimeSignatures, getTimeSignatures)
 }
 
 export function useTimeSignatures({
@@ -29,7 +22,7 @@ export function useTimeSignatures({
 }: {
   selectedTimeSignatureEventIds: Set<number>
 }) {
-  const timeSignatures = useTimeSignatureEvents()
+  const timeSignatures = useTimeSignatureItems()
   const { transform, tickRange } = useTickScroll()
 
   return useMemo(() => {
