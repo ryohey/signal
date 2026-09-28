@@ -1,9 +1,9 @@
 import { GLNode, useTransform } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
-import { vec4 } from "gl-matrix"
-import { FC } from "react"
+import type { Rect } from "@signal-app/geometry"
+import type { vec4 } from "gl-matrix"
+import type { FC } from "react"
 import { DrumNoteShader } from "./shaders/DrumNoteShader"
-import { INoteData } from "./shaders/NoteShader"
+import type { INoteData } from "./shaders/NoteShader"
 
 export interface NoteCirclesProps {
   rects: (Rect & INoteData)[]

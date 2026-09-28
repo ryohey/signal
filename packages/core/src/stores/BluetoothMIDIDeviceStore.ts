@@ -1,6 +1,6 @@
-import { Observable, ObservableValue } from "@signal-app/observable"
-import { BLEMIDIDevice, MIDIMessageEvent } from "web-ble-midi"
-import { MIDIInput } from "../services/MIDIInput"
+import { type Observable, ObservableValue } from "@signal-app/observable"
+import { BLEMIDIDevice, type MIDIMessageEvent } from "web-ble-midi"
+import type { MIDIInput } from "../services/MIDIInput"
 
 const STORAGE_KEY = "BluetoothMIDIDeviceStore"
 

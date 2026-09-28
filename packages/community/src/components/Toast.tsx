@@ -1,13 +1,13 @@
 import { keyframes, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import * as Portal from "@radix-ui/react-portal"
-import { ToastSeverity } from "dialog-hooks"
+import type { ToastSeverity } from "dialog-hooks"
 import ErrorIcon from "mdi-react/AlertCircleIcon.js"
 import Warning from "mdi-react/AlertIcon.js"
 import CheckCircle from "mdi-react/CheckCircleIcon.js"
 import Info from "mdi-react/InformationIcon.js"
-import { FC, useEffect, useState } from "react"
-import { Theme } from "../theme/Theme.js"
+import { type FC, useEffect, useState } from "react"
+import type { Theme } from "../theme/Theme.js"
 
 export interface ToastProps {
   message: string

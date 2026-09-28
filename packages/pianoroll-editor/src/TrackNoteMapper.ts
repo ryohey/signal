@@ -1,11 +1,11 @@
 import {
   isNoteEvent,
-  TrackEventStore,
-  NoteEvent as TrackNoteEvent,
+  type TrackEventStore,
+  type NoteEvent as TrackNoteEvent,
 } from "@signal-app/core"
-import { NoteEvent } from "./entities"
-import { PianoRollMutationContext } from "./mutations"
-import { PianoRollQueryContext } from "./queries"
+import type { NoteEvent } from "./entities"
+import type { PianoRollMutationContext } from "./mutations"
+import type { PianoRollQueryContext } from "./queries"
 
 export class TrackNoteMapper
   implements PianoRollQueryContext, PianoRollMutationContext

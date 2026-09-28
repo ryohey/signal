@@ -1,7 +1,7 @@
 import {
   isVolumeEvent,
-  Track,
-  TrackId,
+  type Track,
+  type TrackId,
   volumeMidiEvent,
 } from "@signal-app/core"
 import { useCallback, useState } from "react"

@@ -1,14 +1,14 @@
 import {
-  MIDIDeviceStore,
-  MIDIInput,
-  NoteEvent,
-  SongStore,
-  Track,
-  TrackEvent,
-  TrackId,
+  type MIDIDeviceStore,
+  type MIDIInput,
+  type NoteEvent,
+  type SongStore,
+  type Track,
+  type TrackEvent,
+  type TrackId,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
-import { Player } from "@signal-app/player"
+import type { Player } from "@signal-app/player"
 
 export class MIDIRecorder {
   trackId: TrackId = UNASSIGNED_TRACK_ID

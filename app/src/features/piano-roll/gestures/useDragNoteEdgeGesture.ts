@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
 import { useTrack } from "../../../hooks/useTrack"
 import { useSelectNote } from "../hooks/selection"

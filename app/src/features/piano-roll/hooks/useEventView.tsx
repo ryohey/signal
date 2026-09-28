@@ -2,7 +2,7 @@ import {
   isEventOverlapRange,
   isNoteEvent,
   isProgramChangeEvent,
-  TrackEvent,
+  type TrackEvent,
 } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect } from "react"

@@ -1,5 +1,5 @@
-import { TrackId } from "@signal-app/core"
-import { SendableEvent, SynthOutput } from "@signal-app/player"
+import type { TrackId } from "@signal-app/core"
+import type { SendableEvent, SynthOutput } from "@signal-app/player"
 import { METRONOME_TRACK_ID } from "../player/EventSource"
 import { TrackMute } from "../trackMute/TrackMute"
 

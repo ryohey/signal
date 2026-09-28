@@ -1,4 +1,9 @@
-import { emptySong, Song, TrackId, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import {
+  emptySong,
+  type Song,
+  type TrackId,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { useCallback } from "react"
 import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
 import {

@@ -1,8 +1,8 @@
-import { Track } from "@signal-app/core"
-import { ControlItem } from "./entities/ControlItem"
-import { ValueEventType } from "./entities/ValueEventType"
+import type { Track } from "@signal-app/core"
+import type { ControlItem } from "./entities/ControlItem"
+import type { ValueEventType } from "./entities/ValueEventType"
 import {
-  ControlEditorMutator,
+  type ControlEditorMutator,
   createOrUpdateItemValue,
   duplicateItems,
   moveItems,
@@ -13,7 +13,7 @@ import {
   updateItemsInRangeWithEasing,
 } from "./mutations"
 import {
-  ControlEditorQuery,
+  type ControlEditorQuery,
   getItemsByIds,
   getItemsClipboardData,
   getItemsInRangeWithPrevious,

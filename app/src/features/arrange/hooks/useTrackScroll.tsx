@@ -1,5 +1,5 @@
-import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import { atom, type SetStateAction, useAtomValue, useSetAtom } from "jotai"
+import type { Store } from "jotai/vanilla/store"
 import { createScope } from "jotai-scope"
 import { clamp } from "lodash"
 import { createContext, useContext, useEffect } from "react"

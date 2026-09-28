@@ -1,11 +1,11 @@
 import {
   isEventOverlapRange,
   isNoteEvent,
-  Range,
-  Track,
+  type Range,
+  type Track,
 } from "@signal-app/core"
-import { Unsubscribe } from "@signal-app/observable"
-import { VelocityItem } from "./entities/VelocityItem"
+import type { Unsubscribe } from "@signal-app/observable"
+import type { VelocityItem } from "./entities/VelocityItem"
 import { updateVelocitiesInRange } from "./trackMutations/note"
 
 // Velocity is one of control-pane's lanes (alongside the pitchBend/controller

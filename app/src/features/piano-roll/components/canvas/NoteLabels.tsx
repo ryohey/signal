@@ -1,11 +1,11 @@
 import { useTheme } from "@emotion/react"
 import { GLNode, useRenderer, useTransform } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 import Color from "color"
-import { FC, useEffect, useMemo, useState } from "react"
+import { type FC, useEffect, useMemo, useState } from "react"
 import fontAtlas from "../../../../assets/font-atlas.png"
 import { colorToVec4 } from "../../../../gl/color"
-import { INoteLabelData, NoteLabelShader } from "./shaders/NoteLabelShader"
+import { type INoteLabelData, NoteLabelShader } from "./shaders/NoteLabelShader"
 
 export interface NoteLabelProps {
   rects: (Rect & INoteLabelData)[]

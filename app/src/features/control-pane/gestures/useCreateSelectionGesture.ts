@@ -1,12 +1,12 @@
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import { ControlCoordTransform } from "../entities/ControlCoordTransform"
-import { ControlSelection } from "../entities/ControlSelection"
+import type { ControlCoordTransform } from "../entities/ControlCoordTransform"
+import type { ControlSelection } from "../entities/ControlSelection"
 import { useControlPane } from "../hooks/useControlPane"
 
 export const useCreateSelectionGesture = (): MouseDownHandler<

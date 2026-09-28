@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react"
 import { usePianoRoll } from "../hooks/usePianoRoll"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useChangeToolGesture } from "./useChangeToolGesture"
 import { useDragScrollGesture } from "./useDragScrollGesture"
 import { usePencilGesture } from "./usePencilGesture"

@@ -1,6 +1,6 @@
-import { Song, TrackId } from "@signal-app/core"
+import type { Song, TrackId } from "@signal-app/core"
 import { dragNote, getDraggableArea, getDraggablePosition } from "./draggable"
-import { NoteEvent } from "./entities"
+import type { NoteEvent } from "./entities"
 import { getTrackOrThrow } from "./getTrackOrThrow"
 import {
   addClipboardNotes,

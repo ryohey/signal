@@ -1,5 +1,5 @@
-import { Observable } from "./observable"
-import { Unsubscribe } from "./types"
+import type { Observable } from "./observable"
+import type { Unsubscribe } from "./types"
 
 type Subscribe<T = void> = Observable<T>["subscribe"]
 

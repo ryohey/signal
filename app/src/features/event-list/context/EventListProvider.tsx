@@ -1,6 +1,6 @@
 import { UNASSIGNED_TRACK_ID } from "@signal-app/core"
 import { createEventListEditor } from "@signal-app/event-list-editor"
-import { FC, ReactNode, useEffect, useMemo } from "react"
+import { type FC, type ReactNode, useEffect, useMemo } from "react"
 import { useSong } from "../../../hooks/useSong"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { EventListEditorProvider } from "../hooks/useEventListEditor"

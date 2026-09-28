@@ -1,4 +1,4 @@
-import { Observable, ObservableValue } from "@signal-app/observable"
+import { type Observable, ObservableValue } from "@signal-app/observable"
 
 const STORAGE_KEY = "MIDIDeviceStore"
 type MIDIInputRouting = "selectedTrack" | "channelRouting"

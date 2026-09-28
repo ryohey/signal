@@ -1,8 +1,8 @@
 import * as fs from "fs"
-import { AnyEvent } from "midifile-ts"
+import type { AnyEvent } from "midifile-ts"
 import * as path from "path"
 import { describe, expect, it } from "vitest"
-import { emptySong, NoteEvent, Track } from "../entities"
+import { emptySong, type NoteEvent, type Track } from "../entities"
 import {
   noteOffMidiEvent,
   noteOnMidiEvent,

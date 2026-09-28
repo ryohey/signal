@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import { Positioned } from "@signal-app/ui"
 import range from "lodash/range"
-import { FC } from "react"
-import { TempoCoordTransform } from "../entities/TempoCoordTransform"
+import type { FC } from "react"
+import type { TempoCoordTransform } from "../entities/TempoCoordTransform"
 
 const Container = styled(Positioned)`
   height: 100%;

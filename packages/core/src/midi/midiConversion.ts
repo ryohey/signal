@@ -1,14 +1,14 @@
 import { partition } from "lodash"
 import groupBy from "lodash/groupBy"
 import {
-  AnyEvent,
-  EndOfTrackEvent,
-  MidiFile,
+  type AnyEvent,
+  type EndOfTrackEvent,
+  type MidiFile,
   read,
-  StreamSource,
+  type StreamSource,
   write as writeMidiFile,
 } from "midifile-ts"
-import { AnyEventFeature, Song, Track } from "../entities"
+import { type AnyEventFeature, Song, Track } from "../entities"
 import { isNotNull } from "../helpers/array"
 import { addDeltaTime, toRawEvents } from "./toRawEvents"
 import {

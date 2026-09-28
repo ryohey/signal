@@ -1,11 +1,11 @@
-import { closedRange, interpolate, Range } from "@signal-app/core"
+import { closedRange, interpolate, type Range } from "@signal-app/core"
 import { max, min } from "lodash"
-import { ControlItem } from "../entities/ControlItem"
-import { ClipboardData } from "../entities/clipboardTypes"
+import type { ControlItem } from "../entities/ControlItem"
+import type { ClipboardData } from "../entities/clipboardTypes"
 import { moveControlItem } from "../entities/transform"
 import { ValueEventType } from "../entities/ValueEventType"
 import { getItemsByIds } from "../queries/items"
-import { ControlEditorMutator } from "./type"
+import type { ControlEditorMutator } from "./type"
 
 export const removeItems =
   (ids: readonly number[]): ControlEditorMutator<void> =>

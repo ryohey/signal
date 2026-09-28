@@ -1,10 +1,13 @@
-import { Song, Track, TrackEvent } from "@signal-app/core"
+import type { Song, Track, TrackEvent } from "@signal-app/core"
 import {
   combineSubscription,
   switchSubscription,
-  Unsubscribe,
+  type Unsubscribe,
 } from "@signal-app/observable"
-import { ArrangeNote, getArrangeNotesInTrack } from "./entities/ArrangeNote"
+import {
+  type ArrangeNote,
+  getArrangeNotesInTrack,
+} from "./entities/ArrangeNote"
 
 const runTracksTransaction = <R>(tracks: readonly Track[], fn: () => R): R => {
   const runFrom = (index: number): R =>

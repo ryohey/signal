@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 import { BottomPlayer } from "../components/BottomPlayer.js"
 import { Navigation } from "../components/Navigation.js"
 

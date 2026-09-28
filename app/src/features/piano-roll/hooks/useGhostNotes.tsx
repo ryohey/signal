@@ -1,11 +1,11 @@
 import {
   isEventOverlapRange,
   isNoteEvent,
-  Range,
-  TrackEventStore,
-  TrackId,
+  type Range,
+  type TrackEventStore,
+  type TrackId,
 } from "@signal-app/core"
-import { NoteEvent } from "@signal-app/pianoroll-editor"
+import type { NoteEvent } from "@signal-app/pianoroll-editor"
 import { useCallback, useMemo } from "react"
 import { useSyncTrackQuery } from "../../../hooks/useSyncTrackQuery"
 import { useTickScroll } from "../../../hooks/useTickScroll"

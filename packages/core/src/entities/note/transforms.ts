@@ -1,5 +1,5 @@
 import { clamp } from "lodash"
-import { NoteEvent } from "../event"
+import type { NoteEvent } from "../event"
 import { NoteNumber } from "../unit"
 
 export type NoteTransform = (note: NoteEvent) => NoteEvent

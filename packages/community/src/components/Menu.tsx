@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { Content, Portal, Root, Trigger } from "@radix-ui/react-dropdown-menu"
-import React, { FC, PropsWithChildren } from "react"
+import type React from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export type MenuProps = PropsWithChildren<{
   open?: boolean

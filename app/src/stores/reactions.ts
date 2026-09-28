@@ -1,5 +1,5 @@
-import { Unsubscribe } from "../types"
-import RootStore from "./RootStore"
+import type { Unsubscribe } from "../types"
+import type RootStore from "./RootStore"
 
 export const registerReactions = ({
   songStore,

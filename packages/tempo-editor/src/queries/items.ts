@@ -1,7 +1,7 @@
 import { Range } from "@signal-app/core"
-import { TempoItem } from "../entities"
-import { ClipboardData } from "../entities/clipboardTypes"
-import { TempoEditorQuery } from "./type"
+import type { TempoItem } from "../entities"
+import type { ClipboardData } from "../entities/clipboardTypes"
+import type { TempoEditorQuery } from "./type"
 
 export const getItemsByIds =
   (ids: readonly number[]): TempoEditorQuery<readonly TempoItem[]> =>

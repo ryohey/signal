@@ -1,5 +1,5 @@
-import { ValueEventType } from "@signal-app/control-editor"
-import { FC } from "react"
+import type { ValueEventType } from "@signal-app/control-editor"
+import type { FC } from "react"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { ControlEditorProvider } from "../context/ControlEditorProvider"
 import { VelocityEditorProvider } from "../context/VelocityEditorProvider"

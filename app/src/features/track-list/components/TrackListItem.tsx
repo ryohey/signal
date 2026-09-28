@@ -1,13 +1,13 @@
 import { keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
-import { TrackId, trackColorToCSSColor } from "@signal-app/core"
+import { type TrackId, trackColorToCSSColor } from "@signal-app/core"
 import Headset from "mdi-react/HeadphonesIcon"
 import Layers from "mdi-react/LayersIcon"
 import VolumeUp from "mdi-react/VolumeHighIcon"
 import VolumeOff from "mdi-react/VolumeOffIcon"
 import React, {
-  FC,
-  MouseEventHandler,
+  type FC,
+  type MouseEventHandler,
   useCallback,
   useRef,
   useState,

@@ -1,5 +1,5 @@
-import { AnyChannelEvent, AnySysExEvent } from "midifile-ts"
-import { DistributiveOmit } from "./types.js"
+import type { AnyChannelEvent, AnySysExEvent } from "midifile-ts"
+import type { DistributiveOmit } from "./types.js"
 
 export type SendableEvent = DistributiveOmit<
   AnySysExEvent | AnyChannelEvent,

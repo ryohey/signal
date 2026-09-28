@@ -1,6 +1,6 @@
 import {
-  BrowserWindow,
-  IpcMainInvokeEvent,
+  type BrowserWindow,
+  type IpcMainInvokeEvent,
   app,
   dialog,
   ipcMain,
@@ -10,7 +10,7 @@ import { readFile, readdir, writeFile } from "fs/promises"
 import { isAbsolute, join } from "path"
 import { getArgument } from "./arguments"
 import { signInWithBrowser } from "./auth"
-import { FirebaseCredential } from "./FirebaseCredential"
+import type { FirebaseCredential } from "./FirebaseCredential"
 
 interface Callbacks {
   getMainWindow: () => BrowserWindow

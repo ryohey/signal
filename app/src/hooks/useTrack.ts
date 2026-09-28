@@ -1,8 +1,8 @@
 import {
   isProgramChangeEvent,
-  TrackColor,
-  TrackEvent,
-  TrackId,
+  type TrackColor,
+  type TrackEvent,
+  type TrackId,
 } from "@signal-app/core"
 import { useCallback, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"

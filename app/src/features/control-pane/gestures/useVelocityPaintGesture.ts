@@ -1,10 +1,10 @@
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import { usePianoRoll } from "../../../features/piano-roll/hooks/usePianoRoll"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import { VelocityTransform } from "../entities/VelocityTransform"
+import type { VelocityTransform } from "../entities/VelocityTransform"
 import { useVelocityEditor } from "../hooks/useVelocityEditor"
 
 export const useVelocityPaintGesture = (

@@ -1,5 +1,5 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 import { useCallback, useMemo } from "react"
 import { Selection } from "../../../../components/GLNodes/Selection"
 import { getClientPos } from "../../../../helpers/mouseEvent"

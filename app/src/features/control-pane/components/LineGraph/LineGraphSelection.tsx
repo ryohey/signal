@@ -1,7 +1,7 @@
 import { HitArea } from "@ryohey/webgl-react"
 import { Selection } from "../../../../components/GLNodes/Selection"
 import { usePianoRoll } from "../../../piano-roll/hooks/usePianoRoll"
-import { ControlCoordTransform } from "../../entities/ControlCoordTransform"
+import type { ControlCoordTransform } from "../../entities/ControlCoordTransform"
 import { useControlPane } from "../../hooks/useControlPane"
 
 export interface LineGraphSelectionProps {

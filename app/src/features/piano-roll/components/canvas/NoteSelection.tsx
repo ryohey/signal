@@ -1,6 +1,6 @@
 import { HitArea } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
-import { FC, useCallback, useMemo } from "react"
+import type { Rect } from "@signal-app/geometry"
+import { type FC, useCallback, useMemo } from "react"
 import { Selection } from "../../../../components/GLNodes/Selection"
 import { Selection as SelectionEntity } from "../../entities/Selection"
 import { useDragSelectionLeftEdgeGesture } from "../../gestures/useDragSelectionLeftEdgeGesture"

@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react"
 import { BorderedRectangles } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { colorToVec4 } from "../../gl/color"
 
 export interface SelectionProps {

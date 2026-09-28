@@ -1,5 +1,5 @@
-import { TrackEvent } from "../../event/TrackEvent"
-import { TrackEventsQueryContext } from "../queries"
+import type { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEventsQueryContext } from "../queries"
 
 export interface TrackEventsMutatorContext extends TrackEventsQueryContext {
   remove(id: number): readonly TrackEvent[]

@@ -1,7 +1,7 @@
-import { ControllerEvent } from "midifile-ts"
+import type { ControllerEvent } from "midifile-ts"
 import { describe, expect, it } from "vitest"
 import { isPanEvent, isVolumeEvent } from "../event/identify"
-import { NoteEvent, TrackEventOf } from "../event/TrackEvent"
+import type { NoteEvent, TrackEventOf } from "../event/TrackEvent"
 import { Track } from "./Track"
 import { emptyTrack } from "./TrackFactory"
 

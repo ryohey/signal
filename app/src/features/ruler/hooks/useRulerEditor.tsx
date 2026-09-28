@@ -1,4 +1,4 @@
-import { RulerEditor } from "@signal-app/ruler-editor"
+import type { RulerEditor } from "@signal-app/ruler-editor"
 import { createContext, useContext } from "react"
 
 export const RulerEditorContext = createContext<RulerEditor | undefined>(

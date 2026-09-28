@@ -1,7 +1,7 @@
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag } from "../../../helpers/observeDrag"
-import { VelocityTransform } from "../entities/VelocityTransform"
+import type { VelocityTransform } from "../entities/VelocityTransform"
 import { useChangeNotesVelocity } from "../hooks/useChangeNotesVelocity"
 
 export const useDragVelocityGesture = (

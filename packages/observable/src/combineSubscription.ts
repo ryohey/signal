@@ -1,4 +1,4 @@
-import { Unsubscribe } from "./types"
+import type { Unsubscribe } from "./types"
 
 type Subscribe = (listener: () => void) => Unsubscribe
 

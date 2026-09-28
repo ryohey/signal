@@ -1,11 +1,11 @@
 import {
   bpmToUSecPerBeat,
-  TrackEventOf,
+  type TrackEventOf,
   uSecPerBeatToBPM,
 } from "@signal-app/core"
 import { clamp } from "lodash"
-import { SetTempoEvent } from "midifile-ts"
-import { TempoItem } from "./TempoItem"
+import type { SetTempoEvent } from "midifile-ts"
+import type { TempoItem } from "./TempoItem"
 
 export const setTempoEventToTempoItem = (
   event: TrackEventOf<SetTempoEvent>,

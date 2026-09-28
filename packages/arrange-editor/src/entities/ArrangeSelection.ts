@@ -1,4 +1,4 @@
-import { ArrangePoint } from "./ArrangePoint"
+import type { ArrangePoint } from "./ArrangePoint"
 
 export interface ArrangeSelection {
   readonly fromTick: number

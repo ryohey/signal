@@ -1,8 +1,8 @@
-import { isEventInRange, Range, TrackEvent } from "@signal-app/core"
-import { ArrangeNote } from "../entities/ArrangeNote"
-import { ArrangeSelection } from "../entities/ArrangeSelection"
-import { ArrangeEventsClipboardData } from "../entities/clipboardTypes"
-import { ArrangeEditorQuery } from "./type"
+import { isEventInRange, Range, type TrackEvent } from "@signal-app/core"
+import type { ArrangeNote } from "../entities/ArrangeNote"
+import type { ArrangeSelection } from "../entities/ArrangeSelection"
+import type { ArrangeEventsClipboardData } from "../entities/clipboardTypes"
+import type { ArrangeEditorQuery } from "./type"
 
 // Only notes are drawn in the arrange view, so this is the display-side
 // query. Selection and mutation deliberately work on every event type.

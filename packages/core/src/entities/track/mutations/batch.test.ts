@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { NoteEvent } from "../../event/TrackEvent"
+import type { NoteEvent } from "../../event/TrackEvent"
 import { emptyTrack } from "../TrackFactory"
 import { batchUpdateNotesVelocity } from "./batch"
 

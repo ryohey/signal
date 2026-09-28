@@ -1,9 +1,9 @@
 import { isEqual, omit } from "lodash"
 import { isDevelopment } from "../../../helpers/isDevelopment"
-import { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEvent } from "../../event/TrackEvent"
 import { validateMidiEvent } from "../../event/validate"
 import { getEventById } from "../queries"
-import { TrackEventsMutator } from "./type"
+import type { TrackEventsMutator } from "./type"
 
 export const removeEvent =
   (id: number): TrackEventsMutator =>

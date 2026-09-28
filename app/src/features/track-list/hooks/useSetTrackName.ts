@@ -1,4 +1,4 @@
-import { TrackId } from "@signal-app/core"
+import type { TrackId } from "@signal-app/core"
 import { useCallback } from "react"
 import { useHistory } from "../../../hooks/useHistory"
 import { useTrack } from "../../../hooks/useTrack"

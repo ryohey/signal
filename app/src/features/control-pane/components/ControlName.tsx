@@ -1,7 +1,7 @@
 import { MIDIControlEventNames, MIDIControlEvents } from "midifile-ts"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../../localize/useLocalization"
-import { ControlMode } from "../entities/ControlMode"
+import type { ControlMode } from "../entities/ControlMode"
 
 export const ControlName: FC<{ mode: ControlMode }> = ({ mode }) => {
   switch (mode.type) {

@@ -1,5 +1,5 @@
-import { Rect } from "@signal-app/geometry"
-import { TempoCoordTransform } from "./TempoCoordTransform"
+import type { Rect } from "@signal-app/geometry"
+import type { TempoCoordTransform } from "./TempoCoordTransform"
 
 export interface TempoSelection {
   readonly fromTick: number

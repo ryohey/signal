@@ -1,4 +1,4 @@
-import { LoopSetting } from "@signal-app/player"
+import type { LoopSetting } from "@signal-app/player"
 import { useCallback, useSyncExternalStore } from "react"
 import { useStores } from "./useStores"
 

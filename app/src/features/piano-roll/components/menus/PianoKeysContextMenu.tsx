@@ -1,5 +1,5 @@
-import { ContextMenu, ContextMenuProps, MenuItem } from "@signal-app/ui"
-import { FC, useState } from "react"
+import { ContextMenu, type ContextMenuProps, MenuItem } from "@signal-app/ui"
+import { type FC, useState } from "react"
 import { Localized } from "../../../../localize/useLocalization"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { KeySignatureDialog } from "../dialogs/KeySignatureDialog"

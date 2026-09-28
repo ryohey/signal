@@ -1,4 +1,4 @@
-import { TrackEvent, TrackEventStore } from "@signal-app/core"
+import type { TrackEvent, TrackEventStore } from "@signal-app/core"
 
 export const getEventsByIdsOrAll =
   (ids: readonly number[]) =>

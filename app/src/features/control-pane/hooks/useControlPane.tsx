@@ -2,8 +2,8 @@ import { atom, useAtomValue, useSetAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 import { focusAtom } from "jotai-optics"
 import { historyAtom } from "../../../hooks/historyAtom"
-import { ControlMode, defaultControlModes } from "../entities/ControlMode"
-import { ControlSelection } from "../entities/ControlSelection"
+import { type ControlMode, defaultControlModes } from "../entities/ControlMode"
+import type { ControlSelection } from "../entities/ControlSelection"
 
 export function useControlPane() {
   return {

@@ -1,4 +1,4 @@
-import { atom, SetStateAction, useAtomValue, useSetAtom } from "jotai"
+import { atom, type SetStateAction, useAtomValue, useSetAtom } from "jotai"
 import { clamp } from "lodash"
 import { Layout } from "../../../Constants"
 import { KeyTransform } from "../entities/KeyTransform"

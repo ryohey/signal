@@ -6,13 +6,13 @@ import {
   Label,
   Select,
 } from "@signal-app/ui"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import {
-  Language,
+  type Language,
   Localized,
   useCurrentLanguage,
 } from "../../../localize/useLocalization"
-import { ThemeType, themes } from "../../../theme/Theme"
+import { type ThemeType, themes } from "../../../theme/Theme"
 import { ThemeName } from "../../../theme/ThemeName"
 import { useSettings } from "../hooks/useSettings"
 

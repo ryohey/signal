@@ -15,8 +15,11 @@ import {
   isTrackNameEvent,
   isVolumeEvent,
 } from "./identify"
-import { isSignalTrackColorEvent, SignalTrackColorEvent } from "./signalEvents"
-import { TrackEvent } from "./TrackEvent"
+import {
+  isSignalTrackColorEvent,
+  type SignalTrackColorEvent,
+} from "./signalEvents"
+import type { TrackEvent } from "./TrackEvent"
 
 export const getLast = <T extends { tick: number }>(
   events: readonly T[],

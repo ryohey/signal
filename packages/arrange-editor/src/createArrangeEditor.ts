@@ -1,6 +1,6 @@
-import { Song } from "@signal-app/core"
+import type { Song } from "@signal-app/core"
 import {
-  ArrangeEditorMutator,
+  type ArrangeEditorMutator,
   batchUpdateSelectionVelocity,
   duplicateSelection,
   moveEvents,
@@ -9,7 +9,7 @@ import {
   transposeSelection,
 } from "./mutations"
 import {
-  ArrangeEditorQuery,
+  type ArrangeEditorQuery,
   getEventIdsInSelection,
   getEventsClipboardData,
   hasEventsInSelection,

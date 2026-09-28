@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { EventListItem as EventListItemData } from "@signal-app/event-list-editor"
-import { FC } from "react"
+import type { EventListItem as EventListItemData } from "@signal-app/event-list-editor"
+import type { FC } from "react"
 import { List, type RowComponentProps } from "react-window"
 import { Localized } from "../../../localize/useLocalization"
 import { EventListProvider } from "../context/EventListProvider"

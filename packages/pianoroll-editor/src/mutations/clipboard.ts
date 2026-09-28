@@ -1,8 +1,12 @@
 import { map } from "@signal-app/core"
 import { flow } from "lodash"
-import { moveEvent, NoteEvent, PianoNotesClipboardData } from "../entities"
+import {
+  moveEvent,
+  type NoteEvent,
+  type PianoNotesClipboardData,
+} from "../entities"
 import { addNotes } from "./mutations"
-import { PianoRollEditorMutator } from "./type"
+import type { PianoRollEditorMutator } from "./type"
 
 export const addClipboardNotes =
   (

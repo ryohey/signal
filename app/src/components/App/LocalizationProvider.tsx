@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 import { useSettings } from "../../features/setting/hooks/useSettings"
 import { LocalizationContext } from "../../localize/useLocalization"
 

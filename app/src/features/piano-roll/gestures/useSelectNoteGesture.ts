@@ -1,6 +1,6 @@
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useQuantizer } from "../../../hooks/useQuantizer"

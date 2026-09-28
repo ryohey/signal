@@ -1,7 +1,7 @@
 import { flow } from "lodash"
-import { PianoNotesClipboardData, toNotesClipboardData } from "../entities"
+import { type PianoNotesClipboardData, toNotesClipboardData } from "../entities"
 import { getNotesByIds } from "./queries"
-import { PianoRollEditorQuery } from "./type"
+import type { PianoRollEditorQuery } from "./type"
 
 export const getNotesClipboardData = (
   noteIds: readonly number[],

@@ -1,7 +1,7 @@
-import { type MIDIController } from "spessasynth_core"
+import type { MIDIController } from "spessasynth_core"
 import { WorkletSynthesizer } from "spessasynth_lib"
-import { SoundFont } from "./SoundFont.js"
-import { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import type { SoundFont } from "./SoundFont.js"
+import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null

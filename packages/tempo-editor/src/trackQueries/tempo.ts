@@ -1,10 +1,10 @@
 import {
   isSetTempoEvent,
-  TrackEventOf,
-  TrackEventStore,
+  type TrackEventOf,
+  type TrackEventStore,
 } from "@signal-app/core"
-import { SetTempoEvent } from "midifile-ts"
-import { TempoItem } from "../entities"
+import type { SetTempoEvent } from "midifile-ts"
+import type { TempoItem } from "../entities"
 import { setTempoEventToTempoItem } from "../entities/tempo/transform"
 
 const getSetTempoEvents = (

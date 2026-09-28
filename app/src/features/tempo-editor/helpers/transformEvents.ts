@@ -1,6 +1,6 @@
-import { TempoItem } from "@signal-app/tempo-editor"
-import { TempoGraphItem } from "../components/TempoGraphItem"
-import { TempoCoordTransform } from "../entities/TempoCoordTransform"
+import type { TempoItem } from "@signal-app/tempo-editor"
+import type { TempoGraphItem } from "../components/TempoGraphItem"
+import type { TempoCoordTransform } from "../entities/TempoCoordTransform"
 
 export const transformEvents = (
   tempoItems: readonly TempoItem[],

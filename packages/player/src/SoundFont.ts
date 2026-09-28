@@ -1,4 +1,8 @@
-import { BasicSoundBank, BasicZone, SoundBankLoader } from "spessasynth_core"
+import {
+  BasicSoundBank,
+  type BasicZone,
+  SoundBankLoader,
+} from "spessasynth_core"
 
 interface PresetMeta {
   name: string

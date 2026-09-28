@@ -1,4 +1,4 @@
-import { Unsubscribe } from "@signal-app/observable"
+import type { Unsubscribe } from "@signal-app/observable"
 import { useCallback, useRef, useSyncExternalStore } from "react"
 
 /**

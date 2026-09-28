@@ -1,4 +1,8 @@
-import { isNoteEvent, NoteEvent, TrackEventStore } from "@signal-app/core"
+import {
+  isNoteEvent,
+  type NoteEvent,
+  type TrackEventStore,
+} from "@signal-app/core"
 
 export const getAllNotes = () => (track: TrackEventStore) =>
   track.getEvents().filter(isNoteEvent)

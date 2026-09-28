@@ -1,5 +1,5 @@
-import { Track } from "@signal-app/core"
-import { MeasureProvider, SongRulerEditor } from "./SongRulerEditor"
+import type { Track } from "@signal-app/core"
+import { type MeasureProvider, SongRulerEditor } from "./SongRulerEditor"
 
 export const createRulerEditor = (
   song: MeasureProvider,

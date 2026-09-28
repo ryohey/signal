@@ -1,8 +1,8 @@
-import { isEventInRange, isNotUndefined, Range } from "@signal-app/core"
+import { isEventInRange, isNotUndefined, type Range } from "@signal-app/core"
 import { maxBy, min } from "lodash"
-import { ControlItem } from "../entities/ControlItem"
-import { ClipboardData } from "../entities/clipboardTypes"
-import { ControlEditorQuery } from "./type"
+import type { ControlItem } from "../entities/ControlItem"
+import type { ClipboardData } from "../entities/clipboardTypes"
+import type { ControlEditorQuery } from "./type"
 
 export const getItemsByIds =
   (ids: readonly number[]): ControlEditorQuery<readonly ControlItem[]> =>

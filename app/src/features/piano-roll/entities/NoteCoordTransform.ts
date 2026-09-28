@@ -1,7 +1,7 @@
-import { Point } from "@signal-app/geometry"
-import { NoteEvent, NotePoint } from "@signal-app/pianoroll-editor"
-import { TickTransform } from "../../../entities/transform/TickTransform"
-import { KeyTransform } from "../entities/KeyTransform"
+import type { Point } from "@signal-app/geometry"
+import type { NoteEvent, NotePoint } from "@signal-app/pianoroll-editor"
+import type { TickTransform } from "../../../entities/transform/TickTransform"
+import type { KeyTransform } from "../entities/KeyTransform"
 
 export class NoteCoordTransform {
   constructor(

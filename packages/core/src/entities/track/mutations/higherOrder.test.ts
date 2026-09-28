@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
-import { NoteEvent, TrackEvent } from "../../event/TrackEvent"
+import type { NoteEvent, TrackEvent } from "../../event/TrackEvent"
 import { combineMutators } from "./higherOrder"
 import { addEvent, updateEvent } from "./primitives"
 

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Slider } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../../../localize/useLocalization"
 import { usePanSlider } from "../../hooks/usePanSlider"
 

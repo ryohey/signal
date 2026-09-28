@@ -1,5 +1,10 @@
-import { NoteEvent, Track, TrackEventOf, TrackId } from "@signal-app/core"
-import { SetTempoEvent } from "midifile-ts"
+import {
+  type NoteEvent,
+  Track,
+  type TrackEventOf,
+  type TrackId,
+} from "@signal-app/core"
+import type { SetTempoEvent } from "midifile-ts"
 import { describe, expect, it } from "vitest"
 import { getArrangeNotesInTrack } from "./ArrangeNote"
 

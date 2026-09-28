@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { ToolbarButton, Tooltip } from "@signal-app/ui"
 import KeyboardTab from "mdi-react/KeyboardTabIcon"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { useTickScroll } from "../../hooks/useTickScroll"
 import { Localized } from "../../localize/useLocalization"
 

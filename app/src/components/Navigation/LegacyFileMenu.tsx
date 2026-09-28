@@ -1,5 +1,5 @@
 import { MenuDivider, MenuItem } from "@signal-app/ui"
-import { ChangeEvent, FC } from "react"
+import type { ChangeEvent, FC } from "react"
 import { useSongFile } from "../../hooks/useSongFile"
 import { Localized } from "../../localize/useLocalization"
 

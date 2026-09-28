@@ -1,15 +1,16 @@
 import { useTheme } from "@emotion/react"
-import { LoopSetting } from "@signal-app/player"
+import type { LoopSetting } from "@signal-app/player"
 import { findLast } from "lodash"
-import React, { FC, useCallback } from "react"
+import type React from "react"
+import { type FC, useCallback } from "react"
 import { Layout } from "../../../Constants"
 import DrawCanvas from "../../../components/DrawCanvas"
-import { TickTransform } from "../../../entities/transform/TickTransform"
+import type { TickTransform } from "../../../entities/transform/TickTransform"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useTickScroll } from "../../../hooks/useTickScroll"
-import { Theme } from "../../../theme/Theme"
-import { RulerBeat } from "../hooks/useRulerBeats"
-import { RulerTimeSignature } from "../hooks/useTimeSignatures"
+import type { Theme } from "../../../theme/Theme"
+import type { RulerBeat } from "../hooks/useRulerBeats"
+import type { RulerTimeSignature } from "../hooks/useTimeSignatures"
 
 const textPadding = 2
 const TIME_SIGNATURE_HIT_WIDTH = 20

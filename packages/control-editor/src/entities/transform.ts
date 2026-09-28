@@ -1,6 +1,6 @@
 import { clamp } from "lodash"
-import { ControlEvent } from "./ControlEvent"
-import { ControlItem } from "./ControlItem"
+import type { ControlEvent } from "./ControlEvent"
+import type { ControlItem } from "./ControlItem"
 
 export const controlEventToItem = (event: ControlEvent): ControlItem => ({
   id: event.id,

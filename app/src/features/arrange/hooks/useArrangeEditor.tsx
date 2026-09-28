@@ -1,4 +1,4 @@
-import { ArrangeEditor } from "@signal-app/arrange-editor"
+import type { ArrangeEditor } from "@signal-app/arrange-editor"
 import { createContext, useContext } from "react"
 
 export const ArrangeEditorContext = createContext<ArrangeEditor | undefined>(

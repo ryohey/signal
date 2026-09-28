@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react"
 import { BorderedCircles, HitArea, Rectangles } from "@ryohey/webgl-react"
-import { Point, Rect } from "@signal-app/geometry"
+import type { Point, Rect } from "@signal-app/geometry"
 import Color from "color"
 import { partition } from "lodash"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { colorToVec4 } from "../../../../gl/color"
 import { joinObjects } from "../../../../helpers/array"
 

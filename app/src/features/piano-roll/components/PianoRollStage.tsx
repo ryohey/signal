@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Positioned } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Layout } from "../../../Constants"
 import { Ruler } from "../../ruler"
 import { useKeyScroll } from "../hooks/useKeyScroll"

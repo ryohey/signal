@@ -1,9 +1,9 @@
 import { MaxNoteNumber, Range } from "@signal-app/core"
 import { max, maxBy, min, minBy } from "lodash"
-import { PianoNotesClipboardData } from "../clipboardTypes"
-import { NotePoint } from "../NotePoint"
-import { NoteSelection } from "../NoteSelection"
-import { NoteEvent } from "./NoteEvent"
+import type { PianoNotesClipboardData } from "../clipboardTypes"
+import type { NotePoint } from "../NotePoint"
+import type { NoteSelection } from "../NoteSelection"
+import type { NoteEvent } from "./NoteEvent"
 import { moveEvent, sortedNotes } from "./transform"
 
 export const getNotesDuration = (

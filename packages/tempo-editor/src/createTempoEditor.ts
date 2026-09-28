@@ -1,4 +1,4 @@
-import { Track } from "@signal-app/core"
+import type { Track } from "@signal-app/core"
 import {
   createOrUpdateItem,
   duplicateItems,
@@ -7,14 +7,14 @@ import {
   removeItems,
   removeRedundantItems,
   setBpm,
-  TempoEditorMutator,
+  type TempoEditorMutator,
   updateItemsInRange,
 } from "./mutations"
 import {
   getEventIdsInRange,
   getItemsByIds,
   getItemsClipboardData,
-  TempoEditorQuery,
+  type TempoEditorQuery,
 } from "./queries"
 import { TrackTempoEditor } from "./TrackTempoEditor"
 

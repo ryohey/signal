@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Alert, Button, DialogContent, DialogTitle } from "@signal-app/ui"
-import { ChangeEvent, FC } from "react"
+import type { ChangeEvent, FC } from "react"
 import { FileInput } from "../../../components/Navigation/LegacyFileMenu"
 import { isRunningInElectron } from "../../../helpers/platform"
 import { Localized } from "../../../localize/useLocalization"

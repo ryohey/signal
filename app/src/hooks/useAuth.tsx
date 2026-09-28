@@ -1,4 +1,4 @@
-import { AuthUser, User } from "@signal-app/api"
+import type { AuthUser, User } from "@signal-app/api"
 import { atom, useAtom, useAtomValue } from "jotai"
 import { atomEffect } from "jotai-effect"
 import { useCallback, useEffect } from "react"

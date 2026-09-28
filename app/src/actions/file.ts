@@ -1,4 +1,4 @@
-import { Song, songFromMidi, songToMidi } from "@signal-app/core"
+import { type Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { writeFile } from "../services/fs-helper"
 import { useSetSong } from "./song"

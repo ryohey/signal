@@ -1,13 +1,13 @@
-import { AnyEvent } from "midifile-ts"
+import type { AnyEvent } from "midifile-ts"
 import {
-  AnyEventFeature,
-  DeltaTimeProvider,
+  type AnyEventFeature,
+  type DeltaTimeProvider,
   isSequencerSpecificEvent,
-  TickProvider,
-  TrackEvent,
+  type TickProvider,
+  type TrackEvent,
 } from "../entities"
 import { mapToSignalEvent } from "../entities/event/signalEvents"
-import { DistributiveOmit } from "../types"
+import type { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 
 export function addTick<T extends DeltaTimeProvider>(

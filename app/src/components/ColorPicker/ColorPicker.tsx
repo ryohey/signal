@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { Button, Dialog, DialogActions, DialogContent } from "@signal-app/ui"
 import range from "lodash/range"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 
 export interface ColorPickerProps {

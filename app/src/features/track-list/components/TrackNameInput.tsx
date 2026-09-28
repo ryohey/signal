@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { useTrack } from "../../../hooks/useTrack"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { useSetTrackName } from "../hooks/useSetTrackName"

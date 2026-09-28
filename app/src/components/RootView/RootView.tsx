@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { ArrangeEditor } from "../../features/arrange/components/ArrangeEditor"
 import { CloudFileDialog } from "../../features/cloud-file/components/CloudFileDialog"
 import { ControlSettingDialog } from "../../features/control-pane/components/dialogs/ControlSettingDialog"

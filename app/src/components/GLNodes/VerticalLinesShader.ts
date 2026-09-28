@@ -1,11 +1,11 @@
 import {
-  InstancedBuffer,
+  type InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformFloat,
   uniformMat4,
   uniformVec4,
-  VertexArray,
+  type VertexArray,
 } from "@ryohey/webgl-react"
 
 class VerticalLinesBuffer

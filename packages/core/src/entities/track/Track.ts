@@ -1,17 +1,17 @@
 import {
   combineSubscription,
   Emitter,
-  Observable,
+  type Observable,
   ObservableValue,
-  Unsubscribe,
+  type Unsubscribe,
 } from "@signal-app/observable"
 import { flow } from "lodash"
-import { TimeSignatureEvent } from "midifile-ts"
+import type { TimeSignatureEvent } from "midifile-ts"
 import {
   deserializeTickOrderedArray,
   TickOrderedArray,
 } from "../../data/OrdererdArray/TickOrderedArray"
-import { Branded } from "../../types"
+import type { Branded } from "../../types"
 import {
   getColorEvent,
   getMaxTick,
@@ -28,14 +28,14 @@ import {
 } from "../event/identify"
 import {
   isSignalTrackColorEvent,
-  SignalTrackColorEvent,
+  type SignalTrackColorEvent,
 } from "../event/signalEvents"
-import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
+import type { TrackEvent, TrackEventOf } from "../event/TrackEvent"
+import type { TrackEventsMutator } from "./mutations"
 import * as Mutations from "./mutations"
-import { TrackEventsMutator } from "./mutations"
+import type { TrackEventsQuery } from "./queries"
 import * as Queries from "./queries"
-import { TrackEventsQuery } from "./queries"
-import { TrackEventStore } from "./TrackEventStore"
+import type { TrackEventStore } from "./TrackEventStore"
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId

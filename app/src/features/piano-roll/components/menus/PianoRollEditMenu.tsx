@@ -1,5 +1,5 @@
 import { MenuHotKey as HotKey, MenuDivider, MenuItem } from "@signal-app/ui"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { EditMenuPortal } from "../../../../components/Navigation/EditMenuPortal"
 import { envString } from "../../../../localize/envString"
 import { Localized } from "../../../../localize/useLocalization"

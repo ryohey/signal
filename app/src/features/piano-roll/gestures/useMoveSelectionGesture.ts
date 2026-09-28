@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useCloneSelection } from "../hooks/selection"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 import { useMoveDraggableGesture } from "./useMoveDraggableGesture"

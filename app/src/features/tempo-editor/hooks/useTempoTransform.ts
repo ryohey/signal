@@ -1,4 +1,4 @@
-import { Point } from "@signal-app/geometry"
+import type { Point } from "@signal-app/geometry"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback, useMemo } from "react"
 import { TempoCoordTransform } from "../entities/TempoCoordTransform"

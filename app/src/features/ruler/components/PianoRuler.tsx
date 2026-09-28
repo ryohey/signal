@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useState } from "react"
+import type React from "react"
+import { type FC, useCallback, useState } from "react"
 import { useContextMenu } from "../../../hooks/useContextMenu"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { RulerEditorProvider } from "../context/RulerEditorProvider"
 import { useRuler } from "../hooks/useRuler"
 import { useRulerBeats } from "../hooks/useRulerBeats"
 import {
-  RulerTimeSignature,
+  type RulerTimeSignature,
   useTimeSignatures,
 } from "../hooks/useTimeSignatures"
 import { useUpdateTimeSignature } from "../hooks/useUpdateTimeSignature"

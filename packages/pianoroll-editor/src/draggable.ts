@@ -1,14 +1,14 @@
-import { flatMap, Range } from "@signal-app/core"
+import { flatMap, type Range } from "@signal-app/core"
 import { flow } from "lodash"
 import {
-  NoteEvent,
-  NoteTransform,
+  type NoteEvent,
+  type NoteTransform,
   toDraggableArea,
   toDraggablePosition,
 } from "./entities"
-import { NotePoint } from "./entities/NotePoint"
-import { PianoRollEditorMutator } from "./mutations"
-import { getNotesByIds, PianoRollEditorQuery } from "./queries"
+import type { NotePoint } from "./entities/NotePoint"
+import type { PianoRollEditorMutator } from "./mutations"
+import { getNotesByIds, type PianoRollEditorQuery } from "./queries"
 
 export const draggedNote =
   (

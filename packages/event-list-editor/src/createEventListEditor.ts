@@ -1,4 +1,4 @@
-import { Track } from "@signal-app/core"
+import type { Track } from "@signal-app/core"
 import { TrackEventListEditor } from "./TrackEventListEditor"
 
 export const createEventListEditor = (track: Track) =>

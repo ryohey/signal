@@ -6,7 +6,7 @@ import {
 } from "@signal-app/ui"
 import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import MusicNote from "mdi-react/MusicNoteIcon"
-import React, { FC, useCallback } from "react"
+import React, { type FC, useCallback } from "react"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { Localized } from "../../../localize/useLocalization"
 import { QuantizePopup } from "./QuantizePopup"

@@ -1,7 +1,7 @@
-import { Track, TrackEvent } from "@signal-app/core"
-import { ObservableValue, Unsubscribe } from "@signal-app/observable"
+import type { Track, TrackEvent } from "@signal-app/core"
+import { ObservableValue, type Unsubscribe } from "@signal-app/observable"
 import { getEventController } from "./entities/EventController"
-import { EventListItem } from "./entities/EventListItem"
+import type { EventListItem } from "./entities/EventListItem"
 import { getEventsByIdsOrAll } from "./trackQueries/queries"
 
 // Unlike the other domain editors (tempo/control/pianoroll/arrange), this

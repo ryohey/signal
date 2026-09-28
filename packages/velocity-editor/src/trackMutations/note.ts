@@ -1,4 +1,8 @@
-import { isNoteEvent, NoteEvent, TrackEventStore } from "@signal-app/core"
+import {
+  isNoteEvent,
+  type NoteEvent,
+  type TrackEventStore,
+} from "@signal-app/core"
 import { updateVelocitiesLinear } from "../entities/note"
 
 // update velocities of notes in the specified range using linear interpolation

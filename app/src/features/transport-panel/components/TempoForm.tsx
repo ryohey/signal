@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { NumberInput } from "../../../components/inputs/NumberInput"
 import { useTempoForm } from "../hooks/useTempoForm"
 

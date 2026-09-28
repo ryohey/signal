@@ -1,5 +1,5 @@
-import { AnyEvent, deserializeSingleEvent, Stream } from "midifile-ts"
-import { MIDIDeviceStore } from "../stores/MIDIDeviceStore"
+import { type AnyEvent, deserializeSingleEvent, Stream } from "midifile-ts"
+import type { MIDIDeviceStore } from "../stores/MIDIDeviceStore"
 
 export interface MIDIInputEvent {
   message: AnyEvent

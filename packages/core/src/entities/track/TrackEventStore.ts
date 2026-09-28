@@ -1,4 +1,4 @@
-import { TrackEvent } from "../event/TrackEvent"
+import type { TrackEvent } from "../event/TrackEvent"
 
 export interface TrackEventStore {
   getEvents(): readonly TrackEvent[]

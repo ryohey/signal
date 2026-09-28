@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { ClipboardData } from "../entities/clipboardTypes"
+import type { ClipboardData } from "../entities/clipboardTypes"
 import { createTrackControlEditor } from "../testUtils"
 import {
   createOrUpdateItemValue,

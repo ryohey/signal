@@ -1,6 +1,6 @@
 import { isNoteEvent } from "../../event"
-import { BatchUpdateOperation, batchUpdateNoteVelocity } from "../../note"
-import { TrackEventStore } from "../TrackEventStore"
+import { type BatchUpdateOperation, batchUpdateNoteVelocity } from "../../note"
+import type { TrackEventStore } from "../TrackEventStore"
 
 export const batchUpdateNotesVelocity =
   (events: TrackEventStore) =>

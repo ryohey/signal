@@ -6,13 +6,13 @@ import {
   DialogContent,
   DialogTitle,
 } from "@signal-app/ui"
-import { FC, useCallback, useState } from "react"
+import { type FC, useCallback, useState } from "react"
 import { useRootView } from "../../../hooks/useRootView"
 import { Localized } from "../../../localize/useLocalization"
 import { MIDIDeviceView } from "../../midi-device/components/MIDIDeviceView"
 import { SoundFontSettingsView } from "../../soundfont/components/SoundFontSettingView"
 import { GeneralSettingsView } from "./GeneralSettingsView"
-import { SettingNavigation, SettingRoute } from "./SettingNavigation"
+import { SettingNavigation, type SettingRoute } from "./SettingNavigation"
 
 const RouteContent: FC<{ route: SettingRoute }> = ({ route }) => {
   switch (route) {

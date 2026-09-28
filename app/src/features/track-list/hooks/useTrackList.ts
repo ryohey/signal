@@ -1,4 +1,4 @@
-import { TrackId } from "@signal-app/core"
+import type { TrackId } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback } from "react"
 import { useHistory } from "../../../hooks/useHistory"

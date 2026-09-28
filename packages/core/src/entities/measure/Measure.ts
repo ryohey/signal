@@ -1,5 +1,5 @@
-import { Beat } from "../beat/Beat"
-import { Range } from "../geometry/Range"
+import type { Beat } from "../beat/Beat"
+import type { Range } from "../geometry/Range"
 
 interface TimeSignature {
   readonly tick: number

@@ -2,13 +2,13 @@ import { isNotUndefined, map } from "@signal-app/core"
 import { flow } from "lodash"
 import {
   duplicatedNotes,
-  NoteEvent,
+  type NoteEvent,
   quantizeNote,
   toId,
   transposeNote,
 } from "../entities"
 import { getNotesByIds } from "../queries"
-import { PianoRollEditorMutator, PianoRollMutationContext } from "./type"
+import type { PianoRollEditorMutator, PianoRollMutationContext } from "./type"
 
 export const updateNotes =
   (editor: PianoRollMutationContext) => (notes: readonly NoteEvent[]) =>

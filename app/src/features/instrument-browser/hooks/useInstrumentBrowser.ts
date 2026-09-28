@@ -8,7 +8,7 @@ import { useSong } from "../../../hooks/useSong"
 import { useTrack } from "../../../hooks/useTrack"
 import { getCategoryIndex } from "../../../midi/GM"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import { InstrumentSetting } from "../entities/InstrumentSetting"
+import type { InstrumentSetting } from "../entities/InstrumentSetting"
 import { useInsertTrackInstrument } from "./useInsertTrackInstrument"
 import { useSetTrackInstrument } from "./useSetTrackInstrument"
 

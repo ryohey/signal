@@ -1,12 +1,12 @@
-import { TempoEditor } from "@signal-app/tempo-editor"
+import type { TempoEditor } from "@signal-app/tempo-editor"
 import { atom, useAtomValue, useSetAtom } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { createContext, useContext } from "react"
 import { historyAtom } from "../../../hooks/historyAtom"
 import { BeatsProvider } from "../../../hooks/useBeats"
 import { QuantizerProvider } from "../../../hooks/useQuantizer"
 import { TickScrollProvider, useTickScroll } from "../../../hooks/useTickScroll"
-import { TempoSelection } from "../entities/TempoSelection"
+import type { TempoSelection } from "../entities/TempoSelection"
 
 type TempoEditorStore = {
   quantizerScope: Store

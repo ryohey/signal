@@ -6,7 +6,7 @@ import {
   DialogContent,
   PrimaryButton,
 } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { userRepository } from "../../services/repositories"

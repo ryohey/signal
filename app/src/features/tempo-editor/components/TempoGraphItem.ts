@@ -1,4 +1,4 @@
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 
 export interface TempoGraphItem {
   id: number

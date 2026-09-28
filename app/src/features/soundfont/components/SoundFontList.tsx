@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
-import { SoundFontFile } from "@signal-app/core"
+import type { SoundFontFile } from "@signal-app/core"
 import { Button, CircularProgress, RadioButton } from "@signal-app/ui"
 import Color from "color"
 import { useToast } from "dialog-hooks"
 import RemoveIcon from "mdi-react/RemoveIcon"
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { useSoundFont } from "../hooks/useSoundFont"
 
 const List = styled.div`

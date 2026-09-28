@@ -1,6 +1,6 @@
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { observer } from "mobx-react-lite"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../localize/useLocalization.js"
 import { Button } from "./Button.js"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "./Dialog.js"

@@ -1,7 +1,7 @@
 import { createArrangeEditor } from "@signal-app/arrange-editor"
 import {
-  FC,
-  ReactNode,
+  type FC,
+  type ReactNode,
   useCallback,
   useMemo,
   useSyncExternalStore,

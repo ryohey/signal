@@ -1,6 +1,6 @@
 import {
   bpmToUSecPerBeat,
-  TrackEvent,
+  type TrackEvent,
   uSecPerBeatToBPM,
 } from "@signal-app/core"
 import { clamp, flow } from "lodash"

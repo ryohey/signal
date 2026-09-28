@@ -1,6 +1,6 @@
-import { Point } from "@signal-app/geometry"
-import { TickTransform } from "../../../entities/transform/TickTransform"
-import { TrackTransform } from "./TrackTransform"
+import type { Point } from "@signal-app/geometry"
+import type { TickTransform } from "../../../entities/transform/TickTransform"
+import type { TrackTransform } from "./TrackTransform"
 
 export class ArrangeCoordTransform {
   constructor(

@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { useCallback } from "react"
 import {
-  HistoryAtomsSnapshot,
+  type HistoryAtomsSnapshot,
   restoreHistoryAtoms,
   snapshotHistoryAtoms,
 } from "./historyAtom"

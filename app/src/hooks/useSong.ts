@@ -1,4 +1,4 @@
-import { Song, TrackId } from "@signal-app/core"
+import type { Song, TrackId } from "@signal-app/core"
 import { useCallback, useSyncExternalStore } from "react"
 import { useStores } from "./useStores"
 

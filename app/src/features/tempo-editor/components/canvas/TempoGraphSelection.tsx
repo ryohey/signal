@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Selection } from "../../../../components/GLNodes/Selection"
 import { TempoSelection } from "../../entities/TempoSelection"
 import { useTempoEditor } from "../../hooks/useTempoEditor"

@@ -1,12 +1,12 @@
 import {
   emptyTrack,
   isPanEvent,
-  NoteEvent,
-  Track,
-  TrackEventOf,
+  type NoteEvent,
+  type Track,
+  type TrackEventOf,
 } from "@signal-app/core"
 import { act, renderHook } from "@testing-library/react"
-import { ControllerEvent } from "midifile-ts"
+import type { ControllerEvent } from "midifile-ts"
 import { describe, expect, it, vi } from "vitest"
 import { useSyncTrackQueryInternal } from "./useSyncTrackQuery"
 

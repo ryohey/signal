@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import React, { FC } from "react"
+import React, { type FC } from "react"
 
 const Parent = styled.div`
   text-align: right;

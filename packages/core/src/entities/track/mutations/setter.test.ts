@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { bpmToUSecPerBeat } from "../../../helpers/bpm"
 import { getTempoEvent } from "../../event/selectors"
-import { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEvent } from "../../event/TrackEvent"
 import { setTempo } from "./setter"
 
 describe("track mutations/setter", () => {

@@ -1,15 +1,15 @@
 import { isNotNullOrUndefined, Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
-import { NoteEvent, NotePoint } from "@signal-app/pianoroll-editor"
+import { type NoteEvent, NotePoint } from "@signal-app/pianoroll-editor"
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
 import { useNoteCoordTransform } from "../hooks/useNoteCoordTransform"
 import {
-  DraggableArea,
-  PianoRollDraggable,
+  type DraggableArea,
+  type PianoRollDraggable,
   usePianoRollDraggable,
 } from "../hooks/usePianoRollDraggable"
 

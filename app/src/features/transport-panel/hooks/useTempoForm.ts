@@ -1,4 +1,8 @@
-import { isSetTempoEvent, Track, UNASSIGNED_TRACK_ID } from "@signal-app/core"
+import {
+  isSetTempoEvent,
+  type Track,
+  UNASSIGNED_TRACK_ID,
+} from "@signal-app/core"
 import { DEFAULT_TEMPO } from "@signal-app/player"
 import { useCallback } from "react"
 import { useConductorTrack } from "../../../hooks/useConductorTrack"

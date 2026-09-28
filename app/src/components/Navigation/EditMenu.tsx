@@ -1,5 +1,5 @@
 import { MenuHotKey as HotKey, Menu, MenuItem } from "@signal-app/ui"
-import React, { FC, useCallback, useState } from "react"
+import React, { type FC, useCallback, useState } from "react"
 import { useHistory } from "../../hooks/useHistory"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"

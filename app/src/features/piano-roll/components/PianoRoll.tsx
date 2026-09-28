@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import { clamp } from "lodash"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { type FC, useCallback, useEffect, useRef } from "react"
 import { Layout, WHEEL_SCROLL_RATE } from "../../../Constants"
 import {
   HorizontalScaleScrollBar,

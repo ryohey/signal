@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { getPan, getVolume } from "../../event/selectors"
-import { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEvent } from "../../event/TrackEvent"
 import { setPan, setVolume } from "./controller"
 
 describe("track mutations/controller", () => {

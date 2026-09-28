@@ -1,6 +1,6 @@
 import type { EventListItem as EventListItemData } from "@signal-app/event-list-editor"
 import isEqual from "lodash/isEqual"
-import React, { FC, useCallback } from "react"
+import React, { type FC, useCallback } from "react"
 import { useEventListEditor } from "../hooks/useEventListEditor"
 import { Cell, Row } from "./EventList"
 import { EventListInput } from "./EventListInput"

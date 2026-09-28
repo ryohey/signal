@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
 
 export interface InitializeErrorDialogProps {

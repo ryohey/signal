@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import type { CheckedState } from "@radix-ui/react-checkbox"
-import { type TrackEventOf, type TrackId } from "@signal-app/core"
+import type { TrackEventOf, TrackId } from "@signal-app/core"
 import {
   Button,
   Checkbox,

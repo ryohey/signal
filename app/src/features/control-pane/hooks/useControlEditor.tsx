@@ -1,4 +1,4 @@
-import { ControlEditor } from "@signal-app/control-editor"
+import type { ControlEditor } from "@signal-app/control-editor"
 import { createContext, useContext } from "react"
 
 export const ControlEditorContext = createContext<ControlEditor | undefined>(

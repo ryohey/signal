@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { FC, ReactNode, useCallback, useEffect, useMemo } from "react"
+import { type FC, type ReactNode, useCallback, useEffect, useMemo } from "react"
 import { MenuContextProvider } from "./Menu"
 import { Positioned } from "./Positioned"
 

@@ -6,8 +6,8 @@ import {
   OAuthProvider,
   signInWithCredential,
 } from "firebase/auth"
-import { FC } from "react"
-import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
+import type { FC } from "react"
+import type { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 import { useSetSong } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
 import { useCloudFile } from "../../features/cloud-file/hooks/useCloudFile"

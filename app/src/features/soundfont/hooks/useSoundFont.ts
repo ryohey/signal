@@ -1,8 +1,8 @@
 import {
   defaultSoundFontId,
-  Metadata,
-  SoundFontFile,
-  SoundFontItem,
+  type Metadata,
+  type SoundFontFile,
+  type SoundFontItem,
 } from "@signal-app/core"
 import { SoundFont } from "@signal-app/player"
 import { atom, useAtomValue } from "jotai"

@@ -1,7 +1,7 @@
 import { createRulerEditor } from "@signal-app/ruler-editor"
 import {
-  FC,
-  ReactNode,
+  type FC,
+  type ReactNode,
   useCallback,
   useMemo,
   useSyncExternalStore,

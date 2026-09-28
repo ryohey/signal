@@ -1,6 +1,6 @@
 import { Beat } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { useEffect } from "react"
 import { useSong } from "./useSong"

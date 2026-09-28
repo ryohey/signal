@@ -1,4 +1,4 @@
-import { BatchUpdateOperation } from "@signal-app/core"
+import type { BatchUpdateOperation } from "@signal-app/core"
 import { useCallback } from "react"
 import { VelocityDialog } from "../../../../components/VelocityDialog/VelocityDialog"
 import { usePianoRoll } from "../../hooks/usePianoRoll"

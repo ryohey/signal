@@ -7,7 +7,7 @@ import {
   PrimaryButton,
   TextField,
 } from "@signal-app/ui"
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 
 export interface TransposeDialogProps {

@@ -1,16 +1,16 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback, GLNode, HitArea, useTransform } from "@ryohey/webgl-react"
-import { VelocityItem } from "@signal-app/velocity-editor"
-import { Rect } from "@signal-app/geometry"
+import type { VelocityItem } from "@signal-app/velocity-editor"
+import type { Rect } from "@signal-app/geometry"
 import Color from "color"
-import { FC, useCallback, useMemo } from "react"
+import { type FC, useCallback, useMemo } from "react"
 import { colorToVec4, enhanceContrast } from "../../../../gl/color"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { usePianoRoll } from "../../../piano-roll/hooks/usePianoRoll"
-import { VelocityTransform } from "../../entities/VelocityTransform"
+import type { VelocityTransform } from "../../entities/VelocityTransform"
 import { useVelocityItems } from "../../hooks/useVelocityItems"
 import { LegacyVelocityItems } from "./LegacyVelocityItems"
-import { IVelocityData, VelocityShader } from "./VelocityShader"
+import { type IVelocityData, VelocityShader } from "./VelocityShader"
 
 export interface VelocityItemsProps {
   velocityTransform: VelocityTransform

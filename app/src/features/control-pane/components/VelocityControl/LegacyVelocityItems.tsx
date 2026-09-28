@@ -1,10 +1,10 @@
 import { useTheme } from "@emotion/react"
 import { Rectangles } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 import Color from "color"
-import { FC } from "react"
+import type { FC } from "react"
 import { colorToVec4 } from "../../../../gl/color"
-import { IVelocityData } from "./VelocityShader"
+import type { IVelocityData } from "./VelocityShader"
 
 export const LegacyVelocityItems: FC<{ rects: (Rect & IVelocityData)[] }> = ({
   rects,

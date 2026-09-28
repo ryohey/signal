@@ -1,4 +1,4 @@
-import {
+import type {
   ControllerEvent,
   EndOfTrackEvent,
   PitchBendEvent,
@@ -8,7 +8,7 @@ import {
   TimeSignatureEvent,
   TrackNameEvent,
 } from "midifile-ts"
-import { NoteEvent, TrackEvent, TrackEventOf } from "./TrackEvent"
+import type { NoteEvent, TrackEvent, TrackEventOf } from "./TrackEvent"
 
 export const isNoteEvent = (e: TrackEvent): e is NoteEvent =>
   "subtype" in e && e.subtype === "note"

@@ -1,4 +1,4 @@
-import { SendableEvent, SynthOutput } from "@signal-app/player"
+import type { SendableEvent, SynthOutput } from "@signal-app/player"
 import { serialize } from "midifile-ts"
 
 export default class MIDIDeviceOutput implements SynthOutput {

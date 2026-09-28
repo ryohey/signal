@@ -1,4 +1,4 @@
-import { Observable } from "./observable"
+import type { Observable } from "./observable"
 
 export class Emitter<T = void> implements Observable<T> {
   private listeners = new Set<(value: T) => void>()

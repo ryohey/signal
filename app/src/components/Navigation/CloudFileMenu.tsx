@@ -1,5 +1,5 @@
 import { MenuDivider, MenuItem } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { hasFSAccess } from "../../actions/file"
 import { useCloudFile } from "../../features/cloud-file/hooks/useCloudFile"
 import { useSong } from "../../hooks/useSong"

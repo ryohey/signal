@@ -1,4 +1,4 @@
-import { MIDIInputEvent, TrackId } from "@signal-app/core"
+import type { MIDIInputEvent, TrackId } from "@signal-app/core"
 import { useEffect } from "react"
 import { useStores } from "../../../hooks/useStores"
 import { useTrack } from "../../../hooks/useTrack"

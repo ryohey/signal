@@ -1,6 +1,6 @@
-import { isSetTempoEvent, Track } from "@signal-app/core"
-import { Unsubscribe } from "@signal-app/observable"
-import { TempoItem } from "./entities"
+import { isSetTempoEvent, type Track } from "@signal-app/core"
+import type { Unsubscribe } from "@signal-app/observable"
+import type { TempoItem } from "./entities"
 import { addTempoItem, updateTempoItems } from "./trackMutations/tempo"
 import { getTempoItemById, getTempoItems } from "./trackQueries/tempo"
 

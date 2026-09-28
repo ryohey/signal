@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { BatchUpdateOperation } from "@signal-app/core"
+import type { BatchUpdateOperation } from "@signal-app/core"
 import {
   Button,
   Dialog,
@@ -8,7 +8,7 @@ import {
   DialogTitle,
   RadioButton,
 } from "@signal-app/ui"
-import { FC, useCallback, useEffect, useState } from "react"
+import { type FC, useCallback, useEffect, useState } from "react"
 import { Localized } from "../../localize/useLocalization"
 import { StyledNumberInput } from "../ui/StyledNumberInput"
 

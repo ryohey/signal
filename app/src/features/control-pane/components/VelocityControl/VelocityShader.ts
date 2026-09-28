@@ -1,12 +1,12 @@
 import {
-  InstancedBuffer,
+  type InstancedBuffer,
   rectToTriangles,
   Shader,
   uniformMat4,
   uniformVec4,
-  VertexArray,
+  type VertexArray,
 } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 
 export interface IVelocityData {
   isSelected: boolean

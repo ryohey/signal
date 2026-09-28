@@ -11,7 +11,7 @@ import {
 } from "@signal-app/ui"
 import { useToast } from "dialog-hooks"
 import OpenInNewIcon from "mdi-react/OpenInNewIcon"
-import { FC, useCallback, useEffect, useState } from "react"
+import { type FC, useCallback, useEffect, useState } from "react"
 import {
   usePublishSong,
   useUnpublishSong,

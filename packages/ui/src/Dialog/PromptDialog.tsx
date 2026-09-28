@@ -1,5 +1,5 @@
-import { PromptContext, PromptProps } from "dialog-hooks"
-import { FC, useContext, useState } from "react"
+import { PromptContext, type PromptProps } from "dialog-hooks"
+import { type FC, useContext, useState } from "react"
 import { Button } from "../Button"
 import { TextField } from "../TextField"
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "./Dialog"

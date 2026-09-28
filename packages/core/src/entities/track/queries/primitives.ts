@@ -1,5 +1,5 @@
-import { TrackEvent } from "../../event/TrackEvent"
-import { TrackEventsQuery } from "./type"
+import type { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEventsQuery } from "./type"
 
 export const getEventById =
   (id: number): TrackEventsQuery<TrackEvent | undefined> =>

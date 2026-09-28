@@ -15,7 +15,7 @@ import { DraggableList } from "../../../../components/DraggableList/DraggableLis
 import { useRootView } from "../../../../hooks/useRootView"
 import { Localized } from "../../../../localize/useLocalization"
 import {
-  ControlMode,
+  type ControlMode,
   controlModeKey,
   defaultControlModes,
   isEqualControlMode,

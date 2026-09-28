@@ -1,10 +1,10 @@
 import {
   ContextMenu,
-  ContextMenuProps,
+  type ContextMenuProps,
   ContextMenuHotKey as HotKey,
   MenuItem,
 } from "@signal-app/ui"
-import React, { FC, useCallback, useState } from "react"
+import React, { type FC, useCallback, useState } from "react"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { envString } from "../../../localize/envString"
 import { Localized } from "../../../localize/useLocalization"

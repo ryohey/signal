@@ -1,4 +1,4 @@
-import { NoteEvent } from "../entities"
+import type { NoteEvent } from "../entities"
 
 export interface PianoRollQueryContext {
   getNoteById: (id: number) => NoteEvent | undefined

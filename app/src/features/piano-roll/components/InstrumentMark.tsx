@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { type TrackEventOf } from "@signal-app/core"
+import type { TrackEventOf } from "@signal-app/core"
 import type { ProgramChangeEvent } from "midifile-ts"
 import { type FC, useCallback, useMemo, useState } from "react"
 import type { TickTransform } from "../../../entities/transform/TickTransform"

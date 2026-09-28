@@ -1,7 +1,7 @@
 import { isNotUndefined } from "../../../helpers"
-import { TrackEvent } from "../../event/TrackEvent"
+import type { TrackEvent } from "../../event/TrackEvent"
 import { getEventById } from "./primitives"
-import { TrackEventsQuery } from "./type"
+import type { TrackEventsQuery } from "./type"
 
 export const getEventsByIds =
   (ids: readonly number[]): TrackEventsQuery<readonly TrackEvent[]> =>

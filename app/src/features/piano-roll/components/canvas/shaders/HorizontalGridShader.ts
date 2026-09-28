@@ -1,13 +1,13 @@
 import {
-  Buffer,
+  type Buffer,
   rectToTriangles,
   Shader,
   uniformFloat,
   uniformMat4,
   uniformVec4,
-  VertexArray,
+  type VertexArray,
 } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 import isEqual from "lodash/isEqual"
 
 export class HorizontalGridBuffer implements Buffer<Rect, "position"> {

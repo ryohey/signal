@@ -1,17 +1,17 @@
 import {
-  BatchUpdateOperation,
+  type BatchUpdateOperation,
   batchUpdateNoteVelocity,
   isNoteEvent,
   isNotUndefined,
-  NoteEvent,
-  TrackEvent,
+  type NoteEvent,
+  type TrackEvent,
   transposeNote,
 } from "@signal-app/core"
-import { ArrangePoint } from "../entities/ArrangePoint"
-import { ArrangeSelection } from "../entities/ArrangeSelection"
-import { ArrangeEventsClipboardData } from "../entities/clipboardTypes"
+import type { ArrangePoint } from "../entities/ArrangePoint"
+import type { ArrangeSelection } from "../entities/ArrangeSelection"
+import type { ArrangeEventsClipboardData } from "../entities/clipboardTypes"
 import { getEventsInSelection } from "../queries/items"
-import { ArrangeEditorMutator } from "./type"
+import type { ArrangeEditorMutator } from "./type"
 
 // Every mutator below works on whatever events the selection covers, not
 // just notes. transposeSelection/batchUpdateSelectionVelocity are the

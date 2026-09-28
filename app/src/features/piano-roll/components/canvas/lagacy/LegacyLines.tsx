@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Layout } from "../../../../../Constants"
 import { colorToVec4 } from "../../../../../gl/color"
 import { useTickScroll } from "../../../../../hooks/useTickScroll"

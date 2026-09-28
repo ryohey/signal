@@ -1,8 +1,8 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { colorToVec4 } from "../../../../../gl/color"
 import { useIsRhythmTrack } from "../../../hooks/useIsRhythmTrack"
 import { useNoteColor } from "../../../hooks/useNoteColor"
-import { PianoNoteItem } from "../../../hooks/useNotes"
+import type { PianoNoteItem } from "../../../hooks/useNotes"
 import { NoteCircles } from "./NoteCircles"
 import { NoteRectangles } from "./NoteRectangles"
 

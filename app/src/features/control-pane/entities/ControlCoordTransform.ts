@@ -1,7 +1,7 @@
-import { Point, Rect } from "@signal-app/geometry"
-import { TickTransform } from "../../../entities/transform/TickTransform"
-import { ItemValue } from "../components/LineGraph/LineGraph"
-import { ControlSelection } from "./ControlSelection"
+import type { Point, Rect } from "@signal-app/geometry"
+import type { TickTransform } from "../../../entities/transform/TickTransform"
+import type { ItemValue } from "../components/LineGraph/LineGraph"
+import type { ControlSelection } from "./ControlSelection"
 
 export class ControlCoordTransform {
   constructor(

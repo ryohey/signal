@@ -1,7 +1,7 @@
-import { Track, TrackEvent } from "@signal-app/core"
-import { Unsubscribe } from "@signal-app/observable"
-import { ControlEvent } from "./entities/ControlEvent"
-import { ControlItem } from "./entities/ControlItem"
+import type { Track, TrackEvent } from "@signal-app/core"
+import type { Unsubscribe } from "@signal-app/observable"
+import type { ControlEvent } from "./entities/ControlEvent"
+import type { ControlItem } from "./entities/ControlItem"
 import { controlEventToItem } from "./entities/transform"
 import { ValueEventType } from "./entities/ValueEventType"
 

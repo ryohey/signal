@@ -1,5 +1,10 @@
-import { NoteEvent, Song, Track, TrackEventOf } from "@signal-app/core"
-import { ControllerEvent } from "midifile-ts"
+import {
+  type NoteEvent,
+  Song,
+  Track,
+  type TrackEventOf,
+} from "@signal-app/core"
+import type { ControllerEvent } from "midifile-ts"
 import { SongArrangeEditor } from "./SongArrangeEditor"
 
 export const createSongArrangeEditor = (

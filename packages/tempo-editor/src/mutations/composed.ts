@@ -1,10 +1,10 @@
-import { closedRange, interpolate, Range } from "@signal-app/core"
+import { closedRange, interpolate, type Range } from "@signal-app/core"
 import { max, min } from "lodash"
-import { TempoItem } from "../entities"
-import { ClipboardData } from "../entities/clipboardTypes"
+import type { TempoItem } from "../entities"
+import type { ClipboardData } from "../entities/clipboardTypes"
 import { moveTempoItem } from "../entities/tempo/transform"
 import { getItemsByIds } from "../queries/items"
-import { TempoEditorMutator } from "./type"
+import type { TempoEditorMutator } from "./type"
 
 const createOrUpdateItems =
   (

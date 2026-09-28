@@ -1,5 +1,5 @@
 import { GLFallback, HitArea } from "@ryohey/webgl-react"
-import React, { FC, useCallback, useMemo } from "react"
+import React, { type FC, useCallback, useMemo } from "react"
 import { useSettings } from "../../../setting/hooks/useSettings"
 import { useAddNoteToSelectionGesture } from "../../gestures/useAddNoteToSelectionGesture"
 import {
@@ -10,7 +10,7 @@ import {
 import { useRemoveNoteFromSelectionGesture } from "../../gestures/useRemoveNoteFromSelectionGesture"
 import { useIsRhythmTrack } from "../../hooks/useIsRhythmTrack"
 import { useNoteColor } from "../../hooks/useNoteColor"
-import { PianoNoteItem, useNotes } from "../../hooks/useNotes"
+import { type PianoNoteItem, useNotes } from "../../hooks/useNotes"
 import { usePianoRoll } from "../../hooks/usePianoRoll"
 import { usePianoRollEditor } from "../../hooks/usePianoRollEditor"
 import { LegacyNotes } from "./lagacy/LegacyNotes"

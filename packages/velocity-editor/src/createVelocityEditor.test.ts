@@ -1,4 +1,4 @@
-import { NoteEvent, Track } from "@signal-app/core"
+import { type NoteEvent, Track } from "@signal-app/core"
 import { describe, expect, it, vi } from "vitest"
 import { createVelocityEditor } from "./createVelocityEditor"
 

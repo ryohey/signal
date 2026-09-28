@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Toolbar } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { AutoScrollButton } from "../../../components/Toolbar/AutoScrollButton"
 import { QuantizeSelector } from "../../../components/Toolbar/QuantizeSelector/QuantizeSelector"
 import { Localized } from "../../../localize/useLocalization"

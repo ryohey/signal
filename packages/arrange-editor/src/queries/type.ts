@@ -1,3 +1,3 @@
-import { SongArrangeEditor } from "../SongArrangeEditor"
+import type { SongArrangeEditor } from "../SongArrangeEditor"
 
 export type ArrangeEditorQuery<R> = (editor: SongArrangeEditor) => R

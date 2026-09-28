@@ -5,10 +5,10 @@ import {
   isEventInRange,
   noteOnMidiEvent,
   Range,
-  SongStore,
-  TrackId,
+  type SongStore,
+  type TrackId,
 } from "@signal-app/core"
-import { IEventSource, PlayerEvent } from "@signal-app/player"
+import type { IEventSource, PlayerEvent } from "@signal-app/player"
 
 export const METRONOME_TRACK_ID = 99999 as TrackId
 

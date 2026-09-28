@@ -3,7 +3,12 @@ import { Tooltip } from "@signal-app/ui"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
-import React, { CSSProperties, FC, MouseEvent, useCallback } from "react"
+import React, {
+  type CSSProperties,
+  type FC,
+  type MouseEvent,
+  useCallback,
+} from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"

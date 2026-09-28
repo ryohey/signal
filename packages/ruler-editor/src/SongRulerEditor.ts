@@ -1,13 +1,13 @@
 import {
   isTimeSignatureEvent,
   Measure,
-  Track,
-  TrackEventOf,
+  type Track,
+  type TrackEventOf,
   timeSignatureMidiEvent,
 } from "@signal-app/core"
-import { Unsubscribe } from "@signal-app/observable"
-import { TimeSignatureEvent } from "midifile-ts"
-import { TimeSignatureItem } from "./entities"
+import type { Unsubscribe } from "@signal-app/observable"
+import type { TimeSignatureEvent } from "midifile-ts"
+import type { TimeSignatureItem } from "./entities"
 
 export interface MeasureProvider {
   measures: readonly Measure[]

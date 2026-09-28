@@ -1,10 +1,10 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { IconButton, Menu, MenuItem } from "@signal-app/ui"
 import { useToast } from "dialog-hooks"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized, useLocalization } from "../../../localize/useLocalization"
 import { useCloudFile } from "../hooks/useCloudFile"
 

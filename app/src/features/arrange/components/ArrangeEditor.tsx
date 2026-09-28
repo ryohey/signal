@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { useAutoFocus } from "../../../hooks/useAutoFocus"
 import { ArrangeEditorProvider } from "../context/ArrangeEditorProvider"
 import { ArrangeViewScope } from "../hooks/useArrangeView"

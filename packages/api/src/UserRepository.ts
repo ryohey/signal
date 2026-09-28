@@ -1,19 +1,19 @@
-import { Auth, deleteUser } from "firebase/auth"
+import { type Auth, deleteUser } from "firebase/auth"
 import {
   collection,
   doc,
-  Firestore,
-  FirestoreDataConverter,
+  type Firestore,
+  type FirestoreDataConverter,
   getDoc,
   getDocs,
   onSnapshot,
-  QueryDocumentSnapshot,
+  type QueryDocumentSnapshot,
   query,
   runTransaction,
   Timestamp,
   where,
 } from "firebase/firestore"
-import { AuthUser, IUserRepository, User } from "./IUserRepository.js"
+import type { AuthUser, IUserRepository, User } from "./IUserRepository.js"
 
 export const createUserRepository = (
   firestore: Firestore,

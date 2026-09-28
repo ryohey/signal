@@ -1,13 +1,13 @@
 import {
   combineSubscription,
   Emitter,
-  Observable,
+  type Observable,
   ObservableValue,
   switchSubscription,
 } from "@signal-app/observable"
-import { PlayerEvent } from "@signal-app/player"
+import type { PlayerEvent } from "@signal-app/player"
 import { Measure } from "../measure/Measure"
-import { Track, TrackId } from "../track"
+import { Track, type TrackId } from "../track"
 import { emptyTrack } from "../track/TrackFactory"
 import { collectAllEvents } from "./collectAllEvents"
 

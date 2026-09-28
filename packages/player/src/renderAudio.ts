@@ -1,6 +1,6 @@
 import { BasicMIDI } from "spessasynth_core"
 import { WorkletSynthesizer } from "spessasynth_lib"
-import { PlayerEvent } from "./PlayerEvent.js"
+import type { PlayerEvent } from "./PlayerEvent.js"
 import { playerEventsToMIDI } from "./playerEventsToMidi.js"
 
 export const renderAudio = async (

@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@signal-app/ui"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"

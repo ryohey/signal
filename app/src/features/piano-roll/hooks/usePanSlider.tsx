@@ -1,4 +1,9 @@
-import { isPanEvent, panMidiEvent, Track, TrackId } from "@signal-app/core"
+import {
+  isPanEvent,
+  panMidiEvent,
+  type Track,
+  type TrackId,
+} from "@signal-app/core"
 import { useCallback, useState } from "react"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"

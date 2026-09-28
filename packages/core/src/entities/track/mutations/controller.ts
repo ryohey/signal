@@ -1,8 +1,8 @@
-import { ControllerEvent } from "midifile-ts"
+import type { ControllerEvent } from "midifile-ts"
 import { getControllerEventWithType } from "../../event/selectors"
-import { TrackEventOf } from "../../event/TrackEvent"
+import type { TrackEventOf } from "../../event/TrackEvent"
 import { updateOrAdd } from "./composed"
-import { TrackEventsMutator } from "./type"
+import type { TrackEventsMutator } from "./type"
 
 const setControllerValue = (
   controllerType: number,

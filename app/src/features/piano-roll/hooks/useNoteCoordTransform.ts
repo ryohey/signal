@@ -1,4 +1,4 @@
-import { Point } from "@signal-app/geometry"
+import type { Point } from "@signal-app/geometry"
 import { useCallback, useMemo } from "react"
 import { NoteCoordTransform } from "../entities/NoteCoordTransform"
 import { useKeyScroll } from "./useKeyScroll"

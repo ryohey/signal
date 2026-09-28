@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Beats } from "../../../../components/GLNodes/Beats"
 import { Cursor } from "../../../../components/GLNodes/Cursor"
 import { matrixFromTranslation } from "../../../../helpers/matrix"

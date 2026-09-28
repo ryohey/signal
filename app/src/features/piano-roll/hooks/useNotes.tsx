@@ -1,5 +1,5 @@
-import { Rect } from "@signal-app/geometry"
-import { NoteEvent } from "@signal-app/pianoroll-editor"
+import type { Rect } from "@signal-app/geometry"
+import type { NoteEvent } from "@signal-app/pianoroll-editor"
 import { useCallback, useMemo } from "react"
 import { useNoteEvents } from "./useEventView"
 import { useIsRhythmTrack } from "./useIsRhythmTrack"

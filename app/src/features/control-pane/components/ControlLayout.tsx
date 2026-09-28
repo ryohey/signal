@@ -1,11 +1,11 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon"
-import React, { FC, HTMLAttributes, useCallback, useRef } from "react"
+import React, { type FC, type HTMLAttributes, useCallback, useRef } from "react"
 import { useRootView } from "../../../hooks/useRootView"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import {
-  ControlMode,
+  type ControlMode,
   controlModeKey,
   isEqualControlMode,
 } from "../entities/ControlMode"

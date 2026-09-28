@@ -1,5 +1,5 @@
 import { NoteNumber } from "@signal-app/core"
-import { NoteEvent } from "./NoteEvent"
+import type { NoteEvent } from "./NoteEvent"
 
 export const moveEvent =
   (deltaTick: number) =>

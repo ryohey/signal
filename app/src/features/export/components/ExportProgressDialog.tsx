@@ -6,7 +6,7 @@ import {
   DialogTitle,
   LinearProgress,
 } from "@signal-app/ui"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { Localized } from "../../../localize/useLocalization"
 import { useExport } from "../hooks/useExport"
 

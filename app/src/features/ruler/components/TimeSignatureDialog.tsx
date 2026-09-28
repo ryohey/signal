@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@signal-app/ui"
 import { range } from "lodash"
-import React, { FC, useEffect, useState } from "react"
+import React, { type FC, useEffect, useState } from "react"
 import { Localized } from "../../../localize/useLocalization"
 
 export interface TimeSignatureDialogProps {

@@ -1,6 +1,6 @@
-import { TrackEventOf, TrackEventStore } from "@signal-app/core"
-import { SetTempoEvent } from "midifile-ts"
-import { TempoItem } from "../entities"
+import type { TrackEventOf, TrackEventStore } from "@signal-app/core"
+import type { SetTempoEvent } from "midifile-ts"
+import type { TempoItem } from "../entities"
 import {
   setTempoEventToTempoItem,
   tempoItemToSetTempoEvent,

@@ -1,10 +1,10 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: ignore in test */
 import { SongStore } from "@signal-app/core"
 import { act, renderHook } from "@testing-library/react"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { StoreContext } from "../../../hooks/useStores"
-import RootStore from "../../../stores/RootStore"
+import type RootStore from "../../../stores/RootStore"
 import { usePanSlider } from "./usePanSlider"
 
 // Mock dependencies that don't need real implementation

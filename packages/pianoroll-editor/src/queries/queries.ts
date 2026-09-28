@@ -4,7 +4,7 @@ import {
   filterNotesInSelection,
   findNeighborNote,
   type NoteEvent,
-  NoteSelection,
+  type NoteSelection,
   toId,
 } from "../entities"
 import type { PianoRollEditorQuery } from "./type"

@@ -1,4 +1,4 @@
-import { ControllerEvent, SysExEvent } from "midifile-ts"
+import type { ControllerEvent, SysExEvent } from "midifile-ts"
 
 export function controllerMidiEvent(
   deltaTime: number,

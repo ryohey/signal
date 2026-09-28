@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { Button } from "@signal-app/ui"
 import RemoveIcon from "mdi-react/RemoveIcon"
-import { FC } from "react"
+import type { FC } from "react"
 import { Localized } from "../../../localize/useLocalization"
 import { useSoundFont } from "../hooks/useSoundFont"
 

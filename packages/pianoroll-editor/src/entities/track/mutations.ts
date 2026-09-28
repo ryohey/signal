@@ -1,4 +1,4 @@
-import { NoteEvent, TrackEventStore } from "@signal-app/core"
+import type { NoteEvent, TrackEventStore } from "@signal-app/core"
 
 export const addNote =
   (note: Omit<NoteEvent, "id">) =>

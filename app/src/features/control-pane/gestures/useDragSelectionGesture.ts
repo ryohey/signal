@@ -1,10 +1,10 @@
-import { Point } from "@signal-app/geometry"
+import type { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag2 } from "../../../helpers/observeDrag"
 import { useHistory } from "../../../hooks/useHistory"
 import { useQuantizer } from "../../../hooks/useQuantizer"
-import { ControlCoordTransform } from "../entities/ControlCoordTransform"
+import type { ControlCoordTransform } from "../entities/ControlCoordTransform"
 import { useControlEditor } from "../hooks/useControlEditor"
 import { useControlPane } from "../hooks/useControlPane"
 

@@ -1,8 +1,8 @@
 import { GLNode, useTransform } from "@ryohey/webgl-react"
-import { Rect } from "@signal-app/geometry"
-import { vec4 } from "gl-matrix"
-import { FC } from "react"
-import { IColorData, NoteShader } from "./NoteShader"
+import type { Rect } from "@signal-app/geometry"
+import type { vec4 } from "gl-matrix"
+import type { FC } from "react"
+import { type IColorData, NoteShader } from "./NoteShader"
 
 export interface NoteRectanglesProps {
   rects: (Rect & IColorData)[]

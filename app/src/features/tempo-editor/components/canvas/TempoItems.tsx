@@ -1,6 +1,6 @@
 import { HitArea } from "@ryohey/webgl-react"
 import { Rect } from "@signal-app/geometry"
-import { FC, useCallback, useMemo } from "react"
+import { type FC, useCallback, useMemo } from "react"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { LineGraphItems } from "../../../control-pane/components/LineGraph/LineGraphItems"
 import { transformEvents } from "../../helpers/transformEvents"
@@ -9,7 +9,7 @@ import { useDragSelectionGesture } from "../../hooks/useDragSelectionGesture"
 import { useTempoEditor } from "../../hooks/useTempoEditor"
 import { useTempoItems } from "../../hooks/useTempoItems"
 import { useTempoTransform } from "../../hooks/useTempoTransform"
-import { TempoGraphItem } from "../TempoGraphItem"
+import type { TempoGraphItem } from "../TempoGraphItem"
 
 const CIRCLE_RADIUS = 4
 

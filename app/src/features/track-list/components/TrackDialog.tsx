@@ -1,4 +1,4 @@
-import { TrackId } from "@signal-app/core"
+import type { TrackId } from "@signal-app/core"
 import {
   Button,
   Dialog,
@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@signal-app/ui"
 import { range } from "lodash"
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useState } from "react"
 import { useTrack } from "../../../hooks/useTrack"
 import { Localized } from "../../../localize/useLocalization"
 import { useSetTrackName } from "../hooks/useSetTrackName"

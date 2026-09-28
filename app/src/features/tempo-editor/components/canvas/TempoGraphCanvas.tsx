@@ -1,5 +1,5 @@
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
-import { CSSProperties, FC, useCallback, useMemo } from "react"
+import { type CSSProperties, type FC, useCallback, useMemo } from "react"
 import { Beats } from "../../../../components/GLNodes/Beats"
 import { Cursor } from "../../../../components/GLNodes/Cursor"
 import { matrixFromTranslation } from "../../../../helpers/matrix"

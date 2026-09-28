@@ -1,4 +1,4 @@
-import { NoteEvent, Track } from "@signal-app/core"
+import { type NoteEvent, Track } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
 import { getEventsByIdsOrAll } from "./queries"
 

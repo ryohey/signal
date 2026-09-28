@@ -8,7 +8,7 @@ import {
   Label,
   Select,
 } from "@signal-app/ui"
-import React, { FC } from "react"
+import React, { type FC } from "react"
 import { ScaleName } from "../../../../components/KeySignatureDialog/ScaleName"
 import { Scale } from "../../../../entities/scale/Scale"
 import { Localized } from "../../../../localize/useLocalization"

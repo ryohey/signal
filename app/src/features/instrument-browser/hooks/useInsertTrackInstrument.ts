@@ -1,4 +1,4 @@
-import { programChangeMidiEvent, TrackId } from "@signal-app/core"
+import { programChangeMidiEvent, type TrackId } from "@signal-app/core"
 import { useCallback } from "react"
 import { useHistory } from "../../../hooks/useHistory"
 import { usePlayer } from "../../../hooks/usePlayer"

@@ -1,7 +1,7 @@
 import { useTheme } from "@emotion/react"
 import { GLFallback } from "@ryohey/webgl-react"
 import Color from "color"
-import { FC, useMemo } from "react"
+import { type FC, useMemo } from "react"
 import { Layout } from "../../../../Constants"
 import { KeySignature } from "../../../../entities/scale/KeySignature"
 import { colorToVec4 } from "../../../../gl/color"

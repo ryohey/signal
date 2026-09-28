@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useCreateSelectionGesture } from "./useCreateSelectionGesture"
 
 export const useSelectionGesture = (): MouseDownHandler => {

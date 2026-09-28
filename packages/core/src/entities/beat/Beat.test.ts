@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { Range } from "../geometry/Range"
-import { Measure } from "../measure/Measure"
+import type { Measure } from "../measure/Measure"
 import { Beat } from "./Beat"
 
 describe("createBeatsInRange", () => {

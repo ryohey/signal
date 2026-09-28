@@ -1,4 +1,4 @@
-import { Getter, Setter, WritableAtom } from "jotai"
+import type { Getter, Setter, WritableAtom } from "jotai"
 import { cloneDeep } from "lodash"
 
 // An atom whose value takes part in undo/redo. Wrapping an atom is the only

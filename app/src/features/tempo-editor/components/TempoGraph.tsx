@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import useComponentSize from "@rehooks/component-size"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { type FC, useCallback, useEffect, useRef } from "react"
 import { Layout } from "../../../Constants"
 import {
   BAR_WIDTH,

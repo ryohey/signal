@@ -1,8 +1,8 @@
 import {
   isNoteEvent,
-  NoteEvent,
-  TrackEventStore,
-  TrackId,
+  type NoteEvent,
+  type TrackEventStore,
+  type TrackId,
 } from "@signal-app/core"
 
 export type ArrangeNoteContent = {

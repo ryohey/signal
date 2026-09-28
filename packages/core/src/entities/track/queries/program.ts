@@ -1,10 +1,10 @@
 import { flow } from "lodash"
-import { ProgramChangeEvent } from "midifile-ts"
+import type { ProgramChangeEvent } from "midifile-ts"
 import { some } from "../../../helpers"
 import { isProgramChangeEvent } from "../../event"
-import { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
+import type { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
 import { getAll } from "./primitives"
-import { TrackEventsQuery } from "./type"
+import type { TrackEventsQuery } from "./type"
 
 export const findProgramChangeEventAtOrBefore =
   (tick: number) =>

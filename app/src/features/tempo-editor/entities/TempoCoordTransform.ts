@@ -1,5 +1,5 @@
-import { Point } from "@signal-app/geometry"
-import { TickTransform } from "../../../entities/transform/TickTransform"
+import type { Point } from "@signal-app/geometry"
+import type { TickTransform } from "../../../entities/transform/TickTransform"
 
 export class TempoCoordTransform {
   constructor(

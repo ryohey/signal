@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { ToolSelector } from "../../../../components/Toolbar/ToolSelector"
 import { useTempoEditor } from "../../hooks/useTempoEditor"
 

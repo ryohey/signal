@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from "react"
-import { ElectronAPI } from "../../../../electron/src/ElectronAPI"
-import { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
+import { type FC, useEffect, useState } from "react"
+import type { ElectronAPI } from "../../../../electron/src/ElectronAPI"
+import type { FirebaseCredential } from "../../../../electron/src/FirebaseCredential"
 
 declare global {
   interface Window {

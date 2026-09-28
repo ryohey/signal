@@ -1,7 +1,7 @@
-import { ValueEventType } from "@signal-app/control-editor"
-import { Size } from "@signal-app/geometry"
+import type { ValueEventType } from "@signal-app/control-editor"
+import type { Size } from "@signal-app/geometry"
 import { MIDIControlEvents } from "midifile-ts"
-import React, { FC, useMemo } from "react"
+import React, { type FC, useMemo } from "react"
 import LineGraphControl from "../LineGraph/LineGraph"
 
 export type ValueEventGraphProps = Size & {

@@ -1,4 +1,4 @@
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { usePianoRoll } from "../hooks/usePianoRoll"
 
 export const useChangeToolGesture = (): MouseDownHandler => {

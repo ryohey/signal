@@ -29,10 +29,11 @@
       },
       "style": {
         "noUnusedTemplateLiteral": "off",
-        "useImportType": "off",
+        "useImportType": "error",
         "useNodejsImportProtocol": "off",
         "useTemplate": "off",
-        "useBlockStatements": "error"
+        "useBlockStatements": "error",
+        "useExportType": "error"
       },
       "correctness": {},
       "a11y": {

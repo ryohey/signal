@@ -1,6 +1,6 @@
-import { ArrangeSelection } from "@signal-app/arrange-editor"
+import type { ArrangeSelection } from "@signal-app/arrange-editor"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { createContext, useContext, useMemo } from "react"
 import { historyAtom } from "../../../hooks/historyAtom"
 import { BeatsProvider, createBeatsScope } from "../../../hooks/useBeats"

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC } from "react"
+import type { FC } from "react"
 import { DraggableList } from "../../../components/DraggableList/DraggableList"
 import { useTrackList } from "../hooks/useTrackList"
 import { AddTrackButton } from "./AddTrackButton"

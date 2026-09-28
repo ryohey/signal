@@ -1,7 +1,7 @@
-import { ProgramChangeEvent } from "midifile-ts"
+import type { ProgramChangeEvent } from "midifile-ts"
 import { describe, expect, it } from "vitest"
 import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
-import { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
+import type { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
 import { addEvent } from "../mutations"
 import {
   getProgramChangeEventAtOrBefore,

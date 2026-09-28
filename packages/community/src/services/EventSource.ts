@@ -1,4 +1,4 @@
-import { IEventSource, PlayerEvent } from "@signal-app/player"
+import type { IEventSource, PlayerEvent } from "@signal-app/player"
 import maxBy from "lodash/maxBy.js"
 import uniq from "lodash/uniq.js"
 import { isNotUndefined } from "../helpers/array.js"
@@ -9,7 +9,7 @@ import {
   isProgramChangeEvent,
   isSetTempoEvent,
 } from "../song/identify.js"
-import { Song, TrackEvent } from "../song/Song.js"
+import type { Song, TrackEvent } from "../song/Song.js"
 
 export const isEventInRange =
   <T extends { tick: number }>(startTick: number, endTick: number) =>

@@ -1,5 +1,5 @@
 import { IndexedDBStorage } from "../data/IndexedDBStorage"
-import {
+import type {
   Metadata,
   SoundFontFile,
   SoundFontItem,

@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { MouseDownHandler } from "../../../gesture/MouseGesture"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { useCreateNoteGesture } from "./useCreateNoteGesture"
 import { useSelectNoteGesture } from "./useSelectNoteGesture"
 

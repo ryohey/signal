@@ -1,4 +1,4 @@
-import { Song, Track, TrackId } from "@signal-app/core"
+import type { Song, Track, TrackId } from "@signal-app/core"
 
 export const getTrackOrThrow = (song: Song, trackId: TrackId): Track => {
   const track = song.getTrack(trackId)

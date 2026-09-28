@@ -1,4 +1,4 @@
-import { Range } from "../geometry/Range"
+import type { Range } from "../geometry/Range"
 import { Measure } from "../measure/Measure"
 
 export interface Beat {

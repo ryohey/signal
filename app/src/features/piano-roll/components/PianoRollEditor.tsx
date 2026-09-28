@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { SplitPaneProps } from "@ryohey/react-split-pane"
-import { FC, ReactNode } from "react"
+import type { SplitPaneProps } from "@ryohey/react-split-pane"
+import type { FC, ReactNode } from "react"
 import { useAutoFocus } from "../../../hooks/useAutoFocus"
 import EventList from "../../event-list/components/EventList"
 import { useEventList } from "../../event-list/hooks/useEventList"

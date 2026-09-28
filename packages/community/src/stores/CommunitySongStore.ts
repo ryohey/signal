@@ -1,4 +1,4 @@
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { makeObservable, observable } from "mobx"
 
 export class CommunitySongStore {

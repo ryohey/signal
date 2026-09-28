@@ -1,5 +1,5 @@
 import { Emitter } from "./emitter"
-import { Observable } from "./observable"
+import type { Observable } from "./observable"
 
 export class ObservableValue<T> {
   private readonly emitter = new Emitter()

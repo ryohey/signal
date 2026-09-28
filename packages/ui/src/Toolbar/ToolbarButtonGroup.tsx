@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ComponentProps, forwardRef } from "react"
+import { type ComponentProps, forwardRef } from "react"
 
 export const ToolbarButtonGroup = styled.div`
   min-width: auto;

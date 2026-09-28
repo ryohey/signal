@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@signal-app/ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { StyledFirebaseAuth } from "../../auth/StyledFirebaseAuth"
 import "firebase/auth"
 import { Alert, Button } from "@signal-app/ui"

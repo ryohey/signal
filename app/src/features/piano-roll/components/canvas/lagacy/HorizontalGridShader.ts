@@ -6,7 +6,7 @@ import {
   uniformMat4,
   uniformVec4,
 } from "@ryohey/webgl-react/legacy"
-import { Rect } from "@signal-app/geometry"
+import type { Rect } from "@signal-app/geometry"
 
 class HorizontalGridBuffer {
   readonly buffers: {

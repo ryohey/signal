@@ -1,5 +1,8 @@
-import { createControlEditor, ValueEventType } from "@signal-app/control-editor"
-import { FC, ReactNode, useMemo } from "react"
+import {
+  createControlEditor,
+  type ValueEventType,
+} from "@signal-app/control-editor"
+import { type FC, type ReactNode, useMemo } from "react"
 import { useSong } from "../../../hooks/useSong"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { ControlEditorContext } from "../hooks/useControlEditor"

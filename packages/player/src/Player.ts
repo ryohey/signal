@@ -1,12 +1,12 @@
 import { type Observable, ObservableValue } from "@signal-app/observable"
 import range from "lodash/range.js"
 import throttle from "lodash/throttle.js"
-import { AnyEvent, MIDIControlEvents } from "midifile-ts"
-import { EventScheduler, EventSchedulerSource } from "./EventScheduler.js"
+import { type AnyEvent, MIDIControlEvents } from "midifile-ts"
+import { EventScheduler, type EventSchedulerSource } from "./EventScheduler.js"
 import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js"
-import { PlayerEvent } from "./PlayerEvent.js"
-import { SendableEvent, SynthOutput } from "./SynthOutput.js"
-import { DistributiveOmit } from "./types.js"
+import type { PlayerEvent } from "./PlayerEvent.js"
+import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import type { DistributiveOmit } from "./types.js"
 
 export interface LoopSetting {
   begin: number

@@ -1,7 +1,7 @@
 import { Measure } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
-import { Store } from "jotai/vanilla/store"
+import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
 import { useCallback, useMemo } from "react"
 import { useSong } from "./useSong"
