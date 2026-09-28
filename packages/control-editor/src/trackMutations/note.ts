@@ -1,11 +1,14 @@
-import { flow } from "lodash"
-import { filter, isEventInRange } from "../../../helpers"
-import { isNoteEvent } from "../../event"
-import { TrackEvent } from "../../event/TrackEvent"
-import { Range } from "../../geometry/Range"
-import { getAll, getNotesByIds } from "../queries"
-import { updateEvents } from "./composed"
-import { TrackEventsMutator } from "./type"
+import {
+  getAll,
+  getNotesByIds,
+  isEventInRange,
+  isNoteEvent,
+  Range,
+  TrackEvent,
+  TrackEventsMutator,
+  updateEvents,
+} from "@signal-app/core"
+import { filter, flow } from "lodash"
 
 // update velocities of notes in the specified range using linear interpolation
 export const updateVelocitiesInRange =

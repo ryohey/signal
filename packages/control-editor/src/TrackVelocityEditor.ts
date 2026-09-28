@@ -3,10 +3,10 @@ import {
   isNoteEvent,
   Range,
   Track,
-  updateVelocitiesInRange,
 } from "@signal-app/core"
 import { Unsubscribe } from "@signal-app/observable"
 import { VelocityItem } from "./entities/VelocityItem"
+import { updateVelocitiesInRange } from "./trackMutations/note"
 
 // Velocity is control-pane's own lane (alongside pitchBend/controller
 // lanes), but it edits NoteEvent.velocity, not a ValueEventType-shaped

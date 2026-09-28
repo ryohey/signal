@@ -1,6 +1,5 @@
 export * from "./batch"
 export * from "./composed"
 export * from "./higherOrder"
-export * from "./note"
 export * from "./primitives"
 export * from "./type"
