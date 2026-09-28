@@ -11,13 +11,9 @@ export const updateEvents = (
   updates: readonly Partial<TrackEvent>[],
 ): TrackEventsMutator =>
   combineMutators(
-    ...updates
-      .map((update) => {
-        if (update.id !== undefined) {
-          return updateEvent(update.id, update)
-        }
-      })
-      .filter(isNotUndefined),
+    ...updates.flatMap((update) =>
+      update.id !== undefined ? [updateEvent(update.id, update)] : [],
+    ),
   )
 
 export const addEvents = <T extends TrackEvent>(
