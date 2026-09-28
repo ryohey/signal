@@ -21,6 +21,7 @@
     "noUncheckedSideEffectImports": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true
   }
 }
