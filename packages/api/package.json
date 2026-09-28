@@ -19,9 +19,10 @@
   "author": "ryohey",
   "license": "MIT",
   "peerDependencies": {
-    "firebase": "^10.0.0"
+    "firebase": "catalog:"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

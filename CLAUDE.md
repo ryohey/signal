@@ -6,31 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Commands
 
-- `npm start` - Start development tasks via Turbo (`turbo run dev --parallel`)
-- `npm run build` - Build app artifacts for distribution (`npm run build:app`)
-- `npm test` - Run tests across all packages using turbo
-- `npm run lint` - Run lint tasks via Turbo
-- `npm run format` - Run format tasks via Turbo
-- `npm run check` - Run check tasks via Turbo
-- `npm run typecheck` - Run TypeScript type-check across all packages and app via Turbo
+- `pnpm start` - Start development tasks via Turbo (`turbo run dev --parallel`)
+- `pnpm build` - Build app artifacts for distribution (`pnpm build:app`)
+- `pnpm test` - Run tests across all packages using turbo
+- `pnpm lint` - Run lint tasks via Turbo
+- `pnpm format` - Run format tasks via Turbo
+- `pnpm check` - Run check tasks via Turbo
+- `pnpm typecheck` - Run TypeScript type-check across all packages and app via Turbo
 
 ### App-specific Commands
 
-- `npm run dev -w app` - Start dev server for the main app
-- `npm run build -w app` - Build the main React application
-- `npm run test -w app` - Run tests for the app
-- `npm run lint -w app` - Run Biome linting for the app
-- `npm run format -w app` - Format app code with Biome
-- `npm run check -w app` - Run Biome checks for the app
-- `npm run typecheck -w app` - Run TypeScript type-check for app
+- `pnpm --dir app dev` - Start dev server for the main app
+- `pnpm --dir app build` - Build the main React application
+- `pnpm --dir app test` - Run tests for the app
+- `pnpm --dir app lint` - Run Biome linting for the app
+- `pnpm --dir app format` - Format app code with Biome
+- `pnpm --dir app check` - Run Biome checks for the app
+- `pnpm --dir app typecheck` - Run TypeScript type-check for app
 
 ### Electron Commands
 
-- `npm run dev:electron` - Start Electron development (concurrently runs app dev server and electron)
-- `npm run build:electron` - Build the Electron application
-- `npm run make:electron` - Package Electron app for distribution
-- `npm run make:darwin` - Package for macOS
-- `npm run make:win` - Package for Windows
+- `pnpm dev:electron` - Start Electron development (concurrently runs app dev server and electron)
+- `pnpm build:electron` - Build the Electron application
+- `pnpm make:electron` - Package Electron app for distribution
+- `pnpm make:darwin` - Package for macOS
+- `pnpm make:win` - Package for Windows
+
+### Dependencies
+
+- Package manager is pnpm (workspace defined in `pnpm-workspace.yaml`; `electron/`, `functions/` stay on npm)
+- External library versions are pinned in the `catalog:` section of `pnpm-workspace.yaml`; reference them as `"catalog:"` in `package.json`
+- Internal packages are referenced as `"workspace:*"`
+- pnpm does not hoist, so every package must declare what it imports (including `@types/*`)
 
 ### Docker
 

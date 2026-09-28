@@ -5,7 +5,8 @@ FROM node:${NODE_VERSION} AS builder
 WORKDIR /code
 
 COPY . .
-RUN --mount=type=cache,target=/root/.npm npm install && npm run build
+RUN npm install --global corepack@latest && corepack enable
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile && pnpm build
 
 FROM node:${NODE_VERSION} AS runner
 

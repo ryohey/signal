@@ -17,11 +17,12 @@
     }
   },
   "devDependencies": {
-    "typescript": "6.0.3",
-    "vitest": "4.1.5"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
-    "@signal-app/core": "*",
-    "@signal-app/observable": "*"
+    "@signal-app/core": "workspace:*",
+    "@signal-app/observable": "workspace:*"
   }
 }

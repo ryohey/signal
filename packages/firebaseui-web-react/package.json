@@ -18,12 +18,15 @@
   "author": "ryohey",
   "license": "MIT",
   "peerDependencies": {
-    "firebase": "^10.0.0",
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0",
-    "firebaseui": "^6.1.0"
+    "firebase": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "firebaseui": "catalog:"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
+    "@emotion/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
   }
 }
