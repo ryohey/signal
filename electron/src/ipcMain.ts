@@ -1,12 +1,12 @@
 import {
-  type BrowserWindow,
-  type IpcMainInvokeEvent,
   app,
+  type BrowserWindow,
   dialog,
+  type IpcMainInvokeEvent,
   ipcMain,
 } from "electron"
 import log from "electron-log"
-import { readFile, readdir, writeFile } from "fs/promises"
+import { readdir, readFile, writeFile } from "fs/promises"
 import { isAbsolute, join } from "path"
 import { getArgument } from "./arguments"
 import { signInWithBrowser } from "./auth"

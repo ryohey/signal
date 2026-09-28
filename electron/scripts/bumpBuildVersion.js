@@ -9,7 +9,7 @@ const envPath = path.join(__dirname, "..", ".env")
 const env = dotenv.parse(fs.readFileSync(envPath))
 
 const BUILD_VERSION = env.BUILD_VERSION
-const newBuildVersion = parseInt(BUILD_VERSION) + 1
+const newBuildVersion = parseInt(BUILD_VERSION, 10) + 1
 
 env.BUILD_VERSION = newBuildVersion.toString()
 

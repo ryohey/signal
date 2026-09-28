@@ -1,6 +1,5 @@
-import { type FC, useState } from "react"
-
 import styled from "@emotion/styled"
+import { type FC, useState } from "react"
 import "firebase/auth"
 import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../firebase/firebase"

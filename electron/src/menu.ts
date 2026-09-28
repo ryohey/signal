@@ -1,4 +1,4 @@
-import { type MenuItemConstructorOptions, app } from "electron"
+import { app, type MenuItemConstructorOptions } from "electron"
 
 const isMac = process.platform === "darwin"
 

@@ -69,10 +69,9 @@ export class SoundFont {
 
           const sampleName = instrumentZone.sample.name
           for (let key = min; key <= max; key++) {
-            if (!presetMeta.samples.has(key)) {
-              presetMeta.samples.set(key, [])
-            }
-            presetMeta.samples.get(key)!.push({ name: sampleName })
+            const samples = presetMeta.samples.get(key) ?? []
+            samples.push({ name: sampleName })
+            presetMeta.samples.set(key, samples)
           }
         }
       }

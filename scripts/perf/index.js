@@ -1,6 +1,6 @@
+import { setTimeout } from "node:timers/promises"
 import { existsSync } from "fs"
 import fs from "fs/promises"
-import { setTimeout } from "node:timers/promises"
 import path, { dirname } from "path"
 import puppeteer from "puppeteer"
 import { fileURLToPath } from "url"

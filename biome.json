@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,19 +7,15 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "!!**/.claude"]
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "!!**/.claude",
+      "!electron/scripts/generate-appx-manifest"
+    ]
   },
-  "overrides": [
-    {
-      "includes": ["electron/scripts/generate-appx-manifest/**"],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      }
-    }
-  ],
   "linter": {
     "enabled": true,
     "rules": {
