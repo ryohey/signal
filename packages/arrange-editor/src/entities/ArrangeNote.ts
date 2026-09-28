@@ -1,13 +1,9 @@
 import {
-  filter,
-  getAll,
   isNoteEvent,
-  map,
   NoteEvent,
-  TrackEventsQuery,
+  TrackEventStore,
   TrackId,
 } from "@signal-app/core"
-import { flow } from "lodash"
 
 export type ArrangeNoteContent = {
   readonly tick: number
@@ -23,21 +19,19 @@ export type ArrangeNote = ArrangeNoteContent & {
   readonly trackIndex: number
 }
 
-export const getArrangeNotesInTrack = (
-  trackId: TrackId,
-  trackIndex: number,
-): TrackEventsQuery<readonly ArrangeNote[]> =>
-  flow(
-    getAll,
-    filter(isNoteEvent),
-    map((event) => ({
-      id: event.id,
-      tick: event.tick,
-      duration: event.duration,
-      noteNumber: event.noteNumber,
-      velocity: event.velocity,
-      event,
-      trackId,
-      trackIndex,
-    })),
-  )
+export const getArrangeNotesInTrack =
+  (trackId: TrackId, trackIndex: number) =>
+  (track: TrackEventStore): readonly ArrangeNote[] =>
+    track
+      .getEvents()
+      .filter(isNoteEvent)
+      .map((event) => ({
+        id: event.id,
+        tick: event.tick,
+        duration: event.duration,
+        noteNumber: event.noteNumber,
+        velocity: event.velocity,
+        event,
+        trackId,
+        trackIndex,
+      }))

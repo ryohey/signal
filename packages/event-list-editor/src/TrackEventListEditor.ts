@@ -1,7 +1,8 @@
-import { getEventsByIdsOrAll, Track, TrackEvent } from "@signal-app/core"
+import { Track, TrackEvent } from "@signal-app/core"
 import { ObservableValue, Unsubscribe } from "@signal-app/observable"
 import { getEventController } from "./entities/EventController"
 import { EventListItem } from "./entities/EventListItem"
+import { getEventsByIdsOrAll } from "./trackQueries/queries"
 
 // Unlike the other domain editors (tempo/control/pianoroll/arrange), this
 // editor's items are heterogeneous by design - it's a generic inspector over
@@ -38,7 +39,7 @@ export class TrackEventListEditor {
   }
 
   private updateItems = () => {
-    const events = this.track.query(getEventsByIdsOrAll(this._selectedIds))
+    const events = getEventsByIdsOrAll(this._selectedIds)(this.track)
     this._items.set(
       events.map((e) => ({
         id: e.id,

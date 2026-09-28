@@ -1,27 +1,24 @@
 import {
-  filter,
-  getAll,
-  getEventById,
   isSetTempoEvent,
   TrackEventOf,
-  TrackEventsQuery,
+  TrackEventStore,
 } from "@signal-app/core"
-import { flow } from "lodash"
 import { SetTempoEvent } from "midifile-ts"
 import { TempoItem } from "../entities"
 import { setTempoEventToTempoItem } from "../entities/tempo/transform"
 
-const getSetTempoEvents: TrackEventsQuery<
-  readonly TrackEventOf<SetTempoEvent>[]
-> = flow(getAll, filter(isSetTempoEvent))
+const getSetTempoEvents = (
+  events: TrackEventStore,
+): readonly TrackEventOf<SetTempoEvent>[] =>
+  events.getEvents().filter(isSetTempoEvent)
 
-export const getTempoItems: TrackEventsQuery<readonly TempoItem[]> = (events) =>
+export const getTempoItems = (events: TrackEventStore): readonly TempoItem[] =>
   getSetTempoEvents(events).map(setTempoEventToTempoItem)
 
 export const getTempoItemById =
-  (id: number): TrackEventsQuery<TempoItem | undefined> =>
-  (events) => {
-    const event = getEventById(id)(events)
+  (id: number) =>
+  (events: TrackEventStore): TempoItem | undefined => {
+    const event = events.getEventById(id)
     if (event === undefined || !isSetTempoEvent(event)) {
       return undefined
     }

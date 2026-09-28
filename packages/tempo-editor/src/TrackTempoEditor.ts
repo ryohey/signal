@@ -7,21 +7,20 @@ import { getTempoItemById, getTempoItems } from "./trackQueries/tempo"
 export class TrackTempoEditor {
   constructor(private readonly conductorTrack: Track) {}
 
-  getItems = (): readonly TempoItem[] =>
-    this.conductorTrack.query(getTempoItems)
+  getItems = (): readonly TempoItem[] => getTempoItems(this.conductorTrack)
 
   getById = (id: number): TempoItem | undefined =>
-    this.conductorTrack.query(getTempoItemById(id))
+    getTempoItemById(id)(this.conductorTrack)
 
   addItem = (item: Omit<TempoItem, "id">): TempoItem =>
-    this.conductorTrack.mutate(addTempoItem(item))
+    addTempoItem(item)(this.conductorTrack)
 
   removeItem = (id: number): void => {
     this.conductorTrack.removeEvent(id)
   }
 
   updateItem = (item: TempoItem): void =>
-    this.conductorTrack.mutate(updateTempoItems([item]))
+    updateTempoItems([item])(this.conductorTrack)
 
   observeItems = (listener: () => void): Unsubscribe =>
     this.conductorTrack.subscribeEventsChanged(isSetTempoEvent, listener)

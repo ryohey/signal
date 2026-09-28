@@ -255,7 +255,7 @@ export class Track implements TrackEventStore {
     return this._events.transaction(() => func(this))
   }
 
-  mutate = <R = void>(fn: TrackEventsMutator<R>): R => {
+  private mutate = <R = void>(fn: TrackEventsMutator<R>): R => {
     return this._events.transaction(() => fn(this._events))
   }
 

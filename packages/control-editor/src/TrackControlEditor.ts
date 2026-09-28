@@ -19,10 +19,10 @@ export class TrackControlEditor {
   }
 
   getItems = (): readonly ControlItem[] =>
-    this.track.query(getAll).filter(this.predicate).map(controlEventToItem)
+    this.track.getEvents().filter(this.predicate).map(controlEventToItem)
 
   getById = (id: number): ControlItem | undefined => {
-    const event = this.track.query(getEventById(id))
+    const event = this.track.getEventById(id)
     return event !== undefined && this.predicate(event)
       ? controlEventToItem(event)
       : undefined

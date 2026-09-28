@@ -1,9 +1,4 @@
-import {
-  getEventById as getTrackEventById,
-  Song,
-  Track,
-  TrackEvent,
-} from "@signal-app/core"
+import { Song, Track, TrackEvent } from "@signal-app/core"
 import {
   combineSubscription,
   switchSubscription,
@@ -41,11 +36,11 @@ export class SongArrangeEditor {
     this.tracks[trackIndex]?.events ?? []
 
   getEventById = (trackIndex: number, id: number): TrackEvent | undefined =>
-    this.tracks[trackIndex]?.query(getTrackEventById(id))
+    this.tracks[trackIndex]?.getEventById(id)
 
   getArrangeNotes = (): readonly ArrangeNote[] =>
     this.tracks.flatMap((track, index) =>
-      track.query(getArrangeNotesInTrack(track.id, index)),
+      getArrangeNotesInTrack(track.id, index)(track),
     )
 
   // mutations

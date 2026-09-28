@@ -29,13 +29,6 @@ export const createPianoRollEditor = (song: Song, trackId: TrackId) => {
   const track = getTrackOrThrow(song, trackId)
   const mapper = new TrackNoteMapper(track)
 
-  const bindTrackMutation =
-    <A extends unknown[], R>(
-      fn: (...args: A) => TrackEventsMutator<R>,
-    ): ((...args: A) => R) =>
-    (...args: A) =>
-      track.mutate(fn(...args))
-
   const bindQuery =
     <A extends unknown[], R>(
       fn: (...args: A) => (context: TrackNoteMapper) => R,
@@ -78,6 +71,6 @@ export const createPianoRollEditor = (song: Song, trackId: TrackId) => {
     quantizeNotes: bindMutation(quantizeNotes),
     removeNotes: bindMutation(removeNotes),
     transposeNotes: bindMutation(transposeNotes),
-    batchUpdateNotesVelocity: bindTrackMutation(batchUpdateNotesVelocity),
+    batchUpdateNotesVelocity: batchUpdateNotesVelocity(track),
   }
 }

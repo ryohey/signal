@@ -1,9 +1,4 @@
-import {
-  addEvent,
-  TrackEventOf,
-  type TrackEventsMutator,
-  updateEvent,
-} from "@signal-app/core"
+import { TrackEventOf, TrackEventStore } from "@signal-app/core"
 import { SetTempoEvent } from "midifile-ts"
 import { TempoItem } from "../entities"
 import {
@@ -12,25 +7,25 @@ import {
 } from "../entities/tempo/transform"
 
 export const addTempoItem =
-  (item: Omit<TempoItem, "id">): TrackEventsMutator<TempoItem> =>
-  (context) => {
+  (item: Omit<TempoItem, "id">) =>
+  (context: TrackEventStore): TempoItem => {
     const event = tempoItemToSetTempoEvent({ id: 0, ...item })
-    const addedEvent = addEvent<TrackEventOf<SetTempoEvent>>(event)(context)
+    const addedEvent = context.addEvent<TrackEventOf<SetTempoEvent>>(event)
     return setTempoEventToTempoItem(addedEvent)
   }
 
 export const addTempoItems =
-  (items: readonly Omit<TempoItem, "id">[]): TrackEventsMutator<TempoItem[]> =>
-  (context) =>
+  (items: readonly Omit<TempoItem, "id">[]) =>
+  (context: TrackEventStore): readonly TempoItem[] =>
     items.map((item) => addTempoItem(item)(context))
 
 export const updateTempoItem =
-  (item: TempoItem): TrackEventsMutator<void> =>
-  (context) => {
-    updateEvent(item.id, tempoItemToSetTempoEvent(item))(context)
+  (item: TempoItem) => (context: TrackEventStore) => {
+    context.updateEvent(item.id, tempoItemToSetTempoEvent(item))
   }
 
 export const updateTempoItems =
-  (items: readonly TempoItem[]): TrackEventsMutator<void> =>
-  (context) =>
+  (items: readonly TempoItem[]) =>
+  (context: TrackEventStore): void => {
     items.map((item) => updateTempoItem(item)(context))
+  }

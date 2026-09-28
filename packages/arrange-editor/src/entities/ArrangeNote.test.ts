@@ -29,9 +29,7 @@ describe("entities/ArrangeNote", () => {
 
     const trackId = 7 as TrackId
     const trackIndex = 2
-    const arrangeNotes = track.query(
-      getArrangeNotesInTrack(trackId, trackIndex),
-    )
+    const arrangeNotes = getArrangeNotesInTrack(trackId, trackIndex)(track)
 
     expect(arrangeNotes.length).toBe(1)
     expect(arrangeNotes[0]).toMatchObject({
