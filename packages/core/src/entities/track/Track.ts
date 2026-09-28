@@ -29,8 +29,15 @@ import { setProgramNumberAt, setProgramNumberById } from "./mutations/program"
 import { setColor, setName, setTempo } from "./mutations/setter"
 import { addTimeSignature } from "./mutations/timeSignature"
 import { TrackEventsMutator } from "./mutations/type"
-import { hasProgramChangeEventAfter, hasTimeSignatureAt } from "./queries"
+import {
+  getAll,
+  getEventById,
+  getEventsByIds,
+  hasProgramChangeEventAfter,
+  hasTimeSignatureAt,
+} from "./queries"
 import { TrackEventsQuery } from "./queries/type"
+import { TrackEventStore } from "./TrackEventStore"
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
@@ -49,7 +56,7 @@ type SerializedTrack = {
   endOfTrack?: number
 }
 
-export class Track {
+export class Track implements TrackEventStore {
   private readonly _id = new ObservableValue<TrackId>(UNASSIGNED_TRACK_ID)
   private _events = new TickOrderedArray<TrackEvent>()
   private readonly _name = new ObservableValue<string | undefined>(undefined)
@@ -258,6 +265,9 @@ export class Track {
 
   /* queries */
 
+  getEvents = flow(getAll, this.query)
+  getEventById = flow(getEventById, this.query)
+  getEventsByIds = flow(getEventsByIds, this.query)
   hasProgramChangeEventAfter = flow(hasProgramChangeEventAfter, this.query)
 
   /* mutations */
