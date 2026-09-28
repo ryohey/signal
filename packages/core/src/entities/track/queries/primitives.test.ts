@@ -25,7 +25,7 @@ describe("track queries/primitives", () => {
       velocity: 100,
     })(events)
 
-    const result = getAll(events)
+    const result = getAll()(events)
 
     expect(result.map((event) => event.id)).toStrictEqual([first.id, second.id])
   })

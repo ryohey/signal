@@ -31,27 +31,10 @@ import {
   SignalTrackColorEvent,
 } from "../event/signalEvents"
 import { TrackEvent, TrackEventOf } from "../event/TrackEvent"
-import * as TrackEvents from "./mutations"
-import {
-  addTimeSignature,
-  batchUpdateNotesVelocity,
-  setColor,
-  setName,
-  setPan,
-  setProgramNumberAt,
-  setProgramNumberById,
-  setTempo,
-  setVolume,
-  TrackEventsMutator,
-} from "./mutations"
-import {
-  getAll,
-  getEventById,
-  getEventsByIds,
-  hasProgramChangeEventAfter,
-  hasTimeSignatureAt,
-  TrackEventsQuery,
-} from "./queries"
+import * as Mutations from "./mutations"
+import { TrackEventsMutator } from "./mutations"
+import * as Queries from "./queries"
+import { TrackEventsQuery } from "./queries"
 import { TrackEventStore } from "./TrackEventStore"
 
 export type TrackId = Branded<number, "TrackId">
@@ -197,10 +180,10 @@ export class Track implements TrackEventStore {
     return this._onEventsChanged
   }
 
-  subscribeEventsChanged(
+  subscribeEventsChanged = (
     predicate: TrackEventPredicate,
     listener: () => void,
-  ): Unsubscribe {
+  ): Unsubscribe => {
     const emitter = new Emitter()
     const observer: FilteredEventsObserver = { predicate, emitter }
     this._filteredEventsObservers.add(observer)
@@ -255,7 +238,7 @@ export class Track implements TrackEventStore {
     }
   }
 
-  addEvents<T extends TrackEvent>(events: Omit<T, "id">[]): T[] {
+  addEvents = <T extends TrackEvent>(events: Omit<T, "id">[]): T[] => {
     const result = this.transaction(() => {
       const dontMoveChannelEvent = this.isConductorTrack
 
@@ -280,10 +263,15 @@ export class Track implements TrackEventStore {
 
   /* queries */
 
-  getEvents = () => this.query(getAll)
-  getEventById = flow(getEventById, this.query)
-  getEventsByIds = flow(getEventsByIds, this.query)
-  hasProgramChangeEventAfter = flow(hasProgramChangeEventAfter, this.query)
+  private bindQuery = <A extends unknown[], R>(fn: (...args: A) => R) =>
+    flow(fn, this.query)
+
+  getEvents = this.bindQuery(Queries.getAll)
+  getEventById = this.bindQuery(Queries.getEventById)
+  getEventsByIds = this.bindQuery(Queries.getEventsByIds)
+  hasProgramChangeEventAfter = this.bindQuery(
+    Queries.hasProgramChangeEventAfter,
+  )
   getProgramChangeEvent = (tick: number) =>
     getProgramChangeEvent(tick)(this.events)
   getVolume = (tick: number) => getVolume(tick)(this.events)
@@ -291,37 +279,38 @@ export class Track implements TrackEventStore {
 
   /* mutations */
 
-  addEvent = flow(TrackEvents.addEvent, this.mutate)
-  updateEvent = flow(TrackEvents.updateEvent, this.mutate)
-  updateEvents = flow(TrackEvents.updateEvents, this.mutate)
-  removeEvent = flow(
-    (id: number) => TrackEvents.removeEvents([id]),
-    this.mutate,
-  )
-  removeEvents = flow(TrackEvents.removeEvents, this.mutate)
-  createOrUpdate = flow(TrackEvents.createOrUpdate, this.mutate)
-  setColor = flow(setColor, this.mutate)
-  setName = flow(setName, this.mutate)
-  setProgramNumberAt = flow(setProgramNumberAt, this.mutate)
-  setProgramNumberById = flow(setProgramNumberById, this.mutate)
-  setPan = flow(setPan, this.mutate)
-  setVolume = flow(setVolume, this.mutate)
-  batchUpdateNotesVelocity = flow(batchUpdateNotesVelocity, this.mutate)
+  private bindMutation = <A extends unknown[], R>(
+    fn: (...args: A) => TrackEventsMutator<R>,
+  ) => flow(fn, this.mutate)
+
+  addEvent = this.bindMutation(Mutations.addEvent)
+  updateEvent = this.bindMutation(Mutations.updateEvent)
+  updateEvents = this.bindMutation(Mutations.updateEvents)
+  removeEvent = this.bindMutation((id: number) => Mutations.removeEvents([id]))
+  removeEvents = this.bindMutation(Mutations.removeEvents)
+  createOrUpdate = this.bindMutation(Mutations.createOrUpdate)
+  setColor = this.bindMutation(Mutations.setColor)
+  setName = this.bindMutation(Mutations.setName)
+  setProgramNumberAt = this.bindMutation(Mutations.setProgramNumberAt)
+  setProgramNumberById = this.bindMutation(Mutations.setProgramNumberById)
+  setPan = this.bindMutation(Mutations.setPan)
+  setVolume = this.bindMutation(Mutations.setVolume)
+  batchUpdateNotesVelocity = Mutations.batchUpdateNotesVelocity(this)
 
   /* conductor track features */
 
-  hasTimeSignatureAt = flow(hasTimeSignatureAt, this.query)
-  addTimeSignature = flow(addTimeSignature, this.mutate)
+  hasTimeSignatureAt = flow(Queries.hasTimeSignatureAt, this.query)
+  addTimeSignature = flow(Mutations.addTimeSignature, this.mutate)
   getTempo = (tick: number) => getTempo(tick)(this.events)
-  setTempo = flow(setTempo, this.mutate)
+  setTempo = flow(Mutations.setTempo, this.mutate)
 
   /* helper */
 
-  updateEndOfTrack() {
+  updateEndOfTrack = () => {
     this.endOfTrack = getMaxTick(this.events)
   }
 
-  private extendEndOfTrack(newEvent: TrackEvent) {
+  private extendEndOfTrack = (newEvent: TrackEvent) => {
     if (isNoteEvent(newEvent)) {
       this.endOfTrack = Math.max(
         this.endOfTrack,
@@ -346,14 +335,14 @@ export class Track implements TrackEventStore {
     return this.channel === 9
   }
 
-  clone() {
+  clone = () => {
     const track = new Track()
     track.channel = this.channel
     track.addEvents(this.events.map((e) => ({ ...e })))
     return track
   }
 
-  serialize() {
+  serialize = () => {
     return {
       id: this.id,
       _events: this._events.serialize(),

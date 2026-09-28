@@ -36,7 +36,7 @@ export const setColor =
   (color: TrackColor | null): TrackEventsMutator =>
   (events) => {
     if (color === null) {
-      const e = flow(getAll, getColorEvent)(events)
+      const e = flow(getAll(), getColorEvent)(events)
       if (e !== undefined) {
         removeEvent(e.id)(events)
       }

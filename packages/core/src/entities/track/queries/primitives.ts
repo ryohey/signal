@@ -6,5 +6,5 @@ export const getEventById =
   (events) =>
     events.get(id)
 
-export const getAll: TrackEventsQuery<readonly TrackEvent[]> = (events) =>
+export const getAll = (): TrackEventsQuery<readonly TrackEvent[]> => (events) =>
   events.getArray()

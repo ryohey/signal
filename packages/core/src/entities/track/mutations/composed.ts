@@ -35,7 +35,7 @@ export const createOrUpdate =
     newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
   ): TrackEventsMutator<T> =>
   (events) => {
-    const redundantEvents = flow(getAll, getRedundantEvents(newEvent))(events)
+    const redundantEvents = flow(getAll(), getRedundantEvents(newEvent))(events)
 
     if (redundantEvents.length > 0) {
       redundantEvents.forEach((event) => {
@@ -55,7 +55,7 @@ export const updateOrAdd =
     newEvent: Omit<T, "id"> & { subtype?: string; tick?: number },
   ): TrackEventsMutator<T | null> =>
   (events) => {
-    const event = flow(getAll, findEvent)(events)
+    const event = flow(getAll(), findEvent)(events)
     if (event !== undefined) {
       const { tick: _tick, ...update } = newEvent
       return updateEvent<T>(event.id, update as Partial<T>)(events)
