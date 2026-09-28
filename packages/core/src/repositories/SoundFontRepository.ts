@@ -6,22 +6,26 @@ import {
 } from "../entities/soundFont/SoundFont"
 import { isRunningInElectron } from "../helpers/platform"
 
-const defaultSoundFont: SoundFontItem & Metadata & { id: number } =
+const DEFAULT_SOUND_FONT_ID = -999 // Use negative number to avoid conflict with user saved soundfonts
+
+// Resolved on first use rather than at module load, so importing core does
+// not touch `navigator`.
+const getDefaultSoundFont = (): SoundFontItem & Metadata & { id: number } =>
   isRunningInElectron()
     ? {
-        id: -999, // Use negative number to avoid conflict with user saved soundfonts
+        id: DEFAULT_SOUND_FONT_ID,
         type: "file",
         path: "./assets/soundfonts/A320U.sf2",
         name: "A320U.sf2 (Signal Factory Sound)",
       }
     : {
-        id: -999, // Use negative number to avoid conflict with user saved soundfonts
+        id: DEFAULT_SOUND_FONT_ID,
         type: "remote",
         name: "A320U.sf2 (Signal Factory Sound)",
         url: "https://cdn.jsdelivr.net/gh/ryohey/signal@4569a31/public/A320U.sf2",
       }
 
-export const defaultSoundFontId = defaultSoundFont.id
+export const defaultSoundFontId = DEFAULT_SOUND_FONT_ID
 
 export class SoundFontRepository {
   private readonly storage = new IndexedDBStorage<SoundFontItem, Metadata>(
@@ -39,12 +43,12 @@ export class SoundFontRepository {
       ...list[Number(id)],
       id: Number(id),
     }))
-    return [defaultSoundFont, ...savedFiles]
+    return [getDefaultSoundFont(), ...savedFiles]
   }
 
   async getItem(id: number): Promise<SoundFontItem | null> {
-    if (defaultSoundFont.id === id) {
-      return defaultSoundFont
+    if (id === DEFAULT_SOUND_FONT_ID) {
+      return getDefaultSoundFont()
     }
     return await this.storage.load(id)
   }
