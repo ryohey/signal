@@ -1,6 +1,7 @@
 import { ControlEventsClipboardDataSchema } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
 import { useCallback } from "react"
+import { ValueEventType } from "../entities/event/ValueEventType"
 import { isNotUndefined } from "../helpers/array"
 import { useCommands } from "../hooks/useCommands"
 import { useControlPane } from "../hooks/useControlPane"
@@ -49,6 +50,31 @@ export const useCreateOrUpdateControlEventsValue = () => {
       position,
       pushHistory,
     ],
+  )
+}
+
+// value is in display units (e.g. pitch bend center is 0)
+export const useUpdateControlEventValue = () => {
+  const { selectedTrackId } = usePianoRoll()
+  const { getEventById, updateEvent } = useTrack(selectedTrackId)
+  const { pushHistory } = useHistory()
+
+  return useCallback(
+    (eventType: ValueEventType, eventId: number, value: number) => {
+      const event = getEventById(eventId)
+      if (
+        event === undefined ||
+        !ValueEventType.getEventPredicate(eventType)(event)
+      ) {
+        return
+      }
+
+      pushHistory()
+      updateEvent(eventId, {
+        value: ValueEventType.fromDisplayValue(eventType, value),
+      })
+    },
+    [getEventById, updateEvent, pushHistory],
   )
 }
 

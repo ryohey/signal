@@ -2,9 +2,10 @@ import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { isEventInRange, Range, TrackEventOf } from "@signal-app/core"
 import { ControllerEvent, PitchBendEvent } from "midifile-ts"
-import { MouseEventHandler, useCallback, useMemo } from "react"
+import { MouseEventHandler, useCallback, useMemo, useState } from "react"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
 import { Point } from "../../../entities/geometry/Point"
+import { Rect } from "../../../entities/geometry/Rect"
 import { ControlCoordTransform } from "../../../entities/transform/ControlCoordTransform"
 import { matrixFromTranslation } from "../../../helpers/matrix"
 import { useBeats } from "../../../hooks/useBeats"
@@ -60,6 +61,9 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
   )
   const createSelectionGesture = useCreateSelectionGesture()
   const { onContextMenu, menuProps } = useContextMenu()
+  const [contextMenuHitEventId, setContextMenuHitEventId] = useState<
+    number | null
+  >(null)
 
   const cursor = useMemo(() => {
     if (mouseMode !== "pencil") return "auto"
@@ -89,6 +93,21 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
       y: e.offsetY,
     }),
     [scrollLeft],
+  )
+
+  const handleContextMenu: MouseEventHandler = useCallback(
+    (ev) => {
+      const local = getLocal(ev.nativeEvent)
+      const hitItem = items.find((item) =>
+        Rect.containsPoint(
+          Rect.fromPointWithSize(item, circleRadius * 2),
+          local,
+        ),
+      )
+      setContextMenuHitEventId(hitItem?.id ?? null)
+      onContextMenu(ev)
+    },
+    [items, circleRadius, getLocal, onContextMenu],
   )
 
   const pencilMouseDown: MouseEventHandler = useCallback(
@@ -153,7 +172,7 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
           width={width}
           height={height}
           onMouseDown={onMouseDown}
-          onContextMenu={onContextMenu}
+          onContextMenu={handleContextMenu}
           style={style}
           cursor={cursor}
         >
@@ -184,7 +203,10 @@ export const LineGraphCanvas = <T extends ControllerEvent | PitchBendEvent>({
             />
           )}
       </div>
-      <ControlSelectionContextMenu {...menuProps} />
+      <ControlSelectionContextMenu
+        {...menuProps}
+        hitEventId={contextMenuHitEventId}
+      />
     </>
   )
 }

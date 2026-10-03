@@ -6,6 +6,8 @@ import {
   isPitchBendEvent,
   pitchBendMidiEvent,
 } from "@signal-app/core"
+import { clamp } from "lodash"
+import { MIDIControlEvents } from "midifile-ts"
 
 export type ValueEventType =
   | { type: "pitchBend" }
@@ -28,6 +30,41 @@ export namespace ValueEventType {
       case "controller":
         return isControllerEventWithType(t.controllerType)
     }
+  }
+
+  // range of the raw MIDI value
+  export const getValueRange = (t: ValueEventType) => {
+    switch (t.type) {
+      case "pitchBend":
+        return { min: 0, max: 0x4000 - 1 }
+      case "controller":
+        return { min: 0, max: 0x80 - 1 }
+    }
+  }
+
+  // offset subtracted from the raw value to get the value shown to the user
+  // (e.g. pitch bend 0x2000 and pan 0x40 are displayed as 0)
+  const getDisplayOffset = (t: ValueEventType) => {
+    switch (t.type) {
+      case "pitchBend":
+        return 0x2000
+      case "controller":
+        return t.controllerType === MIDIControlEvents.MSB_PAN ? 0x40 : 0
+    }
+  }
+
+  export const toDisplayValue = (t: ValueEventType, value: number) =>
+    value - getDisplayOffset(t)
+
+  // converts a displayed value to a raw MIDI value, clamped to the valid range
+  export const fromDisplayValue = (t: ValueEventType, value: number) => {
+    const { min, max } = getValueRange(t)
+    return clamp(Math.round(value + getDisplayOffset(t)), min, max)
+  }
+
+  export const getDisplayValueRange = (t: ValueEventType) => {
+    const { min, max } = getValueRange(t)
+    return { min: toDisplayValue(t, min), max: toDisplayValue(t, max) }
   }
 
   export const equals = (

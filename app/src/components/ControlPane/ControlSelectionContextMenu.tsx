@@ -13,11 +13,18 @@ import {
   ContextMenuProps,
   ContextMenuHotKey as HotKey,
 } from "../ContextMenu/ContextMenu"
-import { MenuItem } from "../ui/Menu"
+import { MenuDivider, MenuItem } from "../ui/Menu"
 
-export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
+export type ControlSelectionContextMenuProps = ContextMenuProps & {
+  // the event under the cursor when the menu was opened
+  hitEventId: number | null
+}
+
+export const ControlSelectionContextMenu: FC<
+  ControlSelectionContextMenuProps
+> = ({ hitEventId, ...props }) => {
   const { handleClose } = props
-  const { selectedEventIds } = useControlPane()
+  const { selectedEventIds, setValueDialogEventId } = useControlPane()
   const isEventSelected = selectedEventIds.length > 0
   const copyControlSelection = useCopyControlSelection()
   const deleteControlSelection = useDeleteControlSelection()
@@ -50,6 +57,11 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
     handleClose()
   }, [deleteControlSelection, handleClose])
 
+  const onClickSetValue = useCallback(() => {
+    setValueDialogEventId(hitEventId)
+    handleClose()
+  }, [setValueDialogEventId, hitEventId, handleClose])
+
   return (
     <ContextMenu {...props}>
       <MenuItem onClick={onClickCut} disabled={!isEventSelected}>
@@ -71,6 +83,10 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem onClick={onClickDelete} disabled={!isEventSelected}>
         <Localized name="delete" />
         <HotKey>Del</HotKey>
+      </MenuItem>
+      <MenuDivider />
+      <MenuItem onClick={onClickSetValue} disabled={hitEventId === null}>
+        <Localized name="set-value" />
       </MenuItem>
     </ContextMenu>
   )

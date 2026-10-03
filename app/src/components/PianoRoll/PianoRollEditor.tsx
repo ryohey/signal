@@ -6,6 +6,7 @@ import { useEventList } from "../../hooks/useEventList"
 import { PianoRollScope } from "../../hooks/usePianoRoll"
 import { usePianoRollKeyboardShortcut } from "../../hooks/usePianoRollKeyboardShortcut"
 import { useTrackList } from "../../hooks/useTrackList"
+import { PianoRollControlValueDialog } from "../ControlValueDialog/PianoRollControlValueDialog"
 import EventList from "../EventEditor/EventList"
 import { PianoRollToolbar } from "../PianoRollToolbar/PianoRollToolbar"
 import { TrackList } from "../TrackList/TrackList"
@@ -79,6 +80,7 @@ export const PianoRollEditor: FC = () => {
       </ColumnContainer>
       <PianoRollTransposeDialog />
       <PianoRollVelocityDialog />
+      <PianoRollControlValueDialog />
     </PianoRollScope>
   )
 }

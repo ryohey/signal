@@ -1,4 +1,3 @@
-import { MIDIControlEvents } from "midifile-ts"
 import React, { FC, useMemo } from "react"
 import { ValueEventType } from "../../../entities/event/ValueEventType"
 import { Size } from "../../../entities/geometry/Size"
@@ -28,23 +27,10 @@ const maxValueForType = (type: ValueEventType) => {
   }
 }
 
-const labelFormatterForType = (
-  type: ValueEventType,
-): ((v: number) => string) => {
-  switch (type.type) {
-    case "controller":
-      switch (type.controllerType) {
-        case MIDIControlEvents.MSB_PAN:
-          return (v) => (v - 0x40).toString()
-        default:
-          return (v) => v.toString()
-      }
-    case "pitchBend":
-      return (v) => (v - 0x2000).toString()
-    default:
-      return (v) => v.toString()
-  }
-}
+const labelFormatterForType =
+  (type: ValueEventType) =>
+  (v: number): string =>
+    ValueEventType.toDisplayValue(type, v).toString()
 
 export const ValueEventGraph: FC<ValueEventGraphProps> = React.memo(
   ({ width, height, type, axisWidth }) => {

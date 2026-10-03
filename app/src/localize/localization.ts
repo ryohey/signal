@@ -371,6 +371,7 @@ export default {
     "operation-set": "Set",
     "operation-add": "Add",
     "operation-multiply": "Multiply",
+    "set-value": "Set Value",
   },
   fr: {
     "piano-roll": "Rouleau de piano",
@@ -746,6 +747,7 @@ export default {
     "operation-set": "Mêttre",
     "operation-add": "Ajouter",
     "operation-multiply": "Multiplier",
+    "set-value": "Définir la valeur",
   },
   ja: {
     "piano-roll": "ピアノロール",
@@ -1115,6 +1117,7 @@ export default {
     "operation-set": "変更",
     "operation-add": "加算",
     "operation-multiply": "乗算",
+    "set-value": "値を設定",
   },
   "zh-Hans": {
     "piano-roll": "钢琴卷",
@@ -1485,6 +1488,7 @@ export default {
     "operation-set": "Set",
     "operation-add": "Add",
     "operation-multiply": "Multiply",
+    "set-value": "设置值",
   },
   "zh-Hant": {
     "piano-roll": "鋼琴卷軸",
@@ -1854,6 +1858,7 @@ export default {
     "operation-set": "Set",
     "operation-add": "Add",
     "operation-multiply": "Multiply",
+    "set-value": "設定值",
   },
   sk: {
     "piano-roll": "Piano Roll",
@@ -2225,5 +2230,6 @@ export default {
     "operation-set": "Nastaviť",
     "operation-add": "Pridať",
     "operation-multiply": "Násobiť",
+    "set-value": "Nastaviť hodnotu",
   },
 } as const
