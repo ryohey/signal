@@ -144,7 +144,12 @@ export const ControlSettingDialog = () => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose} style={{ maxWidth: "40rem" }}>
+    <Dialog
+      open={open}
+      onOpenChange={onClose}
+      style={{ maxWidth: "40rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="control-settings" />
       </DialogTitle>

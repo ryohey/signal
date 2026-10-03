@@ -3,7 +3,12 @@ import { FC } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { userRepository } from "../../services/repositories"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogDescription,
+} from "../Dialog/Dialog"
 import { Button, PrimaryButton } from "../ui/Button"
 
 export const DeleteAccountDialog: FC = () => {
@@ -28,7 +33,9 @@ export const DeleteAccountDialog: FC = () => {
         <Localized name="delete-account" />
       </DialogTitle>
       <DialogContent>
-        <Localized name="delete-account-description" />
+        <DialogDescription>
+          <Localized name="delete-account-description" />
+        </DialogDescription>
       </DialogContent>
       <DialogActions>
         <PrimaryButton onClick={onClickDelete}>

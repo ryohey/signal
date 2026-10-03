@@ -11,6 +11,7 @@ export class EventView<T extends TrackEvent> {
   private endTick: number = 0
   private listeners: Set<() => void> = new Set()
   private unregisterReaction: Unsubscribe | null = null
+  private unobservedEvents: readonly T[] | null = null
 
   constructor(private readonly loadEvents: () => readonly T[]) {
     makeObservable<EventView<T>, "startTick" | "endTick">(this, {
@@ -32,6 +33,7 @@ export class EventView<T extends TrackEvent> {
 
   private registerReaction = () => {
     this.unregisterReaction?.()
+    this.unobservedEvents = null
     this.unregisterReaction = observe(
       this,
       "windowedEvents",
@@ -59,10 +61,18 @@ export class EventView<T extends TrackEvent> {
     }
     this.startTick = startTick
     this.endTick = endTick
+    this.unobservedEvents = null
   }
 
   getEvents = (): readonly T[] => {
-    return this.windowedEvents
+    if (this.unregisterReaction !== null) {
+      return this.windowedEvents
+    }
+    // Until subscribe() is called nothing observes windowedEvents, so MobX
+    // recomputes it into a new array on every read. Cache it so that
+    // useSyncExternalStore gets the same snapshot each time it asks.
+    this.unobservedEvents ??= this.windowedEvents
+    return this.unobservedEvents
   }
 
   subscribe = (callback: () => void): Unsubscribe => {

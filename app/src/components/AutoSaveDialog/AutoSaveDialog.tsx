@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "../Dialog/Dialog"
 import { Button, PrimaryButton } from "../ui/Button"
@@ -42,7 +43,9 @@ export const AutoSaveDialog: React.FC<AutoSaveDialogProps> = ({
         <Localized name="auto-save-dialog-title" />
       </DialogTitle>
       <DialogContent>
-        <Localized name="auto-save-dialog-description" />
+        <DialogDescription>
+          <Localized name="auto-save-dialog-description" />
+        </DialogDescription>
         {lastSaveTime && (
           <p>
             <Localized name="auto-save-dialog-last-save-time" />{" "}

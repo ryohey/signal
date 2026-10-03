@@ -3,7 +3,7 @@ import BluetoothIcon from "mdi-react/BluetoothIcon"
 import { FC } from "react"
 import { Device, useMIDIDevice } from "../../../hooks/useMIDIDevice"
 import { Localized } from "../../../localize/useLocalization"
-import { DialogContent, DialogTitle } from "../../Dialog/Dialog"
+import { DialogContent, DialogSectionTitle } from "../../Dialog/Dialog"
 import { Alert } from "../../ui/Alert"
 import { Checkbox } from "../../ui/Checkbox"
 import { CircularProgress } from "../../ui/CircularProgress"
@@ -99,9 +99,9 @@ export const MIDIDeviceView: FC = () => {
 
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="midi-settings" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         {isLoading && <CircularProgress />}
         {requestError && (

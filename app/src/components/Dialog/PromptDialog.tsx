@@ -28,7 +28,12 @@ export const PromptDialog: FC<PromptProps> = (props) => {
   }
 
   return (
-    <Dialog open={true} onOpenChange={onCancel} style={{ width: "20rem" }}>
+    <Dialog
+      open={true}
+      onOpenChange={onCancel}
+      style={{ width: "20rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
         <TextField

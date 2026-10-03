@@ -2,7 +2,12 @@ import styled from "@emotion/styled"
 import range from "lodash/range"
 import { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  VisuallyHiddenDialogTitle,
+} from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
 
 export interface ColorPickerProps {
@@ -52,7 +57,10 @@ export const ColorPicker: FC<ColorPickerProps> = ({
   )
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose} aria-describedby={undefined}>
+      <VisuallyHiddenDialogTitle>
+        <Localized name="change-track-color" />
+      </VisuallyHiddenDialogTitle>
       <DialogContent>
         <Container>
           {colors.map((color) => (

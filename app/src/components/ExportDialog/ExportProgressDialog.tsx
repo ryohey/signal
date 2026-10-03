@@ -24,7 +24,11 @@ export const ExportProgressDialog: FC = () => {
   }, [setOpen, cancelExport])
 
   return (
-    <Dialog open={open} style={{ minWidth: "20rem" }}>
+    <Dialog
+      open={open}
+      style={{ minWidth: "20rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="exporting-audio" />
       </DialogTitle>

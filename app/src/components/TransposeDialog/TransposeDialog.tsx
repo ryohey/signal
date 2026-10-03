@@ -36,7 +36,7 @@ export const TransposeDialog: FC<TransposeDialogProps> = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose} aria-describedby={undefined}>
       <DialogTitle>
         <Localized name="transpose" />
       </DialogTitle>

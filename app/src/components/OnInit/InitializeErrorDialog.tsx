@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "../Dialog/Dialog"
 import { Button } from "../ui/Button"
@@ -24,7 +25,9 @@ export const InitializeErrorDialog: FC<InitializeErrorDialogProps> = ({
       <DialogTitle>
         <Localized name="initialize-error" />
       </DialogTitle>
-      <DialogContent>{message}</DialogContent>
+      <DialogContent>
+        <DialogDescription>{message}</DialogDescription>
+      </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>
           <Localized name="close" />

@@ -3,7 +3,7 @@ import { ChangeEvent, FC } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useSoundFont } from "../../hooks/useSoundFont"
 import { Localized } from "../../localize/useLocalization"
-import { DialogContent, DialogTitle } from "../Dialog/Dialog"
+import { DialogContent, DialogSectionTitle } from "../Dialog/Dialog"
 import { FileInput } from "../Navigation/LegacyFileMenu"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
@@ -35,9 +35,9 @@ export const SoundFontSettingsView: FC = () => {
 
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="soundfont" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         <SoundFontList />
         {!isRunningInElectron() && (

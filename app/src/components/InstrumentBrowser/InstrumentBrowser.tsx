@@ -6,7 +6,12 @@ import { type FC, useCallback, useEffect, useMemo, useState } from "react"
 import { useInstrumentBrowser } from "../../hooks/useInstrumentBrowser"
 import { useTrack } from "../../hooks/useTrack"
 import { Localized } from "../../localize/useLocalization"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  VisuallyHiddenDialogTitle,
+} from "../Dialog/Dialog"
 import { InstrumentName } from "../TrackList/InstrumentName"
 import { Button, PrimaryButton } from "../ui/Button"
 import { Checkbox } from "../ui/Checkbox"
@@ -152,7 +157,14 @@ export const InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   }, [targetEventId, removeEvent, onOpenChange])
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onOpenChange}
+      aria-describedby={undefined}
+    >
+      <VisuallyHiddenDialogTitle>
+        <Localized name="select-instrument" />
+      </VisuallyHiddenDialogTitle>
       <DialogContent className="InstrumentBrowser">
         <Finder>
           <Left>

@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "../Dialog/Dialog"
 
@@ -23,7 +24,7 @@ const BetaLabel = styled.span`
   color: var(--color-text-secondary);
 `
 
-const Description = styled.div`
+const Description = styled(DialogDescription)`
   margin: 1rem 0 2rem 0;
   line-height: 1.5;
 `

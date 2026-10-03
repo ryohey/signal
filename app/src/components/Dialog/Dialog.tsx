@@ -1,14 +1,16 @@
-import { keyframes } from "@emotion/react"
+import { css, keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
 import { composeEventHandlers } from "@radix-ui/primitive"
 import {
   Content,
+  Description,
   DialogOverlay,
   DialogPortal,
   Overlay,
   Portal,
   DialogProps as Props,
   Root,
+  Title,
 } from "@radix-ui/react-dialog"
 import {
   ComponentPropsWithoutRef,
@@ -96,21 +98,63 @@ const StyledContent = styled(FocusFixedDialogContent)`
 
 export type DialogProps = Props & {
   style?: React.CSSProperties
+  // Pass `aria-describedby={undefined}` when the dialog has no DialogDescription
+  "aria-describedby"?: string
 }
 
-export const Dialog: FC<DialogProps> = ({ children, style, ...props }) => (
-  <Root {...props}>
+export const Dialog: FC<DialogProps> = ({
+  open,
+  defaultOpen,
+  onOpenChange,
+  modal,
+  children,
+  ...contentProps
+}) => (
+  <Root
+    open={open}
+    defaultOpen={defaultOpen}
+    onOpenChange={onOpenChange}
+    modal={modal}
+  >
     <Portal>
       <StyledOverlay />
-      <StyledContent style={style}>{children}</StyledContent>
+      <StyledContent {...contentProps}>{children}</StyledContent>
     </Portal>
   </Root>
 )
 
-export const DialogTitle = styled.div`
+const titleStyle = css`
   font-size: 1.25rem;
+  font-weight: normal;
   color: var(--color-text);
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
+`
+
+// Every dialog needs a DialogTitle so screen readers can announce it
+export const DialogTitle = styled(Title)`
+  ${titleStyle}
+`
+
+// For dialogs whose design has no visible heading
+export const VisuallyHiddenDialogTitle = styled(Title)`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`
+
+// Looks like DialogTitle, for headings inside a dialog that already has one
+export const DialogSectionTitle = styled.div`
+  ${titleStyle}
+`
+
+export const DialogDescription = styled(Description)`
+  margin: 0;
 `
 
 export const DialogContent = styled.div`

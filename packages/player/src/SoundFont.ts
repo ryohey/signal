@@ -3,6 +3,7 @@ import {
   BasicZone,
   SoundBankLoader,
 } from "spessasynth_core"
+import { clearInvalidCreationDate } from "./clearInvalidCreationDate"
 
 interface PresetMeta {
   name: string
@@ -81,7 +82,8 @@ export class SoundFont {
 
   static async load(data: ArrayBuffer) {
     await BasicSoundBank.isSF3DecoderReady
-    const parsed = SoundBankLoader.fromArrayBuffer(data)
-    return new SoundFont(data, parsed)
+    const sanitized = clearInvalidCreationDate(data)
+    const parsed = SoundBankLoader.fromArrayBuffer(sanitized)
+    return new SoundFont(sanitized, parsed)
   }
 }

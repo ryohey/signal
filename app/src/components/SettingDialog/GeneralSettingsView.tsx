@@ -8,7 +8,7 @@ import {
 } from "../../localize/useLocalization"
 import { themes, ThemeType } from "../../theme/Theme"
 import { ThemeName } from "../../theme/ThemeName"
-import { DialogContent, DialogTitle } from "../Dialog/Dialog"
+import { DialogContent, DialogSectionTitle } from "../Dialog/Dialog"
 import { Checkbox } from "../ui/Checkbox"
 import { Label } from "../ui/Label"
 import { Select } from "../ui/Select"
@@ -104,9 +104,9 @@ const SectionContent = styled.div`
 export const GeneralSettingsView: FC = () => {
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="general" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         <Column>
           <LanguageSelect />

@@ -66,7 +66,12 @@ export const TrackDialog: FC<TrackDialogProps> = ({
   }, [trackId, open])
 
   return (
-    <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
+    <Dialog
+      open={open}
+      onOpenChange={onClose}
+      style={{ minWidth: "20rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="track" />: <TrackName trackId={trackId} />
       </DialogTitle>

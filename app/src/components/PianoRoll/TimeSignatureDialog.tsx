@@ -52,7 +52,7 @@ export const TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
   }, [open])
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose} aria-describedby={undefined}>
       <DialogTitle>
         <Localized name="time-signature" />
       </DialogTitle>
