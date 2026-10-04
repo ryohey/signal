@@ -12,8 +12,7 @@ import {
   PrimaryButton,
 } from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
-import React, { type FC, useCallback, useEffect, useState } from "react"
-import { useTrack } from "../../../hooks/useTrack"
+import React, { type FC, useCallback } from "react"
 import { Localized } from "../../../localize/useLocalization"
 import { InstrumentName } from "../../track-list/components/InstrumentName"
 import { useInstrumentBrowser } from "../hooks/useInstrumentBrowser"
@@ -52,61 +51,41 @@ export interface InstrumentBrowserProps {
 const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   isOpen,
   onOpenChange,
-  trackId,
-  targetEvent,
-  showInsertButton = false,
-}) => {
+  ...props
+}) => (
+  <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    {isOpen && (
+      <InstrumentBrowserContent
+        {...props}
+        onClose={() => onOpenChange(false)}
+      />
+    )}
+  </Dialog>
+)
+
+export const InstrumentBrowser = React.memo(_InstrumentBrowser)
+
+// Mounted only while open, so the draft state starts from the latest track state
+const InstrumentBrowserContent: FC<
+  Omit<InstrumentBrowserProps, "isOpen" | "onOpenChange"> & {
+    onClose: () => void
+  }
+> = ({ trackId, targetEvent, showInsertButton = false, onClose }) => {
   const {
-    programNumber: initialProgramNumber,
-    isRhythmTrack: initialIsRhythmTrack,
-  } = useTrack(trackId)
-  const [setting, setSetting] = useState({
-    programNumber: initialProgramNumber ?? 0,
-    isRhythmTrack: initialIsRhythmTrack ?? false,
-  })
-  const { programNumber, isRhythmTrack } = setting
-  const {
+    programNumber,
+    isRhythmTrack,
     selectedCategoryIndex,
     categoryFirstProgramEvents,
     categoryInstruments,
-    insertInstrumentChangeAtCurrentPosition,
-    changeInstrument,
-    onClickOK,
-    onClickDelete,
+    selectInstrument,
     changeRhythmTrack,
-  } = useInstrumentBrowser(setting, targetEvent?.id)
-
-  useEffect(() => {
-    if (isOpen) {
-      if (targetEvent) {
-        setSetting({
-          programNumber: targetEvent.value,
-          isRhythmTrack: initialIsRhythmTrack ?? false,
-        })
-      }
-    }
-  }, [isOpen, targetEvent, initialIsRhythmTrack])
-
-  const onChange = useCallback(
-    (programNumber: number) => {
-      setSetting({
-        programNumber,
-        isRhythmTrack,
-      })
-      changeInstrument(programNumber)
-    },
-    [isRhythmTrack, changeInstrument],
-  )
+    applyInstrument,
+    insertInstrumentAtCurrentPosition,
+    deleteTargetEvent,
+  } = useInstrumentBrowser(trackId, targetEvent)
 
   const handleChangeRhythmTrack = useCallback(
-    (state: CheckedState) => {
-      const isRhythmTrack = state === true
-      setSetting({
-        programNumber: 0, // reset program number when changing rhythm track
-        isRhythmTrack,
-      })
-      changeRhythmTrack(isRhythmTrack)
-    },
+    (state: CheckedState) => changeRhythmTrack(state === true),
     [changeRhythmTrack],
   )
 
@@ -125,22 +104,22 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   }))
 
   const handleClickOK = useCallback(() => {
-    onClickOK()
-    onOpenChange(false)
-  }, [onClickOK, onOpenChange])
+    applyInstrument()
+    onClose()
+  }, [applyInstrument, onClose])
 
   const handleClickInsert = useCallback(() => {
-    insertInstrumentChangeAtCurrentPosition(programNumber)
-    onOpenChange(false)
-  }, [onOpenChange, insertInstrumentChangeAtCurrentPosition, programNumber])
+    insertInstrumentAtCurrentPosition()
+    onClose()
+  }, [insertInstrumentAtCurrentPosition, onClose])
 
   const handleClickDelete = useCallback(() => {
-    onClickDelete()
-    onOpenChange(false)
-  }, [onClickDelete, onOpenChange])
+    deleteTargetEvent()
+    onClose()
+  }, [deleteTargetEvent, onClose])
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <>
       <DialogContent className="InstrumentBrowser">
         <Finder>
           <Left>
@@ -150,7 +129,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
             <SelectBox
               items={categoryOptions}
               selectedValue={selectedCategoryIndex}
-              onChange={(i) => onChange(i * 8)} // Choose the first instrument of the category
+              onChange={(i) => selectInstrument(i * 8)} // Choose the first instrument of the category
             />
           </Left>
           <Right>
@@ -160,7 +139,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
             <SelectBox
               items={instrumentOptions}
               selectedValue={programNumber}
-              onChange={onChange}
+              onChange={selectInstrument}
             />
           </Right>
         </Finder>
@@ -178,7 +157,7 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
             <Localized name="delete" />
           </Button>
         )}
-        <Button onClick={() => onOpenChange(false)}>
+        <Button onClick={onClose}>
           <Localized name="cancel" />
         </Button>
         {!showInsertButton && (
@@ -200,8 +179,6 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
           </DropdownButton>
         )}
       </DialogActions>
-    </Dialog>
+    </>
   )
 }
-
-export const InstrumentBrowser = React.memo(_InstrumentBrowser)

@@ -17,3 +17,5 @@ Choose a track's instrument.
 ## Design Notes
 
 - Instrument changes are track edits, so they are part of undo and redo.
+- The dialog content mounts only while open. `useInstrumentBrowser` reads the track on mount, so no effect is needed to sync state.
+- Only the program number is a draft until OK. Switching to or from a rhythm track is applied to the track immediately.

@@ -114,6 +114,12 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
+    insertProgramChangeAt: useCallback(
+      (tick: number, programNumber: number) => {
+        return track?.insertProgramChangeAt(tick, programNumber)
+      },
+      [track],
+    ),
     setProgramNumberById: useCallback(
       (eventId: number, programNumber: number) => {
         return track?.setProgramNumberById(eventId, programNumber)

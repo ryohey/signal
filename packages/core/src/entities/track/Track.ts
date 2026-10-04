@@ -292,6 +292,7 @@ export class Track implements TrackEventStore {
   setColor = this.bindMutation(Mutations.setColor)
   setName = this.bindMutation(Mutations.setName)
   setProgramNumberAt = this.bindMutation(Mutations.setProgramNumberAt)
+  insertProgramChangeAt = this.bindMutation(Mutations.insertProgramChangeAt)
   setProgramNumberById = this.bindMutation(Mutations.setProgramNumberById)
   setPan = this.bindMutation(Mutations.setPan)
   setVolume = this.bindMutation(Mutations.setVolume)

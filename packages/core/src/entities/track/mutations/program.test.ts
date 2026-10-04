@@ -4,7 +4,11 @@ import { TickOrderedArray } from "../../../data/OrdererdArray/TickOrderedArray"
 import { isProgramChangeEvent } from "../../event/identify"
 import type { TrackEvent, TrackEventOf } from "../../event/TrackEvent"
 import { addEvent } from "./primitives"
-import { setProgramNumberAt, setProgramNumberById } from "./program"
+import {
+  insertProgramChangeAt,
+  setProgramNumberAt,
+  setProgramNumberById,
+} from "./program"
 
 describe("track mutations/program", () => {
   it("setProgramNumberAt updates last event at or before target tick", () => {
@@ -47,6 +51,27 @@ describe("track mutations/program", () => {
     expect(result).toBeDefined()
     expect(result?.tick).toBe(0)
     expect(result?.value).toBe(9)
+  })
+
+  it("insertProgramChangeAt adds event at tick without updating existing ones", () => {
+    const events = new TickOrderedArray<TrackEvent>()
+
+    const existing = addEvent<TrackEventOf<ProgramChangeEvent>>({
+      type: "channel",
+      subtype: "programChange",
+      tick: 20,
+      value: 1,
+    })(events)
+
+    const result = insertProgramChangeAt(50, 9)(events)
+    const unchanged = events.get(existing.id)
+
+    expect(result.id).not.toBe(existing.id)
+    expect(result.tick).toBe(50)
+    expect(result.value).toBe(9)
+    expect(
+      unchanged && isProgramChangeEvent(unchanged) ? unchanged.value : null,
+    ).toBe(1)
   })
 
   it("setProgramNumberById updates specified event", () => {

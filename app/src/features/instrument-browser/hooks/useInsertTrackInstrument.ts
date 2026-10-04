@@ -7,7 +7,7 @@ import { useTrack } from "../../../hooks/useTrack"
 export const useInsertTrackInstrument = (trackId: TrackId) => {
   const { sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel, setProgramNumberAt } = useTrack(trackId)
+  const { channel, insertProgramChangeAt } = useTrack(trackId)
 
   return useCallback(
     (programNumber: number, tick: number) => {
@@ -15,9 +15,9 @@ export const useInsertTrackInstrument = (trackId: TrackId) => {
         return
       }
       pushHistory()
-      setProgramNumberAt(tick, programNumber)
+      insertProgramChangeAt(tick, programNumber)
       sendEvent(programChangeMidiEvent(0, channel, programNumber))
     },
-    [pushHistory, channel, sendEvent, setProgramNumberAt],
+    [pushHistory, channel, sendEvent, insertProgramChangeAt],
   )
 }

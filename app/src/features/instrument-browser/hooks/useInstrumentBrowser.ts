@@ -1,33 +1,80 @@
-import { programChangeMidiEvent } from "@signal-app/core"
+import {
+  programChangeMidiEvent,
+  type TrackEventOf,
+  type TrackId,
+} from "@signal-app/core"
 import { difference, range } from "lodash"
-import { useCallback, useMemo } from "react"
+import type { ProgramChangeEvent } from "midifile-ts"
+import { useCallback, useMemo, useState } from "react"
 import { isNotUndefined } from "../../../helpers/array"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { usePreviewNote } from "../../../hooks/usePreviewNote"
 import { useSong } from "../../../hooks/useSong"
 import { useTrack } from "../../../hooks/useTrack"
 import { getCategoryIndex } from "../../../midi/GM"
-import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import type { InstrumentSetting } from "../entities/InstrumentSetting"
 import { useInsertTrackInstrument } from "./useInsertTrackInstrument"
 import { useSetTrackInstrument } from "./useSetTrackInstrument"
 
+// Mount only while the browser is open: the draft program number is
+// initialized from the track (or the target event) on mount.
 export function useInstrumentBrowser(
-  setting: InstrumentSetting,
-  targetEventId?: number,
+  trackId: TrackId,
+  targetEvent?: TrackEventOf<ProgramChangeEvent>,
 ) {
-  const { selectedTrackId } = usePianoRoll()
-  const { isRhythmTrack, channel, setChannel, removeEvents } =
-    useTrack(selectedTrackId)
-  const { isPlaying, sendEvent } = usePlayer()
+  const {
+    isRhythmTrack,
+    programNumber: currentProgramNumber,
+    channel,
+    setChannel,
+    removeEvents,
+  } = useTrack(trackId)
+  const { isPlaying, sendEvent, position } = usePlayer()
   const setTrackInstrumentAction = useSetTrackInstrument(
-    selectedTrackId,
-    targetEventId,
+    trackId,
+    targetEvent?.id,
   )
-  const insertTrackInstrumentAction = useInsertTrackInstrument(selectedTrackId)
+  const insertTrackInstrumentAction = useInsertTrackInstrument(trackId)
   const { tracks } = useSong()
   const { previewNoteOn } = usePreviewNote()
-  const { position } = usePlayer()
+
+  // Only the program number is a draft until OK.
+  // Rhythm track changes are applied to the track immediately.
+  const [programNumber, setProgramNumber] = useState(
+    targetEvent?.value ?? currentProgramNumber,
+  )
+
+  const selectedCategoryIndex = isRhythmTrack
+    ? 0
+    : getCategoryIndex(programNumber)
+
+  const categoryFirstProgramEvents = useMemo(() => {
+    if (isRhythmTrack) {
+      return [0]
+    }
+    return range(0, 127, 8)
+  }, [isRhythmTrack])
+
+  const categoryInstruments = useMemo(() => {
+    if (isRhythmTrack) {
+      return [0, 8, 16, 24, 25, 32, 40, 48, 56]
+    }
+    const offset = selectedCategoryIndex * 8
+    return range(offset, offset + 8)
+  }, [selectedCategoryIndex, isRhythmTrack])
+
+  const selectInstrument = useCallback(
+    (programNumber: number) => {
+      setProgramNumber(programNumber)
+      if (channel === undefined) {
+        return
+      }
+      sendEvent(programChangeMidiEvent(0, channel, programNumber))
+      if (!isPlaying) {
+        previewNoteOn(isRhythmTrack ? 38 : 64, 500)
+      }
+    },
+    [channel, previewNoteOn, sendEvent, isPlaying, isRhythmTrack],
+  )
 
   const changeRhythmTrack = useCallback(
     (newRhythmTrack: boolean) => {
@@ -37,87 +84,47 @@ export function useInstrumentBrowser(
       if (newRhythmTrack) {
         setChannel(9)
       } else {
-        if (isRhythmTrack) {
-          // 適当なチャンネルに変える
-          const channels = range(16)
-          const usedChannels = tracks
-            .filter((t) => t.id !== selectedTrackId)
-            .map((t) => t.channel)
-          const availableChannel =
-            Math.min(
-              ...difference(channels, usedChannels).filter(isNotUndefined),
-            ) || 0
-          setChannel(availableChannel)
-        }
+        // 適当なチャンネルに変える
+        const channels = range(16)
+        const usedChannels = tracks
+          .filter((t) => t.id !== trackId)
+          .map((t) => t.channel)
+        const availableChannel =
+          Math.min(
+            ...difference(channels, usedChannels).filter(isNotUndefined),
+          ) || 0
+        setChannel(availableChannel)
       }
+      setProgramNumber(0)
       setTrackInstrumentAction(0)
     },
-    [
-      isRhythmTrack,
-      selectedTrackId,
-      setChannel,
-      tracks,
-      setTrackInstrumentAction,
-    ],
+    [isRhythmTrack, trackId, setChannel, tracks, setTrackInstrumentAction],
   )
 
-  const onClickOK = useCallback(() => {
-    setTrackInstrumentAction(setting.programNumber)
-  }, [setTrackInstrumentAction, setting])
+  const applyInstrument = useCallback(() => {
+    setTrackInstrumentAction(programNumber)
+  }, [setTrackInstrumentAction, programNumber])
 
-  const onClickDelete = useCallback(() => {
-    if (targetEventId !== undefined) {
-      removeEvents([targetEventId])
+  const insertInstrumentAtCurrentPosition = useCallback(() => {
+    insertTrackInstrumentAction(programNumber, position)
+  }, [insertTrackInstrumentAction, programNumber, position])
+
+  const deleteTargetEvent = useCallback(() => {
+    if (targetEvent !== undefined) {
+      removeEvents([targetEvent.id])
     }
-  }, [targetEventId, removeEvents])
-
-  const selectedCategoryIndex = isRhythmTrack
-    ? 0
-    : getCategoryIndex(setting.programNumber)
+  }, [targetEvent, removeEvents])
 
   return {
+    programNumber,
+    isRhythmTrack,
     selectedCategoryIndex,
-    get categoryFirstProgramEvents() {
-      return useMemo(() => {
-        if (setting.isRhythmTrack) {
-          return [0]
-        }
-        return range(0, 127, 8)
-      }, [setting.isRhythmTrack])
-    },
-    get categoryInstruments() {
-      return useMemo(() => {
-        if (setting.isRhythmTrack) {
-          return [0, 8, 16, 24, 25, 32, 40, 48, 56]
-        }
-        const offset = selectedCategoryIndex * 8
-        return range(offset, offset + 8)
-      }, [selectedCategoryIndex, setting.isRhythmTrack])
-    },
-    changeInstrument: useCallback(
-      (programNumber: number) => {
-        if (channel === undefined) {
-          return
-        }
-        sendEvent(programChangeMidiEvent(0, channel, programNumber))
-        if (!isPlaying) {
-          if (setting.isRhythmTrack) {
-            previewNoteOn(38, 500)
-          } else {
-            previewNoteOn(64, 500)
-          }
-        }
-      },
-      [channel, previewNoteOn, sendEvent, isPlaying, setting],
-    ),
+    categoryFirstProgramEvents,
+    categoryInstruments,
+    selectInstrument,
     changeRhythmTrack,
-    insertInstrumentChangeAtCurrentPosition: useCallback(
-      (programNumber: number) => {
-        insertTrackInstrumentAction(programNumber, position)
-      },
-      [insertTrackInstrumentAction, position],
-    ),
-    onClickOK,
-    onClickDelete,
+    applyInstrument,
+    insertInstrumentAtCurrentPosition,
+    deleteTargetEvent,
   }
 }
