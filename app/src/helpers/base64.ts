@@ -2,7 +2,11 @@
  * Converts a Uint8Array to a base64 encoded string
  */
 export function uint8ArrayToBase64(bytes: Uint8Array): string {
-  return btoa(String.fromCharCode(...bytes))
+  let str = ""
+  for (const p of bytes) {
+    str += String.fromCharCode(p)
+  }
+  return btoa(str)
 }
 
 /**

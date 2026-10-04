@@ -1,21 +1,25 @@
 import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
-import { useToast } from "dialog-hooks"
-import OpenInNewIcon from "mdi-react/OpenInNewIcon"
-import { FC, useCallback, useEffect, useState } from "react"
-import { usePublishSong, useUnpublishSong } from "../../actions/cloudSong"
-import { useRootView } from "../../hooks/useRootView"
-import { useSong } from "../../hooks/useSong"
-import { Localized, useLocalization } from "../../localize/useLocalization"
-import { cloudSongRepository } from "../../services/repositories"
 import {
+  Alert,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Alert } from "../ui/Alert"
-import { Button, PrimaryButton } from "../ui/Button"
+  PrimaryButton,
+} from "@signal-app/ui"
+import { useToast } from "dialog-hooks"
+import OpenInNewIcon from "mdi-react/OpenInNewIcon"
+import { type FC, useCallback, useEffect, useState } from "react"
+import {
+  usePublishSong,
+  useUnpublishSong,
+} from "../../features/cloud-file/hooks/cloudSong"
+import { useRootView } from "../../hooks/useRootView"
+import { useSong } from "../../hooks/useSong"
+import { Localized, useLocalization } from "../../localize/useLocalization"
+import { cloudSongRepository } from "../../services/repositories"
 import { LinkShare } from "../ui/LinkShare"
 
 type PublishState = "publishable" | "published" | "notPublishable"
@@ -32,6 +36,7 @@ export const PublishDialog: FC = () => {
   const theme = useTheme()
   const localized = useLocalization()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     ;(async () => {
       if (open) {
@@ -46,7 +51,6 @@ export const PublishDialog: FC = () => {
         setIsLoading(false)
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const onClose = useCallback(

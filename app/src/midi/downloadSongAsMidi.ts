@@ -1,4 +1,4 @@
-import { Song, songToMidi } from "@signal-app/core"
+import { type Song, songToMidi } from "@signal-app/core"
 import { downloadBlob } from "../helpers/Downloader"
 
 export function downloadSongAsMidi(song: Song) {

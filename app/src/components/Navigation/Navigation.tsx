@@ -1,8 +1,14 @@
 import styled from "@emotion/styled"
+import { Tooltip } from "@signal-app/ui"
 import Forum from "mdi-react/ForumIcon"
 import Help from "mdi-react/HelpCircleIcon"
 import Settings from "mdi-react/SettingsIcon"
-import { CSSProperties, FC, MouseEvent, useCallback } from "react"
+import React, {
+  type CSSProperties,
+  type FC,
+  type MouseEvent,
+  useCallback,
+} from "react"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
@@ -11,7 +17,6 @@ import PianoIcon from "../../images/icons/piano.svg"
 import TempoIcon from "../../images/icons/tempo.svg"
 import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
-import { Tooltip } from "../ui/Tooltip"
 import { EditMenuButton } from "./EditMenuButton"
 import { FileMenuButton } from "./FileMenuButton"
 import { UserButton } from "./UserButton"
@@ -33,6 +38,7 @@ const Container = styled.div`
           return "0 0 0 76px"
       }
     }
+    return undefined
   }};
 `
 
@@ -82,7 +88,7 @@ export const IconStyle: CSSProperties = {
   fill: "currentColor",
 }
 
-export const Navigation: FC = () => {
+const _Navigation: FC = () => {
   const { setOpenSettingDialog, setOpenHelpDialog } = useRootView()
   const { path, setPath } = useRouter()
 
@@ -225,3 +231,5 @@ export const Navigation: FC = () => {
     </Container>
   )
 }
+
+export const Navigation = React.memo(_Navigation)

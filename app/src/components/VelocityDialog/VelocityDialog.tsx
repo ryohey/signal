@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
-import { BatchUpdateOperation } from "@signal-app/core"
-import { FC, useCallback, useEffect, useState } from "react"
-import { Localized } from "../../localize/useLocalization"
+import type { BatchUpdateOperation } from "@signal-app/core"
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "../Dialog/Dialog"
-import { Button } from "../ui/Button"
-import { RadioButton } from "../ui/RadioButton"
+  RadioButton,
+} from "@signal-app/ui"
+import { type FC, useCallback, useEffect, useState } from "react"
+import { Localized } from "../../localize/useLocalization"
 import { StyledNumberInput } from "../ui/StyledNumberInput"
 
 const Column = styled.div`
@@ -43,11 +43,11 @@ export const VelocityDialog: FC<VelocityDialogProps> = ({
     useState<BatchUpdateOperation["type"]>("set")
   const [value, setValue] = useState(initialValue)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     if (open) {
       setValue(initialValue)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const _onClickOK = useCallback(() => {

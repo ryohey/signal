@@ -1,4 +1,4 @@
-import { Song, songFromMidi, songToMidi } from "@signal-app/core"
+import { type Song, songFromMidi, songToMidi } from "@signal-app/core"
 import { basename } from "../helpers/path"
 import { writeFile } from "../services/fs-helper"
 import { useSetSong } from "./song"
@@ -23,7 +23,7 @@ export const useOpenFile = () => {
           types: [
             {
               description: "MIDI file",
-              accept: { "audio/midi": [".mid"] },
+              accept: { "audio/midi": [".mid", ".midi"] },
             },
           ],
         })
@@ -92,7 +92,7 @@ export const saveFile = async (song: Song) => {
 }
 
 export const saveFileAs = async (song: Song) => {
-  let fileHandle
+  let fileHandle: FileSystemFileHandle | null = null
   try {
     fileHandle = await window.showSaveFilePicker({
       types: [
@@ -112,6 +112,9 @@ export const saveFileAs = async (song: Song) => {
     return
   }
   try {
+    if (fileHandle === null) {
+      return
+    }
     const data = songToMidi(song).buffer as ArrayBuffer
     await writeFile(fileHandle, data)
     song.fileHandle = fileHandle

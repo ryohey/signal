@@ -1,4 +1,10 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react"
 
 export interface ProgressMessage {
   message: string
@@ -47,7 +53,7 @@ export const useProgress = () => {
 
   return {
     show(message: string) {
-      return addMessage({ message, key: new Date().getTime() })
+      return addMessage({ message, key: Date.now() })
     },
   }
 }

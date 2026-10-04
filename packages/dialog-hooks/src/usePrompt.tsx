@@ -1,4 +1,10 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react"
 
 export const PromptProvider: FC<{
   children: ReactNode

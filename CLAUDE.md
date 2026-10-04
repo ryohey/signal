@@ -6,29 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Commands
 
-- `npm start` - Start development server (runs turbo dev in parallel for app and static)
-- `npm run build` - Build the entire project (app and static site)
-- `npm test` - Run tests across all packages using turbo
-- `npm run lint` - Run linting with Biome across all packages
-- `npm run format` - Format code with Biome across all packages
-- `npm run check` - Run linting and formatting check with Biome
+- `pnpm dev` - Start development tasks via Turbo (`turbo run dev --parallel`)
+- `pnpm build` - Build app artifacts for distribution (`pnpm build:app`)
+- `pnpm test` - Run tests across all packages using turbo
+- `pnpm lint` - Run lint tasks via Turbo
+- `pnpm format` - Run format tasks via Turbo
+- `pnpm check` - Run check tasks via Turbo
+- `pnpm typecheck` - Run TypeScript type-check across all packages and app via Turbo
 
 ### App-specific Commands
 
-- `npm run dev -w app` - Start dev server for the main app
-- `npm run build -w app` - Build the main React application
-- `npm run test -w app` - Run tests for the app
-- `npm run lint -w app` - Run Biome linting for the app
-- `npm run format -w app` - Format app code with Biome
-- `npm run check -w app` - Run Biome checks for the app
+- `pnpm --dir app dev` - Start dev server for the main app
+- `pnpm --dir app build` - Build the main React application
+- `pnpm --dir app test` - Run tests for the app
+- `pnpm --dir app lint` - Run Biome linting for the app
+- `pnpm --dir app format` - Format app code with Biome
+- `pnpm --dir app check` - Run Biome checks for the app
+- `pnpm --dir app typecheck` - Run TypeScript type-check for app
 
 ### Electron Commands
 
-- `npm run dev:electron` - Start Electron development (concurrently runs app dev server and electron)
-- `npm run build:electron` - Build the Electron application
-- `npm run make:electron` - Package Electron app for distribution
-- `npm run make:darwin` - Package for macOS
-- `npm run make:win` - Package for Windows
+- `pnpm dev:electron` - Start Electron development (concurrently runs app dev server and electron)
+- `pnpm build:electron` - Build the Electron application
+- `pnpm make:electron` - Package Electron app for distribution
+- `pnpm make:darwin` - Package for macOS
+- `pnpm make:win` - Package for Windows
+
+### Dependencies
+
+- Package manager is pnpm (workspace defined in `pnpm-workspace.yaml`; `electron/`, `functions/` stay on npm)
+- External library versions are pinned in the `catalog:` section of `pnpm-workspace.yaml`; reference them as `"catalog:"` in `package.json`
+- Internal packages are referenced as `"workspace:*"`
+- pnpm does not hoist, so every package must declare what it imports (including `@types/*`)
 
 ### Docker
 
@@ -42,18 +51,23 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 **Main Application (`/app`)**
 
-- React application using MobX for state management
+- React application using Jotai for app/feature-side state
 - WebGL-based rendering for performance-critical UI components (piano roll, arrange view)
 - Web Audio API integration for MIDI playback and audio synthesis
-- Modular store architecture with reactive patterns
+- Feature-oriented architecture with hooks/scopes and reactive bridges to core
 
-**Core Stores (MobX-based):**
+**Core Domain (`/packages/core`):**
 
-- `RootStore` - Central store managing audio context, synthesizers, and MIDI I/O
-- `SongStore` - Song data and track management
-- `PianoRollStore` - Piano roll editor state
-- `ArrangeViewStore` - Arrange view state and selections
-- `ControlStore` - Control pane for automation data
+- Core keeps its internal state implementation private
+- App synchronization is done via `useSyncExternalStore`-compatible subscriptions
+
+Representative core modules:
+
+- `SongStore` - Current song lifecycle and change notifications
+- `Track` - Event storage with named read/write methods (`getEvents`, `addEvent`, `updateEvents`, `transaction`, ...); its internal query/mutate functions are private
+- `Song` - Track list with song-level methods such as `addNewTrack`, `duplicateTrack`, and `moveTrack`
+- Per-domain Editor facade packages (e.g. `@signal-app/tempo-editor`'s `createTempoEditor`) build on `Track` and expose plain query/mutation/observe methods for app-side use
+- MIDI/device services and repositories
 
 **Key Views:**
 
@@ -67,8 +81,18 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - `@signal-app/player` - Audio playback engine with SoundFont synthesis
 - `@signal-app/api` - Firebase/Cloud integration for song storage
 - `@signal-app/community` - Community features and song sharing
+- `@signal-app/pianoroll-editor` - Editor facade for piano roll note editing
+- `@signal-app/arrange-editor` - Editor facade for multi-track arrange editing
+- `@signal-app/control-editor` - Editor facade for pitchBend/controller automation lanes
+- `@signal-app/velocity-editor` - Editor facade for the note velocity lane
+- `@signal-app/tempo-editor` - Editor facade for tempo automation
+- `@signal-app/ruler-editor` - Editor facade for the timeline ruler's time signatures
+- `@signal-app/event-list-editor` - Editor facade for the event list panel
+- `@signal-app/observable` - Framework-independent observable primitives
+- `@signal-app/geometry` - Point/size/rect geometry primitives
 - `dialog-hooks` - React hooks for modal dialogs
-- `firebaseui-web-react` - Firebase authentication components
+- `@signal-app/firebaseui-web-react` - Firebase authentication UI wrapper
+- `@signal-app/ui` - Shared design-system-like UI components
 
 **Electron Application (`/electron`)**
 
@@ -76,9 +100,7 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 - File system access for local MIDI files
 - Native OS integration (menus, file associations)
 
-**Static Site (`/static`)**
-
-- Marketing/landing page built with Next.js
+Note: The static website project has been moved to a separate repository and is not part of this workspace.
 
 ### Data Architecture
 
@@ -92,15 +114,16 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 - Web Audio API context management in `RootStore`
 - SoundFont-based synthesis via `SoundFontSynth`
-- Real-time MIDI input/output through `MIDIInput`/`MIDIOutput`
+- Real-time MIDI input/output through `MIDIInput`/`MIDIDeviceOutput`
 - Audio rendering for export via `renderAudio`
 
 ### Technology Stack
 
-- **Frontend:** React 18, TypeScript, MobX, Emotion CSS-in-JS
+- **Frontend:** React 19, TypeScript, Jotai, Emotion CSS-in-JS
+- **Core State Engine:** Internal reactive domain engine (encapsulated within `@signal-app/core`)
 - **Audio:** Web Audio API, SoundFont synthesis, WebMIDI API
 - **Graphics:** WebGL for performance-critical rendering
-- **Build:** Vite, Turbo (monorepo), ESLint, Prettier
+- **Build/Quality:** Vite, Turbo (monorepo), Biome
 - **Desktop:** Electron with Forge
 - **Cloud:** Firebase (auth, storage), Vercel (hosting)
 
@@ -108,7 +131,34 @@ Signal is a web-based music sequencer built with React and TypeScript, with cros
 
 - Component co-location pattern: related files grouped by feature
 - Shared utilities in `/helpers` and `/services`
-- Domain entities in `/entities` (geometry, beats, selections, transforms)
+- App-side domain entities in `/entities` (scales, tick transforms); shared geometry lives in `@signal-app/geometry`
 - WebGL shaders and rendering code in `/gl` and component-specific shader directories
 
+### Rendering and Performance Policy
+
+This codebase is highly performance-sensitive. Minimize React re-renders and avoid broad prop drilling for high-churn editor data.
+
+Preferred pattern:
+
+- Leaf components fetch required data via focused hooks.
+- Parent components pass only structural/static props when possible.
+- Use memoized derived data and targeted subscriptions.
+
+Example pattern:
+
+- Prefer `<Notes zIndex={2} />` where `Notes` internally uses `useNotes()`
+- Avoid `<Notes notes={...} selectedNoteIds={...} zIndex={2} />` when it causes wider invalidation and render fan-out
+
+Relevant files:
+
+- `app/src/features/piano-roll/components/canvas/Notes.tsx`
+- `app/src/features/piano-roll/hooks/useNotes.tsx`
+
 The application emphasizes real-time performance for audio and UI, using WebGL acceleration for intensive graphics operations and optimized audio scheduling for glitch-free playback.
+
+## Documentation Map
+
+- `ARCHITECTURE.md` - Current architecture overview and global policies
+- `app/README.md` - App workspace structure and state boundary policy
+- `app/src/features/*/README.md` - Feature-level architecture details
+- `packages/*/README.md` - Package-specific design and API notes

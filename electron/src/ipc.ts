@@ -1,5 +1,5 @@
-import { BrowserWindow } from "electron"
-import { FirebaseCredential } from "./FirebaseCredential"
+import type { BrowserWindow } from "electron"
+import type { FirebaseCredential } from "./FirebaseCredential"
 
 export type IpcEvent =
   | { name: "onNewFile" }

@@ -1,5 +1,6 @@
 import { addTick, toTrackEvents } from "@signal-app/core"
-import { AnyEvent } from "midifile-ts"
+import type { AnyEvent } from "midifile-ts"
+import { describe, expect, it } from "vitest"
 
 describe("toTrackEvents", () => {
   it("addTick", () => {

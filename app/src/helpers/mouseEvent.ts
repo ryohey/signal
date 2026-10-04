@@ -1,4 +1,4 @@
-import { Point } from "../entities/geometry/Point"
+import type { Point } from "@signal-app/geometry"
 
 export const getClientPos = (e: MouseEvent): Point => ({
   x: e.clientX,

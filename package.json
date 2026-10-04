@@ -3,24 +3,26 @@
   "version": "0.0.1",
   "description": "A friendly music sequencer application for OS X and Windows.",
   "scripts": {
-    "start": "turbo run dev --parallel",
-    "build": "npm run build:app",
+    "dev": "turbo run dev --parallel",
+    "build": "pnpm run build:app",
     "build:app": "turbo build && cpx \"app/dist/**/*\" dist",
-    "serve": "npx http-server dist",
+    "serve": "pnpm dlx http-server dist",
     "test": "turbo test",
-    "lint": "biome lint .",
-    "format": "biome format . --write",
-    "format:check": "biome format .",
-    "check": "biome check .",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "format": "turbo format",
+    "format:check": "turbo format:check",
+    "check": "turbo check",
+    "typecheck": "turbo typecheck",
     "firebase": "npm --prefix functions run build && firebase emulators:start",
     "firebase:deploy": "firebase deploy",
-    "dev:electron": "concurrently \"npm run dev -w app\" \"npm run dev --prefix electron\"",
-    "build:electron": "npm run build:electron -w app && rimraf electron/dist_renderer && cpx \"app/dist/**/*\" electron/dist_renderer",
-    "package:electron:darwin": "npm run build:electron && npm run package:darwin --prefix electron",
-    "package:electron": "npm run build:electron && npm run package --prefix electron",
-    "make:electron": "npm run build:electron && npm run make:mas --prefix electron",
-    "make:darwin": "npm run build:electron && npm run make:darwin --prefix electron",
-    "make:win": "npm run build:electron && npm run make:win --prefix electron"
+    "dev:electron": "concurrently \"pnpm --dir app dev\" \"npm run dev --prefix electron\"",
+    "build:electron": "pnpm --dir app build:electron && rimraf electron/dist_renderer && cpx \"app/dist/**/*\" electron/dist_renderer",
+    "package:electron:darwin": "pnpm run build:electron && npm run package:darwin --prefix electron",
+    "package:electron": "pnpm run build:electron && npm run package --prefix electron",
+    "make:electron": "pnpm run build:electron && npm run make:mas --prefix electron",
+    "make:darwin": "pnpm run build:electron && npm run make:darwin --prefix electron",
+    "make:win": "pnpm run build:electron && npm run make:win --prefix electron"
   },
   "repository": {
     "type": "git",
@@ -33,20 +35,17 @@
   },
   "homepage": "https://github.com/ryohey/signal/",
   "private": true,
-  "devDependencies": {
-    "@biomejs/biome": "2.4.4",
-    "@testing-library/dom": "^10.4.1",
-    "@types/aria-query": "^5.0.4",
-    "cpx": "^1.5.0",
-    "rimraf": "^6.1.3",
-    "turbo": "^2.8.10"
+  "engines": {
+    "node": ">=24 <25"
   },
-  "workspaces": [
-    "app",
-    "packages/*"
-  ],
-  "packageManager": "npm@11.10.1",
-  "dependencies": {
-    "optics-ts": "^2.4.1"
-  }
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@testing-library/dom": "catalog:",
+    "@types/aria-query": "catalog:",
+    "cpx": "catalog:",
+    "rimraf": "catalog:",
+    "turbo": "catalog:",
+    "concurrently": "catalog:"
+  },
+  "packageManager": "pnpm@10.34.5"
 }

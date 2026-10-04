@@ -1,4 +1,10 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react"
 
 type KeyType = string | number | symbol | boolean
 
@@ -11,7 +17,7 @@ export const DialogProvider = <Keys extends KeyType>({
   children,
   component: ActionDialog,
 }: DialogProviderProps<Keys>) => {
-  const [dialog, setDialog] = useState<DialogProps<any> | null>(null)
+  const [dialog, setDialog] = useState<DialogProps<Keys> | null>(null)
 
   return (
     <DialogContext.Provider value={{ setDialog }}>
@@ -37,6 +43,7 @@ export type DialogProps<Keys extends KeyType> = DialogOptions<Keys> & {
 }
 
 export const DialogContext = createContext<{
+  // biome-ignore lint/suspicious/noExplicitAny: ignore
   setDialog: (props: DialogProps<any> | null) => void
 }>(null as never)
 

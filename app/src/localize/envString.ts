@@ -1,5 +1,5 @@
 export const envString = (() => {
-  const os = navigator.userAgent.indexOf("Mac") != -1 ? "macOS" : "PC"
+  const os = navigator.userAgent.indexOf("Mac") !== -1 ? "macOS" : "PC"
 
   switch (os) {
     case "macOS":

@@ -1,4 +1,4 @@
-import { ControllerEvent, SysExEvent } from "midifile-ts"
+import type { ControllerEvent, SysExEvent } from "midifile-ts"
 
 export function controllerMidiEvent(
   deltaTime: number,
@@ -17,12 +17,12 @@ export function controllerMidiEvent(
 }
 
 export function gsResetMidiEvent(
-    deltaTime: number,
-    data: number[],
+  deltaTime: number,
+  data: number[],
 ): SysExEvent {
   return {
     deltaTime,
     type: "sysEx",
-    data
+    data,
   }
 }

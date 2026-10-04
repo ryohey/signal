@@ -1,0 +1,34 @@
+{
+  "name": "@signal-app/tempo-editor",
+  "version": "0.1.0",
+  "description": "Editor facade for tempo automation",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write"
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@types/lodash": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@signal-app/core": "workspace:*",
+    "@signal-app/observable": "workspace:*",
+    "lodash": "catalog:"
+  },
+  "peerDependencies": {
+    "midifile-ts": "catalog:",
+    "zod": "catalog:"
+  }
+}

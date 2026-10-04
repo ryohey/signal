@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { useToast } from "dialog-hooks"
 import { observer } from "mobx-react-lite"
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { Alert } from "../components/Alert.js"
 import { PrimaryButton } from "../components/Button.js"
 import { CircularProgress } from "../components/CircularProgress.js"

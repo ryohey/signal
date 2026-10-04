@@ -2,13 +2,18 @@ import { Song } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { useCallback } from "react"
-import { useArrangeView } from "./useArrangeView"
-import { useControlPane } from "./useControlPane"
-import { usePianoRoll } from "./usePianoRoll"
+import {
+  type HistoryAtomsSnapshot,
+  restoreHistoryAtoms,
+  snapshotHistoryAtoms,
+} from "./historyAtom"
 import { useSong } from "./useSong"
 import { useStores } from "./useStores"
 
-type SerializedRootStore = ReturnType<ReturnType<typeof useSerializeState>>
+type HistorySnapshot = {
+  song: ReturnType<Song["serialize"]>
+  atoms: HistoryAtomsSnapshot
+}
 
 export function useHistory() {
   return {
@@ -31,103 +36,97 @@ export function useHistory() {
   }
 }
 
-function useSerializeState() {
+// Snapshots the song plus every atom registered via `historyAtom`, so a
+// feature joins history by wrapping its atoms, not by being listed here.
+function useSnapshot() {
   const { songStore } = useStores()
-  const { serializeState: serializePianoRoll } = usePianoRoll()
-  const { serializeState: serializeControlPane } = useControlPane()
-  const { serializeState: serializeArrangeView } = useArrangeView()
 
-  return useCallback(
-    () => ({
-      song: songStore.serialize(),
-      pianoRollStore: serializePianoRoll(),
-      controlStore: serializeControlPane(),
-      arrangeViewStore: serializeArrangeView(),
-    }),
-    [songStore, serializePianoRoll, serializeControlPane, serializeArrangeView],
+  return useAtomCallback(
+    useCallback(
+      (get): HistorySnapshot => ({
+        song: songStore.serialize(),
+        atoms: snapshotHistoryAtoms(get),
+      }),
+      [songStore],
+    ),
   )
 }
 
-function useRestoreState() {
+function useRestore() {
   const { setSong } = useSong()
-  const { restoreState: restorePianoRoll } = usePianoRoll()
-  const { restoreState: restoreControlPane } = useControlPane()
-  const { restoreState: restoreArrangeView } = useArrangeView()
 
-  return useCallback(
-    (serializedState: SerializedRootStore) => {
-      const song = Song.deserialize(serializedState.song)
-      setSong(song)
-      restorePianoRoll(serializedState.pianoRollStore)
-      restoreControlPane(serializedState.controlStore)
-      restoreArrangeView(serializedState.arrangeViewStore)
-    },
-    [setSong, restorePianoRoll, restoreControlPane, restoreArrangeView],
+  return useAtomCallback(
+    useCallback(
+      (_get, set, snapshot: HistorySnapshot) => {
+        setSong(Song.deserialize(snapshot.song))
+        restoreHistoryAtoms(set, snapshot.atoms)
+      },
+      [setSong],
+    ),
   )
 }
 
 function usePushHistory() {
-  const serializeState = useSerializeState()
+  const snapshot = useSnapshot()
 
   return useAtomCallback(
     useCallback(
       (_get, set) => {
-        const state = serializeState()
-        set(pushHistoryAtom, state)
+        set(pushHistoryAtom, snapshot())
       },
-      [serializeState],
+      [snapshot],
     ),
   )
 }
 
 function useUndo() {
-  const serializeState = useSerializeState()
-  const restoreState = useRestoreState()
+  const snapshot = useSnapshot()
+  const restore = useRestore()
 
   return useAtomCallback(
     useCallback(
       (_get, set) => {
-        const state = set(undoAtom, serializeState())
+        const state = set(undoAtom, snapshot())
         if (state) {
-          restoreState(state)
+          restore(state)
         }
       },
-      [restoreState, serializeState],
+      [restore, snapshot],
     ),
   )
 }
 
 function useRedo() {
-  const serializeState = useSerializeState()
-  const restoreState = useRestoreState()
+  const snapshot = useSnapshot()
+  const restore = useRestore()
 
   return useAtomCallback(
     useCallback(
       (_get, set) => {
-        const state = set(redoAtom, serializeState())
+        const state = set(redoAtom, snapshot())
         if (state) {
-          restoreState(state)
+          restore(state)
         }
       },
-      [serializeState, restoreState],
+      [snapshot, restore],
     ),
   )
 }
 
 // atoms
-const undoHistoryAtom = atom<readonly SerializedRootStore[]>([])
-const redoHistoryAtom = atom<readonly SerializedRootStore[]>([])
+const undoHistoryAtom = atom<readonly HistorySnapshot[]>([])
+const redoHistoryAtom = atom<readonly HistorySnapshot[]>([])
 
 // derived atoms
 const hasUndoAtom = atom((get) => get(undoHistoryAtom).length > 0)
 const hasRedoAtom = atom((get) => get(redoHistoryAtom).length > 0)
 
 // actions
-const pushHistoryAtom = atom(null, (_get, set, state: SerializedRootStore) => {
+const pushHistoryAtom = atom(null, (_get, set, state: HistorySnapshot) => {
   set(undoHistoryAtom, (prev) => [...prev, state])
   set(redoHistoryAtom, [])
 })
-const undoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
+const undoAtom = atom(null, (get, set, currentState: HistorySnapshot) => {
   const undoHistory = [...get(undoHistoryAtom)]
   const state = undoHistory.pop()
   if (state) {
@@ -136,7 +135,7 @@ const undoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   }
   return state
 })
-const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
+const redoAtom = atom(null, (get, set, currentState: HistorySnapshot) => {
   const redoHistory = [...get(redoHistoryAtom)]
   const state = redoHistory.pop()
   if (state) {
@@ -145,7 +144,7 @@ const redoAtom = atom(null, (get, set, currentState: SerializedRootStore) => {
   }
   return state
 })
-const clearHistoryAtom = atom(null, (get, set) => {
+const clearHistoryAtom = atom(null, (_get, set) => {
   set(undoHistoryAtom, [])
   set(redoHistoryAtom, [])
 })

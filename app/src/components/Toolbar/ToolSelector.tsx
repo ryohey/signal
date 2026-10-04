@@ -1,13 +1,13 @@
 import styled from "@emotion/styled"
-import { FC, useCallback } from "react"
-import PencilIcon from "../../images/icons/pencil.svg"
-import SelectionIcon from "../../images/icons/selection.svg"
-import { Localized } from "../../localize/useLocalization"
-import { Tooltip } from "../ui/Tooltip"
 import {
   ToolbarButtonGroup,
   ToolbarButtonGroupItem,
-} from "./ToolbarButtonGroup"
+  Tooltip,
+} from "@signal-app/ui"
+import { type FC, useCallback } from "react"
+import PencilIcon from "../../images/icons/pencil.svg"
+import SelectionIcon from "../../images/icons/selection.svg"
+import { Localized } from "../../localize/useLocalization"
 
 const ButtonGroup = styled(ToolbarButtonGroup)`
   background-color: transparent;

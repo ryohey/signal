@@ -1,5 +1,5 @@
-import { Beat } from "../beat/Beat"
-import { Range } from "../geometry/Range"
+import type { Beat } from "../beat/Beat"
+import type { Range } from "../geometry/Range"
 
 interface TimeSignature {
   readonly tick: number
@@ -127,7 +127,7 @@ export namespace Measure {
   }
 
   export function getMeasureStart(
-    measures: Measure[],
+    measures: readonly Measure[],
     tick: number,
     timebase: number,
   ) {
@@ -196,7 +196,7 @@ function defaultMBTFormatter(mbt: Beat): string {
 }
 
 function getLastSorted<T extends { tick: number }>(
-  events: T[],
+  events: readonly T[],
   tick: number,
 ): T | null {
   let lastMeasure: T | null = null

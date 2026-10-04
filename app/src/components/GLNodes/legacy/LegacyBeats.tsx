@@ -1,14 +1,13 @@
 import { useTheme } from "@emotion/react"
-import { IRect, Rectangles } from "@ryohey/webgl-react"
+import { type IRect, Rectangles } from "@ryohey/webgl-react"
 import Color from "color"
 import { partition } from "lodash"
-import { FC } from "react"
-import { BeatWithX } from "../../../entities/beat/BeatWithX"
+import type { FC } from "react"
 import { colorToVec4 } from "../../../gl/color"
 
 export const LegacyBeats: FC<{
   height: number
-  beats: BeatWithX[]
+  beats: { x: number; beat: number }[]
   zIndex: number
 }> = ({ height, beats, zIndex }) => {
   const theme = useTheme()
