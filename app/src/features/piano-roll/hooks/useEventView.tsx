@@ -18,7 +18,7 @@ export function EventViewProvider({ children }: { children: React.ReactNode }) {
   const track = song.getTrack(selectedTrackId)
 
   useEffect(() => {
-    const update = () => setEvents(track?.events ?? [])
+    const update = () => setEvents([...(track?.events ?? [])])
     update()
     return track?.onEventsChanged.subscribe(update) ?? (() => {})
   }, [track, setEvents])
