@@ -1,45 +1,40 @@
 import { ValueEventType } from "@signal-app/control-editor"
 import { useCallback } from "react"
-import { useUpdateControlEventValue } from "../../hooks/control"
+import { useUpdateControlEventsValue } from "../../hooks/control"
 import { useControlEditor } from "../../hooks/useControlEditor"
 import { useControlPane } from "../../hooks/useControlPane"
 import { ControlName } from "../ControlName"
 import { ControlValueDialog } from "./ControlValueDialog"
 
 export const ControlEventValueDialog = () => {
-  const { valueDialogEventId, setValueDialogEventId } = useControlPane()
+  const { valueDialogEventIds, setValueDialogEventIds } = useControlPane()
   const controlEditor = useControlEditor()
-  const updateControlEventValue = useUpdateControlEventValue()
+  const updateControlEventsValue = useUpdateControlEventsValue()
   const { type } = controlEditor
 
   const onClose = useCallback(
-    () => setValueDialogEventId(null),
-    [setValueDialogEventId],
+    () => setValueDialogEventIds([]),
+    [setValueDialogEventIds],
   )
 
   const onClickOK = useCallback(
     (value: number) => {
-      if (valueDialogEventId === null) {
-        return
-      }
-      updateControlEventValue(valueDialogEventId, value)
-      setValueDialogEventId(null)
+      updateControlEventsValue(valueDialogEventIds, value)
+      setValueDialogEventIds([])
     },
-    [valueDialogEventId, setValueDialogEventId, updateControlEventValue],
+    [valueDialogEventIds, setValueDialogEventIds, updateControlEventsValue],
   )
 
   const { min, max } = ValueEventType.getDisplayValueRange(type)
 
-  const [item] =
-    valueDialogEventId !== null
-      ? controlEditor.getItemsByIds([valueDialogEventId])
-      : []
+  // start from the value of the first point
+  const [item] = controlEditor.getItemsByIds(valueDialogEventIds)
   const initialValue =
     item !== undefined ? ValueEventType.toDisplayValue(type, item.value) : 0
 
   return (
     <ControlValueDialog
-      open={valueDialogEventId !== null}
+      open={valueDialogEventIds.length > 0}
       title={<ControlName mode={type} />}
       value={initialValue}
       minValue={min}

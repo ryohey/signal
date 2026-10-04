@@ -5,7 +5,7 @@ import {
   MenuDivider,
   MenuItem,
 } from "@signal-app/ui"
-import { type FC, useCallback } from "react"
+import { type FC, useCallback, useMemo } from "react"
 import { envString } from "../../../localize/envString"
 import { Localized } from "../../../localize/useLocalization"
 import {
@@ -25,8 +25,16 @@ export const ControlSelectionContextMenu: FC<
   ControlSelectionContextMenuProps
 > = ({ hitEventId, ...props }) => {
   const { handleClose } = props
-  const { selectedEventIds, setValueDialogEventId } = useControlPane()
+  const { selectedEventIds, setValueDialogEventIds } = useControlPane()
   const isEventSelected = selectedEventIds.length > 0
+
+  // Set Value edits the whole selection, unless the clicked point is outside it
+  const valueTargetEventIds = useMemo(() => {
+    if (hitEventId === null || selectedEventIds.includes(hitEventId)) {
+      return selectedEventIds
+    }
+    return [hitEventId]
+  }, [hitEventId, selectedEventIds])
   const copyControlSelection = useCopyControlSelection()
   const deleteControlSelection = useDeleteControlSelection()
   const duplicateControlSelection = useDuplicateControlSelection()
@@ -54,9 +62,9 @@ export const ControlSelectionContextMenu: FC<
   }, [deleteControlSelection])
 
   const onClickSetValue = useCallback(() => {
-    setValueDialogEventId(hitEventId)
+    setValueDialogEventIds(valueTargetEventIds)
     handleClose()
-  }, [setValueDialogEventId, hitEventId, handleClose])
+  }, [setValueDialogEventIds, valueTargetEventIds, handleClose])
 
   return (
     <ContextMenu {...props}>
@@ -81,7 +89,10 @@ export const ControlSelectionContextMenu: FC<
         <HotKey>Del</HotKey>
       </MenuItem>
       <MenuDivider />
-      <MenuItem onClick={onClickSetValue} disabled={hitEventId === null}>
+      <MenuItem
+        onClick={onClickSetValue}
+        disabled={valueTargetEventIds.length === 0}
+      >
         <Localized name="set-value" />
       </MenuItem>
     </ContextMenu>

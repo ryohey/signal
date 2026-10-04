@@ -27,19 +27,19 @@ export const useCreateOrUpdateControlEventsValue = () => {
 }
 
 // value is in display units (e.g. pitch bend center is 0)
-export const useUpdateControlEventValue = () => {
+export const useUpdateControlEventsValue = () => {
   const controlEditor = useControlEditor()
   const { pushHistory } = useHistory()
 
   return useCallback(
-    (eventId: number, value: number) => {
-      if (controlEditor.getItemsByIds([eventId]).length === 0) {
+    (eventIds: readonly number[], value: number) => {
+      if (controlEditor.getItemsByIds(eventIds).length === 0) {
         return
       }
 
       pushHistory()
       controlEditor.createOrUpdateItemValue(
-        [eventId],
+        eventIds,
         ValueEventType.fromDisplayValue(controlEditor.type, value),
         0,
       )
