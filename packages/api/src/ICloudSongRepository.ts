@@ -1,4 +1,4 @@
-import { User } from "./IUserRepository.js"
+import type { User } from "./IUserRepository.js"
 
 export interface CloudSong {
   id: string
@@ -7,9 +7,9 @@ export interface CloudSong {
   updatedAt: Date
   songDataId: string
   userId: string
-  publishedAt?: Date
+  publishedAt?: Date | undefined
   isPublic?: boolean
-  user?: User
+  user?: User | undefined
   playCount?: number
 }
 

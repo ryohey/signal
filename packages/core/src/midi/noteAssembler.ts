@@ -1,5 +1,5 @@
-import { NoteOffEvent, NoteOnEvent } from "midifile-ts"
-import { NoteEvent, TickProvider } from "../entities/track"
+import type { NoteOffEvent, NoteOnEvent } from "midifile-ts"
+import type { NoteEvent, TickProvider } from "../entities"
 import { noteOffMidiEvent, noteOnMidiEvent } from "../midi/MidiEvent"
 
 /**
@@ -67,6 +67,7 @@ export function deassemble<T extends object>(
   e: T | NoteEvent,
 ): (T | TickNoteOnEvent | TickNoteOffEvent)[] {
   if ("subtype" in e && e.subtype === "note") {
+    // biome-ignore lint/suspicious/noExplicitAny: ignore
     const channel = (e as any)["channel"] ?? -1
     const noteOn = noteOnMidiEvent(0, channel, e.noteNumber, e.velocity)
     const noteOff = noteOffMidiEvent(0, channel, e.noteNumber)

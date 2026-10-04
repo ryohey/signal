@@ -1,6 +1,6 @@
-import { Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
-import { Measure } from "../measure/Measure"
+import { Range } from "../geometry/Range"
+import type { Measure } from "../measure/Measure"
 import { Beat } from "./Beat"
 
 describe("createBeatsInRange", () => {

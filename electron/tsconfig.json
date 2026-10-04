@@ -4,7 +4,6 @@
     "module": "esnext",
     "allowJs": false,
     "noImplicitAny": true,
-    "baseUrl": "./src",
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,

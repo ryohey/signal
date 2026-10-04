@@ -1,0 +1,41 @@
+import { useTheme } from "@emotion/react"
+import { Rectangles } from "@ryohey/webgl-react"
+import type { Rect } from "@signal-app/geometry"
+import Color from "color"
+import { range } from "lodash"
+import { type FC, useCallback, useMemo } from "react"
+import { colorToVec4 } from "../../../../gl/color"
+import { useArrangeTrackCount } from "../../hooks/useArrangeTrackCount"
+import { useArrangeTransform } from "../../hooks/useArrangeTransform"
+
+export const Lines: FC<{ width: number; zIndex: number }> = ({
+  width,
+  zIndex,
+}) => {
+  const { trackTransform } = useArrangeTransform()
+  const theme = useTheme()
+
+  const hline = useCallback(
+    (y: number): Rect => ({
+      x: 0,
+      y,
+      width,
+      height: 1,
+    }),
+    [width],
+  )
+
+  const trackCount = useArrangeTrackCount()
+
+  const rects = useMemo(
+    () =>
+      range(trackCount)
+        .map((_, i) => trackTransform.getY(i + 1) - 1)
+        .map(hline),
+    [trackCount, trackTransform, hline],
+  )
+
+  const color = colorToVec4(Color(theme.dividerColor))
+
+  return <Rectangles rects={rects} color={color} zIndex={zIndex} />
+}

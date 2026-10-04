@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { FC, PropsWithChildren, useCallback } from "react"
+import { type FC, type PropsWithChildren, useCallback } from "react"
 import { useSetSong } from "../../actions"
 import { songFromFile } from "../../actions/file"
 import { useSong } from "../../hooks/useSong"

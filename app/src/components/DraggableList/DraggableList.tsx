@@ -1,7 +1,7 @@
 import {
+  closestCenter,
   DndContext,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"

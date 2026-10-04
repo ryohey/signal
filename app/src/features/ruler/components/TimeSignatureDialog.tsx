@@ -1,0 +1,128 @@
+import styled from "@emotion/styled"
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  PrimaryButton,
+  Select,
+  TextField,
+} from "@signal-app/ui"
+import { range } from "lodash"
+import React, { type FC, useEffect, useState } from "react"
+import { Localized } from "../../../localize/useLocalization"
+
+export interface TimeSignatureDialogProps {
+  initialNumerator?: number | undefined
+  initialDenominator?: number | undefined
+  open: boolean
+  onClose: () => void
+  onClickOK: (timeSignature: { numerator: number; denominator: number }) => void
+}
+
+const NumberInput = styled(TextField)`
+  width: 3em;
+  text-align: center;
+  font-size: 1rem;
+  padding: 0.2rem 0;
+
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`
+
+const _TimeSignatureDialog: FC<TimeSignatureDialogProps> = ({
+  initialNumerator = 4,
+  initialDenominator = 4,
+  open,
+  onClose,
+  onClickOK,
+}) => {
+  const [numerator, setNumerator] = useState(initialNumerator)
+  const [denominator, setDenominator] = useState(initialDenominator)
+
+  useEffect(() => {
+    // reset values when opening the dialog
+    if (open) {
+      setNumerator(initialNumerator)
+      setDenominator(initialDenominator)
+    }
+  }, [open, initialDenominator, initialNumerator])
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogTitle>
+        <Localized name="time-signature" />
+      </DialogTitle>
+      <DialogContent>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            justifyContent: "center",
+          }}
+        >
+          <NumberInput
+            value={numerator}
+            type="number"
+            min={1}
+            max={32}
+            onChange={(e) => setNumerator(parseInt(e.target.value, 10))}
+            onBlur={() => setNumerator(Math.max(1, Math.min(32, numerator)))}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                e.currentTarget.blur()
+              }
+            }}
+          />
+          <span
+            style={{
+              width: "3em",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            /
+          </span>
+          <Select
+            style={{
+              minWidth: "5em",
+            }}
+            value={denominator.toString()}
+            onChange={(e) =>
+              setDenominator(parseInt(e.target.value as string, 10))
+            }
+          >
+            {range(0, 6)
+              .map((v) => 2 ** v)
+              .map((v) => (
+                <option key={v} value={v.toString()}>
+                  {v}
+                </option>
+              ))}
+          </Select>
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button autoFocus onClick={onClose}>
+          <Localized name="cancel" />
+        </Button>
+        <PrimaryButton
+          onClick={() => {
+            onClickOK({ numerator, denominator })
+            onClose()
+          }}
+          disabled={Number.isNaN(numerator) && numerator <= 32 && numerator > 0}
+        >
+          <Localized name="ok" />
+        </PrimaryButton>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+export const TimeSignatureDialog = React.memo(_TimeSignatureDialog)

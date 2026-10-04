@@ -1,5 +1,5 @@
 import { useToast } from "dialog-hooks"
-import { FC, useCallback } from "react"
+import { type FC, useCallback } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { useLocalization } from "../../localize/useLocalization"
 import { SignInDialogContent } from "./SignInDialogContent"

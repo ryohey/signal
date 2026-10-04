@@ -1,14 +1,13 @@
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
+import { useHydrateAtoms } from "jotai/utils"
+import type { Store } from "jotai/vanilla/store"
 import { createScope, ScopeProvider } from "jotai-scope"
-import { Store } from "jotai/vanilla/store"
 import { clamp } from "lodash"
-import { SetStateAction, useEffect } from "react"
+import { type SetStateAction, useEffect, useMemo } from "react"
 import { Layout } from "../Constants"
 import { TickTransform } from "../entities/transform/TickTransform"
-import { useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
-import { useStores } from "./useStores"
 
 interface TickScrollConfig {
   readonly minScaleX: number
@@ -44,11 +43,14 @@ export function TickScrollProvider({
   const { isPlaying, position } = usePlayer()
   const triggerAutoScroll = useSetAtom(triggerAutoScrollAtom, { store: scope })
   const setEndTick = useSetAtom(endTickAtom, { store: scope })
-  const setMinScaleX = useSetAtom(minScaleXAtom, { store: scope })
-  const setMaxScaleX = useSetAtom(maxScaleXAtom, { store: scope })
 
-  useEffect(() => setMinScaleX(minScaleX), [setMinScaleX, minScaleX])
-  useEffect(() => setMaxScaleX(maxScaleX), [setMaxScaleX, maxScaleX])
+  useHydrateAtoms(
+    [
+      [minScaleXAtom, minScaleX],
+      [maxScaleXAtom, maxScaleX],
+    ],
+    { store: scope },
+  )
 
   // keep endTick updated
   useEffect(() => {
@@ -70,12 +72,9 @@ export function useTickScroll(store = useStore()) {
       return useAtomValue(autoScrollAtom, { store })
     },
     get cursorX() {
-      const { player } = useStores()
+      const { position } = usePlayer()
       const transform = useAtomValue(transformAtom, { store })
-      return useMobxSelector(
-        () => transform.getX(player.position),
-        [transform, player],
-      )
+      return useMemo(() => transform.getX(position), [transform, position])
     },
     get scrollLeft() {
       return useAtomValue(scrollLeftAtom, { store })
@@ -94,6 +93,9 @@ export function useTickScroll(store = useStore()) {
     },
     get contentWidth() {
       return useAtomValue(contentWidthAtom, { store })
+    },
+    get tickRange() {
+      return useAtomValue(tickRangeAtom, { store })
     },
     getTick: useSetAtom(getTickAtom, { store }),
     setCanvasWidth: useSetAtom(canvasWidthAtom, { store }),
@@ -131,6 +133,14 @@ const contentWidthAtom = atom((get) => {
   const widthTick = transform.getTick(canvasWidth)
   const endTick = startTick + widthTick
   return transform.getX(Math.max(trackEndTick, endTick))
+})
+export const tickRangeAtom = atom((get) => {
+  const transform = get(transformAtom)
+  const scrollLeft = get(scrollLeftAtom)
+  const canvasWidth = get(canvasWidthAtom)
+  const startTick = transform.getTick(scrollLeft)
+  const endTick = transform.getTick(scrollLeft + canvasWidth)
+  return [startTick, endTick] as const
 })
 
 // actions

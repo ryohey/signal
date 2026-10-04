@@ -3,8 +3,9 @@ import { useToast } from "dialog-hooks"
 import SkipNext from "mdi-react/SkipNextIcon.js"
 import SkipPrevious from "mdi-react/SkipPreviousIcon.js"
 import { observer } from "mobx-react-lite"
-import { FC } from "react"
+import type { FC } from "react"
 import { playNextSong, playPreviousSong } from "../actions/song.js"
+import { useIsPlaying } from "../hooks/useIsPlaying.js"
 import { useStores } from "../hooks/useStores.js"
 import { BottomPlayerSong } from "./BottomPlayerSong.js"
 import { CircleButton } from "./CircleButton.js"
@@ -30,9 +31,10 @@ export const BottomPlayer: FC = observer(() => {
     songStore: { currentSong },
   } = rootStore
   const toast = useToast()
+  const isPlaying = useIsPlaying()
 
   const onClickPlay = () => {
-    player.isPlaying ? player.stop() : player.play()
+    isPlaying ? player.stop() : player.play()
   }
 
   const onClickPrevious = () => {
@@ -57,7 +59,7 @@ export const BottomPlayer: FC = observer(() => {
         <CircleButton onClick={onClickPrevious}>
           <SkipPrevious />
         </CircleButton>
-        <PlayButton isPlaying={player.isPlaying} onMouseDown={onClickPlay} />
+        <PlayButton isPlaying={isPlaying} onMouseDown={onClickPlay} />
         <CircleButton onClick={onClickNext} style={{ marginRight: "1rem" }}>
           <SkipNext />
         </CircleButton>

@@ -1,63 +1,118 @@
-import { Track, TrackId } from "@signal-app/core"
-import { useCallback } from "react"
-import { useMobxGetter, useMobxSetter } from "./useMobxSelector"
+import type { Song, TrackId } from "@signal-app/core"
+import { useCallback, useSyncExternalStore } from "react"
 import { useStores } from "./useStores"
 
 export const useSong = () => {
   const { songStore } = useStores()
-  const song = useMobxGetter(songStore, "song")
+  const song = useSyncExternalStore(
+    songStore.onSongChanged.subscribe,
+    useCallback(() => songStore.song, [songStore]),
+  )
 
   return {
     get name() {
-      return useMobxGetter(song, "name")
+      return useSyncExternalStore(
+        song.onNameChanged.subscribe,
+        useCallback(() => song.name, [song]),
+      )
     },
     get timebase() {
-      return useMobxGetter(song, "timebase")
+      return useSyncExternalStore(
+        song.onTimebaseChanged.subscribe,
+        useCallback(() => song.timebase, [song]),
+      )
     },
     get measures() {
-      return useMobxGetter(song, "measures")
-    },
-    get timeSignatures() {
-      return useMobxGetter(song, "timeSignatures")
+      return useSyncExternalStore(
+        song.onMeasuresChanged.subscribe,
+        useCallback(() => song.measures, [song]),
+      )
     },
     get tracks() {
-      return useMobxGetter(song, "tracks")
+      return useSyncExternalStore(
+        song.onTracksChanged.subscribe,
+        song.getTracksSnapshot,
+      )
     },
     get isSaved() {
-      return useMobxGetter(song, "isSaved")
+      return useSyncExternalStore(
+        song.onIsSavedChanged.subscribe,
+        useCallback(() => song.isSaved, [song]),
+      )
     },
     get filepath() {
-      return useMobxGetter(song, "filepath")
+      return useSyncExternalStore(
+        song.onFilepathChanged.subscribe,
+        useCallback(() => song.filepath, [song]),
+      )
     },
     get fileHandle() {
-      return useMobxGetter(song, "fileHandle")
+      return useSyncExternalStore(
+        song.onFilepathChanged.subscribe,
+        useCallback(() => song.fileHandle, [song]),
+      )
     },
     get cloudSongId() {
-      return useMobxGetter(song, "cloudSongId")
+      return useSyncExternalStore(
+        song.onCloudSongIdChanged.subscribe,
+        useCallback(() => song.cloudSongId, [song]),
+      )
     },
     get endOfSong() {
-      return useMobxGetter(song, "endOfSong")
+      return useSyncExternalStore(
+        song.onEndOfSongChanged.subscribe,
+        useCallback(() => song.endOfSong, [song]),
+      )
     },
-    setName: useMobxSetter(song, "name"),
-    getSong: useCallback(() => songStore.song, [songStore]),
-    setSong: useMobxSetter(songStore, "song"),
-    setSaved: useMobxSetter(song, "isSaved"),
-    setFilepath: useMobxSetter(song, "filepath"),
-    addTrack: useCallback(
-      (track: Track) => {
-        song.addTrack(track)
+    get conductorTrack() {
+      return useSyncExternalStore(
+        song.onConductorTrackChanged.subscribe,
+        useCallback(() => song.conductorTrack, [song]),
+      )
+    },
+    setName: useCallback(
+      (name: string) => {
+        song.name = name
       },
       [song],
     ),
-    insertTrack: useCallback(
-      (track: Track, index: number) => {
-        song.insertTrack(track, index)
+    getSong: useCallback(() => songStore.song, [songStore]),
+    setSong: useCallback(
+      (song: Song) => {
+        songStore.song = song
+      },
+      [songStore],
+    ),
+    setSaved: useCallback(
+      (isSaved: boolean) => {
+        song.isSaved = isSaved
+      },
+      [song],
+    ),
+    setFilepath: useCallback(
+      (filepath: string) => {
+        song.filepath = filepath
+      },
+      [song],
+    ),
+    addNewTrack: useCallback(() => {
+      song.addNewTrack()
+    }, [song]),
+    insertNewTrack: useCallback(
+      (index: number) => {
+        song.insertNewTrack(index)
+      },
+      [song],
+    ),
+    duplicateTrack: useCallback(
+      (trackId: TrackId) => {
+        song.duplicateTrack(trackId)
       },
       [song],
     ),
     moveTrack: useCallback(
-      (from: number, to: number) => {
-        song.moveTrack(from, to)
+      (id: TrackId, overId: TrackId) => {
+        song.moveTrack(id, overId)
       },
       [song],
     ),

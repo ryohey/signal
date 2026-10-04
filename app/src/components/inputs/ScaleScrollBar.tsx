@@ -3,8 +3,8 @@ import useComponentSize from "@rehooks/component-size"
 import Add from "mdi-react/AddIcon"
 import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
 import Minus from "mdi-react/MinusIcon"
-import React, { FC, useRef } from "react"
-import { BAR_WIDTH, ScrollBar, ScrollBarProps } from "./ScrollBar"
+import React, { type FC, useRef } from "react"
+import { BAR_WIDTH, ScrollBar, type ScrollBarProps } from "./ScrollBar"
 
 const ScaleButton = styled.div`
   display: flex;

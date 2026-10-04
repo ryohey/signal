@@ -1,4 +1,4 @@
-import {
+import type {
   ControllerEvent,
   EndOfTrackEvent,
   PitchBendEvent,
@@ -7,7 +7,7 @@ import {
   SetTempoEvent,
   TimeSignatureEvent,
 } from "midifile-ts"
-import { TrackEvent, TrackEventOf } from "./Song.js"
+import type { TrackEvent, TrackEventOf } from "./Song.js"
 
 export const isProgramChangeEvent = (
   e: TrackEvent,

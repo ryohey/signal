@@ -1,7 +1,7 @@
-import { CloudSong, ICloudSongRepository } from "@signal-app/api"
-import { SoundFont, SoundFontSynth } from "@signal-app/player"
+import type { CloudSong, ICloudSongRepository } from "@signal-app/api"
+import { type Player, SoundFont, type SoundFontSynth } from "@signal-app/player"
 import debounce from "lodash/debounce.js"
-import RootStore from "../stores/RootStore.js"
+import type RootStore from "../stores/RootStore.js"
 
 const debouncedIncrementPlayCount = debounce(
   (cloudSongRepository: ICloudSongRepository, songId: string) =>
@@ -13,6 +13,7 @@ export const playSong =
   ({ songStore, player, cloudSongRepository, synth }: RootStore) =>
   async (song: CloudSong) => {
     setupSynthIfNeeded(synth)
+    await stopAndWait(player)
     await songStore.loadSong(song)
     player.reset()
     player.play()
@@ -44,6 +45,22 @@ const playSongAt =
 
 export const playPreviousSong = playSongAt(-1)
 export const playNextSong = playSongAt(1)
+
+// Player.stop() only schedules the stop, so play() right after it is ignored
+const stopAndWait = (player: Player) =>
+  new Promise<void>((resolve) => {
+    if (!player.isPlaying) {
+      resolve()
+      return
+    }
+    const unsubscribe = player.onIsPlayingChanged.subscribe(() => {
+      if (!player.isPlaying) {
+        unsubscribe()
+        resolve()
+      }
+    })
+    player.stop()
+  })
 
 const setupSynthIfNeeded = async (synth: SoundFontSynth) => {
   if (synth.isLoaded) {

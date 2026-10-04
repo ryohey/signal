@@ -1,6 +1,6 @@
 import {
   BasicSoundBank,
-  BasicZone,
+  type BasicZone,
   SoundBankLoader,
 } from "spessasynth_core"
 
@@ -13,17 +13,17 @@ interface SampleMeta {
   name: string
 }
 
-
 function getKeyRange(
   zone: BasicZone,
   fallbackMin: number,
   fallbackMax: number,
 ) {
-  if (zone.hasKeyRange)
+  if (zone.hasKeyRange) {
     return {
       min: zone.keyRange.min,
       max: zone.keyRange.max,
     }
+  }
   return { min: fallbackMin, max: fallbackMax }
 }
 
@@ -35,7 +35,7 @@ export class SoundFont {
 
   getDrumKitPresets() {
     const drumKitPresets: Map<number, PresetMeta> = new Map() // programNumber -> PresetMeta
-    
+
     for (const preset of this.parsed.presets) {
       // Only drums
       if (!preset.isDrum) {
@@ -55,17 +55,23 @@ export class SoundFont {
         const presetRange = getKeyRange(presetZone, 0, 127)
         const instrument = presetZone.instrument
         for (const instrumentZone of instrument.zones) {
-          const instRange = getKeyRange(instrumentZone, presetRange.min, presetRange.max)
+          const instRange = getKeyRange(
+            instrumentZone,
+            presetRange.min,
+            presetRange.max,
+          )
           const min = Math.max(presetRange.min, instRange.min)
           const max = Math.min(presetRange.max, instRange.max)
           // Sanity check
-          if (min > max) continue
-          
+          if (min > max) {
+            continue
+          }
+
           const sampleName = instrumentZone.sample.name
           for (let key = min; key <= max; key++) {
-            if (!presetMeta.samples.has(key))
-              presetMeta.samples.set(key, [])
-            presetMeta.samples.get(key)!.push({ name: sampleName })
+            const samples = presetMeta.samples.get(key) ?? []
+            samples.push({ name: sampleName })
+            presetMeta.samples.set(key, samples)
           }
         }
       }

@@ -1,14 +1,14 @@
 import { useTheme } from "@emotion/react"
+import { Menu, MenuDivider, MenuItem, SubMenu } from "@signal-app/ui"
 import ChevronRight from "mdi-react/ChevronRightIcon"
 import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
-import { FC, useCallback, useState } from "react"
+import { type FC, useCallback, useState } from "react"
 import { hasFSAccess } from "../../actions/file"
+import { useExport } from "../../features/export/hooks/useExport"
 import { useAuth } from "../../hooks/useAuth"
-import { useExport } from "../../hooks/useExport"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
-import { Menu, MenuDivider, MenuItem, SubMenu } from "../ui/Menu"
 import { CloudFileMenu } from "./CloudFileMenu"
 import { FileMenu } from "./FileMenu"
 import { LegacyFileMenu } from "./LegacyFileMenu"
@@ -21,17 +21,13 @@ export const FileMenuButton: FC = () => {
   const theme = useTheme()
   const [isOpen, setOpen] = useState(false)
 
-  const handleClose = useCallback(() => setOpen(false), [])
-
   const onClickExportWav = useCallback(() => {
-    handleClose()
     exportSong("WAV")
-  }, [handleClose, exportSong])
+  }, [exportSong])
 
   const onClickExportMp3 = useCallback(() => {
-    handleClose()
     exportSong("MP3")
-  }, [handleClose, exportSong])
+  }, [exportSong])
 
   return (
     <Menu
@@ -46,18 +42,17 @@ export const FileMenuButton: FC = () => {
         </Tab>
       }
     >
-      {user === null && hasFSAccess && <FileMenu close={handleClose} />}
+      {user === null && hasFSAccess && <FileMenu />}
 
-      {user === null && !hasFSAccess && <LegacyFileMenu close={handleClose} />}
+      {user === null && !hasFSAccess && <LegacyFileMenu />}
 
-      {user && <CloudFileMenu close={handleClose} />}
+      {user && <CloudFileMenu />}
 
       {user === null && (
         <>
           <MenuDivider />
           <MenuItem
             onClick={() => {
-              handleClose()
               setOpenSignInDialog(true)
             }}
           >

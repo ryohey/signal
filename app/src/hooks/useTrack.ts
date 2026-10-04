@@ -1,43 +1,64 @@
-import { Track, TrackColor, TrackEvent, TrackId } from "@signal-app/core"
-import { useCallback } from "react"
+import {
+  isProgramChangeEvent,
+  type TrackColor,
+  type TrackEvent,
+  type TrackId,
+} from "@signal-app/core"
+import { useCallback, useSyncExternalStore } from "react"
 import { TrackMute } from "../trackMute/TrackMute"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
 import { usePlayer } from "./usePlayer"
 import { useSong } from "./useSong"
 import { useTrackMute } from "./useTrackMute"
 
+const noop = () => () => {}
+
 export function useTrack(id: TrackId) {
-  const song = useSong()
-  const track = useMobxSelector(() => song.getTrack(id), [song, id])
+  const { getTrack } = useSong()
+  const track = getTrack(id)
 
   return {
     get isRhythmTrack() {
-      return useMobxGetter(track, "isRhythmTrack") ?? false
+      return useSyncExternalStore(
+        track?.onIsRhythmTrackChanged.subscribe ?? noop,
+        useCallback(() => track?.isRhythmTrack ?? false, [track]),
+      )
     },
     get isConductorTrack() {
-      return useMobxGetter(track, "isConductorTrack") ?? false
+      return useSyncExternalStore(
+        track?.onIsConductorTrackChanged.subscribe ?? noop,
+        useCallback(() => track?.isConductorTrack ?? false, [track]),
+      )
     },
     get programNumber() {
       const { position } = usePlayer()
-      return useMobxSelector(
-        () => track?.getProgramNumber(position) ?? 0,
-        [track, position],
+      const subscribe = useCallback(
+        (listener: () => void) =>
+          track?.subscribeEventsChanged(isProgramChangeEvent, listener) ?? noop,
+        [track],
       )
+      const getSnapshot = useCallback(
+        () => track?.getProgramChangeEvent(position)?.value ?? 0,
+        [position, track],
+      )
+      return useSyncExternalStore(subscribe, getSnapshot)
     },
     get name() {
-      return useMobxGetter(track, "name") ?? ""
+      return useSyncExternalStore(
+        track?.onNameChanged.subscribe ?? noop,
+        useCallback(() => track?.name, [track]),
+      )
     },
     get channel() {
-      return useMobxGetter(track, "channel")
-    },
-    get events() {
-      return useMobxGetter(track, "events") ?? []
-    },
-    getEvents() {
-      return track?.events ?? []
+      return useSyncExternalStore(
+        track?.onChannelChanged.subscribe ?? noop,
+        useCallback(() => track?.channel, [track]),
+      )
     },
     get color() {
-      return useMobxGetter(track, "color")
+      return useSyncExternalStore(
+        track?.onColorChanged.subscribe ?? noop,
+        useCallback(() => track?.color, [track]),
+      )
     },
     get isMuted() {
       const { trackMute } = useTrackMute()
@@ -49,6 +70,24 @@ export function useTrack(id: TrackId) {
       const isSolo = TrackMute.isSolo(id)(trackMute)
       return isSolo
     },
+    updateEvent: useCallback(
+      <T extends TrackEvent>(id: number, obj: Partial<T>) => {
+        track?.updateEvent(id, obj)
+      },
+      [track],
+    ),
+    removeEvent: useCallback(
+      (id: number) => {
+        track?.removeEvent(id)
+      },
+      [track],
+    ),
+    removeEvents: useCallback(
+      (ids: readonly number[]) => {
+        track?.removeEvents(ids)
+      },
+      [track],
+    ),
     setColor: useCallback(
       (color: TrackColor | null) => {
         track?.setColor(color)
@@ -69,6 +108,30 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
+    setProgramNumberAt: useCallback(
+      (tick: number, programNumber: number) => {
+        return track?.setProgramNumberAt(tick, programNumber)
+      },
+      [track],
+    ),
+    insertProgramChangeAt: useCallback(
+      (tick: number, programNumber: number) => {
+        return track?.insertProgramChangeAt(tick, programNumber)
+      },
+      [track],
+    ),
+    setProgramNumberById: useCallback(
+      (eventId: number, programNumber: number) => {
+        return track?.setProgramNumberById(eventId, programNumber)
+      },
+      [track],
+    ),
+    hasProgramChangeEventAfter: useCallback(
+      (tick: number) => {
+        return track?.hasProgramChangeEventAfter(tick) ?? false
+      },
+      [track],
+    ),
     setPan: useCallback(
       (pan: number, tick: number) => {
         track?.setPan(pan, tick)
@@ -78,80 +141,6 @@ export function useTrack(id: TrackId) {
     setVolume: useCallback(
       (volume: number, tick: number) => {
         track?.setVolume(volume, tick)
-      },
-      [track],
-    ),
-    ...useTrackEvents(track),
-  }
-}
-
-export function useTrackEvents(track: Track | undefined) {
-  return {
-    addEvent: useCallback(
-      <T extends TrackEvent>(
-        event: Omit<T, "id"> & { subtype?: string },
-      ): T | undefined => {
-        if (track) {
-          return track.addEvent(event)
-        }
-        return undefined
-      },
-      [track],
-    ),
-    addEvents: useCallback(
-      <T extends TrackEvent>(events: Omit<T, "id">[]) => {
-        if (track) {
-          return track.addEvents(events)
-        }
-      },
-      [track],
-    ),
-    removeEvent: useCallback(
-      (eventId: number) => {
-        if (track) {
-          track.removeEvent(eventId)
-        }
-      },
-      [track],
-    ),
-    removeEvents: useCallback(
-      (eventIds: number[]) => {
-        if (track) {
-          track.removeEvents(eventIds)
-        }
-      },
-      [track],
-    ),
-    createOrUpdate: useCallback(
-      <T extends TrackEvent>(
-        newEvent: Omit<T, "id"> & { subtype?: string; controllerType?: number },
-      ) => {
-        if (track) {
-          return track.createOrUpdate(newEvent)
-        }
-      },
-      [track],
-    ),
-    updateEvent: useCallback(
-      <T extends TrackEvent>(id: number, obj: Partial<T>): T | null => {
-        if (track) {
-          return track.updateEvent(id, obj)
-        }
-        return null
-      },
-      [track],
-    ),
-    updateEvents: useCallback(
-      (events: Partial<TrackEvent>[]) => {
-        if (track) {
-          track.updateEvents(events)
-        }
-      },
-      [track],
-    ),
-    getEventById: useCallback(
-      (eventId: number) => {
-        return track?.getEventById(eventId)
       },
       [track],
     ),

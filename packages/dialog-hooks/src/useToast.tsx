@@ -1,4 +1,10 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react"
 
 export type ToastSeverity = "warning" | "error" | "info" | "success"
 
@@ -52,7 +58,7 @@ export const useToast = () => {
   const { addMessage } = useContext(ToastContext)
 
   const show = (message: string, options: { severity: ToastSeverity }) => {
-    addMessage({ message, ...options, key: new Date().getTime() })
+    addMessage({ message, ...options, key: Date.now() })
   }
 
   return {

@@ -1,14 +1,14 @@
 import styled from "@emotion/styled"
-import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
-import MusicNote from "mdi-react/MusicNoteIcon"
-import React, { FC, useCallback } from "react"
-import { useQuantizer } from "../../../hooks/useQuantizer"
-import { Localized } from "../../../localize/useLocalization"
-import { Tooltip } from "../../ui/Tooltip"
 import {
   ToolbarButtonGroup,
   ToolbarButtonGroupItem,
-} from "../ToolbarButtonGroup"
+  Tooltip,
+} from "@signal-app/ui"
+import FiberManualRecord from "mdi-react/FiberManualRecordIcon"
+import MusicNote from "mdi-react/MusicNoteIcon"
+import React, { type FC, useCallback } from "react"
+import { useQuantizer } from "../../../hooks/useQuantizer"
+import { Localized } from "../../../localize/useLocalization"
 import { QuantizePopup } from "./QuantizePopup"
 
 const Container = styled(ToolbarButtonGroup)`
@@ -130,8 +130,8 @@ export const QuantizeSelector: FC = () => {
     useQuantizer()
 
   const onClickQuantizeSwitch = useCallback(() => {
-    setIsQuantizeEnabled(!isQuantizeEnabled)
-  }, [setIsQuantizeEnabled, isQuantizeEnabled])
+    setIsQuantizeEnabled((prev) => !prev)
+  }, [setIsQuantizeEnabled])
 
   return (
     <QuantizeSelectorContent

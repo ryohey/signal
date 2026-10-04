@@ -1,8 +1,10 @@
 import { useProgress } from "dialog-hooks"
-import { FC, useEffect, useState } from "react"
+import { type FC, useEffect, useRef, useState } from "react"
 import { useSetSong } from "../../actions"
-import { useLoadSongFromExternalMidiFile } from "../../actions/cloudSong"
 import { songFromArrayBuffer } from "../../actions/file"
+import { useLoadSongFromExternalMidiFile } from "../../features/cloud-file/hooks/cloudSong"
+import { useMIDIDevice } from "../../features/midi-device/hooks/useMIDIDevice"
+import { useSoundFont } from "../../features/soundfont/hooks/useSoundFont"
 import { isRunningInElectron } from "../../helpers/platform"
 import { useAutoSave } from "../../hooks/useAutoSave"
 import { useStores } from "../../hooks/useStores"
@@ -21,11 +23,16 @@ export const OnInit: FC = () => {
   const { show: showProgress } = useProgress()
   const localized = useLocalization()
   const { shouldShowAutoSaveDialog } = useAutoSave()
+  const { initSoundFont } = useSoundFont()
+  const { initMIDIDevice } = useMIDIDevice()
+  const didInit = useRef(false)
 
   const init = async () => {
     const closeProgress = showProgress(localized["initializing"])
     try {
       await rootStore.init()
+      await initSoundFont()
+      await initMIDIDevice()
     } catch (e) {
       setIsErrorDialogOpen(true)
       setErrorMessage((e as Error).message)
@@ -98,14 +105,19 @@ export const OnInit: FC = () => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
+    // StrictMode runs effects twice in development
+    if (didInit.current) {
+      return
+    }
+    didInit.current = true
     ;(async () => {
       await init()
       await loadExternalMidiIfNeeded()
       await loadArgumentFileIfNeeded()
       await checkAutoSave()
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

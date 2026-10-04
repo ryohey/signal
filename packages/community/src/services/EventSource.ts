@@ -1,14 +1,7 @@
-import {
-  IEventSource,
-  PlayerEvent,
-  PlayerEventOf,
-  SendableEvent,
-} from "@signal-app/player"
+import type { IEventSource, PlayerEvent } from "@signal-app/player"
 import maxBy from "lodash/maxBy.js"
 import uniq from "lodash/uniq.js"
-import { AnyChannelEvent } from "midifile-ts"
 import { isNotUndefined } from "../helpers/array.js"
-import { Song, TrackEvent } from "../song/Song.js"
 import {
   isControllerEvent,
   isControllerEventWithType,
@@ -16,6 +9,7 @@ import {
   isProgramChangeEvent,
   isSetTempoEvent,
 } from "../song/identify.js"
+import type { Song, TrackEvent } from "../song/Song.js"
 
 export const isEventInRange =
   <T extends { tick: number }>(startTick: number, endTick: number) =>
@@ -42,16 +36,13 @@ export class EventSource implements IEventSource {
     )
   }
 
-  getCurrentStateEvents(tick: number): SendableEvent[] {
+  getCurrentStateEvents(tick: number) {
     return this.songProvider.song.tracks.flatMap((t) => {
       const statusEvents = getStatusEvents(t.events, tick)
-      return statusEvents.map(
-        (e) =>
-          ({
-            ...e,
-            trackId: -1,
-          }) as PlayerEventOf<AnyChannelEvent>,
-      )
+      return statusEvents.map((e) => ({
+        ...e,
+        trackId: null,
+      }))
     })
   }
 }

@@ -1,12 +1,12 @@
+import { type Observable, ObservableValue } from "@signal-app/observable"
 import range from "lodash/range.js"
 import throttle from "lodash/throttle.js"
-import { AnyEvent, MIDIControlEvents } from "midifile-ts"
-import { computed, makeObservable, observable } from "mobx"
-import { EventScheduler } from "./EventScheduler.js"
-import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js";
-import { PlayerEvent } from "./PlayerEvent.js"
-import { SendableEvent, SynthOutput } from "./SynthOutput.js"
-import { DistributiveOmit } from "./types.js"
+import { type AnyEvent, MIDIControlEvents } from "midifile-ts"
+import { EventScheduler, type EventSchedulerSource } from "./EventScheduler.js"
+import { controllerMidiEvent, gsResetMidiEvent } from "./MidiEventFactory.js"
+import type { PlayerEvent } from "./PlayerEvent.js"
+import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import type { DistributiveOmit } from "./types.js"
 
 export interface LoopSetting {
   begin: number
@@ -18,35 +18,30 @@ const TIMER_INTERVAL = 50
 const LOOK_AHEAD_TIME = 50
 export const DEFAULT_TEMPO = 120
 
-export interface IEventSource {
-  timebase: number
-  endOfSong: number
-  getEvents(startTick: number, endTick: number): PlayerEvent[]
-  getCurrentStateEvents(tick: number): SendableEvent[]
-}
+export type IEventSource = EventSchedulerSource<PlayerEvent>
 
 export class Player {
   private scheduler: EventScheduler<PlayerEvent> | null = null
   private interval: number | null = null
 
-  private _currentTempo = DEFAULT_TEMPO
-  private _currentTick = 0
-  private _isPlaying = false
+  private readonly _currentTempo = new ObservableValue(DEFAULT_TEMPO)
+  private readonly _currentTick = new ObservableValue(0)
+  private readonly _isPlaying = new ObservableValue(false)
+  private readonly _loop = new ObservableValue<LoopSetting | null>(null)
 
   disableSeek: boolean = false
-  loop: LoopSetting | null = null
+
+  readonly onPositionChanged: Observable
+  readonly onIsPlayingChanged: Observable
+  readonly onLoopChanged: Observable
 
   constructor(
     private readonly output: SynthOutput,
     private readonly eventSource: IEventSource,
   ) {
-    makeObservable<Player, "_currentTick" | "_isPlaying">(this, {
-      _currentTick: observable,
-      _isPlaying: observable,
-      loop: observable,
-      position: computed,
-      isPlaying: computed,
-    })
+    this.onPositionChanged = this._currentTick.onChanged
+    this.onIsPlayingChanged = this._isPlaying.onChanged
+    this.onLoopChanged = this._loop.onChanged
   }
 
   play = () => {
@@ -54,14 +49,15 @@ export class Player {
       console.warn("called play() while playing. aborted.")
       return
     }
+
     this.scheduler = new EventScheduler<PlayerEvent>(
-      (startTick, endTick) => this.eventSource.getEvents(startTick, endTick),
+      this.eventSource,
       () => this.allNotesOffEvents(),
-      this._currentTick,
-      this.eventSource.timebase,
+      () => this.allSoundsOffEvents(),
+      this._currentTick.value,
       TIMER_INTERVAL + LOOK_AHEAD_TIME,
     )
-    this._isPlaying = true
+    this._isPlaying.set(true)
     this.output.activate()
     this.interval = window.setInterval(() => this._onTimer(), TIMER_INTERVAL)
     this.output.activate()
@@ -75,24 +71,24 @@ export class Player {
       return
     }
     tick = Math.min(Math.max(Math.floor(tick), 0), this.eventSource.endOfSong)
-    if (this.scheduler) {
-      this.scheduler.seek(tick)
-    }
-    this._currentTick = tick
-
-    if (this.isPlaying) {
-      this.allSoundsOff()
-    }
-
-    this.sendCurrentStateEvents()
+    this.scheduler?.scheduleSeek(tick)
+    this._currentTick.set(tick)
   }
 
   get position() {
-    return this._currentTick
+    return this._currentTick.value
   }
 
   get isPlaying() {
-    return this._isPlaying
+    return this._isPlaying.value
+  }
+
+  get loop(): LoopSetting | null {
+    return this._loop.value
+  }
+
+  set loop(value: LoopSetting | null) {
+    this._loop.set(value)
   }
 
   get numberOfChannels() {
@@ -100,9 +96,12 @@ export class Player {
   }
 
   allSoundsOffChannel = (ch: number) => {
-    this.sendEvent(
-      controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
-    )
+    this.scheduler?.enqueueEvents([
+      {
+        ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
+        trackId: null,
+      },
+    ])
   }
 
   allSoundsOff = () => {
@@ -122,7 +121,14 @@ export class Player {
   private allNotesOffEvents(): DistributiveOmit<PlayerEvent, "tick">[] {
     return range(0, this.numberOfChannels).map((ch) => ({
       ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_NOTES_OFF, 0),
-      trackId: -1, // do not mute
+      trackId: null, // do not mute
+    }))
+  }
+
+  private allSoundsOffEvents(): DistributiveOmit<PlayerEvent, "tick">[] {
+    return range(0, this.numberOfChannels).map((ch) => ({
+      ...controllerMidiEvent(0, ch, MIDIControlEvents.ALL_SOUNDS_OFF, 0),
+      trackId: null, // do not mute
     }))
   }
 
@@ -134,27 +140,31 @@ export class Player {
       )
     }
     // Full GS reset
-    this.sendEvent(gsResetMidiEvent(
-        0,
-        [
-          0x41, // Roland
-          0x10, // Device ID (defaults to 16 on Roland)
-          0x42, // GS
-          0x12, // Command ID (DT1)
-          0x40, // System parameter - Address
-          0x00, // Global parameter -  Address
-          0x7f, // GS Change - Address
-          0x00, // Turn on - Data
-          0x41, // Checksum
-          0xf7  // End of exclusive
-        ]
-    ))
+    this.sendEvent(
+      gsResetMidiEvent(0, [
+        0x41, // Roland
+        0x10, // Device ID (defaults to 16 on Roland)
+        0x42, // GS
+        0x12, // Command ID (DT1)
+        0x40, // System parameter - Address
+        0x00, // Global parameter -  Address
+        0x7f, // GS Change - Address
+        0x00, // Turn on - Data
+        0x41, // Checksum
+        0xf7, // End of exclusive
+      ]),
+    )
   }
 
   stop = () => {
+    this.scheduler?.scheduleStop()
+    // prevent a pending throttled sync from overwriting a position set right after stop()
+    this.syncPosition.cancel()
+  }
+
+  private finalizeStop() {
     this.scheduler = null
-    this.allSoundsOff()
-    this._isPlaying = false
+    this._isPlaying.set(false)
 
     if (this.interval !== null) {
       clearInterval(this.interval)
@@ -165,27 +175,15 @@ export class Player {
   reset = () => {
     this.resetControllers()
     this.stop()
-    this._currentTick = 0
-  }
-
-  /*
-   to restore synthesizer state (e.g. pitch bend)
-   collect all previous state events
-   and send them to the synthesizer
-  */
-  sendCurrentStateEvents = () => {
-    this.eventSource.getCurrentStateEvents(this._currentTick).forEach((e) => {
-      this.applyPlayerEvent(e)
-      this.sendEvent(e)
-    })
+    this._currentTick.set(0)
   }
 
   get currentTempo() {
-    return this._currentTempo
+    return this._currentTempo.value
   }
 
   set currentTempo(value: number) {
-    this._currentTempo = value
+    this._currentTempo.set(value)
   }
 
   // delayTime: seconds, timestampNow: milliseconds
@@ -200,7 +198,7 @@ export class Player {
 
   private syncPosition = throttle(() => {
     if (this.scheduler !== null) {
-      this._currentTick = this.scheduler.scheduledTick
+      this._currentTick.set(this.scheduler.scheduledTick)
     }
   }, 50)
 
@@ -210,7 +208,7 @@ export class Player {
     if (e.type !== "channel" && "subtype" in e) {
       switch (e.subtype) {
         case "setTempo":
-          this._currentTempo = 60000000 / e.microsecondsPerBeat
+          this._currentTempo.set(60000000 / e.microsecondsPerBeat)
           break
         default:
           break
@@ -226,19 +224,26 @@ export class Player {
     const timestamp = performance.now()
 
     this.scheduler.loop = this.loop?.enabled ? this.loop : null
-    const events = this.scheduler.readNextEvents(this._currentTempo, timestamp)
+    const { events, shouldStop } = this.scheduler.readNextEvents(
+      this._currentTempo.value,
+      timestamp,
+    )
 
     events.forEach(({ event: e, timestamp: time }) => {
-      if (e.type === "channel" || e.type === "sysEx" || e.type === "dividedSysEx") {
+      if (
+        e.type === "channel" ||
+        e.type === "sysEx" ||
+        e.type === "dividedSysEx"
+      ) {
         const delayTime = (time - timestamp) / 1000
-        this.sendEvent(e, delayTime, timestamp, e.trackId)
+        this.sendEvent(e, delayTime, timestamp, e.trackId ?? undefined)
       } else {
         this.applyPlayerEvent(e)
       }
     })
 
-    if (this.scheduler.scheduledTick >= this.eventSource.endOfSong) {
-      this.stop()
+    if (shouldStop) {
+      this.finalizeStop()
     }
 
     this.syncPosition()

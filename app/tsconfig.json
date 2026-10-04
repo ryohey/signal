@@ -4,14 +4,13 @@
       "react",
       "react-dom",
       "node",
-      "webmidi",
       "wicg-file-system-access",
       "web-bluetooth",
       "vite-plugin-svgr/client"
     ],
     "sourceMap": true,
     "target": "esnext",
-    "module": "es2015",
+    "module": "esnext",
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
@@ -25,10 +24,22 @@
     "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "skipLibCheck": true,
     "paths": {
       // Avoid referencing the node_modules of the library when developing a local library.
-      "@types/react": ["../node_modules/@types/react"]
+      "@types/react": ["./node_modules/@types/react"]
     }
   },
   "include": ["src/**/*"]
