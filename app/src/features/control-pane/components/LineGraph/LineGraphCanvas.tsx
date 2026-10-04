@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { isEventInRange, Range } from "@signal-app/core"
-import { type Point, Rect } from "@signal-app/geometry"
-import { type MouseEventHandler, useCallback, useMemo, useState } from "react"
+import type { Point } from "@signal-app/geometry"
+import { type MouseEventHandler, useCallback, useMemo } from "react"
 import { Beats } from "../../../../components/GLNodes/Beats"
 import { Cursor } from "../../../../components/GLNodes/Cursor"
 import { matrixFromTranslation } from "../../../../helpers/matrix"
@@ -49,9 +49,6 @@ export const LineGraphCanvas = ({
     useCurveGesture(effectiveCurveType)
   const createSelectionGesture = useCreateSelectionGesture()
   const { onContextMenu, menuProps } = useContextMenu()
-  const [contextMenuHitEventId, setContextMenuHitEventId] = useState<
-    number | null
-  >(null)
 
   const cursor = useMemo(() => {
     if (mouseMode !== "pencil") {
@@ -84,21 +81,6 @@ export const LineGraphCanvas = ({
       y: e.offsetY,
     }),
     [scrollLeft],
-  )
-
-  const handleContextMenu: MouseEventHandler = useCallback(
-    (ev) => {
-      const local = getLocal(ev.nativeEvent)
-      const hitItem = items.find((item) =>
-        Rect.containsPoint(
-          Rect.fromPointWithSize(item, circleRadius * 2),
-          local,
-        ),
-      )
-      setContextMenuHitEventId(hitItem?.id ?? null)
-      onContextMenu(ev)
-    },
-    [items, circleRadius, getLocal, onContextMenu],
   )
 
   const pencilMouseDown: MouseEventHandler = useCallback(
@@ -161,7 +143,7 @@ export const LineGraphCanvas = ({
           width={width}
           height={height}
           onMouseDown={onMouseDown}
-          onContextMenu={handleContextMenu}
+          onContextMenu={onContextMenu}
           style={style}
           cursor={cursor}
         >
@@ -192,10 +174,7 @@ export const LineGraphCanvas = ({
             />
           )}
       </div>
-      <ControlSelectionContextMenu
-        {...menuProps}
-        hitEventId={contextMenuHitEventId}
-      />
+      <ControlSelectionContextMenu {...menuProps} />
     </>
   )
 }

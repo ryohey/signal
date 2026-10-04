@@ -7,34 +7,35 @@ import { ControlName } from "../ControlName"
 import { ControlValueDialog } from "./ControlValueDialog"
 
 export const ControlEventValueDialog = () => {
-  const { valueDialogEventIds, setValueDialogEventIds } = useControlPane()
+  const { selectedEventIds, isValueDialogOpen, setValueDialogOpen } =
+    useControlPane()
   const controlEditor = useControlEditor()
   const updateControlEventsValue = useUpdateControlEventsValue()
   const { type } = controlEditor
 
   const onClose = useCallback(
-    () => setValueDialogEventIds([]),
-    [setValueDialogEventIds],
+    () => setValueDialogOpen(false),
+    [setValueDialogOpen],
   )
 
   const onClickOK = useCallback(
     (value: number) => {
-      updateControlEventsValue(valueDialogEventIds, value)
-      setValueDialogEventIds([])
+      updateControlEventsValue(selectedEventIds, value)
+      setValueDialogOpen(false)
     },
-    [valueDialogEventIds, setValueDialogEventIds, updateControlEventsValue],
+    [selectedEventIds, setValueDialogOpen, updateControlEventsValue],
   )
 
   const { min, max } = ValueEventType.getDisplayValueRange(type)
 
-  // start from the value of the first point
-  const [item] = controlEditor.getItemsByIds(valueDialogEventIds)
+  // start from the value of the first selected point
+  const [item] = controlEditor.getItemsByIds(selectedEventIds)
   const initialValue =
     item !== undefined ? ValueEventType.toDisplayValue(type, item.value) : 0
 
   return (
     <ControlValueDialog
-      open={valueDialogEventIds.length > 0}
+      open={isValueDialogOpen}
       title={<ControlName mode={type} />}
       value={initialValue}
       minValue={min}
