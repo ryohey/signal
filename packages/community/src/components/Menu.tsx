@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { Content, Portal, Root, Trigger } from "@radix-ui/react-dropdown-menu"
-import React, { FC, PropsWithChildren } from "react"
+import type React from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export type MenuProps = PropsWithChildren<{
   open?: boolean
@@ -23,14 +24,9 @@ const List = styled.ul`
   margin: 0;
 `
 
-export const Menu: FC<MenuProps> = ({
-  trigger,
-  open,
-  onOpenChange,
-  children,
-}) => {
+export const Menu: FC<MenuProps> = ({ trigger, children, ...rootProps }) => {
   return (
-    <Root open={open} onOpenChange={onOpenChange}>
+    <Root {...rootProps}>
       <Trigger asChild>{trigger}</Trigger>
 
       <Portal>

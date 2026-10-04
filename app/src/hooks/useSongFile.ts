@@ -1,5 +1,5 @@
 import { useToast } from "dialog-hooks"
-import { ChangeEvent, useCallback } from "react"
+import { type ChangeEvent, useCallback } from "react"
 import { useCreateSong, useOpenSong, useSaveSong } from "../actions"
 import { saveFile, saveFileAs, useOpenFile } from "../actions/file"
 import { useLocalization } from "../localize/useLocalization"

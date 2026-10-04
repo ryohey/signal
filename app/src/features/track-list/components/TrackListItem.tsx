@@ -1,0 +1,348 @@
+import { keyframes } from "@emotion/react"
+import styled from "@emotion/styled"
+import { type TrackId, trackColorToCSSColor } from "@signal-app/core"
+import Headset from "mdi-react/HeadphonesIcon"
+import Layers from "mdi-react/LayersIcon"
+import VolumeUp from "mdi-react/VolumeHighIcon"
+import VolumeOff from "mdi-react/VolumeOffIcon"
+import React, {
+  type FC,
+  type MouseEventHandler,
+  useCallback,
+  useRef,
+  useState,
+} from "react"
+import { useSelectTrack } from "../../../actions"
+import { useContextMenu } from "../../../hooks/useContextMenu"
+import { useRouter } from "../../../hooks/useRouter"
+import { useToggleGhostTrack } from "../../../hooks/useToggleGhostTrack"
+import { useTrack } from "../../../hooks/useTrack"
+import { useTrackMute } from "../../../hooks/useTrackMute"
+import { InstrumentBrowser } from "../../instrument-browser"
+import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
+import { useMIDIActivity } from "../hooks/useMIDIActivity"
+import { useToggleAllGhostTracks } from "../hooks/useToggleAllGhostTracks"
+import { InstrumentEmoji, InstrumentName } from "./InstrumentName"
+import { TrackDialog } from "./TrackDialog"
+import { TrackListContextMenu } from "./TrackListContextMenu"
+import { TrackName } from "./TrackName"
+
+export type TrackListItemProps = {
+  trackId: TrackId
+}
+
+const Container = styled.div`
+  position: relative;
+  background-color: transparent;
+  border: 1px solid;
+  border-color: transparent;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.5rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  outline: none;
+
+  &:hover {
+    background: var(--color-highlight);
+  }
+
+  &[data-selected="true"] {
+    background-color: var(--color-highlight);
+    border-color: var(--color-divider);
+  }
+`
+
+const Label = styled.div`
+  display: flex;
+  padding-bottom: 0.3em;
+  align-items: baseline;
+`
+
+const Instrument = styled.div`
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`
+
+const Name = styled.div`
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding-right: 0.5em;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &[data-selected="true"] {
+    color: var(--color-text);
+  }
+`
+
+const Controls = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const ChannelName = styled.div`
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.625rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-divider);
+  padding: 0 0.25rem;
+  cursor: pointer;
+  height: 1.25rem;
+  margin-left: 0.25rem;
+
+  &:hover {
+    background: var(--color-highlight);
+  }
+`
+
+const Icon = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 1.3rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  background: var(--color-background-secondary);
+  border: 2px solid;
+  box-sizing: border-box;
+
+  &[data-selected="true"] {
+    background: var(--color-background);
+  }
+`
+
+const midiPulse = keyframes`
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+`
+
+const MIDIActivityDot = styled.div`
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e676;
+  opacity: 0;
+  pointer-events: none;
+
+  &[data-active="true"] {
+    animation: ${midiPulse} 400ms ease-in forwards;
+  }
+`
+
+const IconInner = styled.div`
+  opacity: 0.5;
+
+  &[data-selected="true"] {
+    opacity: 1;
+  }
+`
+
+const ControlButton = styled.div`
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-right: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    background: var(--color-highlight);
+  }
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  &[data-active="true"] {
+    color: var(--color-text);
+  }
+`
+
+const _TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
+  const { selectedTrackId, notGhostTrackIds } = usePianoRoll()
+  const {
+    channel,
+    isConductorTrack,
+    programNumber,
+    isRhythmTrack,
+    color: trackColor,
+    isMuted,
+    isSolo,
+  } = useTrack(trackId)
+  const { setPath } = useRouter()
+  const { toggleMute: toggleMuteTrack, toggleSolo: toggleSoloTrack } =
+    useTrackMute()
+  const toggleGhostTrack = useToggleGhostTrack()
+  const toggleAllGhostTracks = useToggleAllGhostTracks()
+  const selectTrack = useSelectTrack()
+
+  const selected = trackId === selectedTrackId
+  const ghostTrack = !notGhostTrackIds.has(trackId)
+  const { onContextMenu, menuProps } = useContextMenu()
+  const [isDialogOpened, setDialogOpened] = useState(false)
+  const [isInstrumentBrowserOpen, setInstrumentBrowserOpen] = useState(false)
+
+  const onDoubleClickIcon = useCallback(() => {
+    if (isConductorTrack) {
+      return
+    }
+    setInstrumentBrowserOpen(true)
+  }, [isConductorTrack])
+
+  const onClickMute: MouseEventHandler = useCallback(
+    (e) => {
+      e.stopPropagation()
+      toggleMuteTrack(trackId)
+    },
+    [trackId, toggleMuteTrack],
+  )
+
+  const onClickSolo: MouseEventHandler = useCallback(
+    (e) => {
+      e.stopPropagation()
+      toggleSoloTrack(trackId)
+    },
+    [trackId, toggleSoloTrack],
+  )
+
+  const onClickGhostTrack: MouseEventHandler = useCallback(
+    (e) => {
+      e.stopPropagation()
+      if (e.nativeEvent.altKey) {
+        toggleAllGhostTracks()
+      } else {
+        toggleGhostTrack(trackId)
+      }
+    },
+    [trackId, toggleAllGhostTracks, toggleGhostTrack],
+  )
+
+  const onSelectTrack = useCallback(() => {
+    setPath("/track")
+    selectTrack(trackId)
+  }, [trackId, selectTrack, setPath])
+
+  const onClickChannel = useCallback(() => {
+    setDialogOpened(true)
+  }, [])
+
+  const midiIndicatorRef = useRef<HTMLDivElement>(null)
+
+  const onActivity = useCallback(() => {
+    const el = midiIndicatorRef.current
+    if (!el) {
+      return
+    }
+    // Restart the CSS animation by removing the data-active attribute,
+    // forcing a reflow, then re-adding it.
+    el.removeAttribute("data-active")
+    void el.offsetWidth
+    el.setAttribute("data-active", "true")
+  }, [])
+
+  useMIDIActivity(trackId, onActivity)
+
+  const color =
+    trackColor !== undefined ? trackColorToCSSColor(trackColor) : "transparent"
+
+  return (
+    <>
+      <Container
+        data-selected={selected}
+        onMouseDown={onSelectTrack}
+        onContextMenu={onContextMenu}
+        tabIndex={-1}
+      >
+        <MIDIActivityDot ref={midiIndicatorRef} />
+        <Icon
+          data-selected={selected}
+          style={{
+            borderColor: color,
+          }}
+          onDoubleClick={onDoubleClickIcon}
+        >
+          <IconInner data-selected={selected}>
+            <InstrumentEmoji
+              isRhythmTrack={isRhythmTrack}
+              programNumber={programNumber ?? 0}
+            />
+          </IconInner>
+        </Icon>
+        <div>
+          <Label>
+            <Name data-selected={selected}>
+              <TrackName trackId={trackId} />
+            </Name>
+            <Instrument>
+              <InstrumentName
+                programNumber={programNumber}
+                isRhythmTrack={isRhythmTrack}
+              />
+            </Instrument>
+          </Label>
+          <Controls>
+            <ControlButton
+              data-active={isSolo}
+              onMouseDown={onClickSolo}
+              tabIndex={-1}
+            >
+              <Headset />
+            </ControlButton>
+            <ControlButton
+              data-active={isMuted}
+              onMouseDown={onClickMute}
+              tabIndex={-1}
+            >
+              {isMuted ? <VolumeOff /> : <VolumeUp />}
+            </ControlButton>
+            <ControlButton
+              data-active={ghostTrack}
+              onMouseDown={onClickGhostTrack}
+              tabIndex={-1}
+            >
+              <Layers />
+            </ControlButton>
+            {channel !== undefined && (
+              <ChannelName onMouseDown={onClickChannel}>
+                CH {channel + 1}
+              </ChannelName>
+            )}
+          </Controls>
+        </div>
+      </Container>
+      <TrackListContextMenu {...menuProps} trackId={trackId} />
+      <TrackDialog
+        trackId={trackId}
+        open={isDialogOpened}
+        onClose={() => setDialogOpened(false)}
+      />
+      <InstrumentBrowser
+        isOpen={isInstrumentBrowserOpen}
+        onOpenChange={setInstrumentBrowserOpen}
+        trackId={trackId}
+        showInsertButton={true}
+      />
+    </>
+  )
+}
+
+export const TrackListItem = React.memo(_TrackListItem)

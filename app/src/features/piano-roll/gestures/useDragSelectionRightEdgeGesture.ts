@@ -1,0 +1,27 @@
+import { useCallback } from "react"
+import type { MouseDownHandler } from "../../../gesture/MouseGesture"
+import { useMoveDraggableGesture } from "./useMoveDraggableGesture"
+
+export const useDragSelectionRightEdgeGesture = (): MouseDownHandler<
+  [readonly number[]]
+> => {
+  const moveDraggableAction = useMoveDraggableGesture()
+
+  return useCallback(
+    (e, selectedNoteIds) => {
+      moveDraggableAction(
+        e,
+        {
+          type: "selection",
+          position: "right",
+        },
+        selectedNoteIds.map((noteId) => ({
+          type: "note",
+          position: "right",
+          noteId,
+        })),
+      )
+    },
+    [moveDraggableAction],
+  )
+}

@@ -1,11 +1,11 @@
 import styled from "@emotion/styled"
-import { CloudSong } from "@signal-app/api"
+import type { CloudSong } from "@signal-app/api"
 import { useToast } from "dialog-hooks"
 import DownloadIcon from "mdi-react/DownloadIcon.js"
 import PlayArrow from "mdi-react/PlayArrowIcon.js"
 import ShareIcon from "mdi-react/ShareIcon.js"
 import { observer } from "mobx-react-lite"
-import { FC, useState } from "react"
+import { type FC, useState } from "react"
 import { Helmet } from "react-helmet-async"
 import { Link } from "wouter"
 import { playSong } from "../actions/song.js"
@@ -16,6 +16,7 @@ import { CircularProgress } from "../components/CircularProgress.js"
 import { ShareDialog } from "../components/ShareDialog.js"
 import { downloadBlob } from "../helpers/downloadBlob.js"
 import { useAsyncEffect } from "../hooks/useAsyncEffect.js"
+import { useIsPlaying } from "../hooks/useIsPlaying.js"
 import { useStores } from "../hooks/useStores.js"
 import { PageLayout, PageTitle } from "../layouts/PageLayout.js"
 import { Localized } from "../localize/useLocalization.js"
@@ -97,13 +98,14 @@ export const SongPage: FC<SongPageProps> = observer(({ songId }) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const toast = useToast()
 
+  const isPlayerPlaying = useIsPlaying()
   const isPlaying =
-    player.isPlaying && song !== null && currentSong?.metadata.id === song.id
+    isPlayerPlaying && song !== null && currentSong?.metadata.id === song.id
   const onClickPlay = () => {
     if (song === null) {
       return
     }
-    if (player.isPlaying && currentSong?.metadata.id === song.id) {
+    if (isPlaying) {
       player.stop()
     } else {
       try {

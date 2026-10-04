@@ -1,6 +1,16 @@
-import { makeObservable, observable } from "mobx"
-import { createModelSchema, list, mapAsArray, primitive } from "serializr"
-import { pojo } from "../pojo"
+import { Emitter } from "@signal-app/observable"
+
+export type DeserializedOrderedItem = {
+  id: number
+  rowIndex?: number
+  [key: string]: unknown
+}
+
+export type SerializedOrderedArray<T> = {
+  array?: T[]
+  descending?: boolean
+  lookupMap?: T[]
+}
 
 /**
  * A class that efficiently maintains array order using a key extractor
@@ -10,6 +20,12 @@ export class OrderedArray<
   K extends number | string = number,
 > {
   private readonly lookupMap: Map<number, T>
+  private transactionDepth = 0
+  private pendingRemoved: T[] = []
+  private pendingAdded: T[] = []
+  readonly onChange = new Emitter<
+    { removed: T[] } | { added: T[] } | { removed: T[]; added: T[] }
+  >()
 
   constructor(
     readonly array: T[],
@@ -19,14 +35,22 @@ export class OrderedArray<
   ) {
     this.lookupMap = new Map(array.map((item) => [item.id, item]))
     this.sort()
-
-    makeObservable(this, {
-      array: observable.shallow,
-    })
   }
 
   getArray(): readonly T[] {
     return this.array
+  }
+
+  transaction<R>(callback: () => R): R {
+    this.transactionDepth += 1
+    try {
+      return callback()
+    } finally {
+      this.transactionDepth -= 1
+      if (this.transactionDepth === 0) {
+        this.flushPendingChanges()
+      }
+    }
   }
 
   /**
@@ -85,6 +109,7 @@ export class OrderedArray<
     const insertionIndex = this.findInsertionIndex(element)
     this.array.splice(insertionIndex, 0, element)
     this.lookupMap.set(element.id, element)
+    this.emitChange({ added: [element] })
     return this.array
   }
 
@@ -103,6 +128,7 @@ export class OrderedArray<
     if (index !== undefined) {
       this.array.splice(index, 1)
       this.lookupMap.delete(id)
+      this.emitChange({ removed: [obj] })
     }
     return this.array
   }
@@ -122,8 +148,38 @@ export class OrderedArray<
       const newIndex = this.findInsertionIndex(updatedItem)
       this.array.splice(newIndex, 0, updatedItem)
       this.lookupMap.set(updatedItem.id, updatedItem)
+      this.emitChange({ removed: [originalElement], added: [updatedItem] })
     }
     return this.array
+  }
+
+  private emitChange(
+    change: { removed: T[] } | { added: T[] } | { removed: T[]; added: T[] },
+  ): void {
+    if (this.transactionDepth > 0) {
+      if ("removed" in change) {
+        this.pendingRemoved.push(...change.removed)
+      }
+      if ("added" in change) {
+        this.pendingAdded.push(...change.added)
+      }
+      return
+    }
+
+    this.onChange.emit(change)
+  }
+
+  private flushPendingChanges(): void {
+    if (this.pendingRemoved.length === 0 && this.pendingAdded.length === 0) {
+      return
+    }
+
+    this.onChange.emit({
+      removed: this.pendingRemoved,
+      added: this.pendingAdded,
+    })
+    this.pendingRemoved = []
+    this.pendingAdded = []
   }
 
   private sort(): void {
@@ -143,10 +199,24 @@ export class OrderedArray<
       return this.descending ? -comparison : comparison
     })
   }
+
+  serialize(): SerializedOrderedArray<T> {
+    return {
+      array: this.array,
+      descending: this.descending,
+      lookupMap: Array.from(this.lookupMap.values()),
+    }
+  }
 }
 
-createModelSchema(OrderedArray, {
-  array: list(pojo),
-  descending: primitive(),
-  lookupMap: mapAsArray(pojo, "id"),
-})
+export function deserializeOrderedArray(
+  json: unknown,
+): OrderedArray<DeserializedOrderedItem, number> {
+  const serialized = json as SerializedOrderedArray<DeserializedOrderedItem>
+  const source = [...(serialized.lookupMap ?? serialized.array ?? [])]
+  return new OrderedArray<DeserializedOrderedItem, number>(
+    source,
+    (item) => item.rowIndex as number,
+    serialized.descending ?? false,
+  )
+}

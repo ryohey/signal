@@ -1,13 +1,10 @@
 import { useCallback, useMemo } from "react"
-import {
-  useFastForwardOneBar,
-  useRewindOneBar,
-  useStop,
-  useToggleRecording,
-} from "../actions"
+import { useFastForwardOneBar, useRewindOneBar, useStop } from "../actions"
 import { hasFSAccess } from "../actions/file"
 import { fileInputID } from "../components/Navigation/LegacyFileMenu"
+import { useCloudFile } from "../features/cloud-file/hooks/useCloudFile"
 import { useLocalization } from "../localize/useLocalization"
+import { useAuth } from "./useAuth"
 import { useHistory } from "./useHistory"
 import { useKeyboardShortcut } from "./useKeyboardShortcut"
 import { usePlayer } from "./usePlayer"
@@ -15,8 +12,10 @@ import { useRootView } from "./useRootView"
 import { useRouter } from "./useRouter"
 import { useSong } from "./useSong"
 import { useSongFile } from "./useSongFile"
+import { useToggleRecording } from "./useToggleRecording"
 
 export const useGlobalKeyboardShortcut = () => {
+  const { authUser } = useAuth()
   const { setOpenHelpDialog } = useRootView()
   const { setPath } = useRouter()
   const { playOrPause } = usePlayer()
@@ -28,6 +27,11 @@ export const useGlobalKeyboardShortcut = () => {
   const { undo, redo } = useHistory()
   const { createNewSong, openSong, saveSong, saveAsSong, downloadSong } =
     useSongFile()
+  const {
+    openSong: openCloudSong,
+    saveSong: saveCloudSong,
+    saveAsSong: saveCloudAsSong,
+  } = useCloudFile()
   const localized = useLocalization()
 
   const openLegacy = useCallback(async () => {
@@ -35,6 +39,36 @@ export const useGlobalKeyboardShortcut = () => {
       document.getElementById(fileInputID)?.click()
     }
   }, [isSaved, localized])
+
+  const handleOpen = useCallback(async () => {
+    if (authUser) {
+      await openCloudSong()
+    } else if (hasFSAccess) {
+      await openSong()
+    } else {
+      await openLegacy()
+    }
+  }, [authUser, openCloudSong, openSong, openLegacy])
+
+  const handleSave = useCallback(async () => {
+    if (authUser) {
+      await saveCloudSong()
+    } else if (hasFSAccess) {
+      await saveSong()
+    } else {
+      await downloadSong()
+    }
+  }, [authUser, saveCloudSong, saveSong, downloadSong])
+
+  const handleSaveAs = useCallback(async () => {
+    if (authUser) {
+      await saveCloudAsSong()
+    } else if (hasFSAccess) {
+      await saveAsSong()
+    } else {
+      await downloadSong()
+    }
+  }, [authUser, saveCloudAsSong, saveAsSong, downloadSong])
 
   const actions = useMemo(
     () => [
@@ -91,39 +125,39 @@ export const useGlobalKeyboardShortcut = () => {
       {
         code: "KeyS",
         metaKey: true,
-        run: hasFSAccess ? saveSong : downloadSong,
+        run: handleSave,
       },
       // Save (Alt-S)
       {
         code: "KeyS",
         altKey: true,
-        run: hasFSAccess ? saveSong : downloadSong,
+        run: handleSave,
       },
       // Save As (Shift-Meta-S)
       {
         code: "KeyS",
         shiftKey: true,
         metaKey: true,
-        run: hasFSAccess ? saveAsSong : downloadSong,
+        run: handleSaveAs,
       },
       // Save As (Shift-Alt-S)
       {
         code: "KeyS",
         shiftKey: true,
         altKey: true,
-        run: hasFSAccess ? saveAsSong : downloadSong,
+        run: handleSaveAs,
       },
       // Open (Meta-O)
       {
         code: "KeyO",
         metaKey: true,
-        run: hasFSAccess ? openSong : openLegacy,
+        run: handleOpen,
       },
       // Open (Alt-O)
       {
         code: "KeyO",
         altKey: true,
-        run: hasFSAccess ? openSong : openLegacy,
+        run: handleOpen,
       },
       // New (Meta-N)
       {
@@ -142,18 +176,16 @@ export const useGlobalKeyboardShortcut = () => {
       playOrPause,
       undo,
       redo,
-      saveAsSong,
       setOpenHelpDialog,
       stop,
       rewindOneBar,
       fastForwardOneBar,
       toggleRecording,
       setPath,
-      saveSong,
-      downloadSong,
-      openSong,
-      openLegacy,
       createNewSong,
+      handleOpen,
+      handleSave,
+      handleSaveAs,
     ],
   )
 

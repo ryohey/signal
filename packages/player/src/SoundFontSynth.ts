@@ -1,7 +1,7 @@
-import { type MIDIController } from "spessasynth_core"
+import type { MIDIController } from "spessasynth_core"
 import { WorkletSynthesizer } from "spessasynth_lib"
-import { SoundFont } from "./SoundFont.js"
-import { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import type { SoundFont } from "./SoundFont.js"
+import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null
@@ -15,18 +15,20 @@ export class SoundFontSynth implements SynthOutput {
     return this._loadedSoundFont !== null
   }
 
-  private workletModuleAdded = false
+  private setupPromise: Promise<void> | null = null
   private syxBuffer: number[] = []
 
   constructor(private readonly context: AudioContext) {}
 
-  async setup() {
-    if (this.workletModuleAdded) {
-      return
-    }
-    this.workletModuleAdded = true
-    const url = new URL("spessasynth_lib/dist/spessasynth_processor.min.js", import.meta.url)
-    await this.context.audioWorklet.addModule(url)
+  setup(): Promise<void> {
+    // Share the pending promise so concurrent callers wait for addModule
+    this.setupPromise ??= this.context.audioWorklet.addModule(
+      new URL(
+        "spessasynth_lib/dist/spessasynth_processor.min.js",
+        import.meta.url,
+      ),
+    )
+    return this.setupPromise
   }
 
   async loadSoundFont(soundFont: SoundFont) {
@@ -35,7 +37,7 @@ export class SoundFontSynth implements SynthOutput {
       this.synth = new WorkletSynthesizer(this.context)
       this.synth.connect(this.context.destination)
     }
-    
+
     await this.synth.soundBankManager.addSoundBank(
       soundFont.data.slice(0),
       "main",
@@ -48,10 +50,13 @@ export class SoundFontSynth implements SynthOutput {
     e: SendableEvent & { type: "sysEx" | "dividedSysEx" },
     eventTime: number,
   ) {
-    if (this.synth === null) return
-    
-    if (e.type === "sysEx")
+    if (this.synth === null) {
+      return
+    }
+
+    if (e.type === "sysEx") {
       this.syxBuffer = []
+    }
     this.syxBuffer.push(...e.data)
     const buf = this.syxBuffer
     if (buf.length > 0 && buf[buf.length - 1] === 0xf7) {
@@ -61,33 +66,35 @@ export class SoundFontSynth implements SynthOutput {
   }
 
   private postSynthMessage(e: SendableEvent, eventTime: number) {
-    if (this.synth === null)
+    if (this.synth === null) {
       return
-    
+    }
+
     // Handle sysex separately
     if (e.type === "sysEx" || e.type === "dividedSysEx") {
       this.handleSysExEvent(e, eventTime)
       return
     }
-    
-    if (e.type !== "channel")
+
+    if (e.type !== "channel") {
       return
-    
+    }
+
     const ch = e.channel
     const opts = { time: eventTime }
     switch (e.subtype) {
       case "noteOn":
         this.synth.noteOn(ch, e.noteNumber, e.velocity, opts)
         break
-      
+
       case "noteOff":
-        this.synth.noteOff(ch, e.noteNumber,  opts)
+        this.synth.noteOff(ch, e.noteNumber, opts)
         break
-      
+
       case "channelAftertouch":
         this.synth.channelPressure(ch, e.amount, opts)
         break
-      
+
       case "controller":
         this.synth.controllerChange(
           ch,
@@ -96,17 +103,17 @@ export class SoundFontSynth implements SynthOutput {
           opts,
         )
         break
-      
+
       case "noteAftertouch":
         this.synth.polyPressure(ch, e.noteNumber, e.amount, opts)
         break
-      
+
       case "pitchBend":
         this.synth.pitchWheel(ch, e.value, opts)
         break
-      
+
       case "programChange":
-        this.synth.programChange(ch, e.value, opts);
+        this.synth.programChange(ch, e.value, opts)
         break
     }
   }
@@ -117,7 +124,9 @@ export class SoundFontSynth implements SynthOutput {
     _timestampNow: number = performance.now(),
     _trackId?: number,
   ) {
-    if(!this.synth) return;
+    if (!this.synth) {
+      return
+    }
     const eventTime = this.synth.currentTime + delayTime
     this.postSynthMessage(event, eventTime)
   }

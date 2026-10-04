@@ -1,23 +1,24 @@
 import * as Sentry from "@sentry/browser"
-import { configure } from "mobx"
 import { createRoot } from "react-dom/client"
 import { App } from "./components/App/App"
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.VERCEL_ENV,
+  dsn: process.env["SENTRY_DSN"],
+  environment: process.env["VERCEL_ENV"],
   integrations: [Sentry.browserTracingIntegration()],
   tracesSampleRate: 1.0,
 })
 
-configure({
-  enforceActions: "never",
-})
+const rootElement = document.querySelector("#root")
 
-const root = createRoot(document.querySelector("#root")!)
+if (rootElement === null) {
+  throw new Error("Root element '#root' was not found")
+}
+
+const root = createRoot(rootElement)
 root.render(<App />)
 
-if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
+if ("serviceWorker" in navigator && process.env["NODE_ENV"] === "production") {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/service-worker.js", { scope: "/edit" })

@@ -1,5 +1,5 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react"
-import { useSettings } from "../hooks/useSettings"
+import { useSettings } from "../features/setting/hooks/useSettings"
 import { themes } from "./Theme"
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {

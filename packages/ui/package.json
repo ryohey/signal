@@ -1,0 +1,48 @@
+{
+  "name": "@signal-app/ui",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write"
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "author": "ryohey",
+  "license": "MIT",
+  "devDependencies": {
+    "@emotion/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@emotion/react": "catalog:",
+    "@emotion/styled": "catalog:",
+    "@radix-ui/primitive": "catalog:",
+    "@radix-ui/react-checkbox": "catalog:",
+    "@radix-ui/react-dialog": "catalog:",
+    "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-focus-scope": "catalog:",
+    "@radix-ui/react-portal": "catalog:",
+    "@radix-ui/react-slider": "catalog:",
+    "@radix-ui/react-tooltip": "catalog:",
+    "@radix-ui/react-visually-hidden": "catalog:",
+    "@rehooks/component-size": "catalog:",
+    "@ryohey/react-svg-spinners": "catalog:",
+    "color": "catalog:",
+    "dialog-hooks": "workspace:*",
+    "mdi-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

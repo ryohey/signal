@@ -1,63 +1,15 @@
-import {
-  isSetTempoEvent,
-  isTimeSignatureEvent,
-  Measure,
-  UNASSIGNED_TRACK_ID,
-} from "@signal-app/core"
-import { isEqual } from "lodash"
-import { useCallback, useMemo } from "react"
-import { DEFAULT_TEMPO } from "../Constants"
-import { useMobxGetter, useMobxSelector } from "./useMobxSelector"
-import { usePlayer } from "./usePlayer"
+import { useCallback } from "react"
 import { useSong } from "./useSong"
-import { useTrackEvents } from "./useTrack"
 
 export function useConductorTrack() {
-  const { tracks, timebase } = useSong()
-  const conductorTrack = useMobxSelector(
-    () => tracks.find((t) => t.isConductorTrack),
-    [tracks],
-  )
-  const timeSignatures = useMobxSelector(
-    () => (conductorTrack?.events ?? []).filter(isTimeSignatureEvent),
-    [conductorTrack],
-    isEqual,
-  )
-  const measures = useMemo(
-    () => Measure.fromTimeSignatures(timeSignatures, timebase),
-    [timeSignatures, timebase],
-  )
+  const { conductorTrack } = useSong()
 
   return {
-    get id() {
-      return useMobxGetter(conductorTrack, "id") ?? UNASSIGNED_TRACK_ID
-    },
-    get currentTempo() {
-      const { position } = usePlayer()
-      return useMobxSelector(
-        () => conductorTrack?.getTempo(position) ?? DEFAULT_TEMPO,
-        [conductorTrack, position],
-      )
-    },
-    get tempoEvents() {
-      return useMobxSelector(
-        () => (conductorTrack?.events ?? []).filter(isSetTempoEvent),
-        [conductorTrack],
-        isEqual,
-      )
-    },
-    timeSignatures,
-    measures,
-    getEvents: useCallback(
-      () => conductorTrack?.events ?? [],
-      [conductorTrack],
-    ),
     setTempo: useCallback(
-      (bpm: number, tick: number) => {
-        conductorTrack?.setTempo(bpm, tick)
+      (tick: number, bpm: number) => {
+        conductorTrack?.setTempo(tick, bpm)
       },
       [conductorTrack],
     ),
-    ...useTrackEvents(conductorTrack),
   }
 }

@@ -1,4 +1,4 @@
-import { vec4 } from "gl-matrix"
+import type { vec4 } from "gl-matrix"
 
 export interface TrackColor {
   readonly red: number // 0 to 0xFF

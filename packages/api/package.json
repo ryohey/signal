@@ -11,15 +11,18 @@
     }
   },
   "scripts": {
-    "lint": "prettier --check src",
-    "format": "prettier --write src"
+    "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write"
   },
   "author": "ryohey",
   "license": "MIT",
   "peerDependencies": {
-    "firebase": "^10.0.0"
+    "firebase": "catalog:"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

@@ -1,10 +1,15 @@
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { FC } from "react"
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  PrimaryButton,
+} from "@signal-app/ui"
+import type { FC } from "react"
 import { useRootView } from "../../hooks/useRootView"
 import { Localized } from "../../localize/useLocalization"
 import { userRepository } from "../../services/repositories"
-import { Dialog, DialogActions, DialogContent } from "../Dialog/Dialog"
-import { Button, PrimaryButton } from "../ui/Button"
 
 export const DeleteAccountDialog: FC = () => {
   const { openDeleteAccountDialog, setOpenDeleteAccountDialog } = useRootView()

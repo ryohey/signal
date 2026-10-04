@@ -1,10 +1,12 @@
 import flatten from "lodash/flatten"
-import { AnyEvent } from "midifile-ts"
-import { DeltaTimeProvider, TickProvider, TrackEvent } from "../entities/track"
+import type { AnyEvent } from "midifile-ts"
 import {
+  type DeltaTimeProvider,
   isSignalEvent,
   mapFromSignalEvent,
-} from "../entities/track/signalEvents"
+  type TickProvider,
+  type TrackEvent,
+} from "../entities"
 import { deassemble as deassembleNote } from "./noteAssembler"
 
 // events in each tracks
@@ -19,6 +21,7 @@ export function addDeltaTime<T extends TickProvider>(
         ...e,
         deltaTime: Math.round(e.tick) - Math.round(prevTick),
       }
+      // biome-ignore lint/suspicious/noExplicitAny: ignore
       delete (newEvent as any).tick
       prevTick = e.tick
       return newEvent

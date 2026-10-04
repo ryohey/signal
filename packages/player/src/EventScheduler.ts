@@ -9,6 +9,29 @@ export interface EventSchedulerLoop {
   end: number
 }
 
+interface Jump {
+  from: number
+  to: number
+}
+
+export interface EventSchedulerSource<E extends SchedulableEvent> {
+  timebase: number
+  endOfSong: number
+  getEvents(startTick: number, endTick: number): readonly E[]
+
+  /*
+   to restore synthesizer state (e.g. pitch bend)
+   collect all previous state events
+   and send them to the synthesizer
+  */
+  getCurrentStateEvents(tick: number): readonly Omit<E, "tick">[]
+}
+
+export interface SchedulerResult<E extends SchedulableEvent> {
+  events: readonly WithTimestamp<E>[]
+  shouldStop: boolean
+}
+
 type WithTimestamp<E> = {
   event: E
   timestamp: number
@@ -30,21 +53,23 @@ export class EventScheduler<E extends SchedulableEvent> {
   private _currentTick = 0
   private _scheduledTick = 0
   private _prevTime: number | undefined = undefined
-  private _getEvents: (startTick: number, endTick: number) => E[]
-  private _createLoopEndEvents: () => Omit<E, "tick">[]
+  private _isStopScheduled = false
+  private _scheduledSeekTick: number | null = null
+  private _enqueuedEvents: readonly Omit<E, "tick">[] = []
 
   constructor(
-    getEvents: (startTick: number, endTick: number) => E[],
-    createLoopEndEvents: () => Omit<E, "tick">[],
+    private readonly eventSource: EventSchedulerSource<E>,
+    private readonly createLoopEndEvents: () => readonly Omit<E, "tick">[],
+    private readonly createStopEvents: () => readonly Omit<
+      E,
+      "tick"
+    >[] = () => [],
     tick = 0,
-    timebase = 480,
     lookAheadTime = 100,
   ) {
-    this._getEvents = getEvents
-    this._createLoopEndEvents = createLoopEndEvents
     this._currentTick = tick
     this._scheduledTick = tick
-    this.timebase = timebase
+    this.timebase = this.eventSource.timebase
     this.lookAheadTime = lookAheadTime
   }
 
@@ -56,11 +81,20 @@ export class EventScheduler<E extends SchedulableEvent> {
     return (((ms / 1000) * bpm) / 60) * this.timebase
   }
 
-  seek(tick: number) {
-    this._currentTick = this._scheduledTick = Math.max(0, tick)
+  scheduleSeek(tick: number) {
+    this._scheduledSeekTick = tick
   }
 
-  readNextEvents(bpm: number, timestamp: number): WithTimestamp<E>[] {
+  scheduleStop() {
+    this._isStopScheduled = true
+  }
+
+  // enqueue events to be prepended to the next readNextEvents() result.
+  enqueueEvents(events: readonly Omit<E, "tick">[]) {
+    this._enqueuedEvents = this._enqueuedEvents.concat(events)
+  }
+
+  readNextEvents(bpm: number, timestamp: number): SchedulerResult<E> {
     const withTimestamp =
       (currentTick: number) =>
       (e: E): WithTimestamp<E> => {
@@ -74,7 +108,10 @@ export class EventScheduler<E extends SchedulableEvent> {
       startTick: number,
       endTick: number,
       currentTick: number,
-    ) => this._getEvents(startTick, endTick).map(withTimestamp(currentTick))
+    ) =>
+      this.eventSource
+        .getEvents(startTick, endTick)
+        .map(withTimestamp(currentTick))
 
     if (this._prevTime === undefined) {
       this._prevTime = timestamp
@@ -90,30 +127,86 @@ export class EventScheduler<E extends SchedulableEvent> {
 
     this._prevTime = timestamp
 
+    if (this._isStopScheduled) {
+      this._isStopScheduled = false
+      this._currentTick = nowTick
+      this._scheduledTick = endTick
+
+      const events = this.createStopEvents().map((e) =>
+        withTimestamp(nowTick)({ ...e, tick: endTick } as E),
+      )
+      return {
+        events,
+        shouldStop: true,
+      }
+    }
+
+    // If a seek has been scheduled, jump to that tick instead of continuing
+    // from the current position. If a loop is set, jump to the loop start.
+    let jump: Jump | null = null
+
+    if (this._scheduledSeekTick !== null) {
+      jump = {
+        from: endTick,
+        to: this._scheduledSeekTick,
+      }
+      this._scheduledSeekTick = null
+    }
     if (
       this.loop !== null &&
       startTick < this.loop.end &&
       endTick >= this.loop.end
     ) {
-      const loop = this.loop
-      const offset = endTick - loop.end
-      const endTick2 = loop.begin + offset
-      const currentTick = loop.begin - (loop.end - nowTick)
+      jump = {
+        from: this.loop.end,
+        to: this.loop.begin,
+      }
+    }
+
+    const prependedEvents: WithTimestamp<E>[] = []
+
+    if (this._enqueuedEvents.length > 0) {
+      prependedEvents.push(
+        ...this._enqueuedEvents.map((e) =>
+          withTimestamp(nowTick)({ ...e, tick: nowTick } as E),
+        ),
+      )
+      this._enqueuedEvents = []
+    }
+
+    if (jump) {
+      const offset = endTick - jump.from
+      const endTick2 = jump.to + offset
+      const currentTick = jump.to - (jump.from - nowTick)
       this._currentTick = currentTick
       this._scheduledTick = endTick2
 
-      return [
-        ...getEventsInRange(startTick, loop.end, nowTick),
-        ...this._createLoopEndEvents().map((e) =>
-          withTimestamp(currentTick)({ ...e, tick: loop.begin } as E),
+      const events = [
+        ...prependedEvents,
+        ...getEventsInRange(startTick, jump.from, nowTick),
+        ...this.createLoopEndEvents().map((e) =>
+          withTimestamp(currentTick)({ ...e, tick: jump.to } as E),
         ),
-        ...getEventsInRange(loop.begin, endTick2, currentTick),
+        ...this.eventSource
+          .getCurrentStateEvents(jump.to)
+          .map((e) => withTimestamp(currentTick)({ ...e, tick: jump.to } as E)),
+        ...getEventsInRange(jump.to, endTick2, currentTick),
       ]
+      return {
+        events,
+        shouldStop: false,
+      }
     } else {
       this._currentTick = nowTick
       this._scheduledTick = endTick
 
-      return getEventsInRange(startTick, endTick, nowTick)
+      return {
+        events: [
+          ...prependedEvents,
+          ...getEventsInRange(startTick, endTick, nowTick),
+        ],
+        shouldStop: this._scheduledTick >= this.eventSource.endOfSong,
+      }
     }
   }
 }

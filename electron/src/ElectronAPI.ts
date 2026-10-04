@@ -1,4 +1,4 @@
-import { FirebaseCredential } from "./FirebaseCredential"
+import type { FirebaseCredential } from "./FirebaseCredential"
 
 export type Unsubscribe = () => void
 

@@ -1,7 +1,6 @@
-export type DistributiveOmit<T, K extends keyof any> = T extends any
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
   ? Omit<T, K>
   : never
 
 export type Branded<T, U> = T & { __brand: U }
-
-export type Unsubscribe = () => void
+export type { Unsubscribe } from "@signal-app/observable"

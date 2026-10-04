@@ -5,16 +5,21 @@ describe("EventScheduler", () => {
   it("readNextEvents", () => {
     const events = [{ tick: 0 }, { tick: 100 }, { tick: 110 }]
     const s = new EventScheduler(
-      (start, end) => filterEventsWithRange(events, start, end),
+      {
+        timebase: 480,
+        endOfSong: 999999,
+        getEvents: (start, end) => filterEventsWithRange(events, start, end),
+        getCurrentStateEvents: () => [],
+      },
+      () => [],
       () => [],
       0,
-      480,
       100,
     )
 
     // The first event is read within the look ahead time
     {
-      const result = s.readNextEvents(120, 0)
+      const { events: result } = s.readNextEvents(120, 0)
       expect(result.length).toBe(1)
       expect(result[0].timestamp).toBe(0)
       expect(result[0].event).toBe(events[0])
@@ -22,13 +27,13 @@ describe("EventScheduler", () => {
 
     // No events are returned if no time has passed since the last read
     {
-      const result = s.readNextEvents(120, 0)
+      const { events: result } = s.readNextEvents(120, 0)
       expect(result.length).toBe(0)
     }
 
     // Subsequent events are returned after time has passed
     {
-      const result = s.readNextEvents(120, 120)
+      const { events: result } = s.readNextEvents(120, 120)
       expect(result.length).toBe(2)
       expect(result[0].event).toBe(events[1])
       expect(result[0].timestamp).toBe(120)

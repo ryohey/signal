@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
 import { composeEventHandlers } from "@radix-ui/primitive"
 import * as Popover from "@radix-ui/react-popover"
+import { Checkbox } from "@signal-app/ui"
 import {
-  ComponentPropsWithoutRef,
-  ElementRef,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
   forwardRef,
-  ReactNode,
+  type ReactNode,
   useRef,
 } from "react"
 import { Localized } from "../../../localize/useLocalization"
-import { Checkbox } from "../../ui/Checkbox"
 import { NumberPicker } from "./NumberPicker"
 
 export interface QuantizePopupProps {

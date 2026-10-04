@@ -1,5 +1,5 @@
-import { ColorInstance } from "color"
-import { vec4 } from "gl-matrix"
+import type { ColorInstance } from "color"
+import type { vec4 } from "gl-matrix"
 
 export const colorToVec4 = (color: ColorInstance): vec4 => {
   const rgb = color.rgb().array()

@@ -4,6 +4,7 @@ import {
   createCloudSongRepository,
   createUserRepository,
 } from "@signal-app/api"
+import { SoundFontRepository } from "@signal-app/core"
 import { auth, firestore, functions } from "../firebase/firebase"
 
 export const cloudSongRepository = createCloudSongRepository(firestore, auth)
@@ -16,3 +17,4 @@ export const cloudMidiRepository = createCloudMidiRepository(
   functions,
 )
 export const userRepository = createUserRepository(firestore, auth)
+export const soundFontRepository = new SoundFontRepository()

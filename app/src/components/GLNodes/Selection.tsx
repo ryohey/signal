@@ -1,18 +1,18 @@
 import { useTheme } from "@emotion/react"
 import { BorderedRectangles } from "@ryohey/webgl-react"
+import type { Rect } from "@signal-app/geometry"
 import Color from "color"
-import { FC, useMemo } from "react"
-import { Rect } from "../../entities/geometry/Rect"
+import { type FC, useMemo } from "react"
 import { colorToVec4 } from "../../gl/color"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
 
-export const Selection: FC<{ rect: Rect | null; zIndex: number }> = ({
-  rect,
-  zIndex,
-}) => {
+export interface SelectionProps {
+  rect: Rect | null
+  zIndex: number
+  isActive: boolean
+}
+
+export const Selection: FC<SelectionProps> = ({ rect, zIndex, isActive }) => {
   const theme = useTheme()
-  const { activePane } = usePianoRoll()
-  const isActive = useMemo(() => activePane === "notes", [activePane])
   const fillColor = useMemo(
     () =>
       isActive

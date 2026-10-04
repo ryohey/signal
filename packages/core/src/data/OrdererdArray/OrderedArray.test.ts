@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, test } from "vitest"
-import { OrderedArray } from "./OrderedArray"
+import { deserializeOrderedArray, OrderedArray } from "./OrderedArray"
+import {
+  deserializeTickOrderedArray,
+  TickOrderedArray,
+} from "./TickOrderedArray"
 
 describe("OrderedArray", () => {
   interface TestItem {
@@ -298,5 +302,146 @@ describe("OrderedArray", () => {
 
     // Lookup should work
     expect(orderedArray.get(2)?.name).toBe("Bobby")
+  })
+
+  test("should emit per-operation changes outside transaction", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+    orderedArray.remove(1)
+
+    expect(notifications).toEqual([
+      { added: [{ id: 4, rowIndex: 15, name: "Dave" }] },
+      { removed: [{ id: 1, rowIndex: 10, name: "Alice" }] },
+    ])
+  })
+
+  test("should emit a single aggregated change after transaction", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.transaction(() => {
+      orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+      orderedArray.remove(1)
+      orderedArray.update(2, { rowIndex: 5, name: "Bobby" })
+    })
+
+    expect(notifications.length).toBe(1)
+    expect(notifications[0]).toEqual({
+      removed: [
+        { id: 1, rowIndex: 10, name: "Alice" },
+        { id: 2, rowIndex: 20, name: "Bob" },
+      ],
+      added: [
+        { id: 4, rowIndex: 15, name: "Dave" },
+        { id: 2, rowIndex: 5, name: "Bobby" },
+      ],
+    })
+  })
+
+  test("should emit once after nested transactions", () => {
+    const notifications: Array<
+      | { removed: TestItem[] }
+      | { added: TestItem[] }
+      | { removed: TestItem[]; added: TestItem[] }
+    > = []
+    orderedArray.onChange.subscribe((change) => {
+      notifications.push(change)
+    })
+
+    orderedArray.transaction(() => {
+      orderedArray.add({ id: 4, rowIndex: 15, name: "Dave" })
+      orderedArray.transaction(() => {
+        orderedArray.remove(3)
+      })
+    })
+
+    expect(notifications).toEqual([
+      {
+        removed: [{ id: 3, rowIndex: 30, name: "Charlie" }],
+        added: [{ id: 4, rowIndex: 15, name: "Dave" }],
+      },
+    ])
+  })
+
+  test("should serialize to a POJO", () => {
+    const serialized = orderedArray.serialize()
+
+    expect(serialized.array).toStrictEqual(orderedArray.getArray())
+    expect(serialized.descending).toBe(false)
+    expect(serialized.lookupMap).toHaveLength(orderedArray.getArray().length)
+    expect(serialized.lookupMap).toEqual(
+      expect.arrayContaining([...orderedArray.getArray()]),
+    )
+  })
+
+  test("should deserialize from its own serialized POJO", () => {
+    const restored = deserializeOrderedArray(orderedArray.serialize())
+
+    expect(restored.serialize()).toStrictEqual(orderedArray.serialize())
+  })
+
+  test("should not share array instance with serialized source", () => {
+    const serialized = orderedArray.serialize()
+    const restored = deserializeOrderedArray(serialized)
+
+    expect(restored.getArray()).not.toBe(serialized.lookupMap)
+    expect(restored.getArray()).not.toBe(serialized.array)
+  })
+
+  test("TickOrderedArray should serialize to a POJO", () => {
+    const tickArray = new TickOrderedArray<TestItem & { tick: number }>([
+      { id: 3, rowIndex: 30, name: "Charlie", tick: 30 },
+      { id: 1, rowIndex: 10, name: "Alice", tick: 10 },
+      { id: 2, rowIndex: 20, name: "Bob", tick: 20 },
+    ])
+
+    const serialized = tickArray.serialize()
+
+    expect(serialized.array).toStrictEqual(tickArray.getArray())
+    expect(serialized.descending).toBe(false)
+    expect(serialized.lookupMap).toHaveLength(tickArray.getArray().length)
+    expect(serialized.lookupMap).toEqual(
+      expect.arrayContaining([...tickArray.getArray()]),
+    )
+    expect(serialized.lastEventId).toBe(0)
+  })
+
+  test("TickOrderedArray should deserialize from its own serialized POJO", () => {
+    const tickArray = new TickOrderedArray<TestItem & { tick: number }>([
+      { id: 3, rowIndex: 30, name: "Charlie", tick: 30 },
+      { id: 1, rowIndex: 10, name: "Alice", tick: 10 },
+      { id: 2, rowIndex: 20, name: "Bob", tick: 20 },
+    ])
+
+    const restored = deserializeTickOrderedArray(tickArray.serialize())
+
+    expect(restored.serialize()).toStrictEqual(tickArray.serialize())
+  })
+
+  test("TickOrderedArray should not share array instance with serialized source", () => {
+    const tickArray = new TickOrderedArray<TestItem & { tick: number }>([
+      { id: 3, rowIndex: 30, name: "Charlie", tick: 30 },
+      { id: 1, rowIndex: 10, name: "Alice", tick: 10 },
+      { id: 2, rowIndex: 20, name: "Bob", tick: 20 },
+    ])
+    const serialized = tickArray.serialize()
+    const restored = deserializeTickOrderedArray(serialized)
+
+    expect(restored.getArray()).not.toBe(serialized.lookupMap)
+    expect(restored.getArray()).not.toBe(serialized.array)
   })
 })

@@ -1,14 +1,14 @@
 import {
-  Bytes,
-  Firestore,
-  FirestoreDataConverter,
-  Timestamp,
+  type Bytes,
   collection,
   doc,
+  type Firestore,
+  type FirestoreDataConverter,
   getDoc,
+  type Timestamp,
 } from "firebase/firestore"
-import { Functions, httpsCallable } from "firebase/functions"
-import { ICloudMidiRepository } from "./ICloudMidiRepository.js"
+import { type Functions, httpsCallable } from "firebase/functions"
+import type { ICloudMidiRepository } from "./ICloudMidiRepository.js"
 
 export const createCloudMidiRepository = (
   firestore: Firestore,

@@ -1,18 +1,20 @@
 import {
   emptySong,
-  emptyTrack,
-  Song,
-  TrackId,
+  type Song,
+  type TrackId,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
 import { useCallback } from "react"
-import { useArrangeView } from "../hooks/useArrangeView"
+import { useArrangeView } from "../features/arrange/hooks/useArrangeView"
+import {
+  usePianoRoll,
+  usePianoRollTickScroll,
+} from "../features/piano-roll/hooks/usePianoRoll"
+import { useTrackList } from "../features/track-list/hooks/useTrackList"
 import { useAutoSave } from "../hooks/useAutoSave"
 import { useHistory } from "../hooks/useHistory"
-import { usePianoRoll, usePianoRollTickScroll } from "../hooks/usePianoRoll"
 import { usePlayer } from "../hooks/usePlayer"
 import { useSong } from "../hooks/useSong"
-import { useTrackList } from "../hooks/useTrackList"
 import { useTrackMute } from "../hooks/useTrackMute"
 import { downloadSongAsMidi } from "../midi/downloadSongAsMidi"
 import { songFromFile } from "./file"
@@ -30,7 +32,7 @@ export const useSetSong = () => {
   const { setSong } = useSong()
   const { clear: clearHistory } = useHistory()
   const { reset: resetTrackMute } = useTrackMute()
-  const { stop, reset, setPosition } = usePlayer()
+  const { stop, reset, setPosition, setLoop } = usePlayer()
   const { setOpen: setShowTrackList } = useTrackList()
   const {
     setNotGhostTrackIds,
@@ -63,6 +65,7 @@ export const useSetSong = () => {
 
       stop()
       reset()
+      setLoop(null)
       setPosition(0)
     },
     [
@@ -72,6 +75,7 @@ export const useSetSong = () => {
       stop,
       reset,
       setPosition,
+      setLoop,
       setNotGhostTrackIds,
       setScrollLeftInPixels,
       setShowTrackList,
@@ -122,16 +126,6 @@ export const useOpenSong = () => {
   )
 }
 
-export const useAddTrack = () => {
-  const { addTrack, tracks } = useSong()
-  const { pushHistory } = useHistory()
-
-  return useCallback(() => {
-    pushHistory()
-    addTrack(emptyTrack(Math.min(tracks.length - 1, 0xf)))
-  }, [pushHistory, addTrack, tracks])
-}
-
 export const useRemoveTrack = () => {
   const {
     selectedTrackIndex: pianoRollSelectedTrackIndex,
@@ -179,37 +173,4 @@ export const useRemoveTrack = () => {
 export const useSelectTrack = () => {
   const { setSelectedTrackId } = usePianoRoll()
   return setSelectedTrackId
-}
-
-export const useInsertTrack = () => {
-  const { insertTrack, tracks } = useSong()
-  const { pushHistory } = useHistory()
-
-  return useCallback(
-    (trackIndex: number) => {
-      pushHistory()
-      insertTrack(emptyTrack(tracks.length - 1), trackIndex)
-    },
-    [pushHistory, insertTrack, tracks],
-  )
-}
-
-export const useDuplicateTrack = () => {
-  const { getTrack, tracks, insertTrack } = useSong()
-  const { pushHistory } = useHistory()
-
-  return useCallback(
-    (trackId: TrackId) => {
-      const track = getTrack(trackId)
-      if (track === undefined) {
-        throw new Error("No track found")
-      }
-      const trackIndex = tracks.findIndex((t) => t.id === trackId)
-      const newTrack = track.clone()
-      newTrack.channel = undefined
-      pushHistory()
-      insertTrack(newTrack, trackIndex + 1)
-    },
-    [getTrack, tracks, insertTrack, pushHistory],
-  )
 }

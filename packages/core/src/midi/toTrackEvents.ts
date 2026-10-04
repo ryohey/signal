@@ -1,13 +1,13 @@
-import { AnyEvent } from "midifile-ts"
+import type { AnyEvent } from "midifile-ts"
 import {
-  AnyEventFeature,
-  DeltaTimeProvider,
+  type AnyEventFeature,
+  type DeltaTimeProvider,
   isSequencerSpecificEvent,
-  TickProvider,
-  TrackEvent,
-} from "../entities/track"
-import { mapToSignalEvent } from "../entities/track/signalEvents"
-import { DistributiveOmit } from "../types"
+  type TickProvider,
+  type TrackEvent,
+} from "../entities"
+import { mapToSignalEvent } from "../entities/event/signalEvents"
+import type { DistributiveOmit } from "../types"
 import { assemble as assembleNotes } from "./noteAssembler"
 
 export function addTick<T extends DeltaTimeProvider>(
@@ -24,7 +24,8 @@ export function addTick<T extends DeltaTimeProvider>(
   })
 }
 
-export const removeUnnecessaryProps = <T>(e: T): T => {
+const removeUnnecessaryProps = <T>(e: T): T => {
+  // biome-ignore lint/suspicious/noExplicitAny: we should correctly type this function in the future
   const { channel, ...ev } = e as any
   return ev
 }

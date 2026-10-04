@@ -1,4 +1,4 @@
-import { DistributiveOmit } from "@emotion/react"
+import type { DistributiveOmit } from "@emotion/react"
 
 export function addTick<T extends { deltaTime: number }>(events: T[]) {
   let tick = 0

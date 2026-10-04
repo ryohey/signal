@@ -1,9 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron"
-import { ElectronAPI } from "./ElectronAPI"
+import type { ElectronAPI } from "./ElectronAPI"
 import type { IpcEvent, ParamsForEvent } from "./ipc"
 import type { IpcMainAPI } from "./ipcMain"
 
-type Tail<T extends unknown[]> = T extends [any, ...infer Rest] ? Rest : []
+type Tail<T extends unknown[]> = T extends [unknown, ...infer Rest] ? Rest : []
 
 const register =
   <T extends IpcEvent["name"]>(name: T) =>
