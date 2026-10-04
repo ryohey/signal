@@ -1,6 +1,8 @@
-import { UNASSIGNED_TRACK_ID } from "@signal-app/core"
-import { createEventListEditor } from "@signal-app/event-list-editor"
-import { type FC, type ReactNode, useEffect, useMemo } from "react"
+import {
+  createEventListEditor,
+  type EventListEditor,
+} from "@signal-app/event-list-editor"
+import { type FC, type ReactNode, useEffect, useState } from "react"
 import { useSong } from "../../../hooks/useSong"
 import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
 import { EventListEditorProvider } from "../hooks/useEventListEditor"
@@ -10,25 +12,22 @@ export const EventListProvider: FC<{ children: ReactNode }> = ({
 }) => {
   const { selectedTrackId } = usePianoRoll()
   const { getTrack } = useSong()
+  const selectedTrack = getTrack(selectedTrackId)
+  const [eventListEditor, setEventListEditor] = useState<EventListEditor>()
 
-  const selectedTrack = useMemo(
-    () =>
-      selectedTrackId === UNASSIGNED_TRACK_ID
-        ? undefined
-        : getTrack(selectedTrackId),
-    [getTrack, selectedTrackId],
-  )
-
-  const eventListEditor = useMemo(
-    () => selectedTrack && createEventListEditor(selectedTrack),
-    [selectedTrack],
-  )
-
-  // Dispose the previous editor's internal subscription whenever a new one
-  // is created (track switch) or the panel unmounts.
+  // Create the editor inside the effect so its track subscription is paired
+  // with dispose. Creating it in useMemo breaks under StrictMode: the
+  // simulated unmount disposes the memoized editor, and the remount reuses it
+  // without resubscribing, so track changes never reach the list.
   useEffect(() => {
-    return () => eventListEditor?.dispose()
-  }, [eventListEditor])
+    if (selectedTrack === undefined) {
+      setEventListEditor(undefined)
+      return
+    }
+    const editor = createEventListEditor(selectedTrack)
+    setEventListEditor(editor)
+    return () => editor.dispose()
+  }, [selectedTrack])
 
   if (eventListEditor === undefined) {
     return null
