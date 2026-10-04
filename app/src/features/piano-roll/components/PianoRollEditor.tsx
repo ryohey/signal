@@ -23,22 +23,26 @@ const ColumnContainer = styled.div`
   outline: none;
 `
 
+// Always render the split pane and hide the side pane instead of unmounting
+// it, so that toggling it does not remount the children (which would drop
+// the keyboard focus to document.body)
 const PaneLayout: FC<SplitPaneProps & { isShow: boolean; pane: ReactNode }> = ({
   isShow,
   pane,
   children,
+  pane1Style,
   ...props
-}) => {
-  if (isShow) {
-    return (
-      <StyledSplitPane {...props}>
-        {pane}
-        {children}
-      </StyledSplitPane>
-    )
-  }
-  return <>{children}</>
-}
+}) => (
+  <StyledSplitPane
+    {...props}
+    allowResize={isShow}
+    pane1Style={isShow ? pane1Style : { ...pane1Style, display: "none" }}
+    resizerStyle={isShow ? {} : { display: "none" }}
+  >
+    <>{isShow && pane}</>
+    {children}
+  </StyledSplitPane>
+)
 
 const PianoRollPanes: FC = () => {
   const { isOpen: showTrackList } = useTrackList()

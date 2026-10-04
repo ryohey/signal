@@ -13,8 +13,10 @@ import { FocusScope } from "@radix-ui/react-focus-scope"
 import React, {
   type FC,
   type PropsWithChildren,
+  useCallback,
   useContext,
   useMemo,
+  useRef,
 } from "react"
 
 export type MenuProps = PropsWithChildren<{
@@ -52,19 +54,43 @@ const List = styled.ul`
 
 export const Menu: FC<MenuProps> = ({ trigger, children, ...rootProps }) => {
   const { onOpenChange } = rootProps
-  const contextValue: MenuContextValue = useMemo(
-    () => ({
-      onOpenChange: onOpenChange ?? (() => {}),
-    }),
+  // Element focused before the menu opened. Radix tries to focus the trigger
+  // on close, but triggers are often non-focusable elements, which leaves
+  // focus on document.body and breaks keyboard shortcuts bound to containers.
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open && document.activeElement instanceof HTMLElement) {
+        previouslyFocusedRef.current = document.activeElement
+      }
+      onOpenChange?.(open)
+    },
     [onOpenChange],
   )
 
+  const onCloseAutoFocus = useCallback((e: Event) => {
+    const element = previouslyFocusedRef.current
+    previouslyFocusedRef.current = null
+    if (element?.isConnected && element !== document.body) {
+      e.preventDefault()
+      element.focus()
+    }
+  }, [])
+
+  const contextValue: MenuContextValue = useMemo(
+    () => ({
+      onOpenChange: handleOpenChange,
+    }),
+    [handleOpenChange],
+  )
+
   return (
-    <Root {...rootProps}>
+    <Root {...rootProps} onOpenChange={handleOpenChange}>
       <Trigger asChild>{trigger}</Trigger>
 
       <Portal>
-        <StyledContent>
+        <StyledContent onCloseAutoFocus={onCloseAutoFocus}>
           <FocusScope asChild>
             <MenuContextProvider value={contextValue}>
               <List>{children}</List>
