@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A friendly music sequencer application for OS X and Windows.",
   "scripts": {
-    "start": "turbo run dev --parallel",
+    "dev": "turbo run dev --parallel",
     "build": "pnpm run build:app",
     "build:app": "turbo build && cpx \"app/dist/**/*\" dist",
     "serve": "pnpm dlx http-server dist",

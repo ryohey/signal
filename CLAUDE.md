@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Commands
 
-- `pnpm start` - Start development tasks via Turbo (`turbo run dev --parallel`)
+- `pnpm dev` - Start development tasks via Turbo (`turbo run dev --parallel`)
 - `pnpm build` - Build app artifacts for distribution (`pnpm build:app`)
 - `pnpm test` - Run tests across all packages using turbo
 - `pnpm lint` - Run lint tasks via Turbo

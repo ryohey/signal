@@ -56,11 +56,11 @@ By setting these constraints, signal aims to offer a streamlined and distraction
 ### Running the Application
 
 > [!NOTE]
-> The first time you run it, you will get a build error, so please run `pnpm build` once before running `pnpm start`.
+> The first time you run it, you will get a build error, so please run `pnpm build` once before running `pnpm dev`.
 
 1. To start the application, run:
    ```sh
-   pnpm start
+   pnpm dev
    ```
 2. The application should now be running on [http://localhost:3000](http://localhost:3000).
 
