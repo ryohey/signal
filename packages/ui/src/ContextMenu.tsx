@@ -1,7 +1,14 @@
 import styled from "@emotion/styled"
 import { FocusScope } from "@radix-ui/react-focus-scope"
 import * as Portal from "@radix-ui/react-portal"
-import { type FC, type ReactNode, useCallback, useEffect, useMemo } from "react"
+import {
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { MenuContextProvider } from "./Menu"
 import { Positioned } from "./Positioned"
 
@@ -50,6 +57,13 @@ export const ContextMenu: FC<ContextMenuProps> = ({
   position,
   children,
 }) => {
+  const [menuHeight, setMenuHeight] = useState(0)
+  const listRef = useCallback((list: HTMLUListElement | null) => {
+    if (list?.parentElement) {
+      setMenuHeight(list.parentElement.offsetHeight)
+    }
+  }, [])
+
   const onClickContent = useCallback(
     (e: React.MouseEvent) => e.stopPropagation(),
     [],
@@ -86,14 +100,18 @@ export const ContextMenu: FC<ContextMenuProps> = ({
 
   // fix position to avoid placing menu outside of the screen
   const fixedX = Math.min(position.x, window.innerWidth - estimatedWidth)
+  const fixedY = Math.max(
+    0,
+    Math.min(position.y, window.innerHeight - menuHeight),
+  )
 
   return (
     <Portal.Root>
       <Wrapper onClick={handleClose}>
         <FocusScope>
-          <Content left={fixedX} top={position.y} onClick={onClickContent}>
+          <Content left={fixedX} top={fixedY} onClick={onClickContent}>
             <MenuContextProvider value={contextValue}>
-              <List>{children}</List>
+              <List ref={listRef}>{children}</List>
             </MenuContextProvider>
           </Content>
         </FocusScope>

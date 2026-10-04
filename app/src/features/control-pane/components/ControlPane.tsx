@@ -7,6 +7,7 @@ import { useControlPane } from "../hooks/useControlPane"
 import { useControlPaneGlobalKeyboardShortcut } from "../hooks/useControlPaneGlobalKeyboardShortcut"
 import { useControlPaneKeyboardShortcut } from "../hooks/useControlPaneKeyboardShortcut"
 import { ControlLayout } from "./ControlLayout"
+import { ControlEventValueDialog } from "./dialogs/ControlEventValueDialog"
 import { ValueEventGraph } from "./Graph/ValueEventGraph"
 import { PencilModeSelector } from "./PencilModeSelector"
 import PianoVelocityControl from "./VelocityControl/VelocityControl"
@@ -58,6 +59,7 @@ const ControlPaneWrapper: FC<ControlPaneProps> = (props) => {
       return (
         <ControlEditorProvider type={mode}>
           <ControllerGraph {...props} type={mode} />
+          <ControlEventValueDialog />
         </ControlEditorProvider>
       )
   }

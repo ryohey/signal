@@ -26,6 +26,28 @@ export const useCreateOrUpdateControlEventsValue = () => {
   )
 }
 
+// value is in display units (e.g. pitch bend center is 0)
+export const useUpdateControlEventsValue = () => {
+  const controlEditor = useControlEditor()
+  const { pushHistory } = useHistory()
+
+  return useCallback(
+    (eventIds: readonly number[], value: number) => {
+      if (controlEditor.getItemsByIds(eventIds).length === 0) {
+        return
+      }
+
+      pushHistory()
+      controlEditor.createOrUpdateItemValue(
+        eventIds,
+        ValueEventType.fromDisplayValue(controlEditor.type, value),
+        0,
+      )
+    },
+    [controlEditor, pushHistory],
+  )
+}
+
 export const useDeleteControlSelection = () => {
   const { pushHistory } = useHistory()
   const { selectedEventIds, setSelection } = useControlPane()

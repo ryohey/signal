@@ -2,6 +2,7 @@ import {
   ContextMenu,
   type ContextMenuProps,
   ContextMenuHotKey as HotKey,
+  MenuDivider,
   MenuItem,
 } from "@signal-app/ui"
 import { type FC, useCallback } from "react"
@@ -16,7 +17,8 @@ import {
 import { useControlPane } from "../hooks/useControlPane"
 
 export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
-  const { selectedEventIds } = useControlPane()
+  const { handleClose } = props
+  const { selectedEventIds, setValueDialogOpen } = useControlPane()
   const isEventSelected = selectedEventIds.length > 0
   const copyControlSelection = useCopyControlSelection()
   const deleteControlSelection = useDeleteControlSelection()
@@ -44,6 +46,11 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
     deleteControlSelection()
   }, [deleteControlSelection])
 
+  const onClickSetValue = useCallback(() => {
+    setValueDialogOpen(true)
+    handleClose()
+  }, [setValueDialogOpen, handleClose])
+
   return (
     <ContextMenu {...props}>
       <MenuItem onClick={onClickCut} disabled={!isEventSelected}>
@@ -65,6 +72,10 @@ export const ControlSelectionContextMenu: FC<ContextMenuProps> = (props) => {
       <MenuItem onClick={onClickDelete} disabled={!isEventSelected}>
         <Localized name="delete" />
         <HotKey>Del</HotKey>
+      </MenuItem>
+      <MenuDivider />
+      <MenuItem onClick={onClickSetValue} disabled={!isEventSelected}>
+        <Localized name="set-value" />
       </MenuItem>
     </ContextMenu>
   )

@@ -25,6 +25,9 @@ export function useControlPane() {
     get controlCurveType() {
       return useAtomValue(controlCurveTypeAtom)
     },
+    get isValueDialogOpen() {
+      return useAtomValue(isValueDialogOpenAtom)
+    },
     resetSelection: useSetAtom(resetSelectionAtom),
     setControlMode: useSetAtom(controlModeAtom),
     setControlModes: useSetAtom(controlModesAtom),
@@ -32,6 +35,7 @@ export function useControlPane() {
     setSelectedEventIds: useSetAtom(selectedEventIdsAtom),
     setControlPencilMode: useSetAtom(controlPencilModeAtom),
     setControlCurveType: useSetAtom(controlCurveTypeAtom),
+    setValueDialogOpen: useSetAtom(isValueDialogOpenAtom),
   }
 }
 
@@ -41,6 +45,8 @@ const controlPencilModeAtom = atom<"pencil" | "line" | "curve">("pencil")
 const controlCurveTypeAtom = atom<"linear" | "easeIn" | "easeOut">("easeIn")
 const selectionAtom = historyAtom(atom<ControlSelection | null>(null))
 const selectedEventIdsAtom = historyAtom(atom<number[]>([]))
+// the value dialog edits the selected events
+const isValueDialogOpenAtom = atom(false)
 const storageAtom = atomWithStorage<{ controlModes: ControlMode[] }>(
   "ControlStore",
   {
