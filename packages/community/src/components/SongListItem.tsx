@@ -8,6 +8,7 @@ import { observer } from "mobx-react-lite"
 import type { FC } from "react"
 import { playSong } from "../actions/song.js"
 import { formatTimeAgo } from "../helpers/formatTimeAgo.js"
+import { useIsPlaying } from "../hooks/useIsPlaying.js"
 import { useStores } from "../hooks/useStores.js"
 import { Localized } from "../localize/useLocalization.js"
 
@@ -127,9 +128,9 @@ export const SongListItem: FC<SongListItemProps> = observer(({ song }) => {
   } = rootStore
   const toast = useToast()
 
-  const isPlaying = player.isPlaying && currentSong?.metadata.id === song.id
+  const isPlaying = useIsPlaying() && currentSong?.metadata.id === song.id
   const onClick = () => {
-    if (player.isPlaying && currentSong?.metadata.id === song.id) {
+    if (isPlaying) {
       player.stop()
     } else {
       try {
