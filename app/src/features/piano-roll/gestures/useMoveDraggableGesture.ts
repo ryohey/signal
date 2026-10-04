@@ -48,11 +48,7 @@ export const useMoveDraggableGesture = (): MouseDownHandler<
   [PianoRollDraggable, PianoRollDraggable[]?, MoveDraggableCallback?]
 > => {
   const { transform, getLocal } = useNoteCoordTransform()
-  const {
-    isQuantizeEnabled,
-    quantize: quantizeUnit,
-    quantizeRound,
-  } = useQuantizer()
+  const { isQuantizeEnabled, quantizeUnit, quantizeRound } = useQuantizer()
   const { getDraggablePosition, getDraggableArea, updateDraggables } =
     usePianoRollDraggable()
 
