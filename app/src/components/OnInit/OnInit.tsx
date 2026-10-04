@@ -1,5 +1,5 @@
 import { useProgress } from "dialog-hooks"
-import { type FC, useEffect, useState } from "react"
+import { type FC, useEffect, useRef, useState } from "react"
 import { useSetSong } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
 import { useLoadSongFromExternalMidiFile } from "../../features/cloud-file/hooks/cloudSong"
@@ -25,6 +25,7 @@ export const OnInit: FC = () => {
   const { shouldShowAutoSaveDialog } = useAutoSave()
   const { initSoundFont } = useSoundFont()
   const { initMIDIDevice } = useMIDIDevice()
+  const didInit = useRef(false)
 
   const init = async () => {
     const closeProgress = showProgress(localized["initializing"])
@@ -106,6 +107,11 @@ export const OnInit: FC = () => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
+    // StrictMode runs effects twice in development
+    if (didInit.current) {
+      return
+    }
+    didInit.current = true
     ;(async () => {
       await init()
       await loadExternalMidiIfNeeded()

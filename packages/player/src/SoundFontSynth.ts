@@ -15,21 +15,20 @@ export class SoundFontSynth implements SynthOutput {
     return this._loadedSoundFont !== null
   }
 
-  private workletModuleAdded = false
+  private setupPromise: Promise<void> | null = null
   private syxBuffer: number[] = []
 
   constructor(private readonly context: AudioContext) {}
 
-  async setup() {
-    if (this.workletModuleAdded) {
-      return
-    }
-    this.workletModuleAdded = true
-    const url = new URL(
-      "spessasynth_lib/dist/spessasynth_processor.min.js",
-      import.meta.url,
+  setup(): Promise<void> {
+    // Share the pending promise so concurrent callers wait for addModule
+    this.setupPromise ??= this.context.audioWorklet.addModule(
+      new URL(
+        "spessasynth_lib/dist/spessasynth_processor.min.js",
+        import.meta.url,
+      ),
     )
-    await this.context.audioWorklet.addModule(url)
+    return this.setupPromise
   }
 
   async loadSoundFont(soundFont: SoundFont) {
