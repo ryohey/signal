@@ -1,5 +1,10 @@
 import styled from "@emotion/styled"
-import { Alert, Button, DialogContent, DialogTitle } from "@signal-app/ui"
+import {
+  Alert,
+  Button,
+  DialogContent,
+  DialogSectionTitle,
+} from "@signal-app/ui"
 import type { ChangeEvent, FC } from "react"
 import { FileInput } from "../../../components/Navigation/LegacyFileMenu"
 import { isRunningInElectron } from "../../../helpers/platform"
@@ -33,9 +38,9 @@ export const SoundFontSettingsView: FC = () => {
 
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="soundfont" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         <SoundFontList />
         {!isRunningInElectron() && (

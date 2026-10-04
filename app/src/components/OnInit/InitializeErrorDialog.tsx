@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "@signal-app/ui"
 import type { FC } from "react"
@@ -24,7 +25,9 @@ export const InitializeErrorDialog: FC<InitializeErrorDialogProps> = ({
       <DialogTitle>
         <Localized name="initialize-error" />
       </DialogTitle>
-      <DialogContent>{message}</DialogContent>
+      <DialogContent>
+        <DialogDescription>{message}</DialogDescription>
+      </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>
           <Localized name="close" />

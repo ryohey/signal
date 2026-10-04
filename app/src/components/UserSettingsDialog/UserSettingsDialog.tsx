@@ -69,7 +69,11 @@ export const UserSettingsDialog: FC = () => {
   }
 
   return (
-    <Dialog open={openUserSettingsDialog} style={{ minWidth: "30rem" }}>
+    <Dialog
+      open={openUserSettingsDialog}
+      style={{ minWidth: "30rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="user-settings" />
       </DialogTitle>

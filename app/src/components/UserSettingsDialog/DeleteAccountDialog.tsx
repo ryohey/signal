@@ -1,9 +1,10 @@
-import { DialogTitle } from "@radix-ui/react-dialog"
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
   PrimaryButton,
 } from "@signal-app/ui"
 import type { FC } from "react"
@@ -33,7 +34,9 @@ export const DeleteAccountDialog: FC = () => {
         <Localized name="delete-account" />
       </DialogTitle>
       <DialogContent>
-        <Localized name="delete-account-description" />
+        <DialogDescription>
+          <Localized name="delete-account-description" />
+        </DialogDescription>
       </DialogContent>
       <DialogActions>
         <PrimaryButton onClick={onClickDelete}>

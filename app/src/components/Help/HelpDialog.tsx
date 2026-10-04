@@ -62,7 +62,11 @@ export const HelpDialog: FC = () => {
   const close = () => setOpenHelpDialog(false)
 
   return (
-    <Dialog open={openHelpDialog} onOpenChange={close}>
+    <Dialog
+      open={openHelpDialog}
+      onOpenChange={close}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="help" />
       </DialogTitle>

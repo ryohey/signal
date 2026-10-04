@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import {
   Checkbox,
   DialogContent,
-  DialogTitle,
+  DialogSectionTitle,
   Label,
   Select,
 } from "@signal-app/ui"
@@ -107,9 +107,9 @@ const SectionContent = styled.div`
 export const GeneralSettingsView: FC = () => {
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="general" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         <Column>
           <LanguageSelect />

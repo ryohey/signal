@@ -1,5 +1,12 @@
 import styled from "@emotion/styled"
-import { Button, Dialog, DialogActions, DialogContent } from "@signal-app/ui"
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  VisuallyHidden,
+} from "@signal-app/ui"
 import range from "lodash/range"
 import type { FC } from "react"
 import { Localized } from "../../localize/useLocalization"
@@ -51,7 +58,12 @@ export const ColorPicker: FC<ColorPickerProps> = ({
   )
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose} aria-describedby={undefined}>
+      <VisuallyHidden>
+        <DialogTitle>
+          <Localized name="change-track-color" />
+        </DialogTitle>
+      </VisuallyHidden>
       <DialogContent>
         <Container>
           {colors.map((color) => (

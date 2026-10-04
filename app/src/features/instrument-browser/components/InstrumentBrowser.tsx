@@ -7,9 +7,11 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogTitle,
   DropdownButton,
   Label,
   PrimaryButton,
+  VisuallyHidden,
 } from "@signal-app/ui"
 import type { ProgramChangeEvent } from "midifile-ts"
 import React, { type FC, useCallback } from "react"
@@ -53,7 +55,11 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   onOpenChange,
   ...props
 }) => (
-  <Dialog open={isOpen} onOpenChange={onOpenChange}>
+  <Dialog
+    open={isOpen}
+    onOpenChange={onOpenChange}
+    aria-describedby={undefined}
+  >
     {isOpen && (
       <InstrumentBrowserContent
         {...props}
@@ -120,6 +126,11 @@ const InstrumentBrowserContent: FC<
 
   return (
     <>
+      <VisuallyHidden>
+        <DialogTitle>
+          <Localized name="select-instrument" />
+        </DialogTitle>
+      </VisuallyHidden>
       <DialogContent className="InstrumentBrowser">
         <Finder>
           <Left>

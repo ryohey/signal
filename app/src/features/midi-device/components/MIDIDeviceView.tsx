@@ -4,7 +4,7 @@ import {
   Checkbox,
   CircularProgress,
   DialogContent,
-  DialogTitle,
+  DialogSectionTitle,
   Label,
   RadioButton,
 } from "@signal-app/ui"
@@ -129,9 +129,9 @@ export const MIDIDeviceView: FC = () => {
 
   return (
     <>
-      <DialogTitle>
+      <DialogSectionTitle>
         <Localized name="midi-settings" />
-      </DialogTitle>
+      </DialogSectionTitle>
       <DialogContent>
         {isLoading && <CircularProgress />}
         {requestError && (

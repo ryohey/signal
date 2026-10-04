@@ -56,7 +56,11 @@ export const VelocityDialog: FC<VelocityDialogProps> = ({
   }, [value, operationType, onClickOK, onClose])
 
   return (
-    <Dialog open={open} style={{ minWidth: "20rem" }}>
+    <Dialog
+      open={open}
+      style={{ minWidth: "20rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="velocity" />
       </DialogTitle>

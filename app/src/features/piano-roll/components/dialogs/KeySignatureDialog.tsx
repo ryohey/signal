@@ -55,7 +55,12 @@ const _KeySignatureDialog: FC<KeySignatureDialogProps> = ({
   const onClose = () => onOpenChange(false)
 
   return (
-    <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "20rem" }}>
+    <Dialog
+      open={open}
+      onOpenChange={onClose}
+      style={{ minWidth: "20rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="scale" />
       </DialogTitle>

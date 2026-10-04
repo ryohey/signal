@@ -1,8 +1,9 @@
-import { keyframes } from "@emotion/react"
+import { css, keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
 import { composeEventHandlers } from "@radix-ui/primitive"
 import {
   Content,
+  Description,
   DialogOverlay,
   DialogPortal,
   Overlay,
@@ -96,23 +97,47 @@ const StyledContent = styled(FocusFixedDialogContent)`
 `
 
 export type DialogProps = Props & {
-  style?: React.CSSProperties
+  style?: React.CSSProperties | undefined
+  // Pass `aria-describedby={undefined}` when the dialog has no DialogDescription
+  "aria-describedby"?: string | undefined
 }
 
 export const Dialog: FC<DialogProps> = ({ children, style, ...props }) => (
   <Root {...props}>
     <Portal>
       <StyledOverlay />
-      <StyledContent style={style}>{children}</StyledContent>
+      <StyledContent
+        style={style}
+        // Forward only when given, so Radix keeps its default otherwise
+        {...("aria-describedby" in props
+          ? { "aria-describedby": props["aria-describedby"] }
+          : {})}
+      >
+        {children}
+      </StyledContent>
     </Portal>
   </Root>
 )
 
-export const DialogTitle = styled(Title)`
+const titleStyle = css`
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text);
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
+`
+
+// Every dialog needs a DialogTitle so screen readers can announce it
+export const DialogTitle = styled(Title)`
+  ${titleStyle}
+`
+
+// Looks like DialogTitle, for headings inside a dialog that already has one
+export const DialogSectionTitle = styled.div`
+  ${titleStyle}
+`
+
+export const DialogDescription = styled(Description)`
+  margin: 0;
 `
 
 export const DialogContent = styled.div`

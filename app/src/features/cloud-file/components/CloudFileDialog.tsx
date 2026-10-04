@@ -23,6 +23,7 @@ export const CloudFileDialog = () => {
       open={openCloudFileDialog}
       onOpenChange={onClose}
       style={{ minWidth: "30rem" }}
+      aria-describedby={undefined}
     >
       <DialogTitle>
         <Localized name="files" />

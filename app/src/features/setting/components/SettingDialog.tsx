@@ -39,7 +39,12 @@ export const SettingDialog: FC = () => {
   )
 
   return (
-    <Dialog open={open} onOpenChange={onClose} style={{ minWidth: "32rem" }}>
+    <Dialog
+      open={open}
+      onOpenChange={onClose}
+      style={{ minWidth: "32rem" }}
+      aria-describedby={undefined}
+    >
       <DialogTitle>
         <Localized name="settings" />
       </DialogTitle>
