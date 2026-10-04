@@ -1,4 +1,4 @@
-import type { Unsubscribe } from "../types"
+import { switchSubscription } from "@signal-app/observable"
 import type RootStore from "./RootStore"
 
 export const registerReactions = ({
@@ -20,13 +20,12 @@ export const registerReactions = ({
   })
 
   // Watch for song changes and set the auto-save flag
-  let unsubscribeSong: Unsubscribe | null = null
-  songStore.onSongChanged.subscribe(() => {
-    unsubscribeSong?.() // Unsubscribe from previous song changes
-    unsubscribeSong = songStore.song.onIsSavedChanged.subscribe(() => {
-      if (!songStore.song.isSaved) {
-        autoSaveService.onSongChanged()
-      }
-    })
+  switchSubscription(
+    songStore.onSongChanged.subscribe,
+    () => songStore.song.onIsSavedChanged.subscribe,
+  )(() => {
+    if (!songStore.song.isSaved) {
+      autoSaveService.onSongChanged()
+    }
   })
 }
