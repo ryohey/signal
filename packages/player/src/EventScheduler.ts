@@ -145,7 +145,7 @@ export class EventScheduler<E extends SchedulableEvent> {
     // from the current position. If a loop is set, jump to the loop start.
     let jump: Jump | null = null
 
-    if (this._scheduledSeekTick) {
+    if (this._scheduledSeekTick !== null) {
       jump = {
         from: endTick,
         to: this._scheduledSeekTick,

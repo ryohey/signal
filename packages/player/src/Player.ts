@@ -71,11 +71,8 @@ export class Player {
       return
     }
     tick = Math.min(Math.max(Math.floor(tick), 0), this.eventSource.endOfSong)
-    if (this.scheduler) {
-      this.scheduler.scheduleSeek(tick)
-    } else {
-      this._currentTick.set(tick)
-    }
+    this.scheduler?.scheduleSeek(tick)
+    this._currentTick.set(tick)
   }
 
   get position() {
@@ -161,6 +158,8 @@ export class Player {
 
   stop = () => {
     this.scheduler?.scheduleStop()
+    // prevent a pending throttled sync from overwriting a position set right after stop()
+    this.syncPosition.cancel()
   }
 
   private finalizeStop() {
