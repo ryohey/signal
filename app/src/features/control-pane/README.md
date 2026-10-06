@@ -12,6 +12,7 @@ The pane below the piano roll. Edits note velocity and continuous values, such a
 
 - Switch between the velocity lane and value lanes.
 - Draw and edit values with pencil, curve, and selection tools.
+- Edit existing points without creating new ones (edit tool: drag a point or a box-selected group, right-click for the context menu) and remove individual points by clicking or sweeping over them (erase tool).
 - Copy, paste, and delete selected points.
 
 ## Design Notes

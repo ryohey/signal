@@ -1,18 +1,21 @@
 import { useTheme } from "@emotion/react"
 import { GLCanvas, Transform } from "@ryohey/webgl-react"
 import { isEventInRange, Range } from "@signal-app/core"
-import type { Point } from "@signal-app/geometry"
-import { type MouseEventHandler, useCallback, useMemo } from "react"
+import type { Point, Rect } from "@signal-app/geometry"
+import { type MouseEventHandler, useCallback, useMemo, useState } from "react"
 import { Beats } from "../../../../components/GLNodes/Beats"
 import { Cursor } from "../../../../components/GLNodes/Cursor"
+import { Selection } from "../../../../components/GLNodes/Selection"
 import { matrixFromTranslation } from "../../../../helpers/matrix"
 import { useBeats } from "../../../../hooks/useBeats"
 import { useContextMenu } from "../../../../hooks/useContextMenu"
 import { useTickScroll } from "../../../../hooks/useTickScroll"
 import { usePianoRoll } from "../../../piano-roll/hooks/usePianoRoll"
 import { ControlCoordTransform } from "../../entities/ControlCoordTransform"
+import { useBoxSelectGesture } from "../../gestures/useBoxSelectGesture"
 import { useCreateSelectionGesture } from "../../gestures/useCreateSelectionGesture"
 import { curveEasings, useCurveGesture } from "../../gestures/useCurveGesture"
+import { findVertexAt, useEraseGesture } from "../../gestures/useEraseGesture"
 import { usePencilGesture } from "../../gestures/usePencilGesture"
 import { useControlPane } from "../../hooks/useControlPane"
 import { useControlValueEvents } from "../../hooks/useControlValueEvents"
@@ -45,6 +48,9 @@ export const LineGraphCanvas = ({
   const effectiveCurveType =
     controlPencilMode === "line" ? "linear" : controlCurveType
   const handlePencilMouseDown = usePencilGesture()
+  const handleEraseMouseDown = useEraseGesture()
+  const handleBoxSelectMouseDown = useBoxSelectGesture()
+  const [marquee, setMarquee] = useState<Rect | null>(null)
   const { gesture: curveGesture, curveDragState } =
     useCurveGesture(effectiveCurveType)
   const createSelectionGesture = useCreateSelectionGesture()
@@ -56,6 +62,12 @@ export const LineGraphCanvas = ({
     }
     if (controlPencilMode === "line" || controlPencilMode === "curve") {
       return "crosshair"
+    }
+    if (controlPencilMode === "edit") {
+      return "default"
+    }
+    if (controlPencilMode === "erase") {
+      return "pointer"
     }
     return `url("./cursor-pencil.svg") 0 20, pointer`
   }, [mouseMode, controlPencilMode])
@@ -69,6 +81,8 @@ export const LineGraphCanvas = ({
     id: e.id,
     ...controlTransform.toPosition(e.tick, e.value),
   }))
+
+  const hitRadius = circleRadius + 2
 
   const scrollXMatrix = useMemo(
     () => matrixFromTranslation(-Math.floor(scrollLeft), 0),
@@ -112,6 +126,58 @@ export const LineGraphCanvas = ({
     [controlTransform, events, createSelectionGesture, getLocal],
   )
 
+  const eraseMouseDown: MouseEventHandler = useCallback(
+    (ev) => {
+      if (ev.button !== 0) {
+        return
+      }
+      handleEraseMouseDown(
+        ev.nativeEvent,
+        getLocal(ev.nativeEvent),
+        items,
+        hitRadius,
+      )
+    },
+    [handleEraseMouseDown, getLocal, items, hitRadius],
+  )
+
+  // the edit tool only interacts with existing vertices: dragging a vertex is
+  // handled by its hit area, and dragging empty space selects a group of them
+  const editMouseDown: MouseEventHandler = useCallback(
+    (ev) => {
+      if (ev.button !== 0) {
+        return
+      }
+      handleBoxSelectMouseDown(
+        ev.nativeEvent,
+        getLocal(ev.nativeEvent),
+        items,
+        setMarquee,
+      )
+    },
+    [handleBoxSelectMouseDown, getLocal, items],
+  )
+
+  const handleContextMenu: MouseEventHandler = useCallback(
+    (ev) => {
+      if (
+        mouseMode === "pencil" &&
+        (controlPencilMode === "edit" || controlPencilMode === "erase")
+      ) {
+        const local = getLocal(ev.nativeEvent)
+        if (
+          controlPencilMode === "erase" ||
+          findVertexAt(items, local, hitRadius) === undefined
+        ) {
+          ev.preventDefault()
+          return
+        }
+      }
+      onContextMenu(ev)
+    },
+    [mouseMode, controlPencilMode, getLocal, items, hitRadius, onContextMenu],
+  )
+
   const onMouseDown = useMemo(() => {
     if (mouseMode !== "pencil") {
       return selectionMouseDown
@@ -120,6 +186,10 @@ export const LineGraphCanvas = ({
       case "line":
       case "curve":
         return curveMouseDown
+      case "edit":
+        return editMouseDown
+      case "erase":
+        return eraseMouseDown
       default:
         return pencilMouseDown
     }
@@ -128,6 +198,8 @@ export const LineGraphCanvas = ({
     controlPencilMode,
     selectionMouseDown,
     curveMouseDown,
+    editMouseDown,
+    eraseMouseDown,
     pencilMouseDown,
   ])
 
@@ -143,7 +215,7 @@ export const LineGraphCanvas = ({
           width={width}
           height={height}
           onMouseDown={onMouseDown}
-          onContextMenu={onContextMenu}
+          onContextMenu={handleContextMenu}
           style={style}
           cursor={cursor}
         >
@@ -158,6 +230,7 @@ export const LineGraphCanvas = ({
               controlTransform={controlTransform}
             />
             <LineGraphSelection zIndex={2} transform={controlTransform} />
+            <Selection rect={marquee} zIndex={2} isActive={true} />
             <Cursor x={cursorX} height={height} zIndex={3} />
           </Transform>
         </GLCanvas>

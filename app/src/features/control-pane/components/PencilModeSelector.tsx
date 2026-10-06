@@ -1,10 +1,14 @@
 import styled from "@emotion/styled"
 import { Tooltip } from "@signal-app/ui"
 import ArrowDropDownIcon from "mdi-react/ArrowDropDownIcon"
+import CursorDefaultIcon from "mdi-react/CursorDefaultIcon"
+import EraserIcon from "mdi-react/EraserIcon"
+import TrashCanOutlineIcon from "mdi-react/TrashCanOutlineIcon"
 import { useCallback, useEffect, useRef, useState } from "react"
 import PencilIcon from "../../../images/icons/pencil.svg"
 import { Localized } from "../../../localize/useLocalization"
 import { type CurveType, curveTypes } from "../gestures/useCurveGesture"
+import { useClearControlEvents } from "../hooks/control"
 import { useControlPane } from "../hooks/useControlPane"
 
 const Wrapper = styled.div`
@@ -13,6 +17,11 @@ const Wrapper = styled.div`
   background-color: transparent;
   flex-shrink: 0;
   border-left: 1px solid var(--color-border);
+`
+
+const Spacer = styled.div`
+  width: 0.75rem;
+  flex-shrink: 0;
 `
 
 const ModeButton = styled.button<{ selected: boolean }>`
@@ -219,6 +228,22 @@ export function PencilModeSelector() {
     () => setControlPencilMode("curve"),
     [setControlPencilMode],
   )
+  const clearControlEvents = useClearControlEvents()
+  const onClickClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      clearControlEvents()
+    },
+    [clearControlEvents],
+  )
+  const onSelectEditMode = useCallback(
+    () => setControlPencilMode("edit"),
+    [setControlPencilMode],
+  )
+  const onSelectEraseMode = useCallback(
+    () => setControlPencilMode("erase"),
+    [setControlPencilMode],
+  )
   const onSelectCurveType = useCallback(
     (type: CurveType) => {
       setControlCurveType(type)
@@ -260,6 +285,14 @@ export function PencilModeSelector() {
 
   return (
     <Wrapper>
+      <Tooltip title={<Localized name="control-edit-tool" />}>
+        <ModeButton
+          onMouseDown={onSelectEditMode}
+          selected={controlPencilMode === "edit"}
+        >
+          <CursorDefaultIcon style={{ width: "1.2rem", height: "1.2rem" }} />
+        </ModeButton>
+      </Tooltip>
       <Tooltip title={<Localized name="control-pencil-tool" />}>
         <ModeButton
           onMouseDown={onSelectPencilMode}
@@ -320,6 +353,20 @@ export function PencilModeSelector() {
             </DropdownMenu>
           )}
         </CurveSplitButton>
+      </Tooltip>
+      <Spacer />
+      <Tooltip title={<Localized name="control-erase-tool" />}>
+        <ModeButton
+          onMouseDown={onSelectEraseMode}
+          selected={controlPencilMode === "erase"}
+        >
+          <EraserIcon style={{ width: "1.2rem", height: "1.2rem" }} />
+        </ModeButton>
+      </Tooltip>
+      <Tooltip title={<Localized name="control-clear-tool" />}>
+        <ModeButton onMouseDown={onClickClear} selected={false}>
+          <TrashCanOutlineIcon style={{ width: "1.2rem", height: "1.2rem" }} />
+        </ModeButton>
       </Tooltip>
     </Wrapper>
   )

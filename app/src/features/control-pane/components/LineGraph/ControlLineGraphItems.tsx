@@ -26,7 +26,8 @@ export const ControlLineGraphItems = ({
   circleRadius: number
   controlTransform: ControlCoordTransform
 }) => {
-  const { selectedEventIds } = useControlPane()
+  const { selectedEventIds, setSelectedEventIds, controlPencilMode } =
+    useControlPane()
   const { mouseMode } = usePianoRoll()
   const { scrollLeft } = useTickScroll()
   const dragSelectionGesture = useDragSelectionGesture()
@@ -50,14 +51,30 @@ export const ControlLineGraphItems = ({
 
   const handleMouseDownItem = useCallback(
     (e: MouseEvent, hitEventId: number) => {
-      if (mouseMode !== "selection") {
+      const isEditTool = mouseMode === "pencil" && controlPencilMode === "edit"
+      if (mouseMode !== "selection" && !isEditTool) {
         return
       }
       e.stopPropagation()
+      if (isEditTool && e.button === 2) {
+        // right click only selects the vertex; the context menu opens on the canvas
+        if (!selectedEventIds.includes(hitEventId)) {
+          setSelectedEventIds([hitEventId])
+        }
+        return
+      }
       const local = getLocal(e)
       dragSelectionGesture(e, hitEventId, local, controlTransform)
     },
-    [mouseMode, dragSelectionGesture, getLocal, controlTransform],
+    [
+      mouseMode,
+      controlPencilMode,
+      selectedEventIds,
+      setSelectedEventIds,
+      dragSelectionGesture,
+      getLocal,
+      controlTransform,
+    ],
   )
 
   return (
