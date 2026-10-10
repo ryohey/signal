@@ -84,8 +84,8 @@ describe("control editor composed mutations", () => {
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
     updateItemsInRangeWithEasing(
-      [0, 100],
-      [0, 20],
+      { tick: 0, value: 0 },
+      { tick: 20, value: 100 },
       quantizeFloor,
       quantizeUnit,
       (t) => t * t,
@@ -109,7 +109,12 @@ describe("control editor composed mutations", () => {
     const quantizeFloor = (tick: number) =>
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
-    updateItemsInRange([0, 100], [0, 20], quantizeFloor, quantizeUnit)(editor)
+    updateItemsInRange(
+      { tick: 0, value: 0 },
+      { tick: 20, value: 100 },
+      quantizeFloor,
+      quantizeUnit,
+    )(editor)
 
     const items = editor
       .getItems()
@@ -131,8 +136,8 @@ describe("control editor composed mutations", () => {
 
     // Drag from (tick 20, value 100) to (tick 0, value 0)
     updateItemsInRangeWithEasing(
-      [100, 0],
-      [20, 0],
+      { tick: 20, value: 100 },
+      { tick: 0, value: 0 },
       quantizeFloor,
       quantizeUnit,
       (t) => t * t,
@@ -156,7 +161,12 @@ describe("control editor composed mutations", () => {
     const quantizeFloor = (tick: number) =>
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
-    updateItemsInRange([100, 0], [0, 20], quantizeFloor, quantizeUnit)(editor)
+    updateItemsInRange(
+      { tick: 0, value: 100 },
+      { tick: 20, value: 0 },
+      quantizeFloor,
+      quantizeUnit,
+    )(editor)
 
     const items = editor
       .getItems()

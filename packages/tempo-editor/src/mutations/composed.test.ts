@@ -1,4 +1,3 @@
-import { Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
 import { getItemsByIds } from "../queries/items"
 import { createTrackTempoEditor } from "../testUtils"
@@ -117,8 +116,8 @@ describe("tempo editor composed mutations", () => {
     ])
 
     updateItemsInRange(
-      Range.create(100, 200),
-      Range.create(0, 20),
+      { tick: 0, bpm: 100 },
+      { tick: 20, bpm: 200 },
       (tick) => tick,
       10,
     )(editor)
@@ -133,7 +132,12 @@ describe("tempo editor composed mutations", () => {
   it("updates items in a range drawn right to left with a descending value", () => {
     const editor = createTrackTempoEditor()
 
-    updateItemsInRange([100, 200], [20, 0], (tick) => tick, 10)(editor)
+    updateItemsInRange(
+      { tick: 20, bpm: 100 },
+      { tick: 0, bpm: 200 },
+      (tick) => tick,
+      10,
+    )(editor)
 
     expect(editor.getItems()).toMatchObject([
       { tick: 0, bpm: 200 },

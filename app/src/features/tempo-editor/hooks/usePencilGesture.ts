@@ -1,4 +1,3 @@
-import type { Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -14,13 +13,8 @@ const useUpdateTempoEventsInRange = () => {
   const tempoEditor = useTempoEditorService()
 
   return useCallback(
-    (valueRange: Range, tickRange: Range) =>
-      tempoEditor.updateItemsInRange(
-        valueRange,
-        tickRange,
-        quantizeFloor,
-        quantizeUnit,
-      ),
+    (from: { tick: number; bpm: number }, to: { tick: number; bpm: number }) =>
+      tempoEditor.updateItemsInRange(from, to, quantizeFloor, quantizeUnit),
     [tempoEditor, quantizeFloor, quantizeUnit],
   )
 }
@@ -54,7 +48,10 @@ export const usePencilGesture = (): MouseDownHandler<
             Math.min(transform.maxBPM, transform.fromPosition(local).bpm),
           )
           const tick = transform.getTick(local.x)
-          updateTempoEventsInRange([lastValue, value], [lastTick, tick])
+          updateTempoEventsInRange(
+            { tick: lastTick, bpm: lastValue },
+            { tick, bpm: value },
+          )
 
           lastTick = tick
           lastValue = value
