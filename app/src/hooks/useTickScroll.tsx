@@ -1,3 +1,4 @@
+import { Range } from "@signal-app/core"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
 import type { Store } from "jotai/vanilla/store"
@@ -140,7 +141,7 @@ export const tickRangeAtom = atom((get) => {
   const canvasWidth = get(canvasWidthAtom)
   const startTick = transform.getTick(scrollLeft)
   const endTick = transform.getTick(scrollLeft + canvasWidth)
-  return [startTick, endTick] as const
+  return Range.create(startTick, endTick)
 })
 
 // actions

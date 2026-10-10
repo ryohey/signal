@@ -1,3 +1,4 @@
+import { Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
 import type { ClipboardData } from "../entities/clipboardTypes"
 import { createTrackControlEditor } from "../testUtils"
@@ -84,8 +85,8 @@ describe("control editor composed mutations", () => {
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
     updateItemsInRangeWithEasing(
-      [0, 100],
-      [0, 20],
+      Range.create(0, 100),
+      Range.create(0, 20),
       quantizeFloor,
       quantizeUnit,
       (t) => t * t,
@@ -109,7 +110,12 @@ describe("control editor composed mutations", () => {
     const quantizeFloor = (tick: number) =>
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
-    updateItemsInRange([0, 100], [0, 20], quantizeFloor, quantizeUnit)(editor)
+    updateItemsInRange(
+      Range.create(0, 100),
+      Range.create(0, 20),
+      quantizeFloor,
+      quantizeUnit,
+    )(editor)
 
     const items = editor
       .getItems()

@@ -1,3 +1,4 @@
+import { Range } from "@signal-app/core"
 import { describe, expect, it } from "vitest"
 import { createTrackControlEditor } from "../testUtils"
 import {
@@ -48,7 +49,7 @@ describe("control editor composed queries", () => {
     editor.addItem({ tick: 10, value: 2 })
     editor.addItem({ tick: 20, value: 3 })
 
-    const items = getItemsInRangeWithPrevious([15, 25])(editor)
+    const items = getItemsInRangeWithPrevious(Range.create(15, 25))(editor)
 
     expect(items.map((item) => item.tick)).toStrictEqual([10, 20])
   })
@@ -57,7 +58,7 @@ describe("control editor composed queries", () => {
     const editor = createTrackControlEditor()
     editor.addItem({ tick: 20, value: 3 })
 
-    const items = getItemsInRangeWithPrevious([0, 10])(editor)
+    const items = getItemsInRangeWithPrevious(Range.create(0, 10))(editor)
 
     expect(items).toStrictEqual([])
   })

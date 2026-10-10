@@ -1,4 +1,4 @@
-import { type NoteEvent, Track } from "@signal-app/core"
+import { type NoteEvent, Range, Track } from "@signal-app/core"
 import { describe, expect, it, vi } from "vitest"
 import { createVelocityEditor } from "./createVelocityEditor"
 
@@ -35,7 +35,7 @@ describe("createVelocityEditor", () => {
 
     const editor = createVelocityEditor(track)
 
-    expect(editor.getNotesInRange([0, 50])).toMatchObject([
+    expect(editor.getNotesInRange(Range.create(0, 50))).toMatchObject([
       { tick: 10, velocity: 80 },
     ])
   })
@@ -85,7 +85,7 @@ describe("createVelocityEditor", () => {
     const editor = createVelocityEditor(track)
     editor.setVelocity([first.id, second.id], 42)
 
-    expect(editor.getNotesInRange([0, 100])).toMatchObject([
+    expect(editor.getNotesInRange(Range.create(0, 100))).toMatchObject([
       { velocity: 42 },
       { velocity: 42 },
     ])
@@ -107,6 +107,8 @@ describe("createVelocityEditor", () => {
     const editor = createVelocityEditor(track)
     editor.updateVelocityInRange([note.id], 0, 0, 100, 100)
 
-    expect(editor.getNotesInRange([0, 100])).toMatchObject([{ velocity: 50 }])
+    expect(editor.getNotesInRange(Range.create(0, 100))).toMatchObject([
+      { velocity: 50 },
+    ])
   })
 })

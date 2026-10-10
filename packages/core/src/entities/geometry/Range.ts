@@ -1,14 +1,15 @@
 import { isDevelopment } from "../../helpers/isDevelopment"
+import type { Branded } from "../../types"
 
-export type Range = readonly [number, number]
+export type Range = Branded<readonly [number, number], "Range">
 
 export namespace Range {
   export function fromUnordered(a: number, b: number): Range {
-    return [Math.min(a, b), Math.max(a, b)]
+    return [Math.min(a, b), Math.max(a, b)] as unknown as Range
   }
 
   export function fromLength(start: number, length: number): Range {
-    return [start, start + length]
+    return [start, start + length] as unknown as Range
   }
 
   export function create(start: number, end: number): Range {
@@ -17,11 +18,11 @@ export namespace Range {
         `Range.create requires start <= end, but got start=${start}, end=${end}`,
       )
     }
-    return [start, end]
+    return [start, end] as unknown as Range
   }
 
   export function point(value: number): Range {
-    return [value, value]
+    return [value, value] as unknown as Range
   }
 
   export function contains(range: Range, value: number): boolean {

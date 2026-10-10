@@ -1,5 +1,5 @@
 import { ArrangeSelection } from "@signal-app/arrange-editor"
-import type { Range } from "@signal-app/core"
+import { Range } from "@signal-app/core"
 import { type MouseEvent, useCallback } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
 import { observeDrag } from "../../../helpers/observeDrag"
@@ -55,7 +55,9 @@ export const useRulerSelectionGesture = (): MouseDownHandler<
           const deltaPx = e.clientX - startClientX
           const selectionToPx = startPosX + deltaPx
           const endTick = transform.getTick(selectionToPx)
-          selection = selectionFromTickRange([startTick, endTick])
+          selection = selectionFromTickRange(
+            Range.fromUnordered(startTick, endTick),
+          )
           setSelection(selection)
         },
       })
