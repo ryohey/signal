@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import type { Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback, useState } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -86,8 +86,8 @@ export const useCurveGesture = (curveType: CurveType) => {
           const endTick = transform.getTick(endPoint.x)
 
           updateValueEvents(
-            Range.fromUnordered(startPos.value, endValue),
-            Range.fromUnordered(startPos.tick, endTick),
+            [startPos.value, endValue],
+            [startPos.tick, endTick],
           )
           setCurveDragState(null)
         },

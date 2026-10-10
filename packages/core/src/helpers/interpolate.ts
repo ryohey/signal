@@ -13,6 +13,8 @@ export const interpolate = (
     : (tick: number) => {
         const t = (tick - startTick) / (endTick - startTick)
         const value = startValue + easing(t) * (endValue - startValue)
-        return Math.floor(Range.clamp(valueRange, value))
+        return Math.floor(
+          Range.clamp(Range.fromUnordered(startValue, endValue), value),
+        )
       }
 }

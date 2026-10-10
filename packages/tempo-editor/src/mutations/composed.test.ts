@@ -130,6 +130,18 @@ describe("tempo editor composed mutations", () => {
     ])
   })
 
+  it("updates items in a range drawn right to left with a descending value", () => {
+    const editor = createTrackTempoEditor()
+
+    updateItemsInRange([100, 200], [20, 0], (tick) => tick, 10)(editor)
+
+    expect(editor.getItems()).toMatchObject([
+      { tick: 0, bpm: 200 },
+      { tick: 10, bpm: 150 },
+      { tick: 20, bpm: 100 },
+    ])
+  })
+
   it("sets BPM only when the item exists", () => {
     const editor = createTrackTempoEditor([{ tick: 10, bpm: 120 }])
     const [item] = editor.getItems()

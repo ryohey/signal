@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import type { Range } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -68,10 +68,7 @@ export const usePencilGesture = (): MouseDownHandler<
           )
           const tick = transform.getTick(local.x)
 
-          updateValueEvents(
-            Range.fromUnordered(lastValue, value),
-            Range.fromUnordered(lastTick, tick),
-          )
+          updateValueEvents([lastValue, value], [lastTick, tick])
 
           lastTick = tick
           lastValue = value

@@ -1,4 +1,4 @@
-import { closedRange, interpolate, type Range } from "@signal-app/core"
+import { closedRange, interpolate, Range } from "@signal-app/core"
 import { max, min } from "lodash"
 import type { TempoItem } from "../entities"
 import type { ClipboardData } from "../entities/clipboardTypes"
@@ -124,7 +124,11 @@ export const updateItemsInRange =
     quantizeUnit: number,
   ): TempoEditorMutator<void> =>
   (editor) => {
-    const [startTick, endTick] = tickRange
+    // valueRange and tickRange describe a drag from (tickRange[0],
+    // valueRange[0]) to (tickRange[1], valueRange[1]), so they may be
+    // descending. Only the ticks need ordering for quantization.
+    const fromTick = tickRange[0]
+    const [startTick, endTick] = Range.fromUnordered(...tickRange)
     const quantizedStartTick = quantizeFloor(Math.max(0, startTick))
     const quantizedEndTick = quantizeFloor(Math.max(0, endTick))
     const eventUpdateStartTick = Math.min(startTick, quantizedStartTick)
@@ -133,7 +137,7 @@ export const updateItemsInRange =
     const idsToRemove = editor
       .getItems()
       .flatMap((item) =>
-        item.tick === startTick ||
+        item.tick === fromTick ||
         item.tick < eventUpdateStartTick ||
         item.tick > eventUpdateEndTick
           ? []
