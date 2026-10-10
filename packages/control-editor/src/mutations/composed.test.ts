@@ -84,8 +84,8 @@ describe("control editor composed mutations", () => {
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
     updateItemsInRangeWithEasing(
-      [0, 100],
-      [0, 20],
+      { tick: 0, value: 0 },
+      { tick: 20, value: 100 },
       quantizeFloor,
       quantizeUnit,
       (t) => t * t,
@@ -109,7 +109,12 @@ describe("control editor composed mutations", () => {
     const quantizeFloor = (tick: number) =>
       Math.floor(tick / quantizeUnit) * quantizeUnit
 
-    updateItemsInRange([0, 100], [0, 20], quantizeFloor, quantizeUnit)(editor)
+    updateItemsInRange(
+      { tick: 0, value: 0 },
+      { tick: 20, value: 100 },
+      quantizeFloor,
+      quantizeUnit,
+    )(editor)
 
     const items = editor
       .getItems()
@@ -120,6 +125,58 @@ describe("control editor composed mutations", () => {
       { tick: 0, value: 0 },
       { tick: 10, value: 50 },
       { tick: 20, value: 100 },
+    ])
+  })
+
+  it("updateItemsInRangeWithEasing keeps the drag direction when drawn right to left", () => {
+    const editor = createTrackControlEditor()
+    const quantizeUnit = 10
+    const quantizeFloor = (tick: number) =>
+      Math.floor(tick / quantizeUnit) * quantizeUnit
+
+    // Drag from (tick 20, value 100) to (tick 0, value 0)
+    updateItemsInRangeWithEasing(
+      { tick: 20, value: 100 },
+      { tick: 0, value: 0 },
+      quantizeFloor,
+      quantizeUnit,
+      (t) => t * t,
+    )(editor)
+
+    const items = editor
+      .getItems()
+      .map((item) => ({ tick: item.tick, value: item.value }))
+      .sort((a, b) => a.tick - b.tick)
+
+    expect(items).toStrictEqual([
+      { tick: 0, value: 0 },
+      { tick: 10, value: 75 },
+      { tick: 20, value: 100 },
+    ])
+  })
+
+  it("updateItemsInRange draws a descending ramp", () => {
+    const editor = createTrackControlEditor()
+    const quantizeUnit = 10
+    const quantizeFloor = (tick: number) =>
+      Math.floor(tick / quantizeUnit) * quantizeUnit
+
+    updateItemsInRange(
+      { tick: 0, value: 100 },
+      { tick: 20, value: 0 },
+      quantizeFloor,
+      quantizeUnit,
+    )(editor)
+
+    const items = editor
+      .getItems()
+      .map((item) => ({ tick: item.tick, value: item.value }))
+      .sort((a, b) => a.tick - b.tick)
+
+    expect(items).toStrictEqual([
+      { tick: 0, value: 100 },
+      { tick: 10, value: 50 },
+      { tick: 20, value: 0 },
     ])
   })
 

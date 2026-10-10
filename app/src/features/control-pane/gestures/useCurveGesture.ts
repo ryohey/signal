@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import type { InterpolationPoint } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback, useState } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -28,10 +28,10 @@ const useUpdateValueEventsWithCurve = (curveType: CurveType) => {
   const easing = curveEasings[curveType]
 
   return useCallback(
-    (valueRange: Range, tickRange: Range) => {
+    (from: InterpolationPoint, to: InterpolationPoint) => {
       controlEditor.updateItemsInRangeWithEasing(
-        valueRange,
-        tickRange,
+        from,
+        to,
         quantizeFloor,
         quantizeUnit,
         easing,
@@ -85,10 +85,7 @@ export const useCurveGesture = (curveType: CurveType) => {
           )
           const endTick = transform.getTick(endPoint.x)
 
-          updateValueEvents(
-            Range.fromUnordered(startPos.value, endValue),
-            Range.fromUnordered(startPos.tick, endTick),
-          )
+          updateValueEvents(startPos, { tick: endTick, value: endValue })
           setCurveDragState(null)
         },
       })

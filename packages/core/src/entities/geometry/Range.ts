@@ -1,5 +1,12 @@
 import { isDevelopment } from "../../helpers/isDevelopment"
 
+/**
+ * A half-open interval `[start, end)`. `start <= end` must always hold:
+ * never pass a possibly-reversed tuple as a Range, even to a function that
+ * would normalize it. Use `Range.fromUnordered` to build one from two
+ * unordered values, and use explicit start/end points (not Ranges) when the
+ * direction matters.
+ */
 export type Range = readonly [number, number]
 
 export namespace Range {

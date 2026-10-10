@@ -1,4 +1,4 @@
-import { Range } from "@signal-app/core"
+import type { InterpolationPoint } from "@signal-app/core"
 import { Point } from "@signal-app/geometry"
 import { useCallback } from "react"
 import type { MouseDownHandler } from "../../../gesture/MouseGesture"
@@ -17,13 +17,8 @@ const useUpdateValueEvents = () => {
   const controlEditor = useControlEditor()
 
   return useCallback(
-    (valueRange: Range, tickRange: Range) =>
-      controlEditor.updateItemsInRange(
-        valueRange,
-        tickRange,
-        quantizeFloor,
-        quantizeUnit,
-      ),
+    (from: InterpolationPoint, to: InterpolationPoint) =>
+      controlEditor.updateItemsInRange(from, to, quantizeFloor, quantizeUnit),
     [controlEditor, quantizeFloor, quantizeUnit],
   )
 }
@@ -69,8 +64,8 @@ export const usePencilGesture = (): MouseDownHandler<
           const tick = transform.getTick(local.x)
 
           updateValueEvents(
-            Range.fromUnordered(lastValue, value),
-            Range.fromUnordered(lastTick, tick),
+            { tick: lastTick, value: lastValue },
+            { tick, value },
           )
 
           lastTick = tick

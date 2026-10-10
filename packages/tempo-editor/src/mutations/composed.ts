@@ -1,4 +1,4 @@
-import { closedRange, interpolate, type Range } from "@signal-app/core"
+import { closedRange, interpolate, Range } from "@signal-app/core"
 import { max, min } from "lodash"
 import type { TempoItem } from "../entities"
 import type { ClipboardData } from "../entities/clipboardTypes"
@@ -116,15 +116,18 @@ export const createOrUpdateItem = (
 ): TempoEditorMutator<void> =>
   createOrUpdateItems([{ tick: Math.max(0, Math.floor(tick)), bpm }])
 
+type TempoPoint = { tick: number; bpm: number }
+
 export const updateItemsInRange =
   (
-    valueRange: Range,
-    tickRange: Range,
+    from: TempoPoint,
+    to: TempoPoint,
     quantizeFloor: (tick: number) => number,
     quantizeUnit: number,
   ): TempoEditorMutator<void> =>
   (editor) => {
-    const [startTick, endTick] = tickRange
+    // `from` may be to the right of `to` (a right-to-left drag)
+    const [startTick, endTick] = Range.fromUnordered(from.tick, to.tick)
     const quantizedStartTick = quantizeFloor(Math.max(0, startTick))
     const quantizedEndTick = quantizeFloor(Math.max(0, endTick))
     const eventUpdateStartTick = Math.min(startTick, quantizedStartTick)
@@ -133,7 +136,7 @@ export const updateItemsInRange =
     const idsToRemove = editor
       .getItems()
       .flatMap((item) =>
-        item.tick === startTick ||
+        item.tick === from.tick ||
         item.tick < eventUpdateStartTick ||
         item.tick > eventUpdateEndTick
           ? []
@@ -145,12 +148,13 @@ export const updateItemsInRange =
       quantizedEndTick,
       quantizeUnit,
     )
-    createOrUpdateItems(
-      ticks.map((tick) => ({
-        tick,
-        bpm: interpolate(valueRange, tickRange)(tick),
-      })),
-    )(editor)
+    const getBpm = interpolate(
+      { tick: from.tick, value: from.bpm },
+      { tick: to.tick, value: to.bpm },
+    )
+    createOrUpdateItems(ticks.map((tick) => ({ tick, bpm: getBpm(tick) })))(
+      editor,
+    )
   }
 
 export const setBpm =

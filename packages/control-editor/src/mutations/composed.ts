@@ -1,4 +1,9 @@
-import { closedRange, interpolate, type Range } from "@signal-app/core"
+import {
+  closedRange,
+  type InterpolationPoint,
+  interpolate,
+  Range,
+} from "@signal-app/core"
 import { max, min } from "lodash"
 import type { ControlItem } from "../entities/ControlItem"
 import type { ClipboardData } from "../entities/clipboardTypes"
@@ -84,18 +89,19 @@ export const createOrUpdateItemValue =
 
 export const updateItemsInRangeWithEasing =
   (
-    valueRange: Range,
-    tickRange: Range,
+    from: InterpolationPoint,
+    to: InterpolationPoint,
     quantizeFloor: (tick: number) => number,
     quantizeUnit: number,
     easing: (t: number) => number,
   ): ControlEditorMutator<void> =>
   (editor) => {
-    const [startTick, endTick] = tickRange
+    // `from` may be to the right of `to` (a right-to-left drag)
+    const [startTick, endTick] = Range.fromUnordered(from.tick, to.tick)
     const quantizedStartTick = quantizeFloor(Math.max(0, startTick))
     const quantizedEndTick = quantizeFloor(Math.max(0, endTick))
 
-    const getValue = interpolate(valueRange, tickRange, easing)
+    const getValue = interpolate(from, to, easing)
 
     const updateStartTick = Math.min(startTick, quantizedStartTick)
     const updateEndTick = Math.max(endTick, quantizedEndTick)
@@ -104,7 +110,7 @@ export const updateItemsInRangeWithEasing =
       .getItems()
       .filter(
         (item) =>
-          item.tick !== startTick &&
+          item.tick !== from.tick &&
           item.tick >= updateStartTick &&
           item.tick <= updateEndTick,
       )
@@ -119,18 +125,12 @@ export const updateItemsInRangeWithEasing =
   }
 
 export const updateItemsInRange = (
-  valueRange: Range,
-  tickRange: Range,
+  from: InterpolationPoint,
+  to: InterpolationPoint,
   quantizeFloor: (tick: number) => number,
   quantizeUnit: number,
 ): ControlEditorMutator<void> =>
-  updateItemsInRangeWithEasing(
-    valueRange,
-    tickRange,
-    quantizeFloor,
-    quantizeUnit,
-    (t) => t,
-  )
+  updateItemsInRangeWithEasing(from, to, quantizeFloor, quantizeUnit, (t) => t)
 
 export const pasteItemsAtPosition =
   (data: ClipboardData, position: number): ControlEditorMutator<void> =>
