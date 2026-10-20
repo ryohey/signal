@@ -8,20 +8,15 @@ import {
   type TrackId,
   UNASSIGNED_TRACK_ID,
 } from "@signal-app/core"
+import { type Observable, ObservableValue } from "@signal-app/observable"
 import type { Player } from "@signal-app/player"
 
 export class MIDIRecorder {
   trackId: TrackId = UNASSIGNED_TRACK_ID
   private stopRecording: (() => void) | null = null
-  private isRecordingListeners = new Set<() => void>()
-  readonly onIsRecordingChanged = {
-    subscribe: (callback: () => void) => {
-      this.isRecordingListeners.add(callback)
-      return () => {
-        this.isRecordingListeners.delete(callback)
-      }
-    },
-  }
+  private readonly _isRecording = new ObservableValue(false)
+
+  readonly onIsRecordingChanged: Observable = this._isRecording.onChanged
 
   constructor(
     private readonly songStore: SongStore,
@@ -31,7 +26,7 @@ export class MIDIRecorder {
   ) {}
 
   get isRecording() {
-    return this.stopRecording !== null
+    return this._isRecording.value
   }
 
   start() {
@@ -143,18 +138,14 @@ export class MIDIRecorder {
           .map<Partial<TrackEvent>>((e) => ({ ...e, isRecording: false }))
         track.updateEvents(events)
       })
-      this.emitIsRecordingChanged()
     }
 
-    this.emitIsRecordingChanged()
+    this._isRecording.set(true)
   }
 
   stop() {
     this.stopRecording?.()
     this.stopRecording = null
-  }
-
-  private emitIsRecordingChanged() {
-    this.isRecordingListeners.forEach((callback) => callback())
+    this._isRecording.set(false)
   }
 }
