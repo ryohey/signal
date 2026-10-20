@@ -19,10 +19,10 @@ export class MIDIRecorder {
   readonly onIsRecordingChanged: Observable = this._isRecording.onChanged
 
   constructor(
-    private readonly songStore: SongStore,
-    private readonly player: Player,
-    private readonly midiDeviceStore: MIDIDeviceStore,
-    private readonly midiInput: MIDIInput,
+    private readonly songStore: Pick<SongStore, "song">,
+    private readonly player: Pick<Player, "position" | "onPositionChanged">,
+    private readonly midiDeviceStore: Pick<MIDIDeviceStore, "midiInputRouting">,
+    private readonly midiInput: Pick<MIDIInput, "on">,
   ) {}
 
   get isRecording() {

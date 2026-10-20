@@ -1,42 +1,66 @@
 import {
   isNoteEvent,
-  MIDIDeviceStore,
-  MIDIInput,
+  type MIDIInputEvent,
   SongStore,
+  type Track,
 } from "@signal-app/core"
 import { Emitter } from "@signal-app/observable"
-import type { Player } from "@signal-app/player"
 import { describe, expect, it } from "vitest"
 import { MIDIRecorder } from "./MIDIRecorder"
 
+type MIDIMessage = MIDIInputEvent["message"]
+
+const noteOn = (noteNumber: number, velocity: number, channel = 0) =>
+  ({
+    type: "channel",
+    subtype: "noteOn",
+    channel,
+    noteNumber,
+    velocity,
+    deltaTime: 0,
+  }) satisfies MIDIMessage
+
+const noteOff = (noteNumber: number, channel = 0) =>
+  ({
+    type: "channel",
+    subtype: "noteOff",
+    channel,
+    noteNumber,
+    velocity: 0,
+    deltaTime: 0,
+  }) satisfies MIDIMessage
+
 const createRecorder = () => {
   const songStore = new SongStore()
-  const onPositionChanged = new Emitter()
-  const player = { position: 0, onPositionChanged }
-  const midiDeviceStore = new MIDIDeviceStore()
-  const midiInput = new MIDIInput(midiDeviceStore)
+  const player = { position: 0, onPositionChanged: new Emitter() }
+  const midiDeviceStore = {
+    midiInputRouting: "selectedTrack" as "selectedTrack" | "channelRouting",
+  }
+  const midiMessages = new Emitter<MIDIInputEvent>()
+  const midiInput = {
+    on: (_event: "midiMessage", callback: (e: MIDIInputEvent) => void) =>
+      midiMessages.subscribe(callback),
+  }
   const recorder = new MIDIRecorder(
     songStore,
-    player as unknown as Player,
+    player,
     midiDeviceStore,
     midiInput,
   )
   const track = songStore.song.tracks[1]
   recorder.trackId = track.id
 
-  const send = (...data: number[]) =>
-    midiInput.onMidiMessage({ data: new Uint8Array(data) })
+  const send = (message: MIDIMessage) => midiMessages.emit({ message })
 
   const moveTo = (tick: number) => {
     player.position = tick
-    onPositionChanged.emit()
+    player.onPositionChanged.emit()
   }
 
-  return { recorder, track, send, moveTo }
+  return { recorder, songStore, midiDeviceStore, track, send, moveTo }
 }
 
-const notesOf = (track: ReturnType<typeof createRecorder>["track"]) =>
-  track.events.filter(isNoteEvent)
+const notesOf = (track: Track) => track.events.filter(isNoteEvent)
 
 describe("MIDIRecorder", () => {
   it("is not recording initially", () => {
@@ -74,9 +98,9 @@ describe("MIDIRecorder", () => {
 
     recorder.start()
     moveTo(100)
-    send(0x90, 60, 100)
+    send(noteOn(60, 100))
     moveTo(250)
-    send(0x80, 60, 0)
+    send(noteOff(60))
 
     const [note] = notesOf(track)
     expect(note).toMatchObject({
@@ -92,7 +116,7 @@ describe("MIDIRecorder", () => {
     const { recorder, track, send, moveTo } = createRecorder()
 
     recorder.start()
-    send(0x90, 60, 100)
+    send(noteOn(60, 100))
     moveTo(480)
 
     expect(notesOf(track)[0].duration).toBe(480)
@@ -102,7 +126,7 @@ describe("MIDIRecorder", () => {
     const { recorder, track, send } = createRecorder()
 
     recorder.start()
-    send(0x90, 60, 100)
+    send(noteOn(60, 100))
     recorder.stop()
 
     expect(notesOf(track)[0].isRecording).toBe(false)
@@ -113,8 +137,23 @@ describe("MIDIRecorder", () => {
 
     recorder.start()
     recorder.stop()
-    send(0x90, 60, 100)
+    send(noteOn(60, 100))
 
     expect(notesOf(track)).toHaveLength(0)
+  })
+
+  it("records into tracks matching the channel with channelRouting", () => {
+    const { recorder, songStore, midiDeviceStore, track, send } =
+      createRecorder()
+    songStore.song.addNewTrack()
+    const otherTrack = songStore.song.tracks[2]
+    otherTrack.channel = 1
+    midiDeviceStore.midiInputRouting = "channelRouting"
+
+    recorder.start()
+    send(noteOn(60, 100, 1))
+
+    expect(notesOf(track)).toHaveLength(0)
+    expect(notesOf(otherTrack)).toHaveLength(1)
   })
 })
