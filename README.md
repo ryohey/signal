@@ -33,6 +33,8 @@ By setting these constraints, signal aims to offer a streamlined and distraction
 
 ## Setup Instructions
 
+[![Launch on PicoRunner](https://picorunner.com/badges/launch.svg)](https://picorunner.com/launch/?repository=https%3A%2F%2Fgithub.com%2Fryohey%2Fsignal)
+
 ### Cloning the Repository
 
 1. Open your terminal.

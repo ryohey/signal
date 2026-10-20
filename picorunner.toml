@@ -1,0 +1,29 @@
+schema = 1
+name = "signal"
+
+[runtime]
+kind = "node"
+version = "24"
+package_manager = "pnpm"
+
+[[setup.steps]]
+kind = "dependencies"
+locked = true
+
+[[setup.steps]]
+run = ["pnpm", "run", "build"]
+
+[launch]
+command = ["pnpm", "exec", "vite", "preview", "--host", "{host}", "--port", "{port}", "--strictPort"]
+working_directory = "app"
+host = "127.0.0.1"
+port = 4173
+
+[health]
+type = "http"
+path = "/edit"
+timeout_seconds = 90
+
+[persistence]
+# Browser-managed state and user downloads are outside the repository.
+paths = []
