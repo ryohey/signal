@@ -4,6 +4,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "strict": true,
+    "rootDir": "src",
     "outDir": "lib",
     "typeRoots": ["./node_modules/@types"]
   },

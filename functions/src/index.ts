@@ -1,57 +1,74 @@
 import { Midi } from "@tonejs/midi"
-import axios from "axios"
 import * as admin from "firebase-admin"
 import { FieldValue } from "firebase-admin/firestore"
 import * as functions from "firebase-functions/v1"
 import { google } from "googleapis"
+import {
+  fetchExternalFile,
+  InvalidUrlError,
+  trimToDeclaredChunks,
+  validateExternalUrl,
+} from "./fetchExternalMidi"
 
 admin.initializeApp()
 
 export const storeMidiFile = functions.https.onCall(async (data) => {
-  const { midiFileUrl } = data
-
+  let midiFileUrl: string
   try {
-    // Check if the file already exists in Firestore
-    const midiCollection = admin.firestore().collection("midis")
-    const existingMidi = await midiCollection
-      .where("url", "==", midiFileUrl)
-      .limit(1)
-      .get()
-
-    if (!existingMidi.empty) {
-      return {
-        message: "This MIDI file is already stored.",
-        docId: existingMidi.docs[0].id,
-      }
-    }
-
-    // Download the MIDI file
-    const midiResponse = await axios.get(midiFileUrl, {
-      responseType: "arraybuffer",
-    })
-    const midiData = midiResponse.data
-
-    // Validate the MIDI file
-    const midi = new Midi(midiData)
-    if (!midi) {
-      throw new functions.https.HttpsError("internal", "Invalid MIDI file.")
-    }
-
-    // Save to Firestore
-    const docRef = await midiCollection.add({
-      url: midiFileUrl,
-      data: midiData,
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-    })
-    return { message: "MIDI file has been stored.", docId: docRef.id }
+    midiFileUrl = validateExternalUrl(data?.midiFileUrl).toString()
   } catch (error) {
-    console.error("An error occurred", error)
     throw new functions.https.HttpsError(
-      "internal",
-      "An error occurred while processing the MIDI file.",
+      "invalid-argument",
+      error instanceof InvalidUrlError ? error.message : "Invalid URL",
     )
   }
+
+  // Check if the file already exists in Firestore
+  const midiCollection = admin.firestore().collection("midis")
+  const existingMidi = await midiCollection
+    .where("url", "==", midiFileUrl)
+    .limit(1)
+    .get()
+
+  if (!existingMidi.empty) {
+    return {
+      message: "This MIDI file is already stored.",
+      docId: existingMidi.docs[0].id,
+    }
+  }
+
+  // Download the MIDI file
+  let downloaded: Buffer
+  try {
+    downloaded = await fetchExternalFile(new URL(midiFileUrl))
+  } catch (error) {
+    console.error("Failed to download the MIDI file", error)
+    throw new functions.https.HttpsError(
+      "internal",
+      "An error occurred while downloading the MIDI file.",
+    )
+  }
+
+  // Validate the MIDI file
+  let midiData: Buffer
+  try {
+    midiData = trimToDeclaredChunks(downloaded)
+    new Midi(midiData)
+  } catch {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Invalid MIDI file.",
+    )
+  }
+
+  // Save to Firestore
+  const docRef = await midiCollection.add({
+    url: midiFileUrl,
+    data: midiData,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+  return { message: "MIDI file has been stored.", docId: docRef.id }
 })
 
 export const disableApp = functions.pubsub
