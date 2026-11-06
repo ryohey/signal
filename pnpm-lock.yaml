@@ -202,11 +202,11 @@ catalogs:
       specifier: 6.1.3
       version: 6.1.3
     spessasynth_core:
-      specifier: 4.3.22
-      version: 4.3.22
+      specifier: 4.4.8
+      version: 4.4.8
     spessasynth_lib:
-      specifier: 4.3.3
-      version: 4.3.3
+      specifier: 4.4.6
+      version: 4.4.6
     turbo:
       specifier: 2.8.10
       version: 2.8.10
@@ -875,10 +875,10 @@ importers:
         version: 1.5.2
       spessasynth_core:
         specifier: 'catalog:'
-        version: 4.3.22
+        version: 4.4.8
       spessasynth_lib:
         specifier: 'catalog:'
-        version: 4.3.3
+        version: 4.4.6
     devDependencies:
       '@types/lodash':
         specifier: 'catalog:'
@@ -3172,6 +3172,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.19.0:
+    resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
@@ -3821,6 +3826,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   file-entry-cache@11.1.5:
     resolution: {integrity: sha512-+PFTHITI08JIGhnNpGNI8T8inUpgZfk3GNEqfT9R2zZV2iFXg3CvqzSl/uEhs7TSGujYRELEANyDvS8Fj7+S7Q==}
@@ -5131,12 +5139,11 @@ packages:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     deprecated: Please use @jridgewell/sourcemap-codec instead
 
-  spessasynth_core@4.3.22:
-    resolution: {integrity: sha512-qP6NkcZLmTLIs9fCUh2IhZRkd3Junwu8ppD4K0l/0R+Lo4P48d4Rbe8YQ8RlEYyRKFz8HcPM75sXYVQLAb7k4A==}
+  spessasynth_core@4.4.8:
+    resolution: {integrity: sha512-/QUW0JQtm5OEkD3gMKhqEd4hiTad7DqvUWnHM1aY8XzSpMEDGe7jsxg9U4tob6uNlFfL8Cp4PHbUHvLnucQ5Sg==}
 
-  spessasynth_lib@4.3.3:
-    resolution: {integrity: sha512-4fedp9m170b9U12rkZ2NPGqq0Vpkc9iWDxVOuhVuzyD3flBrPxGA9iTY0aOeYMM2pQ6S/EtH7elHnsfU8EsI9w==}
-    deprecated: Only the latest version of spessasynth_lib is supported.
+  spessasynth_lib@4.4.6:
+    resolution: {integrity: sha512-MzmMfh+HB6gGX9QRRRWDLkewMMA2xSyW6RgFvRlm5p6Oob2QjaLVDeIC7NdoNZi8NBM/4XqXwmxmWZUoxMr7Dg==}
 
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -5149,8 +5156,9 @@ packages:
     resolution: {integrity: sha512-72E9+uLc27Mt718pMHt9VMNiAL4LMsmDbBva8mxWUCkT07fSzEGMYUCk0XWY6lp0j6RBAG4cJ3mWuZv2OE3s0g==}
     engines: {node: '>=0.10.0'}
 
-  stb-vorbis@0.0.6:
-    resolution: {integrity: sha512-CyvjJEGROIdnuZknwFvdOfMIO1ssUxO2OawsXCR3IlbJ8z2IMBjDe8FDxFJqBfLgf1ZOdqvoHAYx3Xk8q9rbbg==}
+  stb-vorbis@0.0.7:
+    resolution: {integrity: sha512-OsD8Vm9EcStsiYGUBSqJ88gBPwDYR1Uv57bV/KZhu6Li1kzjm0fO+iiTkm79bZ1L2I/z6IrA1wkWHu3xQYY7Hw==}
+    engines: {node: '>=18'}
 
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
@@ -8062,12 +8070,15 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  acorn-jsx@5.3.2(acorn@8.18.0):
+  acorn-jsx@5.3.2(acorn@8.19.0):
     dependencies:
-      acorn: 8.18.0
+      acorn: 8.19.0
     optional: true
 
   acorn@8.18.0: {}
+
+  acorn@8.19.0:
+    optional: true
 
   agent-base@7.1.4: {}
 
@@ -8806,8 +8817,8 @@ snapshots:
 
   espree@11.2.0:
     dependencies:
-      acorn: 8.18.0
-      acorn-jsx: 5.3.2(acorn@8.18.0)
+      acorn: 8.19.0
+      acorn-jsx: 5.3.2(acorn@8.19.0)
       eslint-visitor-keys: 5.0.1
     optional: true
 
@@ -8898,6 +8909,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
       picomatch: 4.0.7
+
+  fflate@0.8.3: {}
 
   file-entry-cache@11.1.5:
     dependencies:
@@ -10326,13 +10339,14 @@ snapshots:
 
   sourcemap-codec@1.4.8: {}
 
-  spessasynth_core@4.3.22:
+  spessasynth_core@4.4.8:
     dependencies:
-      stb-vorbis: 0.0.6
+      fflate: 0.8.3
+      stb-vorbis: 0.0.7
 
-  spessasynth_lib@4.3.3:
+  spessasynth_lib@4.4.6:
     dependencies:
-      spessasynth_core: 4.3.22
+      spessasynth_core: 4.4.8
 
   split-string@3.1.0:
     dependencies:
@@ -10345,7 +10359,7 @@ snapshots:
       define-property: 0.2.5
       object-copy: 0.1.0
 
-  stb-vorbis@0.0.6: {}
+  stb-vorbis@0.0.7: {}
 
   std-env@4.2.0: {}
 

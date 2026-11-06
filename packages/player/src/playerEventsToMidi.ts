@@ -1,5 +1,6 @@
 import {
   MIDIBuilder,
+  type MIDIController,
   type MIDIMessageType,
   MIDIMessageTypes,
 } from "spessasynth_core"
@@ -20,7 +21,7 @@ function addEvent(midi: MIDIBuilder, track: number, e: PlayerEvent) {
           break
 
         case "controller":
-          midi.controllerChange(ticks, track, ch, e.controllerType, e.value)
+          midi.controllerChange(ticks, track, ch, e.controllerType as MIDIController, e.value)
           break
 
         case "programChange":
