@@ -202,11 +202,11 @@ catalogs:
       specifier: 6.1.3
       version: 6.1.3
     spessasynth_core:
-      specifier: 4.4.1
-      version: 4.4.1
+      specifier: 4.4.8
+      version: 4.4.8
     spessasynth_lib:
-      specifier: 4.4.0
-      version: 4.4.0
+      specifier: 4.4.6
+      version: 4.4.6
     turbo:
       specifier: 2.8.10
       version: 2.8.10
@@ -875,10 +875,10 @@ importers:
         version: 1.5.2
       spessasynth_core:
         specifier: 'catalog:'
-        version: 4.4.1
+        version: 4.4.8
       spessasynth_lib:
         specifier: 'catalog:'
-        version: 4.4.0
+        version: 4.4.6
     devDependencies:
       '@types/lodash':
         specifier: 'catalog:'
@@ -5139,11 +5139,11 @@ packages:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     deprecated: Please use @jridgewell/sourcemap-codec instead
 
-  spessasynth_core@4.4.1:
-    resolution: {integrity: sha512-GuJ8A7r5REKAE8U3nsR5c/E0V50Ns0wDB5fchp7iVeVDX6wHxASiKHuoNGMW2kLRT+7pY+JQbwxVPDMM55H7MQ==}
+  spessasynth_core@4.4.8:
+    resolution: {integrity: sha512-/QUW0JQtm5OEkD3gMKhqEd4hiTad7DqvUWnHM1aY8XzSpMEDGe7jsxg9U4tob6uNlFfL8Cp4PHbUHvLnucQ5Sg==}
 
-  spessasynth_lib@4.4.0:
-    resolution: {integrity: sha512-UNVtqupEyn9SIY+l9WOISlpdqXSjOWoy/uJFUlSLngNt2TDNwVutQnSo0KnAp5kdQJPf5/5diZqLF0huxWgbeQ==}
+  spessasynth_lib@4.4.6:
+    resolution: {integrity: sha512-MzmMfh+HB6gGX9QRRRWDLkewMMA2xSyW6RgFvRlm5p6Oob2QjaLVDeIC7NdoNZi8NBM/4XqXwmxmWZUoxMr7Dg==}
 
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -5156,8 +5156,9 @@ packages:
     resolution: {integrity: sha512-72E9+uLc27Mt718pMHt9VMNiAL4LMsmDbBva8mxWUCkT07fSzEGMYUCk0XWY6lp0j6RBAG4cJ3mWuZv2OE3s0g==}
     engines: {node: '>=0.10.0'}
 
-  stb-vorbis@0.0.6:
-    resolution: {integrity: sha512-CyvjJEGROIdnuZknwFvdOfMIO1ssUxO2OawsXCR3IlbJ8z2IMBjDe8FDxFJqBfLgf1ZOdqvoHAYx3Xk8q9rbbg==}
+  stb-vorbis@0.0.7:
+    resolution: {integrity: sha512-OsD8Vm9EcStsiYGUBSqJ88gBPwDYR1Uv57bV/KZhu6Li1kzjm0fO+iiTkm79bZ1L2I/z6IrA1wkWHu3xQYY7Hw==}
+    engines: {node: '>=18'}
 
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
@@ -10338,14 +10339,14 @@ snapshots:
 
   sourcemap-codec@1.4.8: {}
 
-  spessasynth_core@4.4.1:
+  spessasynth_core@4.4.8:
     dependencies:
       fflate: 0.8.3
-      stb-vorbis: 0.0.6
+      stb-vorbis: 0.0.7
 
-  spessasynth_lib@4.4.0:
+  spessasynth_lib@4.4.6:
     dependencies:
-      spessasynth_core: 4.4.1
+      spessasynth_core: 4.4.8
 
   split-string@3.1.0:
     dependencies:
@@ -10358,7 +10359,7 @@ snapshots:
       define-property: 0.2.5
       object-copy: 0.1.0
 
-  stb-vorbis@0.0.6: {}
+  stb-vorbis@0.0.7: {}
 
   std-env@4.2.0: {}
 
