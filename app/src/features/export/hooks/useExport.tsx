@@ -3,6 +3,7 @@ import { renderAudio } from "@signal-app/player"
 import { useDialog } from "dialog-hooks"
 import { atom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { downloadBlob } from "../../../helpers/Downloader"
+import { yieldToMain } from "../../../helpers/yieldToMain"
 import { useSong } from "../../../hooks/useSong"
 import { useStores } from "../../../hooks/useStores"
 import { useLocalization } from "../../../localize/useLocalization"
@@ -33,9 +34,6 @@ const isCanceledAtom = atom<boolean>(false)
 const cancelExportAtom = atom(null, (_get, set) => {
   set(isCanceledAtom, true)
 })
-
-const waitForAnimationFrame = () =>
-  new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
 const useExportSong = () => {
   const { synth } = useStores()
@@ -78,7 +76,7 @@ const useExportSong = () => {
         sampleRate,
         {
           cancel: () => store.get(isCanceledAtom),
-          waitForEventLoop: waitForAnimationFrame,
+          waitForEventLoop: yieldToMain,
           onProgress: (numFrames, totalFrames) =>
             setProgress(numFrames / totalFrames),
         },

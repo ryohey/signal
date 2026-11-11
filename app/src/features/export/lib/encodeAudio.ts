@@ -1,6 +1,9 @@
 import { Mp3Encoder } from "@breezystack/lamejs"
-import { max } from "lodash"
 import { encode } from "wav-encoder"
+import { yieldToMain } from "../../../helpers/yieldToMain"
+
+// Yield to the main thread after this much continuous work to avoid long tasks
+const YIELD_INTERVAL_MS = 50
 
 export const encodeMp3 = async (audioBuffer: AudioBuffer) => {
   const mp3Encoder = new Mp3Encoder(
@@ -19,10 +22,10 @@ export const encodeMp3 = async (audioBuffer: AudioBuffer) => {
   const r = new Int16Array(right.length)
 
   // Find the maximum amplitude to prevent clipping
-  const maxAmplitude = Math.max(
-    max(left.map((v) => Math.abs(v))) ?? 0,
-    max(right.map((v) => Math.abs(v))) ?? 0,
-  )
+  let maxAmplitude = 0
+  for (let i = 0; i < left.length; i++) {
+    maxAmplitude = Math.max(maxAmplitude, Math.abs(left[i]), Math.abs(right[i]))
+  }
 
   //Convert to required format
   for (let i = 0; i < left.length; i++) {
@@ -32,7 +35,14 @@ export const encodeMp3 = async (audioBuffer: AudioBuffer) => {
 
   const sampleBlockSize = 1152 //can be anything but make it a multiple of 576 to make encoders life easier
 
+  let lastYield = performance.now()
+
   for (let i = 0; i < l.length; i += sampleBlockSize) {
+    if (performance.now() - lastYield > YIELD_INTERVAL_MS) {
+      await yieldToMain()
+      lastYield = performance.now()
+    }
+
     const leftChunk = l.subarray(i, i + sampleBlockSize)
     const rightChunk = r.subarray(i, i + sampleBlockSize)
 
