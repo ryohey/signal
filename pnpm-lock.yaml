@@ -202,11 +202,11 @@ catalogs:
       specifier: 6.1.3
       version: 6.1.3
     spessasynth_core:
-      specifier: 4.4.11
-      version: 4.4.11
+      specifier: 4.4.12
+      version: 4.4.12
     spessasynth_lib:
-      specifier: 4.4.9
-      version: 4.4.9
+      specifier: 4.4.10
+      version: 4.4.10
     turbo:
       specifier: 2.8.10
       version: 2.8.10
@@ -875,10 +875,10 @@ importers:
         version: 1.5.2
       spessasynth_core:
         specifier: 'catalog:'
-        version: 4.4.11
+        version: 4.4.12
       spessasynth_lib:
         specifier: 'catalog:'
-        version: 4.4.9
+        version: 4.4.10
     devDependencies:
       '@types/lodash':
         specifier: 'catalog:'
@@ -5139,11 +5139,11 @@ packages:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     deprecated: Please use @jridgewell/sourcemap-codec instead
 
-  spessasynth_core@4.4.11:
-    resolution: {integrity: sha512-D2MdmTi755BFxHObgF18vJgxeHpE2nMRob5wzso6Qme2h+bvzrwcXmZ/MQjdjTvnuxd3SKy1WaHc4x3PvxVxeA==}
+  spessasynth_core@4.4.12:
+    resolution: {integrity: sha512-/22ca0JyT6nGe8lF4hdg0WoHlzkJyM+Yu6jWjuKxk/UcgQF2OCpbC4tZs1g5OTAjBcMeUmoKIFfYQ2wAokETew==}
 
-  spessasynth_lib@4.4.9:
-    resolution: {integrity: sha512-IcRcv/RcP0ar6fdwfaJ4G72VkIkMGYmc/ngcu273ZrDAPkP2X6cBcwnGftoAr3QugARGzNTXgIRv0f43nXRn1w==}
+  spessasynth_lib@4.4.10:
+    resolution: {integrity: sha512-/D6epXH1HMXWHN6MkENqNN8mFoVedygsvCnbeGn0WYzQbbqvbw3JFSS2e4o2opIkwAuQAzg2mcPh8TmYqGYxDA==}
 
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -10339,14 +10339,14 @@ snapshots:
 
   sourcemap-codec@1.4.8: {}
 
-  spessasynth_core@4.4.11:
+  spessasynth_core@4.4.12:
     dependencies:
       fflate: 0.8.3
       stb-vorbis: 0.0.7
 
-  spessasynth_lib@4.4.9:
+  spessasynth_lib@4.4.10:
     dependencies:
-      spessasynth_core: 4.4.11
+      spessasynth_core: 4.4.12
 
   split-string@3.1.0:
     dependencies:
