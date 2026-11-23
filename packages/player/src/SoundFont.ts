@@ -86,7 +86,7 @@ export class SoundFont {
   }
 
   static async load(data: ArrayBuffer) {
-    await BasicSoundBank.isSF3DecoderReady
+    await BasicSoundBank.ready
     const parsed = SoundBankLoader.fromArrayBuffer(data)
     return new SoundFont(data, parsed)
   }
