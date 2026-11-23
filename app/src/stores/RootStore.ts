@@ -11,6 +11,11 @@ import { AutoSaveService } from "../services/AutoSaveService"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
+import {
+  loadSampleRate,
+  loadSynthesizerParameters,
+  saveSampleRate,
+} from "../services/synthesizerSettings"
 import { registerReactions } from "./reactions"
 
 export default class RootStore {
@@ -25,10 +30,32 @@ export default class RootStore {
   readonly midiMonitor: MIDIMonitor
   readonly bluetoothMIDIDeviceStore: BluetoothMIDIDeviceStore
   readonly autoSaveService: AutoSaveService
+  // The rate picked in the settings, or null for the device rate. It only
+  // changes with a reload, since a running AudioContext can't change its rate.
+  private _sampleRate = loadSampleRate()
 
   constructor() {
-    const context = new (window.AudioContext || window.webkitAudioContext)()
+    let context: AudioContext
+    try {
+      context = createAudioContext(this._sampleRate)
+    } catch (e) {
+      const isUnsupported =
+        e instanceof DOMException && e.name === "NotSupportedError"
+      if (this._sampleRate === null || !isUnsupported) {
+        throw e
+      }
+      // A stored rate the browser doesn't support would otherwise break the whole app
+      console.warn(
+        `Unsupported sample rate ${this._sampleRate}, using default`,
+        e,
+      )
+      context = createAudioContext(null)
+      // Only forget the choice once the default rate actually works
+      this._sampleRate = null
+      saveSampleRate(null)
+    }
     this.synth = new SoundFontSynth(context)
+    this.synth.setSystemParameters(loadSynthesizerParameters())
     this.metronomeSynth = new SoundFontSynth(context)
     this.synthGroup = new GroupOutput(this.metronomeSynth)
     this.synthGroup.outputs.push({ synth: this.synth, isEnabled: true })
@@ -63,10 +90,21 @@ export default class RootStore {
     this.bluetoothMIDIDeviceStore.autoConnect()
   }
 
+  public get sampleRate() {
+    return this._sampleRate
+  }
+
   private async setupMetronomeSynth() {
     const data = await loadMetronomeSoundFontData()
     await this.metronomeSynth.loadSoundFont(await SoundFont.load(data))
   }
+}
+
+function createAudioContext(sampleRate: number | null) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext
+  return sampleRate === null
+    ? new AudioContextClass()
+    : new AudioContextClass({ sampleRate })
 }
 
 async function loadMetronomeSoundFontData() {

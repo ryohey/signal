@@ -3,8 +3,8 @@ import { Button } from "@signal-app/ui"
 import type { FC } from "react"
 import { Localized } from "../../../localize/useLocalization"
 
-export type SettingRoute = "general" | "midi" | "soundfont"
-const routes: SettingRoute[] = ["general", "midi", "soundfont"]
+export type SettingRoute = "general" | "midi" | "soundfont" | "synthesizer"
+const routes: SettingRoute[] = ["general", "midi", "soundfont", "synthesizer"]
 
 const RouteItem = styled(Button)`
   display: flex;
@@ -32,6 +32,8 @@ const RouteName: FC<{ route: SettingRoute }> = ({ route }) => {
       return <Localized name="midi" />
     case "soundfont":
       return <Localized name="soundfont" />
+    case "synthesizer":
+      return <Localized name="synthesizer" />
   }
 }
 

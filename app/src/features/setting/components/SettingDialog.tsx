@@ -11,6 +11,7 @@ import { useRootView } from "../../../hooks/useRootView"
 import { Localized } from "../../../localize/useLocalization"
 import { MIDIDeviceView } from "../../midi-device/components/MIDIDeviceView"
 import { SoundFontSettingsView } from "../../soundfont/components/SoundFontSettingView"
+import { SynthesizerSettingsView } from "../../synthesizer/components/SynthesizerSettingsView"
 import { GeneralSettingsView } from "./GeneralSettingsView"
 import { SettingNavigation, type SettingRoute } from "./SettingNavigation"
 
@@ -22,6 +23,8 @@ const RouteContent: FC<{ route: SettingRoute }> = ({ route }) => {
       return <MIDIDeviceView />
     case "soundfont":
       return <SoundFontSettingsView />
+    case "synthesizer":
+      return <SynthesizerSettingsView />
   }
 }
 const Content = styled.div`

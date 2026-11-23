@@ -1,7 +1,8 @@
-import { BasicMIDI } from "spessasynth_core"
+import { BasicMIDI, type GlobalSystemParameter } from "spessasynth_core"
 import { WorkletSynthesizer } from "spessasynth_lib"
 import type { PlayerEvent } from "./PlayerEvent.js"
 import { playerEventsToMIDI } from "./playerEventsToMidi.js"
+import { applySystemParameters } from "./systemParameters.js"
 
 export const renderAudio = async (
   soundFontData: ArrayBuffer,
@@ -12,6 +13,7 @@ export const renderAudio = async (
     cancel?: () => boolean
     waitForEventLoop?: () => Promise<void>
     onProgress?: (numFrames: number, totalFrames: number) => void
+    systemParameters?: Partial<GlobalSystemParameter>
   },
 ): Promise<AudioBuffer> => {
   await options.waitForEventLoop?.()
@@ -46,6 +48,17 @@ export const renderAudio = async (
     },
   })
   await synth.isReady
+  if (options.systemParameters !== undefined) {
+    // The lib says not to send anything before startOfflineRender, so the
+    // parameters go after it. getSnapshot is a round trip, which makes sure
+    // the processor has applied them before rendering starts. It can't hang
+    // here, startOfflineRender just waited for a reply on the same port.
+    // The offline render allocates voices as needed. Lowering the cap on top
+    // of that makes it skip new voices, so export would lose notes.
+    const { voiceCap: _voiceCap, ...parameters } = options.systemParameters
+    applySystemParameters(synth, parameters)
+    await synth.getSnapshot()
+  }
 
   const progressTimer = setInterval(async () => {
     if (options.cancel?.()) {

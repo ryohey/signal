@@ -21,9 +21,11 @@ Provides MIDI event scheduling and playback components for Signal.
 - `SoundFontSynth`
   - `SynthOutput` implementation backed by `WorkletSynthesizer`.
   - Handles channel events plus SysEx buffering and dispatch.
+  - `setSystemParameters` stores spessasynth global system parameters and applies them once the synth exists.
 - `renderAudio(...)`
   - Offline rendering pipeline using `OfflineAudioContext` and SpessaSynth worklet.
   - Reports progress and supports cancellation.
+  - Accepts optional `systemParameters` to render with the same settings as playback.
 - `SoundFont`
   - Loads/parses SF2/SF3 data and exposes drum-kit preset/sample metadata.
 

@@ -38,7 +38,8 @@ const waitForAnimationFrame = () =>
   new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
 
 const useExportSong = () => {
-  const { synth } = useStores()
+  const rootStore = useStores()
+  const { synth } = rootStore
   const { updateEndOfSong, getSong, timebase } = useSong()
   const localized = useLocalization()
   const dialog = useDialog()
@@ -64,7 +65,7 @@ const useExportSong = () => {
       return
     }
 
-    const sampleRate = 44100
+    const sampleRate = rootStore.sampleRate === null ? 44100 : synth.sampleRate
 
     setCanceled(false)
     setOpenDialog(true)
@@ -81,6 +82,10 @@ const useExportSong = () => {
           waitForEventLoop: waitForAnimationFrame,
           onProgress: (numFrames, totalFrames) =>
             setProgress(numFrames / totalFrames),
+          // The live values, a slider drag only saves when released.
+          // MP3 encoding normalizes to the peak, so master
+          // volume only changes the level of WAV exports.
+          systemParameters: synth.systemParameters,
         },
       )
 
