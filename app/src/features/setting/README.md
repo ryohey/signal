@@ -6,7 +6,7 @@ App settings.
 
 ## Entry Point
 
-`SettingDialog` is the settings modal. It shows `SettingNavigation` on the side and the selected page, such as general, MIDI device, or SoundFont settings.
+`SettingDialog` is the settings modal. It shows `SettingNavigation` on the side and the selected page, such as general, MIDI device, SoundFont, or synthesizer settings.
 
 ## Responsibilities
 

@@ -1,7 +1,8 @@
-import type { MIDIController } from "spessasynth_core"
+import type { GlobalSystemParameter, MIDIController } from "spessasynth_core"
 import { WorkletSynthesizer } from "spessasynth_lib"
 import type { SoundFont } from "./SoundFont.js"
 import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import { applySystemParameters } from "./systemParameters.js"
 
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null
@@ -17,6 +18,8 @@ export class SoundFontSynth implements SynthOutput {
 
   private setupPromise: Promise<void> | null = null
   private syxBuffer: number[] = []
+  // Kept here because the synth is only created with the first SoundFont
+  private _systemParameters: Partial<GlobalSystemParameter> = {}
 
   constructor(private readonly context: AudioContext) {}
 
@@ -36,6 +39,7 @@ export class SoundFontSynth implements SynthOutput {
     if (this.synth === null) {
       this.synth = new WorkletSynthesizer(this.context)
       this.synth.connect(this.context.destination)
+      applySystemParameters(this.synth, this._systemParameters)
     }
 
     await this.synth.soundBankManager.addSoundBank(
@@ -44,6 +48,21 @@ export class SoundFontSynth implements SynthOutput {
     )
     this._loadedSoundFont = soundFont
     await this.synth.isReady
+  }
+
+  public get systemParameters() {
+    return this._systemParameters
+  }
+
+  public get sampleRate() {
+    return this.context.sampleRate
+  }
+
+  public setSystemParameters(parameters: Partial<GlobalSystemParameter>) {
+    this._systemParameters = { ...this._systemParameters, ...parameters }
+    if (this.synth !== null) {
+      applySystemParameters(this.synth, parameters)
+    }
   }
 
   private handleSysExEvent(

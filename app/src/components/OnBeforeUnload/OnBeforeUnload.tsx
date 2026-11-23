@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { isRunningInElectron } from "../../helpers/platform"
+import { shouldSkipUnloadPrompt } from "../../helpers/reloadPage"
 import { useSong } from "../../hooks/useSong"
 import { useLocalization } from "../../localize/useLocalization"
 
@@ -10,6 +11,10 @@ export const OnBeforeUnload = () => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     const listener = (e: BeforeUnloadEvent) => {
+      // Checked first so the flag is always consumed
+      if (shouldSkipUnloadPrompt()) {
+        return
+      }
       if (!getSong().isSaved) {
         const message = localized["confirm-close"]
         if (isRunningInElectron()) {
