@@ -1,6 +1,7 @@
-import type { FC } from "react"
-import { Localized } from "../../../localize/useLocalization"
-import { categoryEmojis, getCategoryIndex } from "../../../midi/GM"
+import { type FC, useMemo } from "react";
+import { Localized } from "../../../localize/useLocalization";
+import { categoryEmojis, getCategoryIndex } from "../../../midi/GM";
+import { useLoadedSoundFont } from "../../soundfont/hooks/useSoundFont";
 
 const NormalInstrumentName: FC<{ programNumber: number | undefined }> = ({
   programNumber,
@@ -293,10 +294,26 @@ const RhythmInstrumentName: FC<{ programNumber: number | undefined }> = ({
   }
 }
 
+// Shows the name of the preset the loaded SoundFont plays for this patch.
+// The General MIDI names are only a fallback until a SoundFont is loaded.
 export const InstrumentName: FC<{
   isRhythmTrack: boolean
   programNumber: number
-}> = ({ isRhythmTrack, programNumber }) => {
+  bankMSB?: number
+  bankLSB?: number
+}> = ({ isRhythmTrack, programNumber, bankMSB = 0, bankLSB = 0 }) => {
+  const soundFont = useLoadedSoundFont()
+  const preset = useMemo(
+    () =>
+      soundFont?.selectPreset(
+        { programNumber, bankMSB, bankLSB },
+        isRhythmTrack,
+      ),
+    [soundFont, programNumber, bankMSB, bankLSB, isRhythmTrack],
+  )
+  if (preset !== undefined) {
+    return preset.name
+  }
   if (isRhythmTrack) {
     return <RhythmInstrumentName programNumber={programNumber} />
   }

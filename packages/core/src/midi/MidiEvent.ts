@@ -1,17 +1,18 @@
 import type {
-  ControllerEvent,
-  EndOfTrackEvent,
-  Event,
-  NoteOffEvent,
-  NoteOnEvent,
-  PitchBendEvent,
-  PortPrefixEvent,
-  ProgramChangeEvent,
-  SequencerSpecificEvent,
-  SetTempoEvent,
-  TimeSignatureEvent,
-  TrackNameEvent,
-} from "midifile-ts"
+    ControllerEvent,
+    EndOfTrackEvent,
+    Event,
+    NoteOffEvent,
+    NoteOnEvent,
+    PitchBendEvent,
+    PortPrefixEvent,
+    ProgramChangeEvent,
+    SequencerSpecificEvent,
+    SetTempoEvent,
+    TimeSignatureEvent,
+    TrackNameEvent
+} from "midifile-ts";
+import type { Patch } from "../entities/track/Patch";
 
 /* factory */
 
@@ -214,6 +215,20 @@ export function sequencerSpecificEvent(
     deltaTime,
     data,
   }
+}
+
+// Bank select followed by the program change that applies it. It always
+// includes the bank, because the synth may still hold another one.
+export function patchMidiEvents(
+  deltaTime: number,
+  channel: number,
+  patch: Patch,
+) {
+  return [
+    controllerMidiEvent(deltaTime, channel, 0, patch.bankMSB),
+    controllerMidiEvent(0, channel, 32, patch.bankLSB),
+    programChangeMidiEvent(0, channel, patch.programNumber),
+  ]
 }
 
 // Control Change

@@ -1,18 +1,23 @@
-import type { MIDIController } from "spessasynth_core"
-import { WorkletSynthesizer } from "spessasynth_lib"
-import type { SoundFont } from "./SoundFont.js"
-import type { SendableEvent, SynthOutput } from "./SynthOutput.js"
+import { ObservableValue } from "@signal-app/observable";
+import type { MIDIController } from "spessasynth_core";
+import { WorkletSynthesizer } from "spessasynth_lib";
+import type { SoundFont } from "./SoundFont.js";
+import type { SendableEvent, SynthOutput } from "./SynthOutput.js";
 
 export class SoundFontSynth implements SynthOutput {
   private synth: WorkletSynthesizer | null = null
 
-  private _loadedSoundFont: SoundFont | null = null
+  private readonly _loadedSoundFont = new ObservableValue<SoundFont | null>(
+    null,
+  )
+  public readonly onLoadedSoundFontChanged = this._loadedSoundFont.onChanged
+
   get loadedSoundFont(): SoundFont | null {
-    return this._loadedSoundFont
+    return this._loadedSoundFont.value
   }
 
   get isLoaded(): boolean {
-    return this._loadedSoundFont !== null
+    return this._loadedSoundFont.value !== null
   }
 
   private setupPromise: Promise<void> | null = null
@@ -42,7 +47,7 @@ export class SoundFontSynth implements SynthOutput {
       soundFont.data.slice(0),
       "main",
     )
-    this._loadedSoundFont = soundFont
+    this._loadedSoundFont.set(soundFont)
     await this.synth.isReady
   }
 

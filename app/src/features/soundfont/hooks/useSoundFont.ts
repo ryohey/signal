@@ -1,18 +1,13 @@
-import {
-  defaultSoundFontId,
-  type Metadata,
-  type SoundFontFile,
-  type SoundFontItem,
-} from "@signal-app/core"
-import { SoundFont } from "@signal-app/player"
-import { atom, useAtomValue } from "jotai"
-import { atomWithStorage, useAtomCallback } from "jotai/utils"
-import { focusAtom } from "jotai-optics"
-import { useCallback } from "react"
-import { basename } from "../../../helpers/path"
-import { isRunningInElectron } from "../../../helpers/platform"
-import { useStores } from "../../../hooks/useStores"
-import { soundFontRepository } from "../../../services/repositories"
+import { defaultSoundFontId, type Metadata, type SoundFontFile, type SoundFontItem } from "@signal-app/core";
+import { SoundFont } from "@signal-app/player";
+import { atom, useAtomValue } from "jotai";
+import { atomWithStorage, useAtomCallback } from "jotai/utils";
+import { focusAtom } from "jotai-optics";
+import { useCallback, useSyncExternalStore } from "react";
+import { basename } from "../../../helpers/path";
+import { isRunningInElectron } from "../../../helpers/platform";
+import { useStores } from "../../../hooks/useStores";
+import { soundFontRepository } from "../../../services/repositories";
 
 export function useSoundFont() {
   const { synth } = useStores()
@@ -130,6 +125,17 @@ export function useSoundFont() {
       ),
     ),
   }
+}
+
+/**
+ * The SoundFont the synth plays with, or null until the first one is loaded.
+ */
+export function useLoadedSoundFont() {
+  const { synth } = useStores()
+  return useSyncExternalStore(
+    synth.onLoadedSoundFontChanged.subscribe,
+    useCallback(() => synth.loadedSoundFont, [synth]),
+  )
 }
 
 async function loadSoundFont(soundfont: SoundFontItem) {

@@ -3,15 +3,12 @@ import {
   Emitter,
   type Observable,
   ObservableValue,
-  type Unsubscribe,
-} from "@signal-app/observable"
-import { flow } from "lodash"
-import type { TimeSignatureEvent } from "midifile-ts"
-import {
-  deserializeTickOrderedArray,
-  TickOrderedArray,
-} from "../../data/OrdererdArray/TickOrderedArray"
-import type { Branded } from "../../types"
+  type Unsubscribe
+} from "@signal-app/observable";
+import { flow } from "lodash";
+import type { TimeSignatureEvent } from "midifile-ts";
+import { deserializeTickOrderedArray, TickOrderedArray } from "../../data/OrdererdArray/TickOrderedArray";
+import type { Branded } from "../../types";
 import {
   getColorEvent,
   getMaxTick,
@@ -19,23 +16,16 @@ import {
   getProgramChangeEvent,
   getTempo,
   getTrackNameEvent,
-  getVolume,
-} from "../event"
-import {
-  isNoteEvent,
-  isTimeSignatureEvent,
-  isTrackNameEvent,
-} from "../event/identify"
-import {
-  isSignalTrackColorEvent,
-  type SignalTrackColorEvent,
-} from "../event/signalEvents"
-import type { TrackEvent, TrackEventOf } from "../event/TrackEvent"
-import type { TrackEventsMutator } from "./mutations"
-import * as Mutations from "./mutations"
-import type { TrackEventsQuery } from "./queries"
-import * as Queries from "./queries"
-import type { TrackEventStore } from "./TrackEventStore"
+  getVolume
+} from "../event";
+import { isNoteEvent, isTimeSignatureEvent, isTrackNameEvent } from "../event/identify";
+import { isSignalTrackColorEvent, type SignalTrackColorEvent } from "../event/signalEvents";
+import type { TrackEvent, TrackEventOf } from "../event/TrackEvent";
+import type { TrackEventsMutator } from "./mutations";
+import * as Mutations from "./mutations";
+import type { TrackEventsQuery } from "./queries";
+import * as Queries from "./queries";
+import type { TrackEventStore } from "./TrackEventStore";
 
 export type TrackId = Branded<number, "TrackId">
 export const UNASSIGNED_TRACK_ID = -1 as TrackId
@@ -274,6 +264,7 @@ export class Track implements TrackEventStore {
   )
   getProgramChangeEvent = (tick: number) =>
     getProgramChangeEvent(tick)(this.events)
+  public getPatch = this.bindQuery(Queries.getPatchAt)
   getVolume = (tick: number) => getVolume(tick)(this.events)
   getPan = (tick: number) => getPan(tick)(this.events)
 
@@ -291,9 +282,13 @@ export class Track implements TrackEventStore {
   createOrUpdate = this.bindMutation(Mutations.createOrUpdate)
   setColor = this.bindMutation(Mutations.setColor)
   setName = this.bindMutation(Mutations.setName)
-  setProgramNumberAt = this.bindMutation(Mutations.setProgramNumberAt)
-  insertProgramChangeAt = this.bindMutation(Mutations.insertProgramChangeAt)
-  setProgramNumberById = this.bindMutation(Mutations.setProgramNumberById)
+  public setPatchAt = this.bindMutation(Mutations.setPatchAt)
+  public insertPatchAt = this.bindMutation(Mutations.insertPatchAt)
+  public setPatchById = this.bindMutation(Mutations.setPatchById)
+  public getBankSelectIds = this.bindQuery(Queries.getBankSelectIds)
+  public dragProgramChange = this.bindMutation(Mutations.dragProgramChange)
+  public moveProgramChange = this.bindMutation(Mutations.moveProgramChange)
+  public removeProgramChange = this.bindMutation(Mutations.removeProgramChange)
   setPan = this.bindMutation(Mutations.setPan)
   setVolume = this.bindMutation(Mutations.setVolume)
   batchUpdateNotesVelocity = Mutations.batchUpdateNotesVelocity(this)

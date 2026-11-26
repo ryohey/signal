@@ -1,27 +1,23 @@
-import { programChangeMidiEvent, type TrackId } from "@signal-app/core"
-import { useCallback } from "react"
-import { useHistory } from "../../../hooks/useHistory"
-import { usePlayer } from "../../../hooks/usePlayer"
-import { useTrack } from "../../../hooks/useTrack"
+import { type Patch, patchMidiEvents, type TrackId } from "@signal-app/core";
+import { useCallback } from "react";
+import { useHistory } from "../../../hooks/useHistory";
+import { usePlayer } from "../../../hooks/usePlayer";
+import { useTrack } from "../../../hooks/useTrack";
 
 export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
   const { sendEvent, position } = usePlayer()
   const { pushHistory } = useHistory()
-  const {
-    channel,
-    setProgramNumberAt,
-    setProgramNumberById,
-    hasProgramChangeEventAfter,
-  } = useTrack(trackId)
+  const { channel, setPatchAt, setPatchById, hasProgramChangeEventAfter } =
+    useTrack(trackId)
 
   return useCallback(
-    (programNumber: number) => {
+    (patch: Patch) => {
       pushHistory()
 
       const targetEvent =
         eventId === undefined
-          ? setProgramNumberAt(position, programNumber)
-          : setProgramNumberById(eventId, programNumber)
+          ? setPatchAt(position, patch)
+          : setPatchById(eventId, patch)
 
       if (!targetEvent) {
         return
@@ -34,7 +30,7 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
         const hasOtherProgramChangeEvents =
           hasProgramChangeEventAfter(tick) ?? false
         if (!hasOtherProgramChangeEvents) {
-          sendEvent(programChangeMidiEvent(0, channel, programNumber))
+          patchMidiEvents(0, channel, patch).forEach((e) => sendEvent(e))
         }
       }
     },
@@ -44,8 +40,8 @@ export const useSetTrackInstrument = (trackId: TrackId, eventId?: number) => {
       sendEvent,
       position,
       eventId,
-      setProgramNumberAt,
-      setProgramNumberById,
+      setPatchAt,
+      setPatchById,
       hasProgramChangeEventAfter,
     ],
   )

@@ -1,23 +1,23 @@
-import { programChangeMidiEvent, type TrackId } from "@signal-app/core"
-import { useCallback } from "react"
-import { useHistory } from "../../../hooks/useHistory"
-import { usePlayer } from "../../../hooks/usePlayer"
-import { useTrack } from "../../../hooks/useTrack"
+import { type Patch, patchMidiEvents, type TrackId } from "@signal-app/core";
+import { useCallback } from "react";
+import { useHistory } from "../../../hooks/useHistory";
+import { usePlayer } from "../../../hooks/usePlayer";
+import { useTrack } from "../../../hooks/useTrack";
 
 export const useInsertTrackInstrument = (trackId: TrackId) => {
   const { sendEvent } = usePlayer()
   const { pushHistory } = useHistory()
-  const { channel, insertProgramChangeAt } = useTrack(trackId)
+  const { channel, insertPatchAt } = useTrack(trackId)
 
   return useCallback(
-    (programNumber: number, tick: number) => {
+    (patch: Patch, tick: number) => {
       if (channel === undefined) {
         return
       }
       pushHistory()
-      insertProgramChangeAt(tick, programNumber)
-      sendEvent(programChangeMidiEvent(0, channel, programNumber))
+      insertPatchAt(tick, patch)
+      patchMidiEvents(0, channel, patch).forEach((e) => sendEvent(e))
     },
-    [pushHistory, channel, sendEvent, insertProgramChangeAt],
+    [pushHistory, channel, sendEvent, insertPatchAt],
   )
 }

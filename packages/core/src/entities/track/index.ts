@@ -1,3 +1,4 @@
+export * from "./Patch"
 export * from "./Track"
 export * from "./TrackColor"
 export * from "./TrackEventStore"
