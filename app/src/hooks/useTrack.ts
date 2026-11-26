@@ -1,16 +1,54 @@
 import {
-  isProgramChangeEvent,
-  type TrackColor,
-  type TrackEvent,
-  type TrackId,
-} from "@signal-app/core"
-import { useCallback, useSyncExternalStore } from "react"
-import { TrackMute } from "../trackMute/TrackMute"
-import { usePlayer } from "./usePlayer"
-import { useSong } from "./useSong"
-import { useTrackMute } from "./useTrackMute"
+    isBankLSBEvent,
+    isBankMSBEvent,
+    isProgramChangeEvent,
+    type Patch,
+    type TrackColor,
+    type TrackEvent,
+    type TrackId
+} from "@signal-app/core";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { TrackMute } from "../trackMute/TrackMute";
+import { usePlayer } from "./usePlayer";
+import { useSong } from "./useSong";
+import { useTrackMute } from "./useTrackMute";
 
 const noop = () => () => {}
+
+/**
+ * The patch of the last program change at or before the tick.
+ */
+export function usePatchAt(id: TrackId, tick: number) {
+  const { getTrack } = useSong()
+  const track = getTrack(id)
+  // useSyncExternalStore compares snapshots by identity, so the patch is
+  // packed into one number (each value is 7 bits) instead of a new object.
+  const packed = useSyncExternalStore(
+    useCallback(
+      (listener: () => void) =>
+        track?.subscribeEventsChanged(
+          (e) =>
+            isProgramChangeEvent(e) || isBankMSBEvent(e) || isBankLSBEvent(e),
+          listener,
+        ) ?? noop,
+      [track],
+    ),
+    useCallback(() => {
+      const patch = track?.getPatch(tick)
+      return patch === undefined
+        ? 0
+        : patch.programNumber | (patch.bankMSB << 7) | (patch.bankLSB << 14)
+    }, [track, tick]),
+  )
+  return useMemo<Patch>(
+    () => ({
+      programNumber: packed & 0x7f,
+      bankMSB: (packed >> 7) & 0x7f,
+      bankLSB: (packed >> 14) & 0x7f,
+    }),
+    [packed],
+  )
+}
 
 export function useTrack(id: TrackId) {
   const { getTrack } = useSong()
@@ -41,6 +79,10 @@ export function useTrack(id: TrackId) {
         [position, track],
       )
       return useSyncExternalStore(subscribe, getSnapshot)
+    },
+    get patch() {
+      const { position } = usePlayer()
+      return usePatchAt(id, position)
     },
     get name() {
       return useSyncExternalStore(
@@ -108,21 +150,47 @@ export function useTrack(id: TrackId) {
       },
       [track],
     ),
-    setProgramNumberAt: useCallback(
-      (tick: number, programNumber: number) => {
-        return track?.setProgramNumberAt(tick, programNumber)
+    setPatchAt: useCallback(
+      (tick: number, patch: Patch) => {
+        return track?.setPatchAt(tick, patch)
       },
       [track],
     ),
-    insertProgramChangeAt: useCallback(
-      (tick: number, programNumber: number) => {
-        return track?.insertProgramChangeAt(tick, programNumber)
+    insertPatchAt: useCallback(
+      (tick: number, patch: Patch) => {
+        return track?.insertPatchAt(tick, patch)
       },
       [track],
     ),
-    setProgramNumberById: useCallback(
-      (eventId: number, programNumber: number) => {
-        return track?.setProgramNumberById(eventId, programNumber)
+    setPatchById: useCallback(
+      (eventId: number, patch: Patch) => {
+        return track?.setPatchById(eventId, patch)
+      },
+      [track],
+    ),
+    getBankSelectIds: useCallback(
+      (eventId: number) => track?.getBankSelectIds(eventId) ?? [],
+      [track],
+    ),
+    dragProgramChange: useCallback(
+      (eventId: number, bankSelectIds: readonly number[], tick: number) =>
+        track?.dragProgramChange(eventId, bankSelectIds, tick) ?? false,
+      [track],
+    ),
+    moveProgramChange: useCallback(
+      (
+        eventId: number,
+        bankSelectIds: readonly number[],
+        fromTick: number,
+        toTick: number,
+      ) => {
+        track?.moveProgramChange(eventId, bankSelectIds, fromTick, toTick)
+      },
+      [track],
+    ),
+    removeProgramChange: useCallback(
+      (eventId: number) => {
+        track?.removeProgramChange(eventId)
       },
       [track],
     ),

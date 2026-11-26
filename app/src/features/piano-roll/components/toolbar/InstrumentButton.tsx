@@ -1,19 +1,22 @@
-import { ToolbarButton } from "@signal-app/ui"
-import { type FC, useState } from "react"
-import { useTrack } from "../../../../hooks/useTrack"
-import { categoryEmojis, getCategoryIndex } from "../../../../midi/GM"
-import { InstrumentBrowser } from "../../../instrument-browser"
-import { InstrumentName } from "../../../track-list/components/InstrumentName"
-import { usePianoRoll } from "../../hooks/usePianoRoll"
+import { ToolbarButton } from "@signal-app/ui";
+import { type FC, useState } from "react";
+import { useTrack } from "../../../../hooks/useTrack";
+import { categoryEmojis, getCategoryIndex } from "../../../../midi/GM";
+import { InstrumentBrowser } from "../../../instrument-browser";
+import { InstrumentName } from "../../../track-list/components/InstrumentName";
+import { usePianoRoll } from "../../hooks/usePianoRoll";
 
 export const InstrumentButton: FC = () => {
   const { selectedTrackId } = usePianoRoll()
-  const { isRhythmTrack, programNumber } = useTrack(selectedTrackId)
+  const {
+    isRhythmTrack,
+    patch: { programNumber, bankMSB, bankLSB },
+  } = useTrack(selectedTrackId)
   const [isOpen, setOpen] = useState(false)
 
   const emoji = isRhythmTrack
     ? "🥁"
-    : categoryEmojis[getCategoryIndex(programNumber ?? 0)]
+    : categoryEmojis[getCategoryIndex(programNumber)]
 
   return (
     <>
@@ -27,6 +30,8 @@ export const InstrumentButton: FC = () => {
         <span>
           <InstrumentName
             programNumber={programNumber}
+            bankMSB={bankMSB}
+            bankLSB={bankLSB}
             isRhythmTrack={isRhythmTrack}
           />
         </span>

@@ -1,31 +1,25 @@
-import { keyframes } from "@emotion/react"
-import styled from "@emotion/styled"
-import { type TrackId, trackColorToCSSColor } from "@signal-app/core"
-import Headset from "mdi-react/HeadphonesIcon"
-import Layers from "mdi-react/LayersIcon"
-import VolumeUp from "mdi-react/VolumeHighIcon"
-import VolumeOff from "mdi-react/VolumeOffIcon"
-import React, {
-  type FC,
-  type MouseEventHandler,
-  useCallback,
-  useRef,
-  useState,
-} from "react"
-import { useSelectTrack } from "../../../actions"
-import { useContextMenu } from "../../../hooks/useContextMenu"
-import { useRouter } from "../../../hooks/useRouter"
-import { useToggleGhostTrack } from "../../../hooks/useToggleGhostTrack"
-import { useTrack } from "../../../hooks/useTrack"
-import { useTrackMute } from "../../../hooks/useTrackMute"
-import { InstrumentBrowser } from "../../instrument-browser"
-import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll"
-import { useMIDIActivity } from "../hooks/useMIDIActivity"
-import { useToggleAllGhostTracks } from "../hooks/useToggleAllGhostTracks"
-import { InstrumentEmoji, InstrumentName } from "./InstrumentName"
-import { TrackDialog } from "./TrackDialog"
-import { TrackListContextMenu } from "./TrackListContextMenu"
-import { TrackName } from "./TrackName"
+import { keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
+import { trackColorToCSSColor, type TrackId } from "@signal-app/core";
+import Headset from "mdi-react/HeadphonesIcon";
+import Layers from "mdi-react/LayersIcon";
+import VolumeUp from "mdi-react/VolumeHighIcon";
+import VolumeOff from "mdi-react/VolumeOffIcon";
+import React, { type FC, type MouseEventHandler, useCallback, useRef, useState } from "react";
+import { useSelectTrack } from "../../../actions";
+import { useContextMenu } from "../../../hooks/useContextMenu";
+import { useRouter } from "../../../hooks/useRouter";
+import { useToggleGhostTrack } from "../../../hooks/useToggleGhostTrack";
+import { useTrack } from "../../../hooks/useTrack";
+import { useTrackMute } from "../../../hooks/useTrackMute";
+import { InstrumentBrowser } from "../../instrument-browser";
+import { usePianoRoll } from "../../piano-roll/hooks/usePianoRoll";
+import { useMIDIActivity } from "../hooks/useMIDIActivity";
+import { useToggleAllGhostTracks } from "../hooks/useToggleAllGhostTracks";
+import { InstrumentEmoji, InstrumentName } from "./InstrumentName";
+import { TrackDialog } from "./TrackDialog";
+import { TrackListContextMenu } from "./TrackListContextMenu";
+import { TrackName } from "./TrackName";
 
 export type TrackListItemProps = {
   trackId: TrackId
@@ -182,7 +176,7 @@ const _TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
   const {
     channel,
     isConductorTrack,
-    programNumber,
+    patch: { programNumber, bankMSB, bankLSB },
     isRhythmTrack,
     color: trackColor,
     isMuted,
@@ -283,7 +277,7 @@ const _TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
           <IconInner data-selected={selected}>
             <InstrumentEmoji
               isRhythmTrack={isRhythmTrack}
-              programNumber={programNumber ?? 0}
+              programNumber={programNumber}
             />
           </IconInner>
         </Icon>
@@ -295,6 +289,8 @@ const _TrackListItem: FC<TrackListItemProps> = ({ trackId }) => {
             <Instrument>
               <InstrumentName
                 programNumber={programNumber}
+                bankMSB={bankMSB}
+                bankLSB={bankLSB}
                 isRhythmTrack={isRhythmTrack}
               />
             </Instrument>

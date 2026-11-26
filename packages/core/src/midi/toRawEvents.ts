@@ -1,13 +1,14 @@
-import flatten from "lodash/flatten"
-import type { AnyEvent } from "midifile-ts"
+import flatten from "lodash/flatten";
+import type { AnyEvent } from "midifile-ts";
 import {
-  type DeltaTimeProvider,
-  isSignalEvent,
-  mapFromSignalEvent,
-  type TickProvider,
-  type TrackEvent,
-} from "../entities"
-import { deassemble as deassembleNote } from "./noteAssembler"
+    type DeltaTimeProvider,
+    isSignalEvent,
+    mapFromSignalEvent,
+    sortForOutput,
+    type TickProvider,
+    type TrackEvent
+} from "../entities";
+import { deassemble as deassembleNote } from "./noteAssembler";
 
 // events in each tracks
 export function addDeltaTime<T extends TickProvider>(
@@ -37,7 +38,9 @@ const fromSignalEvent = (e: TrackEvent): TrackEvent => {
 }
 
 export function toRawEvents(events: readonly TrackEvent[]): AnyEvent[] {
-  const a = flatten(events.map(fromSignalEvent).map(deassembleNote))
+  const a = flatten(
+    sortForOutput(events).map(fromSignalEvent).map(deassembleNote),
+  )
   const c = addDeltaTime(a)
   return c as AnyEvent[]
 }

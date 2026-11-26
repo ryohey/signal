@@ -1,6 +1,6 @@
-import styled from "@emotion/styled"
-import type { CheckedState } from "@radix-ui/react-checkbox"
-import type { TrackEventOf, TrackId } from "@signal-app/core"
+import styled from "@emotion/styled";
+import type { CheckedState } from "@radix-ui/react-checkbox";
+import type { TrackEventOf, TrackId } from "@signal-app/core";
 import {
   Button,
   Checkbox,
@@ -11,31 +11,44 @@ import {
   DropdownButton,
   Label,
   PrimaryButton,
-  VisuallyHidden,
-} from "@signal-app/ui"
-import type { ProgramChangeEvent } from "midifile-ts"
-import React, { type FC, useCallback } from "react"
-import { Localized } from "../../../localize/useLocalization"
-import { InstrumentName } from "../../track-list/components/InstrumentName"
-import { useInstrumentBrowser } from "../hooks/useInstrumentBrowser"
-import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName"
-import { SelectBox } from "./SelectBox"
+  VisuallyHidden
+} from "@signal-app/ui";
+import type { ProgramChangeEvent } from "midifile-ts";
+import React, { type FC, useCallback } from "react";
+import { Localized } from "../../../localize/useLocalization";
+import { InstrumentName } from "../../track-list/components/InstrumentName";
+import { useInstrumentBrowser } from "../hooks/useInstrumentBrowser";
+import { DrumKitCategoryName, FancyCategoryName } from "./CategoryName";
+import { SelectBox } from "./SelectBox";
 
 const Finder = styled.div`
   display: flex;
 `
 
 const Left = styled.div`
-  width: 15rem;
+  width: 13rem;
   display: flex;
   flex-direction: column;
 `
 
 const Right = styled.div`
-  width: 21rem;
+  width: 16rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+`
+
+const Bank = styled.div`
+  width: 13rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`
+
+const BankNumber = styled.span`
+  display: inline-block;
+  min-width: 2rem;
+  color: var(--color-text-secondary);
 `
 
 const Footer = styled.div`
@@ -50,6 +63,8 @@ export interface InstrumentBrowserProps {
   showInsertButton?: boolean
 }
 
+const dialogStyle = { maxWidth: "calc(100vw - 2rem)" }
+
 const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
   isOpen,
   onOpenChange,
@@ -59,6 +74,8 @@ const _InstrumentBrowser: FC<InstrumentBrowserProps> = ({
     open={isOpen}
     onOpenChange={onOpenChange}
     aria-describedby={undefined}
+    // The bank lists make the dialog wider than the default max width
+    style={dialogStyle}
   >
     {isOpen && (
       <InstrumentBrowserContent
@@ -78,12 +95,18 @@ const InstrumentBrowserContent: FC<
   }
 > = ({ trackId, targetEvent, showInsertButton = false, onClose }) => {
   const {
-    programNumber,
+    patch,
     isRhythmTrack,
     selectedCategoryIndex,
-    categoryFirstProgramEvents,
+    categoryIndices,
     categoryInstruments,
+    bankMSBs,
+    bankLSBs,
+    choosePatch,
+    selectCategory,
     selectInstrument,
+    selectBankMSB,
+    selectBankLSB,
     changeRhythmTrack,
     applyInstrument,
     insertInstrumentAtCurrentPosition,
@@ -95,18 +118,53 @@ const InstrumentBrowserContent: FC<
     [changeRhythmTrack],
   )
 
-  const categoryOptions = categoryFirstProgramEvents.map((preset, i) => ({
+  const categoryOptions = categoryIndices.map((i) => ({
     value: i,
     label: isRhythmTrack ? (
       <DrumKitCategoryName />
     ) : (
-      <FancyCategoryName programNumber={preset} />
+      <FancyCategoryName programNumber={i * 8} />
     ),
   }))
 
   const instrumentOptions = categoryInstruments.map((p) => ({
     value: p,
-    label: <InstrumentName programNumber={p} isRhythmTrack={isRhythmTrack} />,
+    label: (
+      <InstrumentName
+        {...(p === patch.programNumber ? patch : choosePatch(p))}
+        isRhythmTrack={isRhythmTrack}
+      />
+    ),
+  }))
+
+  const bankMSBOptions = bankMSBs.map((bankMSB) => ({
+    value: bankMSB,
+    label: (
+      <>
+        <BankNumber>{bankMSB}</BankNumber>
+        <InstrumentName
+          {...(bankMSB === patch.bankMSB
+            ? patch
+            : choosePatch(patch.programNumber, bankMSB))}
+          isRhythmTrack={isRhythmTrack}
+        />
+      </>
+    ),
+  }))
+
+  const bankLSBOptions = bankLSBs.map((bankLSB) => ({
+    value: bankLSB,
+    label: (
+      <>
+        <BankNumber>{bankLSB}</BankNumber>
+        <InstrumentName
+          programNumber={patch.programNumber}
+          bankMSB={patch.bankMSB}
+          bankLSB={bankLSB}
+          isRhythmTrack={isRhythmTrack}
+        />
+      </>
+    ),
   }))
 
   const handleClickOK = useCallback(() => {
@@ -140,7 +198,7 @@ const InstrumentBrowserContent: FC<
             <SelectBox
               items={categoryOptions}
               selectedValue={selectedCategoryIndex}
-              onChange={(i) => selectInstrument(i * 8)} // Choose the first instrument of the category
+              onChange={selectCategory}
             />
           </Left>
           <Right>
@@ -149,10 +207,34 @@ const InstrumentBrowserContent: FC<
             </Label>
             <SelectBox
               items={instrumentOptions}
-              selectedValue={programNumber}
+              selectedValue={patch.programNumber}
               onChange={selectInstrument}
             />
           </Right>
+          {bankMSBOptions.length > 0 && (
+            <Bank>
+              <Label style={{ marginBottom: "0.5rem" }}>
+                <Localized name="bank-msb" />
+              </Label>
+              <SelectBox
+                items={bankMSBOptions}
+                selectedValue={patch.bankMSB}
+                onChange={selectBankMSB}
+              />
+            </Bank>
+          )}
+          {bankLSBOptions.length > 0 && (
+            <Bank>
+              <Label style={{ marginBottom: "0.5rem" }}>
+                <Localized name="bank-lsb" />
+              </Label>
+              <SelectBox
+                items={bankLSBOptions}
+                selectedValue={patch.bankLSB}
+                onChange={selectBankLSB}
+              />
+            </Bank>
+          )}
         </Finder>
         <Footer>
           <Checkbox

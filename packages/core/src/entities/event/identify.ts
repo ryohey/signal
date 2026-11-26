@@ -1,14 +1,14 @@
 import type {
-  ControllerEvent,
-  EndOfTrackEvent,
-  PitchBendEvent,
-  ProgramChangeEvent,
-  SequencerSpecificEvent,
-  SetTempoEvent,
-  TimeSignatureEvent,
-  TrackNameEvent,
-} from "midifile-ts"
-import type { NoteEvent, TrackEvent, TrackEventOf } from "./TrackEvent"
+    ControllerEvent,
+    EndOfTrackEvent,
+    PitchBendEvent,
+    ProgramChangeEvent,
+    SequencerSpecificEvent,
+    SetTempoEvent,
+    TimeSignatureEvent,
+    TrackNameEvent
+} from "midifile-ts";
+import type { NoteEvent, TrackEvent, TrackEventOf } from "./TrackEvent";
 
 export const isNoteEvent = (e: TrackEvent): e is NoteEvent =>
   "subtype" in e && e.subtype === "note"
@@ -57,6 +57,8 @@ export const isVolumeEvent = isControllerEventWithType(7)
 export const isPanEvent = isControllerEventWithType(10)
 export const isModulationEvent = isControllerEventWithType(1)
 export const isExpressionEvent = isControllerEventWithType(0x0b)
+export const isBankMSBEvent = isControllerEventWithType(0)
+export const isBankLSBEvent = isControllerEventWithType(32)
 
 export const isSequencerSpecificEvent = (
   e: TrackEvent,
