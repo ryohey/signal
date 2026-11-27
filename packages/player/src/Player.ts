@@ -196,9 +196,17 @@ export class Player {
     this.output.sendEvent(event, delayTime, timestampNow, trackId)
   }
 
+  // Show the tick being heard, not the end of the look-ahead window,
+  // so the playhead stays in sync with the sound.
   private syncPosition = throttle(() => {
     if (this.scheduler !== null) {
-      this._currentTick.set(this.scheduler.scheduledTick)
+      let tick = this.scheduler.currentTick
+      // Right after a loop jump, the end of the loop is still playing.
+      const loop = this.loop
+      if (loop?.enabled && tick < loop.begin) {
+        tick = loop.end - (loop.begin - tick)
+      }
+      this._currentTick.set(Math.max(0, Math.round(tick)))
     }
   }, 50)
 

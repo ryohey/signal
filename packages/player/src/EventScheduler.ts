@@ -77,6 +77,12 @@ export class EventScheduler<E extends SchedulableEvent> {
     return this._scheduledTick
   }
 
+  // The tick that is audible now. scheduledTick runs ahead of it by the
+  // look-ahead window, because events up to there are already queued.
+  get currentTick() {
+    return this._currentTick
+  }
+
   millisecToTick(ms: number, bpm: number) {
     return (((ms / 1000) * bpm) / 60) * this.timebase
   }

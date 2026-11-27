@@ -41,6 +41,30 @@ describe("EventScheduler", () => {
       expect(result[1].timestamp).toBe(120)
     }
   })
+
+  it("currentTick is the audible tick, scheduledTick is ahead by the look-ahead window", () => {
+    const s = new EventScheduler(
+      {
+        timebase: 480,
+        endOfSong: 999999,
+        getEvents: () => [],
+        getCurrentStateEvents: () => [],
+      },
+      () => [],
+      () => [],
+      0,
+      100,
+    )
+
+    // 120 BPM, timebase 480: 1 ms = 0.96 ticks, so 100 ms = 96 ticks
+    s.readNextEvents(120, 0)
+    expect(s.currentTick).toBe(0)
+    expect(s.scheduledTick).toBe(96)
+
+    s.readNextEvents(120, 500)
+    expect(s.currentTick).toBe(480)
+    expect(s.scheduledTick).toBe(576)
+  })
 })
 
 const filterEventsWithRange = <T extends { tick: number }>(
